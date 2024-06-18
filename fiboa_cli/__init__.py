@@ -15,6 +15,7 @@ from .validate import validate as validate_
 from .validate_schema import validate_schema as validate_schema_
 from .version import __version__, fiboa_version as fiboa_version_
 from .util import log, check_ext_schema_for_cli, valid_file_for_cli, valid_file_for_cli_with_ext, valid_files_folders_for_cli, valid_folder_for_cli
+from .publish import publish as publish_
 
 @click.group()
 @click.version_option(version=__version__)
@@ -427,6 +428,36 @@ def rename_extension(folder, title, slug, org = "fiboa", prefix = None):
         sys.exit(1)
 
 
+## Publish
+@click.command()
+@click.argument('dataset', nargs=1, type=click.Choice(list_all_converter_ids()))
+@click.argument('directory', nargs=1, type=click.Path(exists=False))
+@click.option(
+    '--cache', '-c',
+    type=click.Path(exists=False),
+    help='By default the CLI downloads the source data on every execution. Specify a local file path to avoid downloading the file again. If the file exists, reads from the path, otherwise stores the file there.',
+    default=None
+)
+@click.option(
+    '--source-coop-extension', '-e',
+    type=click.STRING,
+    help='(Future) source_coop extension, will be used as https://beta.source.coop/fiboa/xx-yy/',
+    default=None
+)
+def publish(dataset, directory, cache, source_coop_extension):
+    """
+    Publish a fiboa collection on
+    """
+    log(f"Trying to publish on source coop CLI {__version__}\n", "success")
+    try:
+        directory = os.path.abspath(directory)
+        publish_(dataset, directory, cache, source_coop_extension)
+        log(f"Dataset published from {directory}", "success")
+    except Exception as e:
+        log(e, "error")
+        sys.exit(1)
+
+
 cli.add_command(describe)
 cli.add_command(validate)
 cli.add_command(validate_schema)
@@ -436,6 +467,7 @@ cli.add_command(jsonschema)
 cli.add_command(convert)
 cli.add_command(converters)
 cli.add_command(rename_extension)
+cli.add_command(publish)
 
 if __name__ == '__main__':
     cli()
