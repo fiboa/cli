@@ -2,14 +2,13 @@ from ..convert_utils import convert as convert_
 
 SOURCES = "https://sla.niedersachsen.de/mapbender_sla/download/FB_NDS.zip"
 ID = "de_nds"
+SHORT_NAME = "Germany, Lower Saxony"
 TITLE = "Field boundaries for Lower Saxony, Germany"
 DESCRIPTION = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
 PROVIDER_NAME = "ML/SLA Niedersachsen"
 PROVIDER_URL = "https://sla.niedersachsen.de/landentwicklung/LEA/"
 ATTRIBUTION = "© ML/SLA Niedersachsen (2024), dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), Daten bearbeitet"
 LICENSE = "dl-de/by-2-0"
-# From http://osmtipps.lefty1963.de/2008/10/bundeslnder.html
-BBOX = [6.6545841239,51.2954150799,11.59769814,53.8941514415]
 EXTENSIONS = [
     "https://fiboa.github.io/flik-extension/v0.1.0/schema.yaml"
 ]
@@ -38,13 +37,14 @@ MISSING_SCHEMAS = {
     }
 }
 
-def convert(output_file, cache = None, source_coop_url = None, collection = False, compression = None):
+def convert(output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None):
     """
     Converts the Lower Saxony (Germany) field boundary datasets to fiboa.
     """
     convert_(
         output_file, cache,
-        SOURCES, COLUMNS, ID, TITLE, DESCRIPTION, BBOX,
+        SOURCES, COLUMNS, ID, TITLE, DESCRIPTION,
+        input_files=input_files,
         license=LICENSE,
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,

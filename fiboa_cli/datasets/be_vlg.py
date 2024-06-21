@@ -5,13 +5,13 @@ SOURCES = {
 }
 
 ID = "be_vlg"
+SHORT_NAME = "Belgium, Flanders"
 TITLE = "Crop field boundaries for Belgium - Flanders"
 DESCRIPTION = """
 Since 2020, the Department of Agriculture and Fisheries has been publishing a more extensive set of data related to agricultural use plots (from the 2008 campaign).
 
 From 2023, the downloadable dataset of agricultural use plots will also include the specialization given by the company (= company typology) and that is given to the plots of the company. Based on the typology, the companies are divided into 4 major specializations: arable farming, horticulture, livestock farming and mixed farms. The specialization of each company is calculated annually according to a European method and is based on the standard output of the various agricultural productions on the company. It is therefore an economic specialization and not a reflection of all agricultural production on the company.
 """
-BBOX = [2.531029700947351, 50.67422857041101, 5.932736829503416, 51.49545715218195]
 
 PROVIDER_NAME = "Agentschap Landbouw & Zeevisserij (Government)"
 PROVIDER_URL = "https://landbouwcijfers.vlaanderen.be/open-geodata-landbouwgebruikspercelen"
@@ -71,7 +71,7 @@ MISSING_SCHEMAS = {
 
 
 # Conversion function, usually no changes required
-def convert(output_file, cache = None, source_coop_url = None, collection = False, compression = None):
+def convert(output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None):
     convert_(
         output_file,
         cache,
@@ -80,7 +80,7 @@ def convert(output_file, cache = None, source_coop_url = None, collection = Fals
         ID,
         TITLE,
         DESCRIPTION,
-        BBOX,
+        input_files=input_files,
         provider_name=PROVIDER_NAME,
         provider_url=PROVIDER_URL,
         source_coop_url=source_coop_url,

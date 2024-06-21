@@ -4,7 +4,7 @@ from .util import log
 
 IGNORED_DATASET_FILES = ["__init__.py", "template.py"]
 
-def convert(dataset, output_file, cache = None, source_coop_url = None, collection = False, compression = None):
+def convert(dataset, output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None):
     if dataset in IGNORED_DATASET_FILES:
         raise Exception(f"'{dataset}' is not a converter")
     try:
@@ -12,13 +12,13 @@ def convert(dataset, output_file, cache = None, source_coop_url = None, collecti
     except ImportError as e:
         raise Exception(f"Converter for '{dataset}' not available or faulty: {e}")
 
-    if hasattr(converter, "DATA_ACCESS") and not cache:
+    if hasattr(converter, "DATA_ACCESS") and not cache and not input_files:
         log("Data access is restricted. You need to manually get the data from the source.", "warning")
         log("Instructions for data access:", "warning")
         log(converter.DATA_ACCESS.strip(), "info")
-        raise Exception("Provide the folder that contains the downloaded files through the `-c` parameter.")
+        raise Exception("Provide the file through the `-i` parameter.")
 
-    converter.convert(output_file, cache = cache, source_coop_url = source_coop_url, collection = collection, compression = compression)
+    converter.convert(output_file, input_files = input_files, cache = cache, source_coop_url = source_coop_url, collection = collection, compression = compression)
 
 def list_all_converter_ids():
     datasets = importlib.import_module(".datasets", package="fiboa_cli")
@@ -32,13 +32,10 @@ def list_all_converters(keys):
         try:
             converter = read_converter(id)
             for key in keys:
-                value = getattr(converter, key)
+                value = getattr(converter, key, None)
 
-                if key == "SOURCES":
-                    if isinstance(value, str):
-                        value = tuple([value])
-                    elif isinstance(value, dict):
-                        value = value.keys()
+                if key == "SOURCES" and isinstance(value, dict):
+                    value = ", ".join(list(value.keys()))
                 elif key == "LICENSE" and isinstance(value, dict):
                     value = value["href"]
 

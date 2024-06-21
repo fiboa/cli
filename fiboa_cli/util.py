@@ -193,17 +193,46 @@ def get_collection(data, collection_path = None, basepath = None):
     return None
 
 
+def parse_converter_input_files(ctx, param, value):
+    if value is None:
+        return None
+    elif not isinstance(value, tuple):
+        raise click.BadParameter('Input files must be a tuple')
+    elif len(value) == 0:
+         return None
+
+    sources = {}
+    for v in value:
+        if not "=" in v:
+            sources[v] = name_from_uri(v)
+        else:
+            uri, archive = v.split("=", 2)
+            files = archive.split(",")
+            sources[uri] = files
+
+    return sources
+
+
+def name_from_uri(url):
+    if "://" in url:
+        try:
+            url = urlparse(url).path
+        except:
+            pass
+    return os.path.basename(url)
+
+
 def check_ext_schema_for_cli(value, allow_none = False):
-    map = {}
+    map_ = {}
     for v in value:
         try:
             part = v.split(",", 2)
-            map[part[0]] = None if len(part) < 2 and allow_none else part[1]
+            map_[part[0]] = None if len(part) < 2 and allow_none else part[1]
         except IndexError:
             optionally = "optionally " if allow_none else ""
             raise click.BadParameter(f"Extension schema must be a URL and {optionally}a local file path separated by a comma character")
 
-    return map
+    return map_
 
 
 def merge_schemas(*schemas):

@@ -3,6 +3,7 @@ from ..convert_utils import convert as convert_
 SOURCES = "https://service.pdok.nl/rvo/referentiepercelen/atom/downloads/referentiepercelen.gpkg"
 
 ID = "nl"
+SHORT_NAME = "Netherlands"
 TITLE = "Field boundaries for The Netherlands"
 DESCRIPTION = """
 A field block (Dutch: "Referentieperceel"), formerly known as "AAN" (Agrarisch Areaal Nederland),
@@ -20,7 +21,6 @@ The following field block types exist:
 We filter on "Agricultural area" in this converter.
 For crop data, look at BasisRegistratie gewasPercelen (BRP)
 """
-BBOX = [2.35417303, 50.71447164, 7.5553525, 55.66948102]
 
 PROVIDER_NAME = "RVO / PDOK"
 PROVIDER_URL = "https://www.pdok.nl/introductie/-/article/referentiepercelen"
@@ -60,7 +60,7 @@ MISSING_SCHEMAS = {
 }
 
 
-def convert(output_file, cache = None, source_coop_url = None, collection = False, compression = None):
+def convert(output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None):
     convert_(
         output_file,
         cache,
@@ -69,7 +69,7 @@ def convert(output_file, cache = None, source_coop_url = None, collection = Fals
         ID,
         TITLE,
         DESCRIPTION,
-        BBOX,
+        input_files=input_files,
         provider_name=PROVIDER_NAME,
         provider_url=PROVIDER_URL,
         source_coop_url=source_coop_url,

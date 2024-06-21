@@ -4,13 +4,12 @@ SOURCES = {
   "https://data.geobasis-bb.de/geofachdaten/Landwirtschaft/dfbk.zip": ["DFBK_FB.shp"]
 }
 ID = "de_bb"
+SHORT_NAME = "Germany, Berlin/Brandenburg"
 TITLE = "Field boundaries for Berlin / Brandenburg, Germany"
 DESCRIPTION = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
 LICENSE = "dl-de/by-2-0"
 PROVIDER_NAME = "Land Brandenburg"
 PROVIDER_URL = "https://geobroker.geobasis-bb.de/gbss.php?MODE=GetProductInformation&PRODUCTID=9e95f21f-4ecf-4682-9a44-e5f7609f6fa0"
-# From http://osmtipps.lefty1963.de/2008/10/bundeslnder.html
-BBOX = [11.2681664447,51.3606627053,14.7647105012,53.5579500214]
 EXTENSIONS = [
     "https://fiboa.github.io/flik-extension/v0.1.0/schema.yaml"
 ]
@@ -46,19 +45,20 @@ MISSING_SCHEMAS = {
         'kreis_nr': {
             'type': 'uint16'
         },
-        'tk10_blatt': {
+        'tk10': {
             'type': 'string'
         }
     }
 }
 
-def convert(output_file, cache = None, source_coop_url = None, collection = False, compression = None):
+def convert(output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None):
     """
     Converts the Berlin/Brandenburg (Germany) field boundary datasets to fiboa.
     """
     convert_(
         output_file, cache,
-        SOURCES, COLUMNS, ID, TITLE, DESCRIPTION, BBOX,
+        SOURCES, COLUMNS, ID, TITLE, DESCRIPTION,
+        input_files=input_files,
         license=LICENSE,
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,

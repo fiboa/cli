@@ -4,6 +4,7 @@ SOURCES = {
     "https://inspire.lfrz.gv.at/009501/ds/inspire_referenzen_2021_polygon.gpkg.zip": ["INSPIRE_REFERENZEN_2021_POLYGON.gpkg"]
 }
 ID = "at"
+SHORT_NAME = "Austria"
 TITLE = "Field boundaries for Austria"
 DESCRIPTION = """**Field boundaries for Austria - INVEKOS Referenzen Österreich 2021.**
 
@@ -13,7 +14,6 @@ Reference parcel: is the physical block that can be clearly delimited from the o
 PROVIDER_NAME = "Agrarmarkt Austria"
 PROVIDER_URL = "https://geometadatensuche.inspire.gv.at/metadatensuche/inspire/api/records/9db8a0c3-e92a-4df4-9d55-8210e326a7ed"
 LICENSE = "CC-BY-4.0"
-BBOX = [9.527906274165764, 46.41230158735734, 17.15786908837973, 49.021160570100974]
 COLUMNS = {
     'geometry': 'geometry',
     'RFL_ID': 'id',
@@ -43,13 +43,14 @@ MISSING_SCHEMAS = {
     }
 }
 
-def convert(output_file, cache = None, source_coop_url = None, collection = False, compression = None):
+def convert(output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None):
     """
     Converts the Austrian field boundary datasets to fiboa.
     """
     convert_(
         output_file, cache, SOURCES,
-        COLUMNS, ID, TITLE, DESCRIPTION, BBOX,
+        COLUMNS, ID, TITLE, DESCRIPTION,
+        input_files=input_files,
         license=LICENSE,
         extensions = EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,

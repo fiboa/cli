@@ -6,13 +6,13 @@ SOURCES = {
     ]
 }
 ID = "fr"
+SHORT_NAME = "France"
 TITLE = "Registre Parcellaire Graphique; Crop Fields France"
 DESCRIPTION = """
 France has published Crop Field data for many years. Crop fields are declared by farmers within the Common Agricultural Policy (CAP) subsidy scheme.
 
 The anonymized version is distributed as part of the public service for making reference data available contains graphic data for plots (basic land unit for farmers' declaration) with their main crop. This data has been produced by the Services and Payment Agency (ASP) since 2007.
 """
-BBOX = [-6.047022416643922, -3.916364769838749, 68.89050422648864, 51.075100624023094]
 
 PROVIDER_NAME = "Anstitut National de l'Information Géographique et Forestière"
 PROVIDER_URL = "https://www.data.gouv.fr/en/datasets/registre-parcellaire-graphique-rpg-contours-des-parcelles-et-ilots-culturaux-et-leur-groupe-de-cultures-majoritaire/"
@@ -47,7 +47,7 @@ MISSING_SCHEMAS = {
 }
 
 
-def convert(output_file, cache = None, source_coop_url = None, collection = False, compression = None):
+def convert(output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None):
     convert_(
         output_file,
         cache,
@@ -56,7 +56,7 @@ def convert(output_file, cache = None, source_coop_url = None, collection = Fals
         ID,
         TITLE,
         DESCRIPTION,
-        BBOX,
+        input_files=input_files,
         provider_name=PROVIDER_NAME,
         provider_url=PROVIDER_URL,
         source_coop_url=source_coop_url,

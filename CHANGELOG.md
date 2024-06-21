@@ -9,11 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- ...
+- Added a `SHORT_NAME` variable to the converter template
+- Added a `FILE_MIGRATION` variable to the converter template for per-file migrations
+- Added `-i` parameter to specify input files for converters
 
 ### Changed
 
-- ...
+- The `BBOX` is optional in the converter template as it will be computed automatically from the data.
+- `fiboa converters` is more readable by default
+- `fiboa converters` output can be customized with options `-p`, `-s` and `-v`.
 
 ### Deprecated
 
@@ -25,7 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-- ...
+- Fixed schema issue for the `tk10` column in `de_bb` converter
 
 ## [v0.5.0] - 2024-06-17
 

@@ -5,6 +5,7 @@ import pandas as pd
 SOURCES = "https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/downloads/brpgewaspercelen_concept_2023.gpkg"
 
 ID = "nl_crop"
+SHORT_NAME = "Netherlands (Crops)"
 TITLE = "BRP Crop Field Boundaries for The Netherlands (CAP-based)"
 DESCRIPTION = """
 "BasisRegistratiePercelen" (BRP) combines the location of
@@ -19,7 +20,6 @@ A view service and a download service are available for the most recent BRP crop
 
 Data is currently available for the years 2009 to 2023.
 """
-BBOX = [2.35417303, 50.71447164, 7.5553525, 55.66948102]
 
 PROVIDER_NAME = "RVO / PDOK"
 PROVIDER_URL = "https://www.pdok.nl/introductie/-/article/basisregistratie-gewaspercelen-brp-"
@@ -73,7 +73,7 @@ MISSING_SCHEMAS = {
 }
 
 
-def convert(output_file, cache = None, source_coop_url = None, collection = False, compression = None):
+def convert(output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None):
     convert_(
         output_file,
         cache,
@@ -82,7 +82,7 @@ def convert(output_file, cache = None, source_coop_url = None, collection = Fals
         ID,
         TITLE,
         DESCRIPTION,
-        BBOX,
+        input_files=input_files,
         provider_name=PROVIDER_NAME,
         provider_url=PROVIDER_URL,
         source_coop_url=source_coop_url,

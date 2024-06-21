@@ -25,12 +25,12 @@ SOURCES = "https://fiboa.example/file.xyz"
 
 # Unique identifier for the collection
 ID = "abc"
+# Geonames for the data (e.g. Country, Region, Source, Year)
+SHORT_NAME = "Country, Region, etc."
 # Title of the collection
-TITLE = "Field boundaries for ABC"
+TITLE = "Field boundaries for Country, Region, etc."
 # Description of the collection. Can be multiline and include CommonMark.
 DESCRIPTION = """Describe the dataset here."""
-# Bounding box of the data in WGS84 coordinates
-BBOX = [7.8685145620,53.3590675115,11.3132037822,55.0573747014]
 
 # Provider name, can be None if not applicable, must be provided if PROVIDER_URL is provided
 PROVIDER_NAME = "ABC Corp."
@@ -76,11 +76,20 @@ COLUMN_FILTERS = {
     "land_cover_type": lambda col: (col.isin(["agrictulture"]), True)
 }
 
-# Custom function to migrate the GeoDataFrame if the other options are not sufficient
+# Custom function to migrate the full GeoDataFrame if the other options are not sufficient
 # This should be the last resort!
 # Function signature:
 #   func(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame
 MIGRATION = None
+
+# Custom function to execute actions on the the GeoDataFrame that are loaded from individual file.
+# This is useful if the data is split into multiple files and columns should be added or changed
+# on a per-file basis for example.
+# The path contains the local path to the file that was read.
+# The uri contains the URL that was read.
+# Function signature:
+#   func(gdf: gpd.GeoDataFrame, path: string, uri: string) -> gpd.GeoDataFrame
+FILE_MIGRATION = None
 
 # Schemas for the fields that are not defined in fiboa
 # Keys must be the values from the COLUMNS dict, not the keys
@@ -95,12 +104,12 @@ MISSING_SCHEMAS = {
 
 
 # Conversion function, usually no changes required
-def convert(output_file, cache = None, source_coop_url = None, collection = False, compression = None):
+def convert(output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None):
     """
     Converts the field boundary datasets to fiboa.
 
     For reference, this is the order in which the conversion steps are applied:
-    0. Read GeoDataFrame from file
+    0. Read GeoDataFrame from file(s) and run the FILE_MIGRATION function if provided
     1. Run global migration (if provided through MIGRATION)
     2. Run filters to remove rows that shall not be in the final data
        (if provided through COLUMN_FILTERS)
@@ -131,7 +140,7 @@ def convert(output_file, cache = None, source_coop_url = None, collection = Fals
         ID,
         TITLE,
         DESCRIPTION,
-        BBOX,
+        input_files=input_files,
         provider_name=PROVIDER_NAME,
         provider_url=PROVIDER_URL,
         source_coop_url=source_coop_url,
@@ -141,6 +150,7 @@ def convert(output_file, cache = None, source_coop_url = None, collection = Fals
         column_migrations=COLUMN_MIGRATIONS,
         column_filters=COLUMN_FILTERS,
         migration=MIGRATION,
+        file_migration=FILE_MIGRATION,
         attribution=ATTRIBUTION,
         store_collection=collection,
         license=LICENSE,

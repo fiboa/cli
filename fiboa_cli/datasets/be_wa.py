@@ -1,15 +1,15 @@
 from ..convert_utils import convert as convert_
 import pandas as pd
 
-SOURCES = {
-    "be_wa.zip": ["SIGEC_PARC_AGRI_ANON__2022.gpkg"]
-}
+SOURCES = None
 DATA_ACCESS = """
 To download the data, create an account at <https://geoportail.wallonie.be/>. Go to the dataset at <https://geoportail.wallonie.be/catalogue/49294570-2a8d-49ca-995c-1b0890672bc8.html>. Select 'Accès' and add the data to your downloads (click 'AJOUTER À MES TÉLÉCHARGEMENTS'). Then finish the download through 'finalisez votre demande de téléchargement' at <https://geoportail.wallonie.be/geodata-donwload.html> and select the required data format and projection. Choose 'OGC GeoPackage (.gpkg)' in 'Belge 1972 / Belgian Lambert 72'.
-Select 'Region Wallone' at 'DÉCOUPAGE' for the full dataset. Select 'Je souhaite une license' to acquire a license. Indicate whether it's Professional or Personal ('particulier') use and choose an end-date of the license. You will receive an e-mail with the license and another e-mail with a link to the data. Store the downloaded file as 'be_wa.zip'.
+Select 'Region Wallone' at 'DÉCOUPAGE' for the full dataset. Select 'Je souhaite une license' to acquire a license. Indicate whether it's Professional or Personal ('particulier') use and choose an end-date of the license. You will receive an e-mail with the license and another e-mail with a link to the data.
+Either extract the ZIP file and point to the GeoPackage file or use the `-i` command to extract and pick the `SIGEC_PARC_AGRI_ANON__2022.gpkg` from the ZIP file (e.g. `-i SIGEC_PARC_AGRI_ANON__2022_GEOPACKAGE_31370.zip=SIGEC_PARC_AGRI_ANON__2022.gpkg`)
 """
 
 ID = "be_wa"
+SHORT_NAME = "Belgium, Wallonia"
 TITLE = "Belgium Wallonia: Parcellaire Agricole Anonyme"
 DESCRIPTION = """
 The Crop Fields (PAA) covers land use in agricultural and forestry areas managed as part of the implementation of the Common Agricultural Policy by the Paying Agency of Wallonia.
@@ -18,7 +18,6 @@ The PAA represents the public version of the agricultural plot. It therefore doe
 
 You can download the data yourself, but the license does not allow public distribution. You can obtain a personal/company license for free, or freely use a WMS service for visualization.
 """
-BBOX = [2.840195234589047, 49.48469172050167, 6.4282309142607055, 50.80877425797556]
 
 PROVIDER_NAME = "Service public de Wallonie (SPW)"
 PROVIDER_URL = "https://geoportail.wallonie.be/catalogue/49294570-2a8d-49ca-995c-1b0890672bc8.html"
@@ -59,7 +58,7 @@ MISSING_SCHEMAS = {
     }
 }
 
-def convert(output_file, cache = None, source_coop_url = None, collection = False, compression = None):
+def convert(output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None):
     convert_(
         output_file,
         cache,
@@ -68,7 +67,7 @@ def convert(output_file, cache = None, source_coop_url = None, collection = Fals
         ID,
         TITLE,
         DESCRIPTION,
-        BBOX,
+        input_files=input_files,
         provider_name=PROVIDER_NAME,
         provider_url=PROVIDER_URL,
         source_coop_url=source_coop_url,
