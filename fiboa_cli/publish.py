@@ -15,9 +15,20 @@ def exc(cmd):
     assert os.system(cmd) == 0
 
 
+def check_command(cmd, name=None):
+    if os.system(f"{cmd} --version") != 0:
+        log(f"Missing command {cmd}. Please install {name or cmd}", "error")
+        sys.exit(1)
+
+
 def publish(dataset, directory, cache, source_coop_extension):
     """
     Implement https://github.com/fiboa/data/blob/main/HOWTO.md#each-time-you-update-the-dataset
+
+    You need GDAL 3.8 or later (for ogr2ogr), tippecanoe, and AWS CLI
+    - https://gdal.org/
+    - https://github.com/felt/tippecanoe
+    - https://aws.amazon.com/cli/
     """
     assert dataset in list_all_converter_ids()
     os.makedirs(directory, exist_ok=True)
@@ -85,13 +96,20 @@ def publish(dataset, directory, cache, source_coop_extension):
     pm_file = os.path.join(directory, f"{file_name}.pmtiles")
     if not os.path.exists(pm_file):
         log(f"ogr2ogr geo.json", "info")
+        check_command("ogr2ogr", name="GDAL")
         exc(f"ogr2ogr -t_srs EPSG:4326 geo.json {parquet_file}")
 
         log(f"Running tippecanoe", "info")
+        check_command("tippecanoe")
         exc(f"tippecanoe -zg --projection=EPSG:4326 -o {pm_file} -l {dataset} geo.json --drop-densest-as-needed")
 
         os.remove("geo.json")
 
     log(f"Uploading to aws", "info")
-    log(f"Get your credentials at {source_coop_url}download/ (press ACCESS DATA and GENERATE CREDENTIALS", "info")
+    log(f"Get your credentials at {source_coop_url}download/", "info")
+    log(f"  (press ACCESS DATA, GENERATE CREDENTIALS, copy-paste the exports in the terminal and re-run this command)", "info")
+    if not os.environ.get("AWS_SESSION_TOKEN"):
+        log("Please set AWS_ env vars from source_coop", "error")
+        sys.exit(1)
+    check_command("aws")
     exc(f"aws s3 sync {directory} s3://us-west-2.opendata.source.coop/fiboa/{source_coop_extension}/")
