@@ -6,14 +6,17 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pandas as pd
 import re
+import referencing
 
 from urllib.parse import urlparse
 from fsspec import AbstractFileSystem
 from fsspec.implementations.http import HTTPFileSystem
 from fsspec.implementations.local import LocalFileSystem
+from jsonschema.validators import Draft202012Validator
 from pyarrow import NativeFile
 from pyarrow.fs import FSSpecHandler, PyFileSystem
 from typing import Union
+from urllib.request import Request, urlopen
 
 from .const import LOG_STATUS_COLOR, SUPPORTED_PROTOCOLS, STAC_COLLECTION_SCHEMA, GEOPARQUET_SCHEMA
 from .geopandas import decode_metadata, arrow_to_geopandas
@@ -295,3 +298,20 @@ def log_extensions(collection, logger):
         logger("fiboa extensions:")
         for extension in extensions:
             logger(f"  - {extension}")
+
+
+def create_validator(schema):
+    return Draft202012Validator(
+        schema,
+        format_checker = Draft202012Validator.FORMAT_CHECKER,
+        registry = referencing.Registry(retrieve = retrieve_remote_schema)
+    )
+
+
+def retrieve_remote_schema(uri: str):
+    request = Request(uri)
+    with urlopen(request) as response:
+        return referencing.Resource.from_contents(
+            json.load(response),
+            default_specification=referencing.jsonschema.DRAFT202012,
+        )

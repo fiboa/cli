@@ -13,5 +13,5 @@ __pycache__/
 /.pytest_cache/
 
 # Example files
-*.parquet
+/*.parquet
 /tests/data-files/convert/*/extracted.*/

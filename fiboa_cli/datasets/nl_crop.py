@@ -21,8 +21,13 @@ A view service and a download service are available for the most recent BRP crop
 Data is currently available for the years 2009 to 2023.
 """
 
-PROVIDER_NAME = "RVO / PDOK"
-PROVIDER_URL = "https://www.pdok.nl/introductie/-/article/basisregistratie-gewaspercelen-brp-"
+PROVIDERS = [
+    {
+        "name": "RVO / PDOK",
+        "url": "https://www.pdok.nl/introductie/-/article/basisregistratie-gewaspercelen-brp-",
+        "roles": ["producer", "licensor"]
+    }
+]
 ATTRIBUTION = None
 # Both http://creativecommons.org/publicdomain/zero/1.0/deed.nl and http://creativecommons.org/publicdomain/mark/1.0/
 LICENSE = "CC0-1.0"
@@ -50,7 +55,6 @@ def migrate(gdf):
     gdf['area'] = gdf.area / 10000
     # Add 15th of may to original "year" (jaar) column
     gdf['determination_datetime'] = pd.to_datetime(gdf['jaar'], format='%Y') + pd.DateOffset(months=4, days=14)
-    # index attribute is available through pyogrio
     gdf['id'] = gdf.index
     return gdf
 
@@ -83,8 +87,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         TITLE,
         DESCRIPTION,
         input_files=input_files,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         source_coop_url=source_coop_url,
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,

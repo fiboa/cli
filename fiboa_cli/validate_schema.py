@@ -1,5 +1,4 @@
-from jsonschema.validators import Draft202012Validator
-from .util import log as log_, load_file
+from .util import log as log_, load_file, create_validator
 
 def log(text: str, status="info"):
     # Indent logs
@@ -33,6 +32,6 @@ def validate_schema(file, config):
         return True
 
 def validate_json_schema(obj, schema):
-    validator = Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+    validator = create_validator(schema)
     errors = sorted(validator.iter_errors(obj), key=lambda e: e.path)
     return errors

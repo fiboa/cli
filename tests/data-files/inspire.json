@@ -1,0 +1,54 @@
+{
+  "fiboa": {
+    "fiboa_version": "0.2.0",
+    "fiboa_extensions": [
+      "https://fiboa.github.io/inspire-extension/v0.2.0/schema.yaml"
+    ]
+  },
+  "type": "Feature",
+  "id": "6467974",
+  "bbox": [
+    172.91173669923782,
+    1.3438851951615003,
+    172.95469614953714,
+    1.3690476620161975
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          172.91173669923782,
+          1.3438851951615003
+        ],
+        [
+          172.95469614953714,
+          1.3438851951615003
+        ],
+        [
+          172.95469614953714,
+          1.3690476620161975
+        ],
+        [
+          172.91173669923782,
+          1.3690476620161975
+        ],
+        [
+          172.91173669923782,
+          1.3438851951615003
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "determination_datetime": "2020-01-01T00:00:00Z",
+    "inspire:id": "https://geodaten.nrw.de/id/inspire-lc-dgl/landcoverunit/6467974"
+  },
+  "links": [
+    {
+      "rel": "collection",
+      "href": "collection.json",
+      "type": "application/json"
+    }
+  ]
+}

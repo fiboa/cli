@@ -23,8 +23,13 @@ Landscape elements (LE) are considered part of the eligible agricultural area un
 
 To produce the DGK-Lw, (official) orthophotos from the Thuringian Land Registry and Surveying Administration (TLBG) and orthophotos from the TLLLR's own aerial surveys are interpreted. The origin of this image data is 50% of the state area each year, so that up-to-date image data is available for the entire Thuringian state area every year."""
 
-PROVIDER_NAME = "Thüringer Landesamt für Landwirtschaft und Ländlichen Raum"
-PROVIDER_URL = "https://geomis.geoportal-th.de/geonetwork/srv/ger/catalog.search#/metadata/D872F2D6-60BC-11D6-B67D-00E0290F5BA0"
+PROVIDERS = [
+    {
+        "name": "Thüringer Landesamt für Landwirtschaft und Ländlichen Raum",
+        "url": "https://geomis.geoportal-th.de/geonetwork/srv/ger/catalog.search#/metadata/D872F2D6-60BC-11D6-B67D-00E0290F5BA0",
+        "roles": ["producer", "licensor"]
+    }
+]
 ATTRIBUTION = "© GDI-Th"
 LICENSE = "dl-de/by-2-0"
 
@@ -130,8 +135,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         DESCRIPTION,
         input_files=input_files,
         migration=MIGRATION,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         source_coop_url=source_coop_url,
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,

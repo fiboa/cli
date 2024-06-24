@@ -13,8 +13,13 @@ Since 2020, the Department of Agriculture and Fisheries has been publishing a mo
 From 2023, the downloadable dataset of agricultural use plots will also include the specialization given by the company (= company typology) and that is given to the plots of the company. Based on the typology, the companies are divided into 4 major specializations: arable farming, horticulture, livestock farming and mixed farms. The specialization of each company is calculated annually according to a European method and is based on the standard output of the various agricultural productions on the company. It is therefore an economic specialization and not a reflection of all agricultural production on the company.
 """
 
-PROVIDER_NAME = "Agentschap Landbouw & Zeevisserij (Government)"
-PROVIDER_URL = "https://landbouwcijfers.vlaanderen.be/open-geodata-landbouwgebruikspercelen"
+PROVIDERS = [
+    {
+        "name": "Agentschap Landbouw & Zeevisserij (Government)",
+        "url": "https://landbouwcijfers.vlaanderen.be/open-geodata-landbouwgebruikspercelen",
+        "roles": ["producer", "licensor"]
+    }
+]
 
 """
 The following publication urls use license https://data.vlaanderen.be/id/licentie/modellicentie-gratis-hergebruik/v1.0
@@ -81,8 +86,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         TITLE,
         DESCRIPTION,
         input_files=input_files,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         source_coop_url=source_coop_url,
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,

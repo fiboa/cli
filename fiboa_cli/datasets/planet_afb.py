@@ -7,7 +7,7 @@ import re
 SOURCES = None
 
 DATA_ACCESS = """
-Data must be obtained from the Planet subscriptions API, see 
+Data must be obtained from the Planet subscriptions API, see
 https://developers.planet.com/docs/planetary-variables/field-boundaries/ for additional information.
 The output should look something like FIELD_BOUNDARIES_v1.0.0_S2_P1M-20230101T000000Z_fb.gpkg
 """
@@ -21,8 +21,13 @@ works on a monthly basis and is available for the entire globe. The data is prov
 For more information see the [field boundaries technical specification](https://planet.widen.net/s/5vq8w5wjvf/2403.08_mar-9444-field-boundaries-technical-specification-sheet-3)
 """
 
-PROVIDER_NAME = "Planet Labs, PBC"
-PROVIDER_URL = "https://planet.com"
+PROVIDERS = [
+    {
+        "name": "Planet Labs, PBC",
+        "url": "https://planet.com",
+        "roles": ["producer", "licensor"]
+    }
+]
 ATTRIBUTION = "© 2024 Planet Labs, PBC"
 
 LICENSE = {
@@ -48,7 +53,7 @@ ADD_COLUMNS = {
 
 EXTENSIONS = []
 
-def FILE_MIGRATION(gdf, path, uri):
+def FILE_MIGRATION(gdf, path, uri, layer = None):
     # The file name contains the date, so we can use that to add a
     # date column to the dataset.
     # Assumed filename:
@@ -86,8 +91,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         TITLE,
         DESCRIPTION,
         input_files=input_files,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         source_coop_url=source_coop_url,
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,

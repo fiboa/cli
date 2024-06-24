@@ -5,8 +5,13 @@ ID = "de_nds"
 SHORT_NAME = "Germany, Lower Saxony"
 TITLE = "Field boundaries for Lower Saxony, Germany"
 DESCRIPTION = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
-PROVIDER_NAME = "ML/SLA Niedersachsen"
-PROVIDER_URL = "https://sla.niedersachsen.de/landentwicklung/LEA/"
+PROVIDERS = [
+    {
+        "name": "ML/SLA Niedersachsen",
+        "url": "https://sla.niedersachsen.de/landentwicklung/LEA/",
+        "roles": ["producer", "licensor"]
+    }
+]
 ATTRIBUTION = "© ML/SLA Niedersachsen (2024), dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), Daten bearbeitet"
 LICENSE = "dl-de/by-2-0"
 EXTENSIONS = [
@@ -50,8 +55,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         missing_schemas=MISSING_SCHEMAS,
         attribution=ATTRIBUTION,
         source_coop_url=source_coop_url,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         store_collection=collection,
         compression=compression,
     )

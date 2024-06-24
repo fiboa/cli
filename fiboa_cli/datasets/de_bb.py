@@ -8,8 +8,13 @@ SHORT_NAME = "Germany, Berlin/Brandenburg"
 TITLE = "Field boundaries for Berlin / Brandenburg, Germany"
 DESCRIPTION = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
 LICENSE = "dl-de/by-2-0"
-PROVIDER_NAME = "Land Brandenburg"
-PROVIDER_URL = "https://geobroker.geobasis-bb.de/gbss.php?MODE=GetProductInformation&PRODUCTID=9e95f21f-4ecf-4682-9a44-e5f7609f6fa0"
+PROVIDERS = [
+    {
+        "name": "Land Brandenburg",
+        "url": "https://geobroker.geobasis-bb.de/gbss.php?MODE=GetProductInformation&PRODUCTID=9e95f21f-4ecf-4682-9a44-e5f7609f6fa0",
+        "roles": ["producer", "licensor"]
+    }
+]
 EXTENSIONS = [
     "https://fiboa.github.io/flik-extension/v0.1.0/schema.yaml"
 ]
@@ -63,8 +68,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
         source_coop_url=source_coop_url,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         store_collection=collection,
         layer = "DFBK_FB",
         compression=compression,

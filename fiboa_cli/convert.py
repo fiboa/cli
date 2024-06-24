@@ -38,6 +38,8 @@ def list_all_converters(keys):
                     value = ", ".join(list(value.keys()))
                 elif key == "LICENSE" and isinstance(value, dict):
                     value = value["href"]
+                elif key == "PROVIDERS" and isinstance(value, list):
+                    value = ", ".join(list(map(lambda x: x["name"], value)))
 
                 obj[key] = value
 

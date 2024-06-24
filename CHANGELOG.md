@@ -11,13 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Added a `SHORT_NAME` variable to the converter template
 - Added a `FILE_MIGRATION` variable to the converter template for per-file migrations
+- Added a `LAYER_FILTER` variable to the converter template for loading specific layers from a file
 - Added `-i` parameter to specify input files for converters
+- Further tests
 
 ### Changed
 
 - The `BBOX` is optional in the converter template as it will be computed automatically from the data.
+- The `PROVIDER_NAME` and `PROVIDER_URL` variables in the converter template were replaced by `PROVIDERS`
 - `fiboa converters` is more readable by default
 - `fiboa converters` output can be customized with options `-p`, `-s` and `-v`.
+- Upgraded to geopandas 1.0.0rc.1, which migrates from fiona to pyogrio for data loading
 
 ### Deprecated
 
@@ -30,6 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 
 - Fixed schema issue for the `tk10` column in `de_bb` converter
+- jsonschema library doesn't warn against external references any longer
 
 ## [v0.5.0] - 2024-06-17
 

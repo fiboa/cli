@@ -23,6 +23,12 @@ SOURCES = "https://fiboa.example/file.xyz"
 #   "https://fiboa.example/north_america.zip": ["us.gpkg", "canaga.gpkg"]
 # }
 
+# A filter function for the layer in the file(s) to read.
+# Set to None if the file contains only one layer or all layers should be read.
+# Function signature:
+#   func(layer: str, path: str) -> bool
+LAYER_FILTER = None
+
 # Unique identifier for the collection
 ID = "abc"
 # Geonames for the data (e.g. Country, Region, Source, Year)
@@ -32,11 +38,20 @@ TITLE = "Field boundaries for Country, Region, etc."
 # Description of the collection. Can be multiline and include CommonMark.
 DESCRIPTION = """Describe the dataset here."""
 
-# Provider name, can be None if not applicable, must be provided if PROVIDER_URL is provided
-PROVIDER_NAME = "ABC Corp."
-# URL to the homepage of the data or the provider, can be None if not applicable
-PROVIDER_URL = "https://abc.example"
-# Attribution, can be None if not applicable
+# A list of providers that contributed to the data.
+# This should be an array of Provider Objects:
+# https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object
+PROVIDERS = [
+    {
+        "name": "ABC Corp",
+        "url": "https://abc.example",
+        "roles": ["producer", "licensor"]
+    }
+]
+
+# Attribution (e.g. copyright or citation statement as requested by provider).
+# The attribution is usually shown on the map, in the lower right corner.
+# Can be None if not applicable
 ATTRIBUTION = "© 2024 ABC Corp."
 
 # License of the data, either
@@ -54,7 +69,6 @@ COLUMNS = {
 # Add columns with constant values.
 # The key is the column name, the value is a constant value that's used for all rows.
 ADD_COLUMNS = {
-    "determination_datetime": "2020-01-01T00:00:00Z"
 }
 
 # A list of implemented extension identifiers
@@ -82,13 +96,14 @@ COLUMN_FILTERS = {
 #   func(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame
 MIGRATION = None
 
-# Custom function to execute actions on the the GeoDataFrame that are loaded from individual file.
-# This is useful if the data is split into multiple files and columns should be added or changed
-# on a per-file basis for example.
+# Custom function to execute actions on the the GeoDataFrame that are loaded from individual file or layers.
+# This is useful if the data is split into multiple files/layers and columns should be added or changed
+# on a per-file/layer basis for example.
 # The path contains the local path to the file that was read.
 # The uri contains the URL that was read.
+# The layer may contain the layer name.
 # Function signature:
-#   func(gdf: gpd.GeoDataFrame, path: string, uri: string) -> gpd.GeoDataFrame
+#   func(gdf: gpd.GeoDataFrame, path: str, uri: str, layer: str = None) -> gpd.GeoDataFrame
 FILE_MIGRATION = None
 
 # Schemas for the fields that are not defined in fiboa
@@ -109,7 +124,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
     Converts the field boundary datasets to fiboa.
 
     For reference, this is the order in which the conversion steps are applied:
-    0. Read GeoDataFrame from file(s) and run the FILE_MIGRATION function if provided
+    0. Read GeoDataFrame from file(s) / layer(s) and run the FILE_MIGRATION function if provided
     1. Run global migration (if provided through MIGRATION)
     2. Run filters to remove rows that shall not be in the final data
        (if provided through COLUMN_FILTERS)
@@ -141,14 +156,14 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         TITLE,
         DESCRIPTION,
         input_files=input_files,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         source_coop_url=source_coop_url,
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
         column_additions=ADD_COLUMNS,
         column_migrations=COLUMN_MIGRATIONS,
         column_filters=COLUMN_FILTERS,
+        layer_filter=LAYER_FILTER,
         migration=MIGRATION,
         file_migration=FILE_MIGRATION,
         attribution=ATTRIBUTION,

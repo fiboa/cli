@@ -23,8 +23,13 @@ In the data you'll find this as additional attributes:
 - `EC_hcat_c`: The 10-digit HCAT code indicating the hierarchy of the crop
 """
 
-PROVIDER_NAME = "EuroCrops"
-PROVIDER_URL = "https://github.com/maja601/EuroCrops/wiki/France"
+PROVIDERS = [
+    {
+        "name": "EuroCrops",
+        "url": "https://github.com/maja601/EuroCrops/wiki/France",
+        "roles": ["producer", "licensor"]
+    }
+]
 ATTRIBUTION = "Institut National de l'Information Géographique et Forestière"
 
 LICENSE = "CC-BY-4.0"
@@ -76,8 +81,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         TITLE,
         DESCRIPTION,
         input_files=input_files,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         source_coop_url=source_coop_url,
         missing_schemas=MISSING_SCHEMAS,
         column_additions=ADD_COLUMNS,

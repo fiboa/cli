@@ -14,8 +14,13 @@ France has published Crop Field data for many years. Crop fields are declared by
 The anonymized version is distributed as part of the public service for making reference data available contains graphic data for plots (basic land unit for farmers' declaration) with their main crop. This data has been produced by the Services and Payment Agency (ASP) since 2007.
 """
 
-PROVIDER_NAME = "Anstitut National de l'Information Géographique et Forestière"
-PROVIDER_URL = "https://www.data.gouv.fr/en/datasets/registre-parcellaire-graphique-rpg-contours-des-parcelles-et-ilots-culturaux-et-leur-groupe-de-cultures-majoritaire/"
+PROVIDERS = [
+    {
+        "name": "Anstitut National de l'Information Géographique et Forestière",
+        "url": "https://www.data.gouv.fr/en/datasets/registre-parcellaire-graphique-rpg-contours-des-parcelles-et-ilots-culturaux-et-leur-groupe-de-cultures-majoritaire/",
+        "roles": ["producer", "licensor"]
+    }
+]
 # Attribution example as described in the open license
 ATTRIBUTION = "IGN — Original data downloaded from https://geoservices.ign.fr/rpg, updated on June 14 2024"
 LICENSE = {"title": "Licence Ouverte / Open Licence", "href": "https://etalab.gouv.fr/licence-ouverte-open-licence", "type": "text/html", "rel": "license"}
@@ -57,8 +62,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         TITLE,
         DESCRIPTION,
         input_files=input_files,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         source_coop_url=source_coop_url,
         missing_schemas=MISSING_SCHEMAS,
         column_additions=ADD_COLUMNS,

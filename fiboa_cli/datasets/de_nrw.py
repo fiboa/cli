@@ -6,8 +6,13 @@ SHORT_NAME = "Germany, North Rhine-Westphalia"
 TITLE = "Field boundaries for North Rhine-Westphalia (NRW), Germany"
 DESCRIPTION = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production. Field blocks are classified separately according to the main land uses of arable land, grassland, permanent crops, 2nd pillar and other. Since 2005, field blocks in NRW have represented the area reference within the framework of the Integrated Administration and Control System (IACS) for EU agricultural subsidies."""
 LICENSE = "dl-de/by-2-0"
-PROVIDER_NAME = "Land Nordrhein-Westfalen / Open.NRW"
-PROVIDER_URL = "https://www.opengeodata.nrw.de/produkte/umwelt_klima/bodennutzung/landwirtschaft/"
+PROVIDERS = [
+    {
+        "name": "Land Nordrhein-Westfalen / Open.NRW",
+        "url": "https://www.opengeodata.nrw.de/produkte/umwelt_klima/bodennutzung/landwirtschaft/",
+        "roles": ["producer", "licensor"]
+    }
+]
 EXTENSIONS = [
     "https://fiboa.github.io/inspire-extension/v0.2.0/schema.yaml",
     "https://fiboa.github.io/flik-extension/v0.1.0/schema.yaml"
@@ -45,8 +50,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
         source_coop_url=source_coop_url,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         store_collection=collection,
         compression=compression,
     )

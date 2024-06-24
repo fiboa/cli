@@ -26,7 +26,7 @@ setup(
         "pyarrow>=14.0",
         "fsspec>=2024.0",
         "click>=8.1",
-        "geopandas>=0.14",
+        "geopandas>=1.0.0",
         "requests>=2.30",
         "aiohttp>=3.9",
         "shapely>=2.0",
@@ -35,9 +35,9 @@ setup(
     ],
     extras_require={
         # Optional dependencies for datasets converters go here
-        'nl': [
-            "pyogrio"
-        ]
+        # 'nl': [
+        #     "pyogrio"
+        # ]
     },
     packages=find_packages(),
     package_data={

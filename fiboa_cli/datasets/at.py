@@ -11,8 +11,13 @@ DESCRIPTION = """**Field boundaries for Austria - INVEKOS Referenzen Österreich
 The layer includes all reference parcels ("Referenzparzellen") defined by the paying agency Agrarmarkt Austria and recorded landscape elements (landscape element layers) within the meaning of Art. 5 of Regulation (EU) No. 640/2014 and Regulation of the competent federal ministry with horizontal rules for the area of the Common Agricultural Policy (Horizontal CAP Regulation) StF: Federal Law Gazette II No. 100/2015.
 
 Reference parcel: is the physical block that can be clearly delimited from the outside (e.g. forest, roads, water bodies) and is formed by contiguous agricultural areas that are recognizable in nature."""
-PROVIDER_NAME = "Agrarmarkt Austria"
-PROVIDER_URL = "https://geometadatensuche.inspire.gv.at/metadatensuche/inspire/api/records/9db8a0c3-e92a-4df4-9d55-8210e326a7ed"
+PROVIDERS = [
+    {
+        "name": "Agrarmarkt Austria",
+        "url": "https://geometadatensuche.inspire.gv.at/metadatensuche/inspire/api/records/9db8a0c3-e92a-4df4-9d55-8210e326a7ed",
+        "roles": ["producer", "licensor"]
+    }
+]
 LICENSE = "CC-BY-4.0"
 COLUMNS = {
     'geometry': 'geometry',
@@ -55,8 +60,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         extensions = EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
         source_coop_url=source_coop_url,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         store_collection=collection,
         compression=compression,
     )

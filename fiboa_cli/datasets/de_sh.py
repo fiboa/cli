@@ -5,8 +5,13 @@ ID = "de_sh"
 SHORT_NAME = "Germany, Schleswig-Holstein"
 TITLE = "Field boundaries for Schleswig-Holstein (SH), Germany"
 DESCRIPTION = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
-PROVIDER_NAME = "Land Schleswig-Holstein"
-PROVIDER_URL = "https://sh-mis.gdi-sh.de/catalog/#/datasets/iso/21f67269-780f-4f3c-8f66-03dde27acfe7"
+PROVIDERS = [
+    {
+        "name": "Land Schleswig-Holstein",
+        "url": "https://sh-mis.gdi-sh.de/catalog/#/datasets/iso/21f67269-780f-4f3c-8f66-03dde27acfe7",
+        "roles": ["producer", "licensor"]
+    }
+]
 LICENSE = "dl-de/zero-2-0"
 EXTENSIONS = [
     "https://fiboa.github.io/flik-extension/v0.1.0/schema.yaml"
@@ -38,8 +43,7 @@ def convert(output_file, input_files = None, cache = None, source_coop_url = Non
         missing_schemas=MISSING_SCHEMAS,
         license=LICENSE,
         source_coop_url=source_coop_url,
-        provider_name=PROVIDER_NAME,
-        provider_url=PROVIDER_URL,
+        providers=PROVIDERS,
         store_collection=collection,
         compression=compression,
     )
