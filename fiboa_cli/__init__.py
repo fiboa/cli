@@ -10,6 +10,7 @@ from .create_geoparquet import create_geoparquet as create_geoparquet_
 from .create_geojson import create_geojson as create_geojson_
 from .describe import describe as describe_
 from .jsonschema import jsonschema as jsonschema_
+from .publish import publish as publish_
 from .rename_extension import rename_extension as rename_extension_
 from .validate import validate as validate_
 from .validate_schema import validate_schema as validate_schema_
@@ -471,6 +472,36 @@ def rename_extension(folder, title, slug, org = "fiboa", prefix = None):
         sys.exit(1)
 
 
+## Publish
+@click.command()
+@click.argument('dataset', nargs=1, type=click.Choice(list_all_converter_ids()))
+@click.argument('directory', nargs=1, type=click.Path(exists=False))
+@click.option(
+    '--cache', '-c',
+    type=click.Path(exists=False),
+    help='By default the CLI downloads the source data on every execution. Specify a local folder to avoid downloading the files again. If the files exist, reads from there, otherwise stores the files there.',
+    default=None
+)
+@click.option(
+    '--source-coop-extension', '-e',
+    type=click.STRING,
+    help='(Future) source_coop extension, will be used as https://beta.source.coop/fiboa/xx-yy/',
+    default=None
+)
+def publish(dataset, directory, cache, source_coop_extension):
+    """
+    Publish a fiboa collection on
+    """
+    log(f"Trying to publish on source coop CLI {__version__}\n", "success")
+    try:
+        directory = os.path.abspath(directory)
+        publish_(dataset, directory, cache, source_coop_extension)
+        log(f"Dataset published from {directory}", "success")
+    except Exception as e:
+        log(e, "error")
+        sys.exit(1)
+
+
 cli.add_command(describe)
 cli.add_command(validate)
 cli.add_command(validate_schema)
@@ -480,6 +511,7 @@ cli.add_command(jsonschema)
 cli.add_command(convert)
 cli.add_command(converters)
 cli.add_command(rename_extension)
+cli.add_command(publish)
 
 if __name__ == '__main__':
     cli()
