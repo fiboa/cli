@@ -52,12 +52,7 @@ COLUMNS = {
     'EC_hcat_c': 'EC_hcat_c' #fiboa custom field
 }
 
-def migration(gdf):
-    col = 'DATA_CHANG'
-    gdf[col] = pd.to_datetime(gdf[col], format = "%Y/%m/%d %H:%M:%S.%f", utc = True)
-    return gdf
-
-MIGRATION = migration
+COLUMN_MIGRATIONS = {'DATA_CHANG': lambda column: pd.to_datetime(column, format = "%Y/%m/%d %H:%M:%S.%f", utc = True)}
 
 MISSING_SCHEMAS = {
     'required': ['year', 'parcel_id', 'crop_id','subsidy_type', 'EC_NUTS3', 'PRODUCT_DE', 'EC_trans_n', 'EC_hcat_n', 'EC_hcat_c'],
