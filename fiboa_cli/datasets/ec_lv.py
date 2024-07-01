@@ -39,11 +39,11 @@ LICENSE = "CC-BY-4.0"
 COLUMNS = {
     'geometry': 'geometry', #fiboa core field
     'OBJECTID': 'id', #fiboa core field
-    'AREA_DECLARED': 'area', #fiboa core field
+    'AREA_DECLA': 'area', #fiboa core field
     'DATA_CHANG': 'determination_datetime', #fiboa core field
-    'PERIOD_CODE': 'year', #fiboa custom field
+    'PERIOD_COD': 'year', #fiboa custom field
     'PARCEL_ID': 'parcel_id', #fiboa custom field
-    'PRODUCT_CODE': 'crop_id', #fiboa custom field
+    'PRODUCT_CO': 'crop_id', #fiboa custom field
     'AID_FORMS': 'subsidy_type', #fiboa custom field
     'EC_NUTS3': 'EC_NUTS3', #fiboa custom field
     'PRODUCT_DE': 'PRODUCT_DE', #fiboa custom field
