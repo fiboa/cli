@@ -60,7 +60,7 @@ def publish(dataset, directory, cache, source_coop_extension):
     if not done_convert:
         # fiboa convert xx_yy -o data/xx-yy.parquet -h https://beta.source.coop/fiboa/xx-yy/ --collection
         log(f"Converting file for {dataset} to {parquet_file}\n", "success")
-        convert(dataset, parquet_file, cache, source_coop_url, collection=True)
+        convert(dataset, parquet_file, cache=cache, source_coop_url=source_coop_url, collection=True)
         log(f"Done\n", "success")
     else:
         log(f"Using existing file {parquet_file} for {dataset}\n", "success")
@@ -106,9 +106,12 @@ def publish(dataset, directory, cache, source_coop_extension):
         os.remove("geo.json")
 
     log(f"Uploading to aws", "info")
-    log(f"Get your credentials at {source_coop_url}download/", "info")
-    log(f"  (press ACCESS DATA, GENERATE CREDENTIALS, copy-paste the exports in the terminal and re-run this command)", "info")
     if not os.environ.get("AWS_SESSION_TOKEN"):
+        log(f"Get your credentials at {source_coop_url}download/", "info")
+        log("  Then press 'ACCESS DATA',\n  and click 'GENERATE CREDENTIALS',", "info")
+        log("  Under 'Usage example' there's a code block with EXPORT commands,\n"
+            "  copy-paste this block in this terminal and re-run this command)", "info")
+
         log("Please set AWS_ env vars from source_coop", "error")
         sys.exit(1)
     check_command("aws")
