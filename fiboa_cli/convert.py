@@ -4,7 +4,7 @@ from .util import log
 
 IGNORED_DATASET_FILES = ["__init__.py", "template.py"]
 
-def convert(dataset, output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None, geoparquet1 = False):
+def convert(dataset, output_file, input_files = None, cache = None, source_coop_url = None, collection = False, compression = None, geoparquet1 = False, mapping_file=None):
     if dataset in IGNORED_DATASET_FILES:
         raise Exception(f"'{dataset}' is not a converter")
     try:
@@ -25,7 +25,8 @@ def convert(dataset, output_file, input_files = None, cache = None, source_coop_
         source_coop_url = source_coop_url,
         store_collection = collection,
         compression = compression,
-        geoparquet1 = geoparquet1
+        geoparquet1 = geoparquet1,
+        mapping_file = mapping_file
     )
 
 def list_all_converter_ids():

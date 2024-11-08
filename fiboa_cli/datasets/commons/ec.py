@@ -1,3 +1,8 @@
+import csv
+from io import StringIO
+from fiboa_cli.util import load_file
+
+
 def add_eurocrops(base, year = None):
     if isinstance(base, dict):
         base = DictObject(base)
@@ -49,6 +54,16 @@ In the data you'll find this as additional attributes:
 
     return ID, SHORT_NAME, TITLE, DESCRIPTION, PROVIDERS, EXTENSIONS, COLUMNS, LICENSE
 
+
 class DictObject(object):
     def __init__(self, dict_):
         self.__dict__.update(dict_)
+
+
+def load_ec_mapping(csv_file=None, url=None):
+    if not (csv_file or url):
+        raise ValueError("Either csv_file or url must be specified")
+    if not url:
+        url = f"https://raw.githubusercontent.com/maja601/EuroCrops/refs/heads/main/csvs/country_mappings/{csv_file}"
+    content = load_file(url)
+    return list(csv.DictReader(StringIO(content.decode('utf-8'))))

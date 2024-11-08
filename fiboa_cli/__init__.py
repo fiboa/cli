@@ -1,3 +1,5 @@
+import traceback
+
 import click
 import json
 import pandas as pd
@@ -381,15 +383,21 @@ def jsonschema(schema, out, fiboa_version, id_):
     help='Enforces generating a GeoParquet 1.0 file bounding box. Defaults to GeoParquet 1.1 with bounding box.',
     default=False
 )
-def convert(dataset, out, input, cache, source_coop, collection, compression, geoparquet1):
+@click.option(
+    '--mapping-file', '-m',
+    type=click.STRING,
+    help='Url of mapping file. Some converters use additional sources with mapping data.',
+    default=None
+)
+def convert(dataset, out, input, cache, source_coop, collection, compression, geoparquet1, mapping_file):
     """
     Converts existing field boundary datasets to fiboa.
     """
     log(f"fiboa CLI {__version__} - Convert '{dataset}'\n", "success")
     try:
-        convert_(dataset, out, input, cache, source_coop, collection, compression, geoparquet1)
+        convert_(dataset, out, input, cache, source_coop, collection, compression, geoparquet1, mapping_file)
     except Exception as e:
-        log(e, "error")
+        log(traceback.format_exc(), "error")
         sys.exit(1)
 
 
