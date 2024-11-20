@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = {
     "https://data.slovensko.sk/download?id=e39ad227-1899-4cff-b7c8-734f90aa0b59&blocksize=0": [
@@ -53,6 +54,8 @@ MISSING_SCHEMAS = {
     }
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "SK")
+
 
 def convert(output_file, cache = None, **kwargs):
     convert_(
@@ -64,7 +67,9 @@ def convert(output_file, cache = None, **kwargs):
         TITLE,
         DESCRIPTION,
         providers=PROVIDERS,
+        extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
+        column_additions=ADD_COLUMNS,
         license=LICENSE,
         column_migrations=COLUMN_MIGRATIONS,
         **kwargs

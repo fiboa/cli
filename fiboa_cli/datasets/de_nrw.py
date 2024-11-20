@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = "https://www.opengeodata.nrw.de/produkte/umwelt_klima/bodennutzung/landwirtschaft/LFK-AKTI_EPSG25832_Shape.zip"
 ID = "de_nrw"
@@ -38,15 +39,15 @@ MISSING_SCHEMAS = {
     }
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "DE", "NW")
+
 def convert(output_file, cache = None, **kwargs):
-    """
-    Converts the NRW (Germany) field boundary datasets to fiboa.
-    """
     convert_(
         output_file, cache,
         SOURCES, COLUMNS, ID, TITLE, DESCRIPTION,
         license=LICENSE,
         extensions=EXTENSIONS,
+        column_additions=ADD_COLUMNS,
         missing_schemas=MISSING_SCHEMAS,
         providers=PROVIDERS,
         **kwargs

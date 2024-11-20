@@ -1,6 +1,7 @@
 from ..convert_utils import convert as convert_
 import pandas as pd
 import numpy as np
+from .commons.admin import add_admin
 
 SOURCES = None
 DATA_ACCESS = """
@@ -19,7 +20,7 @@ fiboa convert ch -o swiss.parquet -i lwb_nutzungsflaechen_lv95/geopackage/lwb_nu
 ID = "ch"
 SHORT_NAME = "Switzerland"
 TITLE = "Field boundaries for Switzerland"
-DESCRIPTION = """The cropfields of Switzerland (Nutzungsflächen) are published per administrative subdivision called Canton."""
+DESCRIPTION = "The cropfields of Switzerland (Nutzungsflächen) are published per administrative subdivision called Canton."
 PROVIDERS = [
     {
         "name": "Konferenz der kantonalen Geoinformations- und Katasterstellen",
@@ -37,23 +38,27 @@ COLUMNS = {
     'geometry': 'geometry',
     'id': 'id',
     'flaeche_m2': 'area',
-    'kanton': 'administrative_area_level_1',
+    'admin:country_code': 'admin:country_code',
+    'kanton': 'admin:subdivision_code',
     "nutzung": "crop_name",
     'bezugsjahr': 'determination_datetime'
 }
+EXTENSIONS = [
+    'https://fiboa.github.io/administrative-division-extension/v0.1.0/schema.yaml'
+]
+ADD_COLUMNS = {
+    'admin:country_code': 'CH'
+}
 COLUMN_FILTERS = {
-    "ist_ueberlagernd": lambda col: col == False
+    'ist_ueberlagernd': lambda col: col == False,
 }
 COLUMN_MIGRATIONS = {
     'flaeche_m2': lambda column: np.where(column>0, column/10000, 0.001),
-    'bezugsjahr': lambda col: pd.to_datetime(col, format='%Y')
+    'bezugsjahr': lambda col: pd.to_datetime(col, format='%Y'),
 }
 
 MISSING_SCHEMAS = {
     'properties': {
-        'administrative_area_level_1': {
-            'type': 'string'
-        },
         'crop_name': {
             'type': 'string'
         },
@@ -65,7 +70,9 @@ def convert(output_file, cache = None, **kwargs):
         output_file, cache, SOURCES,
         COLUMNS, ID, TITLE, DESCRIPTION,
         license=LICENSE,
+        extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
+        column_additions=ADD_COLUMNS,
         column_migrations=COLUMN_MIGRATIONS,
         column_filters=COLUMN_FILTERS,
         providers=PROVIDERS,

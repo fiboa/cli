@@ -8,7 +8,7 @@ SOURCES = None
 DATA_ACCESS = """
 Data must be obtained from the Varda API, saved as .json files. Easiest way to try it out is
 to use the UI at https://fieldid.varda.ag/ and find some fields and click 'download .json' file,
-or else call the /boundaries endpoint - details at https://developer.varda.ag/fid.
+or else call the /boundaries endpoint - details at https://developer.varda.ag/reference/get_boundaries_by_spatial_field_relationship_search-1.
 Use the `-i` option to provide the file(s) to the converter.
 """
 

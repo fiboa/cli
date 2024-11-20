@@ -1,5 +1,6 @@
 from ..convert_gml import gml_assure_columns
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = {
   "https://osi-inspire-atom.s3-eu-west-1.amazonaws.com/IACSdata/IACS_GSAA_2022.zip": ["IACS_GSAA_2022.gml"]
@@ -47,6 +48,9 @@ def migration(gdf):
     return gdf
 
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "IE")
+
+
 def convert(output_file, cache = None, **kwargs):
     def file_migration(data, path, uri, layer):
         return gml_assure_columns(data, path, uri, layer,
@@ -63,7 +67,9 @@ def convert(output_file, cache = None, **kwargs):
         providers=PROVIDERS,
         missing_schemas=MISSING_SCHEMAS,
         migration=migration,
+        extensions=EXTENSIONS,
         attribution=ATTRIBUTION,
+        column_additions=ADD_COLUMNS,
         license=LICENSE,
         layer_filter=lambda layer, uri: layer == LAYER,
         file_migration=file_migration,

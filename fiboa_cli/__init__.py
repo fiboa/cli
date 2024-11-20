@@ -408,11 +408,12 @@ def convert(dataset, out, input, cache, source_coop, collection, compression, ge
     Converts existing field boundary datasets to fiboa.
     """
     log(f"fiboa CLI {__version__} - Convert '{dataset}'\n", "success")
-    try:
-        convert_(dataset, out, input, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries)
-    except Exception as e:
-        log(e, "error")
-        sys.exit(1)
+    convert_(dataset, out, input, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries)
+    # try:
+    #     convert_(dataset, out, input, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries)
+    # except Exception as e:
+    #     log(e, "error")
+    #     sys.exit(1)
 
 
 ## CONVERTERS

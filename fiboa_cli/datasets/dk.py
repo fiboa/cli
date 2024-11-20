@@ -1,11 +1,12 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = "https://landbrugsgeodata.fvm.dk/Download/Marker/Marker_2023.zip"
 LAYER_FILTER = None
 ID = "dk"
 SHORT_NAME = "Denmark"
 TITLE = "Denmark Crop Fields (Marker)"
-DESCRIPTION = """The Danish Ministry of Food, Agriculture and Fisheries publishes Crop Fields (Marker) for each year."""
+DESCRIPTION = "The Danish Ministry of Food, Agriculture and Fisheries publishes Crop Fields (Marker) for each year."
 
 PROVIDERS = [
     {
@@ -40,6 +41,7 @@ MISSING_SCHEMAS = {
     }
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "DK")
 
 def convert(output_file, cache = None, **kwargs):
     convert_(
@@ -51,6 +53,8 @@ def convert(output_file, cache = None, **kwargs):
         TITLE,
         DESCRIPTION,
         providers=PROVIDERS,
+        extensions=EXTENSIONS,
+        column_additions=ADD_COLUMNS,
         missing_schemas=MISSING_SCHEMAS,
         layer_filter=LAYER_FILTER,
         license=LICENSE,

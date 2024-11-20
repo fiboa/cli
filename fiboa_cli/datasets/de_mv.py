@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = {
   "https://www.geodaten-mv.de/dienste/gdimv_feldblock_wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&TYPENAME=mv:feldbloecke&OUTPUTFORMAT=shape-zip": "gdimv_feldblock_wfs.zip"
@@ -100,6 +101,8 @@ MISSING_SCHEMAS = {
     }
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "DE", "MV")
+
 # Conversion function, usually no changes required
 def convert(output_file, cache = None, **kwargs):
     convert_(
@@ -112,6 +115,7 @@ def convert(output_file, cache = None, **kwargs):
         DESCRIPTION,
         providers=PROVIDERS,
         extensions=EXTENSIONS,
+        column_additions=ADD_COLUMNS,
         missing_schemas=MISSING_SCHEMAS,
         license=LICENSE,
         **kwargs

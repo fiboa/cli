@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 import re
 import pandas as pd
@@ -76,6 +77,8 @@ COLUMN_FILTERS = {
     "LF": lambda col: col == "LF"
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "DE", "TH")
+
 # Schemas for the fields that are not defined in fiboa
 # Keys must be the values from the COLUMNS dict, not the keys
 MISSING_SCHEMAS = {
@@ -139,6 +142,7 @@ def convert(output_file, cache = None, **kwargs):
         providers=PROVIDERS,
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
+        column_additions=ADD_COLUMNS,
         column_migrations=COLUMN_MIGRATIONS,
         column_filters=COLUMN_FILTERS,
         attribution=ATTRIBUTION,
