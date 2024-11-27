@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = {
   "https://data.geobasis-bb.de/geofachdaten/Landwirtschaft/dfbk.zip": ["DFBK_FB.shp"]
@@ -56,15 +57,16 @@ MISSING_SCHEMAS = {
     }
 }
 
+# todo: this includes Berlin, so we need to separate the subdivision code
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "DE", "BB")
+
 def convert(output_file, cache = None, **kwargs):
-    """
-    Converts the Berlin/Brandenburg (Germany) field boundary datasets to fiboa.
-    """
     convert_(
         output_file, cache,
         SOURCES, COLUMNS, ID, TITLE, DESCRIPTION,
         license=LICENSE,
         extensions=EXTENSIONS,
+        column_additions=ADD_COLUMNS,
         missing_schemas=MISSING_SCHEMAS,
         providers=PROVIDERS,
         layer = "DFBK_FB",

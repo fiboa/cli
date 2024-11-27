@@ -1,6 +1,6 @@
 from ..convert_gml import gml_assure_columns
-
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = {
   "https://geoservices.wallonie.be/geotraitement/spwdatadownload/get/2a0d9be0-ac3d-443e-9db0-a7cfb0f128e2/LU_ExistingLandUse_SIGEC2022.gml.zip?blocksize=0": ["LU_ExistingLandUse_SIGEC2022.gml"]
@@ -30,7 +30,6 @@ PROVIDERS = [
         "roles": ["host", "processor"]
     }
 ]
-ATTRIBUTION = ""
 
 LICENSE = {
     "title": "No conditions apply to access and use. Distributed through Inspire guidelines",
@@ -69,6 +68,8 @@ COLUMN_MIGRATIONS = {
     "crop_name": lambda col: col.str.strip()  # .str.replace("  ", " ").str.replace("( ", "(")
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "BE", "WAL")
+
 def convert(output_file, cache = None, **kwargs):
     def file_migration(data, path, uri, layer):
         return gml_assure_columns(data, path, uri, layer,
@@ -85,9 +86,9 @@ def convert(output_file, cache = None, **kwargs):
         DESCRIPTION,
         providers=PROVIDERS,
         missing_schemas=MISSING_SCHEMAS,
-        attribution=ATTRIBUTION,
         column_additions=ADD_COLUMNS,
         column_migrations=COLUMN_MIGRATIONS,
+        extensions=EXTENSIONS,
         license=LICENSE,
         layer_filter=lambda layer, uri: layer == LAYER,
         file_migration=file_migration,

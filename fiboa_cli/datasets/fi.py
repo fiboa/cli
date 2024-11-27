@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 import pandas as pd
 import numpy as np
 
@@ -39,6 +40,7 @@ def migrate(gdf):
     gdf['area'] = np.where(gdf['PINTA_ALA'] == 0, gdf.area / 10000, gdf['PINTA_ALA'])
     return gdf
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "FI")
 
 MISSING_SCHEMAS = {
     "properties": {
@@ -65,6 +67,8 @@ def convert(output_file, cache = None, **kwargs):
         DESCRIPTION,
         providers=PROVIDERS,
         missing_schemas=MISSING_SCHEMAS,
+        extensions=EXTENSIONS,
+        column_additions=ADD_COLUMNS,
         column_migrations=COLUMN_MIGRATIONS,
         migration=migrate,
         attribution=ATTRIBUTION,

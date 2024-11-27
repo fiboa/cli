@@ -94,8 +94,16 @@ COLUMNS = {
     'fiboa_id': 'id',
     'id' : 'group',
     '_predicate' : '_predicate',
-    'country': 'country',
+    'country': 'admin:country_code',
     'geometry' : 'geometry',
+}
+
+EXTENSIONS = [
+    'https://fiboa.github.io/administrative-division-extension/v0.1.0/schema.yaml'
+]
+
+COLUMN_MIGRATIONS = {
+    'country': lambda col: col.map({'cambodia': 'KH', 'vietnam': 'VN'})
 }
 
 # Add columns with constant values.
@@ -123,10 +131,6 @@ MISSING_SCHEMAS = {
         "_predicate": {
             "type": "string",
             "enum": ["INTERSECTS"]
-        },
-        "country": {
-            "type": "string",
-            "enum": ["cambodia", "vietnam"]
         }
     }
 }
@@ -142,6 +146,8 @@ def convert(output_file, cache = None, **kwargs):
         TITLE,
         DESCRIPTION,
         missing_schemas=MISSING_SCHEMAS,
+        extensions=EXTENSIONS,
+        column_migrations=COLUMN_MIGRATIONS,
         column_additions=ADD_COLUMNS,
         migration=MIGRATION,
         attribution=ATTRIBUTION,

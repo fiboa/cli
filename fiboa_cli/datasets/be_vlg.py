@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = {
     "https://www.landbouwvlaanderen.be/bestanden/gis/Landbouwgebruikspercelen_2023_-_Definitief_(extractie_28-03-2024)_GPKG.zip": [
@@ -68,6 +69,8 @@ MISSING_SCHEMAS = {
     }
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "BE", "VLG")
+
 def convert(output_file, cache = None, **kwargs):
     convert_(
         output_file,
@@ -79,6 +82,7 @@ def convert(output_file, cache = None, **kwargs):
         DESCRIPTION,
         providers=PROVIDERS,
         missing_schemas=MISSING_SCHEMAS,
+        extensions=EXTENSIONS,
         column_additions=ADD_COLUMNS,
         attribution=ATTRIBUTION,
         license=LICENSE,

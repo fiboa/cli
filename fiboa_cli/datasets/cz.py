@@ -1,13 +1,13 @@
 from ..convert_utils import convert as convert_
 import pandas as pd
-import numpy as np
+from .commons.admin import add_admin
 
 SOURCES = "https://mze.gov.cz/public/app/eagriapp/Files/geoprostor_zadosti23_2024-08-01_202409261243_epsg4258.zip"
 
 ID = "cz"
 SHORT_NAME = "Czech"
 TITLE = "Field boundaries for Czech"
-DESCRIPTION = """The cropfields of Czech (Plodina)"""
+DESCRIPTION = "The cropfields of Czech (Plodina)"
 PROVIDERS = [
     {
         "name": "Czech Ministry of Agriculture (Ministr Zemědělství)",
@@ -44,11 +44,15 @@ MISSING_SCHEMAS = {
     }
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "CZ")
+
 def convert(output_file, cache = None, **kwargs):
     convert_(
         output_file, cache, SOURCES,
         COLUMNS, ID, TITLE, DESCRIPTION,
         license=LICENSE,
+        extensions=EXTENSIONS,
+        column_additions=ADD_COLUMNS,
         missing_schemas=MISSING_SCHEMAS,
         column_migrations=COLUMN_MIGRATIONS,
         providers=PROVIDERS,

@@ -1,4 +1,6 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
+
 
 SOURCES = "https://service.gdi-sh.de/SH_OpenGBD/feeds/Atom_SH_Feldblockfinder_OpenGBD/data/Feldbloecke_2024_GPKG.zip"
 ID = "de_sh"
@@ -31,14 +33,14 @@ MISSING_SCHEMAS = {
     }
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "DE", "SH")
+
 def convert(output_file, cache = None, **kwargs):
-    """
-    Converts the Schleswig-Holstein (Germany) field boundary datasets to fiboa.
-    """
     convert_(
         output_file, cache,
         SOURCES, COLUMNS, ID, TITLE, DESCRIPTION,
         extensions=EXTENSIONS,
+        column_additions=ADD_COLUMNS,
         missing_schemas=MISSING_SCHEMAS,
         license=LICENSE,
         providers=PROVIDERS,

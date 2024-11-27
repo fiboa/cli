@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = "https://www.ifap.pt/isip/ows/resources/2023/Continente.gpkg"
 #SOURCES = "https://www.ifap.pt/isip/ows/resources/2022/2022.zip"
@@ -52,6 +53,8 @@ MISSING_SCHEMAS = {
     }
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "PT")
+
 
 def convert(output_file, cache = None, **kwargs):
     convert_(
@@ -63,7 +66,9 @@ def convert(output_file, cache = None, **kwargs):
         TITLE,
         DESCRIPTION,
         providers=PROVIDERS,
+        extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
+        column_additions=ADD_COLUMNS,
         column_migrations=COLUMN_MIGRATIONS,
         attribution=ATTRIBUTION,
         license=LICENSE,

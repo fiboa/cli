@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 import re
 
@@ -80,6 +81,8 @@ def parse_size(x):
     else:
         return None
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "DE", "SL")
+
 def convert(output_file, cache = None, **kwargs):
     convert_(
         output_file, cache,
@@ -87,6 +90,7 @@ def convert(output_file, cache = None, **kwargs):
         license=LICENSE,
         extensions=EXTENSIONS,
         migration=MIGRATION,
+        column_additions=ADD_COLUMNS,
         missing_schemas=MISSING_SCHEMAS,
         attribution=ATTRIBUTION,
         providers=PROVIDERS,

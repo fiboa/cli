@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 import pandas as pd
 
@@ -113,6 +114,8 @@ for key in MISSING_SCHEMAS['properties']:
     if schema["type"] == "boolean":
         COLUMN_MIGRATIONS[key] = lambda col: col.map({'J': True, 'N': False}).astype(bool)
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "DE", "SN")
+
 def convert(output_file, cache = None, **kwargs):
     convert_(
         output_file, cache,
@@ -120,6 +123,7 @@ def convert(output_file, cache = None, **kwargs):
         license=LICENSE,
         extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
+        column_additions=ADD_COLUMNS,
         column_migrations=COLUMN_MIGRATIONS,
         attribution=ATTRIBUTION,
         providers=PROVIDERS,

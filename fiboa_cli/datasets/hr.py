@@ -1,4 +1,5 @@
 from .commons.data import read_data_csv
+from .commons.admin import add_admin
 from ..convert_utils import convert as convert_
 import numpy as np
 
@@ -166,6 +167,9 @@ def migration(gdf):
     return gdf
 
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "HR")
+
+
 def convert(output_file, cache = None, **kwargs):
     convert_(
         output_file,
@@ -177,7 +181,9 @@ def convert(output_file, cache = None, **kwargs):
         DESCRIPTION,
         migration=migration,
         providers=PROVIDERS,
+        extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
+        column_additions=ADD_COLUMNS,
         attribution=ATTRIBUTION,
         license=LICENSE,
         index_as_id=True,

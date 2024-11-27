@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = "https://service.pdok.nl/rvo/referentiepercelen/atom/downloads/referentiepercelen.gpkg"
 
@@ -63,6 +64,8 @@ MISSING_SCHEMAS = {
     }
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "NL")
+
 
 def convert(output_file, cache = None, **kwargs):
     convert_(
@@ -74,6 +77,7 @@ def convert(output_file, cache = None, **kwargs):
         TITLE,
         DESCRIPTION,
         providers=PROVIDERS,
+        extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
         column_additions=ADD_COLUMNS,
         column_filters=COLUMN_FILTERS,

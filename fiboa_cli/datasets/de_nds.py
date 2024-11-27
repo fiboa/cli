@@ -1,4 +1,5 @@
 from ..convert_utils import convert as convert_
+from .commons.admin import add_admin
 
 SOURCES = "https://sla.niedersachsen.de/mapbender_sla/download/FB_NDS.zip"
 ID = "de_nds"
@@ -42,12 +43,16 @@ MISSING_SCHEMAS = {
     }
 }
 
+# todo: this includes Hamburg and Bremen, so we need to separate the subdivision code
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "DE", "NI")
+
 def convert(output_file, cache = None, **kwargs):
     convert_(
         output_file, cache,
         SOURCES, COLUMNS, ID, TITLE, DESCRIPTION,
         license=LICENSE,
         extensions=EXTENSIONS,
+        column_additions=ADD_COLUMNS,
         missing_schemas=MISSING_SCHEMAS,
         attribution=ATTRIBUTION,
         providers=PROVIDERS,

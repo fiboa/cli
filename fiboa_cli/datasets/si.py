@@ -1,6 +1,5 @@
-from .commons.ec import load_ec_mapping
 from ..convert_utils import convert as convert_
-import pandas as pd
+from .commons.admin import add_admin
 
 SOURCES = {
     "https://rkg.gov.si/razno/portal_analysis/KMRS_2023.rar": ["KMRS_2023.shp"]
@@ -60,6 +59,8 @@ MISSING_SCHEMAS = {
     }
 }
 
+COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "SI")
+
 
 def convert(output_file, cache = None, mapping_file=None, **kwargs):
     convert_(
@@ -71,7 +72,9 @@ def convert(output_file, cache = None, mapping_file=None, **kwargs):
         TITLE,
         DESCRIPTION,
         providers=PROVIDERS,
+        extensions=EXTENSIONS,
         missing_schemas=MISSING_SCHEMAS,
+        column_additions=ADD_COLUMNS,
         column_migrations=COLUMN_MIGRATIONS,
         license=LICENSE,
         **kwargs
