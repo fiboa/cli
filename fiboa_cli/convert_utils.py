@@ -12,6 +12,7 @@ import re
 import json
 import geopandas as gpd
 import pandas as pd
+import numpy as np
 import sys
 import zipfile
 import py7zr
@@ -164,6 +165,7 @@ def convert(
     if not original_geometries:
         gdf.geometry = gdf.geometry.make_valid()
         gdf = gdf.explode()
+        gdf = gdf[np.logical_and(gdf.geometry.type == "Polygon", gdf.geometry.is_valid)]
 
     if has_migration or has_col_migrations or has_col_filters or has_col_additions:
         log("GeoDataFrame after migrations and filters:")
@@ -409,7 +411,7 @@ def download_files(uris, cache_folder = None):
                 with rarfile.RarFile(cache_file, 'r') as w:
                     w.extractall(zip_folder)
             else:
-                raise ValueError("Only ZIP and 7Z files are supported for extraction")
+                raise ValueError(f"Only ZIP and 7Z files are supported for extraction. Fails for {cache_file}")
 
         if is_archive:
             for filename in target:

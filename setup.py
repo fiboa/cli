@@ -40,6 +40,9 @@ setup(
         "ie": [
             "zipfile-deflate64"
         ],
+        "es_pv": [
+            "beautifulsoup4>=4.12.0"
+        ]
     },
     packages=find_packages(),
     package_data={
