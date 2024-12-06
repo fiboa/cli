@@ -7,7 +7,7 @@ from click.testing import CliRunner
 Create input files with: `ogr2ogr output.gpkg -limit 100 input.gpkg`
 """
 
-tests = ['at', 'be_vlg', 'br_ba_lem', 'de_sh', 'ec_lv', 'ec_si', 'fi', 'fr', 'hr', 'nl', 'nl_crop', 'pt', 'dk', 'be_wal', 'se', 'ai4sf', 'ch', 'cz', 'us_usda_cropland']
+tests = ['at', 'be_vlg', 'br_ba_lem', 'de_sh', 'ec_lv', 'ec_si', 'fi', 'fr', 'hr', 'nl', 'nl_crop', 'pt', 'dk', 'be_wal', 'se', 'ai4sf', 'ch', 'cz', 'us_usda_cropland', 'jp']
 extra_convert_parameters = {
     "se": ["-m", f"tests/data-files/convert/se/se_2021.csv"],
     "ch": ["-i", f"tests/data-files/convert/ch/lwb_nutzungsflaechen_v2_0_lv95.gpkg"],
