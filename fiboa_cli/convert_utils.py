@@ -87,7 +87,14 @@ def convert(
             elif is_json:
                 data = read_geojson(path, **kwargs)
             else:
-                data = gpd.read_file(path, **kwargs)
+                try:
+                    data = gpd.read_file(path, **kwargs)
+                except IndexError as e:
+                    if str(e).startswith("index 0 is out of bounds") and len(paths) > 1:
+                        log(f"read 0 features from {path}", "warning")
+                        continue
+                    else:
+                        raise
 
             # 0. Run migration per file/layer
             if callable(file_migration):
