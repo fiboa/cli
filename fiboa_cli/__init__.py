@@ -343,6 +343,7 @@ def jsonschema(schema, out, fiboa_version, id_):
 ## CONVERT
 @click.command()
 @click.argument('dataset', nargs=1, type=click.Choice(list_all_converter_ids()))
+@click.argument('variant', required=False)
 @click.option(
     '--out', '-o',
     type=click.Path(exists=False),
@@ -403,13 +404,13 @@ def jsonschema(schema, out, fiboa_version, id_):
     help='Keep the source geometries as provided, i.e. this option disables that geomtries are made valid and converted to Polygons.',
     default=False
 )
-def convert(dataset, out, input, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries):
+def convert(dataset, variant, out, input, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries):
     """
     Converts existing field boundary datasets to fiboa.
     """
     log(f"fiboa CLI {__version__} - Convert '{dataset}'\n", "success")
     try:
-        convert_(dataset, out, input, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries)
+        convert_(dataset, out, variant, input, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries)
     except Exception as e:
         log(e, "error")
         sys.exit(1)

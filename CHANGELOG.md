@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `fiboa convert`: New parameter `--original-geometries` / `-og` to keep the original geometries
 - Converter for Latvia (from original source)
 - Converter for Japan, currently based on supplied (non-fiboa) parquet files
+- Rewrite to class-based converters
 
 ### Changed
 

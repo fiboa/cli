@@ -1,58 +1,42 @@
-from ..convert_utils import convert as convert_
+from .commons.ec import ec_url
+from ..convert_utils import BaseConverter
 
-SOURCES = "https://landbrugsgeodata.fvm.dk/Download/Marker/Marker_2023.zip"
-LAYER_FILTER = None
-ID = "dk"
-SHORT_NAME = "Denmark"
-TITLE = "Denmark Crop Fields (Marker)"
-DESCRIPTION = """The Danish Ministry of Food, Agriculture and Fisheries publishes Crop Fields (Marker) for each year."""
 
-PROVIDERS = [
-    {
-        "name": "Ministry of Food, Agriculture and Fisheries of Denmark",
-        "url": "https://fvm.dk/",
-        "roles": ["licensor"]
-    },
-    {
-        "name": "Danish Agricultural Agency",
-        "url": "https://lbst.dk/",
-        "roles": ["producer", "licensor"]
+class DKConverter(BaseConverter):
+    source_variants = {
+        str(year): f"https://landbrugsgeodata.fvm.dk/Download/Marker/Marker_{year}.zip"
+        for year in range(2024, 2008-1, -1)
     }
-]
+    id = "dk"
+    short_name = "Denmark"
+    title = "Denmark Crop Fields (Marker)"
+    description = """The Danish Ministry of Food, Agriculture and Fisheries publishes Crop Fields (Marker) for each year."""
 
-LICENSE = "CC-0"
-COLUMNS = {
-    'geometry': 'geometry',
-    'Marknr': 'id',
-    'IMK_areal': "area",
-    'Afgkode': 'crop_code',
-    'Afgroede': 'crop_name',
-}
+    extensions = ["https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"]
+    column_additions = {"crop:code_list": ec_url("nl_2020.csv")}
 
-MISSING_SCHEMAS = {
-    "properties": {
-        "crop_name": {
-            "type": "string"
+    providers = [
+        {
+            "name": "Ministry of Food, Agriculture and Fisheries of Denmark",
+            "url": "https://fvm.dk/",
+            "roles": ["licensor"]
         },
-        "crop_code": {
-            "type": "string"
-        },
+        {
+            "name": "Danish Agricultural Agency",
+            "url": "https://lbst.dk/",
+            "roles": ["producer", "licensor"]
+        }
+    ]
+
+    license = "CC-0"
+    columns = {
+        'geometry': 'geometry',
+        'Marknr': 'id',
+        'IMK_areal': "area",
+        'Afgkode': 'crop:code',
+        'Afgroede': 'crop:name',
     }
-}
 
-
-def convert(output_file, cache = None, **kwargs):
-    convert_(
-        output_file,
-        cache,
-        SOURCES,
-        COLUMNS,
-        ID,
-        TITLE,
-        DESCRIPTION,
-        providers=PROVIDERS,
-        missing_schemas=MISSING_SCHEMAS,
-        layer_filter=LAYER_FILTER,
-        license=LICENSE,
-        **kwargs
-    )
+    def migrate(self, gdf):
+        gdf["determination_datetime"] = f"{self.variant}-01-01T00:00:00Z"
+        return gdf
