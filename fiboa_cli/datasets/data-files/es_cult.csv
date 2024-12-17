@@ -1,0 +1,241 @@
+original_code,original_name
+1,Trigo blando
+2,Triticum spelta
+3,Trigo duro (Ver variedades)
+4,Maíz (Ver utilización)
+5,Cebada
+6,Centeno
+7,Sorgo
+8,Avena
+9,Alforfon
+10,Mijo
+11,Alpiste
+12,Tranquillon
+13,Triticales
+14,Tritordium Barbecho tradicional
+20,Barbecho tradicional
+23,Barbecho medioambiental
+24,Barbecho sin producción
+25,Abandono 20 años
+31,Gleditsia
+33,Girasol
+34,Soja
+35,Colza
+36,Camelina
+40,Guisantes
+40,Guisantes
+41,Habas
+43,Altramuz dulce
+49,Alubias
+50,Garbanzos
+51,Lentejas
+52,Veza
+53,Yeros
+58,Festuca
+60,Alfalfa
+61,Alholva
+62,Pastos permanentes de 5 o más años
+63,Pastos de menos de 5 años
+64,Pastizal de 5 o más años
+65,Pasto arbustivo de 5 o más años
+66,Pasto arbolado de 5 o más años
+67,Esparceta
+68,Festuca
+69,Raygras
+70,Agrostis
+71,Arrhenatherum
+72,Dactilo
+73,Fleo
+74,Poa
+76,Zulla
+77,Trebol
+77,Trébol
+80,Arroz
+81,Algodón
+82,Remolacha
+83,Tabaco
+84,Lúpulo
+85,Lino textil para fibra
+86,Cáñamo para fibra
+87,Cacahuete
+88,Cártamo
+89,Chufa
+90,Regaliz
+91,Flores
+92,Romanescu
+93,Lino no textil
+96,Especies aromáticas herbáceas
+97,Setas
+98,Pimiento para pimentón
+99,Patata
+100,Hortalizas al aire libre
+101,Olivar
+102,Viñedo transformación
+103,Uva de mesa
+104,Almendros
+105,Melocotoneros
+106,Nectarinos
+107,Albaricoqueros
+108,Perales
+109,Manzanos
+110,Cerezos
+111,Ciruelos
+112,Nogales
+113,Otros frutales
+114,Superficies forestales maderables
+115,Otras superficies forestales
+116,Chopos
+117,Castaños
+118,Especies aromáticas leñosas
+119,Viveros
+120,Viña-olivar
+121,Boniato
+122,Algarrolbo
+123,Avellano
+124,Pistacho
+125,Frutos de cáscara
+138,Adormidera
+150,Otras utilizaciones no agrarias ni forestales
+151,Puerros
+152,Pimiento fresco
+153,Melón
+154,Brócoli
+155,Lechuga
+156,Sandia
+157,Cebolla
+158,Apio
+159,Colirrábano
+160,Coliflor
+162,Berenjena
+163,Calabacín
+164,Alcachofa
+165,Pepino
+166,Acelga
+167,Cebolleta
+168,Chalota
+169,Ajo
+170,Col
+171,Chirivía
+172,Repollo
+175,Berza
+176,Col de Bruselas
+176,Col de Bruselas
+177,Endivia
+177,Endivia
+178,Zanahoria
+178,Zanahoria
+179,Nabo
+179,Nabo
+180,Judía
+181,Achicoria
+182,Guindillas
+183,Espinaca
+184,Cardo
+185,Calabaza
+186,Calabaza del peregrino
+187,Borraja
+188,Pepinillos
+189,Escarola
+190,Rábano
+191,Berro
+192,Frambuesas
+193,Champiñón
+197,Tomate
+198,Tomate para transformación
+199,Pinos
+201,Platerina
+202,Paraguayo
+203,Endrino
+204,Clementinas
+205,Satsumas
+206,Naranjo
+207,Limonero
+208,Pomelo
+209,Mandarino
+210,Cítricos híbridos
+211,Membrillos
+212,Kiwi
+213,Caqui o palosanto
+214,Nispero
+215,Grosella
+216,Arándano
+217,Granado
+218,Higuera
+219,Fresas
+220,Caña de azúcar
+221,Uva pasa
+222,Paulownia 400 Forestaciones vinc. al Reg. 2080/1992
+222,Quinoa
+223,Miscanthus
+224,Leucaena 500 Forestaciones vinc. al Reg. 1257/1999
+225,Eucalyptus 600 Forestaciones vinc. al Reg. 1698/2005
+226,Opuntia 500 Forestaciones vinc. al Reg. 1257/1999
+227,Salix 700 Agrosilvicultura vinc. al Reg. 1698/2005
+228,Acacia 800 Forestaciones vinc. al Reg. 1305/2013
+230,Robinia
+232,Jacaranda
+233,Phytolacca
+235,Jatropha
+236,Judía
+236,Caña común (Arundo Donax)
+237,Superficies forestales de rotación corta
+238,Altramuz
+239,Almorta
+240,Titarros
+241,Mezcla veza-avena
+242,Mezcla veza-triticale
+243,Cultivos mixtos de especies pratenses
+243,Mezcla veza trigo
+244,Mezcla veza-cebada
+245,Algarroba
+245,Mezcla zulla-avena
+246,Alverja
+246,Mezcla zulla-cebada
+247,Alverjón
+247,Cultivos mixtos de especies pratenses
+248,Algarroba
+249,Alverja
+250,Alverjón
+251,Ajedrea
+252,Cilantro
+253,Anís dulce
+254,Eneldo
+255,Manzanilla
+256,Valeriana
+257,Artemisa
+258,Genciana
+259,Hisopo
+260,Hinopo
+261,Perejil
+262,Azafrán
+263,Tomillo
+264,Albahaca
+265,Melisa o toronjil
+266,Menta
+267,Orégano
+268,Salvia
+269,Perifollo
+270,Estragón
+271,Mejorana
+272,Caléndula
+273,Comino
+274,Estevia
+275,Hipérico
+276,Hierbabuena
+277,Verbena
+278,Frutos del bosque
+279,Espárragos
+280,Trufa
+281,Lavanda
+282,Lavandín
+283,Alcaparra
+284,Ajenjo
+285,Espliego
+286,Helicriso
+287,Hierbaluisa
+288,Romero
+289,Santolina
+290,Aloe vera
+291,Café
+302,Mezcla en márgenes multifuncionales
+303,Mezcla de reservorios

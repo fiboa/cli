@@ -2,7 +2,7 @@ import importlib
 import os
 from .util import log
 
-IGNORED_DATASET_FILES = ["__init__.py", "template.py"]
+IGNORED_DATASET_FILES = ["__init__.py", "template.py", "es.py"]
 
 def convert(
         dataset,
