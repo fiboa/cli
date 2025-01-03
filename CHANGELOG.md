@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Converter for Latvia (from original source)
 - Converter for Japan, currently based on supplied (non-fiboa) parquet files
 - Many converters implement the admin extension
+- Assure tests don't download external sources
 
 ### Changed
 

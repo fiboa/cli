@@ -7,17 +7,20 @@ from click.testing import CliRunner
 Create input files with: `ogr2ogr output.gpkg -limit 100 input.gpkg`
 """
 
-tests = ['at', 'be_vlg', 'br_ba_lem', 'de_sh', 'ec_lv', 'ec_si', 'fi', 'fr', 'hr', 'nl', 'nl_crop', 'pt', 'dk', 'be_wal', 'se', 'ai4sf', 'ch', 'cz', 'us_usda_cropland', 'jp', 'lv']
+tests = ['at', 'be_vlg', 'br_ba_lem', 'de_sh', 'ec_lv', 'ec_si', 'fi', 'fr', 'hr', 'nl', 'nl_crop', 'pt', 'dk', 'be_wal', 'se', 'ai4sf', 'ch', 'cz', 'us_usda_cropland', 'jp', 'lv', 'ie']
+test_path = "tests/data-files/convert"
 extra_convert_parameters = {
-    "lv": ["-i", f"tests/data-files/convert/lv/1_100.xml"],
-    "se": ["-m", f"tests/data-files/convert/se/se_2021.csv"],
-    "ch": ["-i", f"tests/data-files/convert/ch/lwb_nutzungsflaechen_v2_0_lv95.gpkg"],
-    "ai4sf": ['-i', 'tests/data-files/convert/ai4sf/1_vietnam_areas.gpkg', '-i', 'tests/data-files/convert/ai4sf/4_cambodia_areas.gpkg'],
+    "br_ba_lem": ["-i", f"{test_path}/br_ba_lem/LEM_dataset.zip"],
+    "fr": ["-m", f"{test_path}/fr/fr_2018.csv"],
+    "lv": ["-i", f"{test_path}/lv/1_100.xml", "-m", f"{test_path}/lv/lv_2021.csv"],
+    "se": ["-m", f"{test_path}/se/se_2021.csv"],
+    "ch": ["-i", f"{test_path}/ch/lwb_nutzungsflaechen_v2_0_lv95.gpkg"],
+    "ai4sf": ['-i', f'{test_path}/ai4sf/1_vietnam_areas.gpkg', '-i', f'{test_path}/ai4sf/4_cambodia_areas.gpkg'],
 }
 
 
 @mark.parametrize('converter', tests)
-def test_converter(tmp_file, converter):
+def test_converter(tmp_file, converter, block_stream_file):
     path = f"tests/data-files/convert/{converter}"
     runner = CliRunner()
     args = [converter, '-o', tmp_file.name, '-c', path] + extra_convert_parameters.get(converter, [])

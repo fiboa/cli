@@ -1,7 +1,7 @@
 from ..convert_utils import convert as convert_
 from .commons.admin import add_admin
 
-SOURCES = "https://landbrugsgeodata.fvm.dk/Download/Marker/Marker_2023.zip"
+SOURCES = "https://landbrugsgeodata.fvm.dk/Download/Marker/Marker_2024.zip"
 LAYER_FILTER = None
 ID = "dk"
 SHORT_NAME = "Denmark"

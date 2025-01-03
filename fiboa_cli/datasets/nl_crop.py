@@ -3,7 +3,7 @@ from .commons.admin import add_admin
 import pandas as pd
 
 
-SOURCES = "https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/downloads/brpgewaspercelen_concept_2023.gpkg"
+SOURCES = "https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/downloads/brpgewaspercelen_definitief_2023.gpkg"
 
 ID = "nl_crop"
 SHORT_NAME = "Netherlands (Crops)"
