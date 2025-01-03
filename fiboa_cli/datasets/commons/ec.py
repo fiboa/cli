@@ -1,7 +1,9 @@
 import csv
 from io import StringIO
 from fiboa_cli.util import load_file
+import geopandas as gpd
 from .dictobject import DictObject
+
 
 def add_eurocrops(base, year = None):
     if isinstance(base, dict):
@@ -39,8 +41,8 @@ In the data you'll find this as additional attributes:
         }
     ]
 
-    EXTENSIONS = base.EXTENSIONS if hasattr(base, 'EXTENSIONS') else []
-    EXTENSIONS = EXTENSIONS + [
+    EXTENSIONS = getattr(base, "EXTENSIONS", None) or []
+    EXTENSIONS = list(EXTENSIONS) + [
         "https://fiboa.github.io/hcat-extension/v0.1.0/schema.yaml"
     ]
 
@@ -56,10 +58,55 @@ In the data you'll find this as additional attributes:
 
 
 
+class EuroCropsConverterMixin:
+    ec_mapping_csv = None
+    mapping_file = None
+
+    def __init__(self, *args, year=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Some meta-magic to reuse existing add_eurocrops routine
+        attributes = "ID, SHORT_NAME, TITLE, DESCRIPTION, PROVIDERS, EXTENSIONS, COLUMNS, LICENSE".split(", ")
+        base = {k: getattr(self, k.lower()) for k in attributes}
+        for k, v in zip(attributes, add_eurocrops(base, year=year)):
+            setattr(self, k.lower(), v)
+
+    def convert(self, *args, **kwargs):
+        self.mapping_file = kwargs.get("mapping_file")
+        if not self.mapping_file:
+            assert self.ec_mapping_csv is not None, "Specify ec_mapping_csv in Converter, e.g. find them at https://github.com/maja601/EuroCrops/tree/main/csvs/country_mappings"
+        return super().convert(*args, **kwargs)
+
+    def get_code_column(self, gdf):
+        attribute = next(k for k, v in self.columns.items() if v == 'crop:code')
+        col = gdf[attribute]
+        # Should be corrected in original parser
+        return col if col.dtype == 'object' else col.astype(str)
+
+    def add_hcat(self, gdf):
+        ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+        crop_code_col = self.get_code_column(gdf)
+
+        def map_to(attribute):
+            return {e["original_code"]: e[attribute] for e in ec_mapping}
+
+        gdf['EC_trans_n'] = crop_code_col.map(map_to("translated_name"))
+        gdf['EC_hcat_n'] = crop_code_col.map(map_to("HCAT3_name"))
+        gdf['EC_hcat_c'] = crop_code_col.map(map_to("HCAT3_code"))
+        return gdf
+
+    def migrate(self, gdf) -> gpd.GeoDataFrame:
+        gdf = super().migrate(gdf)
+        return self.add_hcat(gdf)
+
+
+def ec_url(csv_file):
+    return f"https://raw.githubusercontent.com/maja601/EuroCrops/refs/heads/main/csvs/country_mappings/{csv_file}"
+
+
 def load_ec_mapping(csv_file=None, url=None):
     if not (csv_file or url):
         raise ValueError("Either csv_file or url must be specified")
     if not url:
-        url = f"https://raw.githubusercontent.com/maja601/EuroCrops/refs/heads/main/csvs/country_mappings/{csv_file}"
+        url = ec_url(csv_file)
     content = load_file(url)
     return list(csv.DictReader(StringIO(content.decode('utf-8'))))

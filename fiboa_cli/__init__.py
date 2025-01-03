@@ -358,6 +358,11 @@ def jsonschema(schema, out, fiboa_version, id_):
     default=None
 )
 @click.option(
+    '--year',
+    type=click.INT,
+    help="Choose a specific year to read data from. Default is the latest available year.",
+)
+@click.option(
     '--cache', '-c',
     type=click.Path(exists=False),
     help='By default the CLI downloads the source data on every execution. Specify a local folder to avoid downloading the files again. If the files exist, reads from there, otherwise stores the files there.',
@@ -403,13 +408,13 @@ def jsonschema(schema, out, fiboa_version, id_):
     help='Keep the source geometries as provided, i.e. this option disables that geomtries are made valid and converted to Polygons.',
     default=False
 )
-def convert(dataset, out, input, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries):
+def convert(dataset, out, input, year, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries):
     """
     Converts existing field boundary datasets to fiboa.
     """
     log(f"fiboa CLI {__version__} - Convert '{dataset}'\n", "success")
     try:
-        convert_(dataset, out, input, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries)
+        convert_(dataset, out, input, year, cache, source_coop, collection, compression, geoparquet1, mapping_file, original_geometries)
     except Exception as e:
         log(e, "error")
         sys.exit(1)
