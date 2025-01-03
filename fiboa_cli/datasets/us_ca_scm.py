@@ -38,7 +38,7 @@ COLUMNS = {
 
 ADD_COLUMNS = {
     "determination_datetime": "2023-05-01T00:00:00Z",
-    "crop:code_list": "https://github.com/fiboa/cli/blob/main/fiboa_cli/datasets/data-files/us_ca_scm.csv",
+    "crop:code_list": "https://fiboa.org/code/us/ca/scm.csv",
 }
 
 MISSING_SCHEMAS = {

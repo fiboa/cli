@@ -1,4 +1,4 @@
-from .commons.ec import load_ec_mapping
+from .commons.ec import load_ec_mapping, ec_url
 from ..convert_utils import convert as convert_
 import numpy as np
 
@@ -63,7 +63,7 @@ def convert(output_file, cache = None, mapping_file = None, **kwargs):
 
     def migrate(gdf):
         gdf['area'] = np.where(gdf['AREA_DECLARED'] == 0, gdf.area / 10000, gdf['AREA_DECLARED'])
-        gdf["crop:code_list"] = f"https://raw.githubusercontent.com/maja601/EuroCrops/refs/heads/main/csvs/country_mappings/lv_2021.csv"
+        gdf["crop:code_list"] = ec_url("lv_2021.csv")
         gdf['crop:name'] = gdf['PRODUCT_CODE'].map(original_name_mapping)
         gdf['crop:name_en'] = gdf['PRODUCT_CODE'].map(name_mapping)
         return gdf

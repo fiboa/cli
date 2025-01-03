@@ -1,3 +1,12 @@
+from __future__ import annotations
+
+from io import StringIO
+from types import MappingProxyType
+from typing import Optional
+from urllib.parse import urlencode
+
+import requests
+
 from .const import STAC_TABLE_EXTENSION
 from .version import fiboa_version
 from .util import log, get_fs, name_from_uri, to_iso8601
@@ -9,18 +18,24 @@ from shapely.geometry import box
 
 import os
 import re
+from glob import glob
 import json
 import geopandas as gpd
 import pandas as pd
+import numpy as np
 import sys
 import zipfile
 import py7zr
 import flatdict
 import rarfile
+import hashlib
+
+# unmodifiable empty dict, avoids accidental mutation
+EMPTY_DICT = MappingProxyType({})
 
 
 def convert(
-        output_file, cache_path,
+        output_file, cache,
         urls, column_map,
         id, title, description,
         input_files = None,
@@ -42,288 +57,18 @@ def convert(
         geoparquet1 = False,
         original_geometries = False,
         index_as_id = False,
-        mapping_file = None,
+        variant = None,  # noqa unused
         **kwargs):
-    """
-    Converts a field boundary datasets to fiboa.
-    """
-    if bbox is not None and len(bbox) != 4:
-        raise ValueError("If provided, the bounding box must consist of 4 numbers")
-
-    # Create output folder if it doesn't exist
-    dir = os.path.dirname(output_file)
-    if dir:
-        os.makedirs(dir, exist_ok=True)
-
-    if input_files is not None and isinstance(input_files, dict) and len(input_files) > 0:
-        log("Using user provided input file(s) instead of the pre-defined file(s)", "warning")
-        urls = input_files
-    elif urls is None:
-        raise ValueError("No input files provided")
-
-    log("Getting file(s) if not cached yet")
-    paths = download_files(urls, cache_path)
-
-    gdfs = []
-    for path, uri in paths:
-        log(f"Reading {path} into GeoDataFrame(s)")
-        is_parquet = path.endswith(".parquet") or path.endswith(".geoparquet")
-        is_json = path.endswith(".json") or path.endswith(".geojson")
-        layers = [None]
-        # Parquet doesn't support layers
-        if not is_parquet:
-            all_layers = gpd.list_layers(path)
-            if layer_filter is not None:
-                layers = [layer for layer in all_layers["name"] if layer_filter(str(layer), path)]
-                if len(layers) == 0:
-                    log(f"No layers left for layering after filtering", "warning")
-
-        for layer in layers:
-            if layer is not None:
-                kwargs["layer"] = layer
-                log(f"- Reading layer {layer} into GeoDataFrame")
-
-            if is_parquet:
-                data = gpd.read_parquet(path, **kwargs)
-            elif is_json:
-                data = read_geojson(path, **kwargs)
-            else:
-                try:
-                    data = gpd.read_file(path, **kwargs)
-                except IndexError as e:
-                    # Error may occur due to paged reading of APIs, e.g. in the LV converter
-                    if str(e).startswith("index 0 is out of bounds") and len(paths) > 1:
-                        log(f"read 0 features from {path}", "warning")
-                        continue
-                    else:
-                        raise
-
-            # 0. Run migration per file/layer
-            if callable(file_migration):
-                log("Applying per-file/layer migrations")
-                data = file_migration(data, path, uri, layer)
-                if not isinstance(data, gpd.GeoDataFrame):
-                    raise ValueError("Per-file/layer migration function must return a GeoDataFrame")
-
-            gdfs.append(data)
-
-    gdf = pd.concat(gdfs)
-    del gdfs
-
-    log("GeoDataFrame created from source(s):")
-    # Make it so that everything is shown, don't output ... if there are too many columns or rows
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_rows', None)
-    print(gdf.head())
-
-    if index_as_id:
-        gdf["id"] = gdf.index
-
-    # 1. Run global migration
-    has_migration = callable(migration)
-    if has_migration:
-        log("Applying global migrations")
-        gdf = migration(gdf)
-        if not isinstance(gdf, gpd.GeoDataFrame):
-            raise ValueError("Migration function must return a GeoDataFrame")
-
-    # 2. Run filters to remove rows that shall not be in the final data
-    has_col_filters = len(column_filters) > 0
-    if has_col_filters:
-        log("Applying filters")
-        for key, fn in column_filters.items():
-            if key in gdf.columns:
-                result = fn(gdf[key])
-                # If the result is a tuple, the second value is a flag to potentially invert the mask
-                if isinstance(result, tuple):
-                    if (result[1]):
-                        # Invert mask
-                        mask = ~result[0]
-                    else:
-                        # Use mask as is
-                        mask = result[0]
-                else:
-                    # Just got a mask, proceed
-                    mask = result
-
-                # Filter columns based on the mask
-                gdf = gdf[mask]
-            else:
-                log(f"Column '{key}' not found in dataset, skipping filter", "warning")
-
-    # 3. Add constant columns
-    has_col_additions = len(column_additions) > 0
-    if has_col_additions:
-        log("Adding columns")
-        for key, value in column_additions.items():
-            gdf[key] = value
-            column_map[key] = key
-
-    # 4. Run column migrations
-    has_col_migrations = len(column_migrations) > 0
-    if has_col_migrations:
-        log("Applying column migrations")
-        for key, fn in column_migrations.items():
-            if key in gdf.columns:
-                gdf[key] = fn(gdf[key])
-            else:
-                log(f"Column '{key}' not found in dataset, skipping migration", "warning")
-
-    # 4b. For geometry column, fix geometries
-    if not original_geometries:
-        gdf.geometry = gdf.geometry.make_valid()
-        gdf = gdf.explode()
-
-    if has_migration or has_col_migrations or has_col_filters or has_col_additions:
-        log("GeoDataFrame after migrations and filters:")
-        print(gdf.head())
-
-    # 5. Duplicate columns if needed
-    actual_columns = {}
-    for old_key, new_key in column_map.items():
-        if old_key in gdf.columns:
-            # If the new keys are a list, duplicate the column
-            if isinstance(new_key, list):
-                for key in new_key:
-                    gdf[key] = gdf.loc[:, old_key]
-                    actual_columns[key] = key
-            # If the new key is a string, plan to rename the column
-            elif old_key in gdf.columns:
-                actual_columns[old_key] = new_key
-        # If old key is not found, remove from the schema and warn
-        else:
-            log(f"Column '{old_key}' not found in dataset, removing from schema", "warning")
-
-    # 6. Rename columns
-    gdf.rename(columns = actual_columns, inplace = True)
-
-    # If a column was renamed to "geometry", we need to update the dataframe with gdf.set_geometry
-    geometry_renamed = any(True for k, v in actual_columns.items() if v == "geometry" and k != v)
-    if geometry_renamed:
-        gdf.set_geometry("geometry", inplace=True)
-
-    # 7. Remove all columns that are not listed
-    drop_columns = list(set(gdf.columns) - set(actual_columns.values()))
-    gdf.drop(columns = drop_columns, inplace = True)
-
-    log("GeoDataFrame fully migrated:")
-    print(gdf.head())
-
-    collection = create_collection(
-        gdf,
-        id, title, description, bbox,
-        providers = providers,
-        source_coop_url = source_coop_url,
-        extensions = extensions,
-        attribution = attribution,
-        license = license
-    )
-
-    log("Creating GeoParquet file: " + output_file)
-    config = {
-        "fiboa_version": fiboa_version,
-    }
-    column_map = list(actual_columns.values())
-    pq_fields = create_parquet(gdf, column_map, collection, output_file, config, missing_schemas, compression, geoparquet1)
-
-    if store_collection:
-        external_collection = add_asset_to_collection(collection, output_file, rows = len(gdf), columns = pq_fields)
-        collection_file = os.path.join(os.path.dirname(output_file), "collection.json")
-        log("Creating Collection file: " + collection_file)
-        with open(collection_file, "w") as f:
-            json.dump(external_collection, f, indent=2)
-
-    log("Finished", "success")
-
-
-def create_collection(
-        gdf,
-        id, title, description, bbox = None,
-        providers = [],
-        source_coop_url = None,
-        extensions = [],
-        attribution = None,
-        license = None
-    ):
-    """
-    Creates a collection for the field boundary datasets.
-    """
-    if bbox is None:
-        bbox = list(gpd.GeoSeries([box(*gdf.total_bounds)], crs=gdf.crs).to_crs(epsg=4326).total_bounds)
-
-    collection = {
-        "fiboa_version": fiboa_version,
-        "fiboa_extensions": extensions,
-        "type": "Collection",
-        "id": id.strip(),
-        "title": title.strip(),
-        "description": description.strip(),
-        "license": "proprietary",
-        "providers": providers,
-        "extent": {
-            "spatial": {
-                "bbox": [bbox]
-            },
-        },
-        "links": []
-    }
-
-    if "determination_datetime" in gdf.columns:
-        dates = pd.to_datetime(gdf['determination_datetime'])
-        min_time = to_iso8601(dates.min())
-        max_time = to_iso8601(dates.max())
-
-        collection["extent"]["temporal"] = {
-            "interval": [[min_time, max_time]]
-        }
-        # Without temporal extent it's not valid STAC
-        collection["stac_version"] = "1.0.0"
-
-    # Add fiboa CLI to providers
-    collection["providers"].append({
-        "name": "fiboa CLI",
-        "roles": ["processor"],
-        "url": "https://pypi.org/project/fiboa-cli"
-    })
-
-    # Add source coop to providers if applicable
-    if source_coop_url is not None:
-        collection["providers"].append({
-            "name": "Source Cooperative",
-            "roles": ["host"],
-            "url": source_coop_url
-        })
-
-    # Update attribution
-    if attribution is not None:
-        collection["attribution"] = attribution
-
-    # Update license
-    if isinstance(license, dict):
-        collection["links"].append(license)
-    elif isinstance(license, str):
-        if license.lower() == "dl-de/by-2-0":
-            collection["links"].append({
-                "href": "https://www.govdata.de/dl-de/by-2-0",
-                "title": "Data licence Germany - attribution - Version 2.0",
-                "type": "text/html",
-                "rel": "license"
-            })
-        elif license.lower() == "dl-de/zero-2-0":
-            collection["links"].append({
-                "href": "https://www.govdata.de/dl-de/zero-2-0",
-                "title": "Data licence Germany - Zero - Version 2.0",
-                "type": "text/html",
-                "rel": "license"
-            })
-        elif re.match(r"^[\w\.-]+$", license):
-            collection["license"] = license
-        else:
-            log(f"Invalid license identifier: {license}", "warning")
-    else:
-        log(f"License information missing", "warning")
-
-    return collection
+    # this function is a (temporary) bridge from function-based converters to class-based converters
+    converter = BaseConverter(sources=urls, columns=column_map, id=id, title=title, description=description, bbox=bbox,
+                              providers=providers, short_name=id,
+                              extensions=extensions, missing_schemas=missing_schemas, column_additions=column_additions,
+                              column_filters=column_filters, column_migrations=column_migrations,
+                              migrate=migration, file_migration=file_migration, layer_filter=layer_filter,
+                              attribution=attribution, license=license, index_as_id=index_as_id)
+    converter.convert(output_file, cache, input_files=input_files, source_coop_url=source_coop_url,
+                      store_collection=store_collection, compression=compression, geoparquet1=geoparquet1,
+                      original_geometries=original_geometries, **kwargs)
 
 
 def add_asset_to_collection(collection, output_file, rows = None, columns = None):
@@ -360,80 +105,6 @@ def add_asset_to_collection(collection, output_file, rows = None, columns = None
     return c
 
 
-def download_files(uris, cache_folder = None):
-    """Download (and cache) files from various sources"""
-    if cache_folder is None:
-        args = {}
-        if sys.version_info.major >= 3 and sys.version_info.minor >= 12:
-            args["delete"] = False # only available in Python 3.12 and later
-        with TemporaryDirectory(**args) as tmp_folder:
-            cache_folder = tmp_folder
-
-    if isinstance(uris, str):
-        uris = {uris: name_from_uri(uris)}
-
-    paths = []
-    i = 0
-    for uri, target in uris.items():
-        i = i + 1
-        is_archive = isinstance(target, list)
-        if is_archive:
-            try:
-                name = name_from_uri(uri)
-                # if there's no file extension, it's likely a folder, which may not be unique
-                if "." not in name:
-                    name = str(i)
-            except:
-                name = str(i)
-        else:
-            name = target
-
-        source_fs = get_fs(uri)
-        cache_fs = get_fs(cache_folder)
-        if not cache_fs.exists(cache_folder):
-            cache_fs.makedirs(cache_folder)
-
-        if isinstance(source_fs, LocalFileSystem):
-            cache_file = uri
-        else:
-            cache_file = os.path.join(cache_folder, name)
-
-        zip_folder = os.path.join(cache_folder, "extracted." + os.path.splitext(name)[0])
-        must_extract = is_archive and not os.path.exists(zip_folder)
-
-        if (not is_archive or must_extract) and not cache_fs.exists(cache_file):
-            with cache_fs.open(cache_file, mode='wb') as file:
-                stream_file(source_fs, uri, file)
-
-        if must_extract:
-            if zipfile.is_zipfile(cache_file):
-                try:
-                    with zipfile.ZipFile(cache_file, 'r') as zip_file:
-                        zip_file.extractall(zip_folder)
-                except NotImplementedError as e:
-                    if str(e) != "That compression method is not supported":
-                        raise
-                    import zipfile_deflate64
-                    with zipfile_deflate64.ZipFile(cache_file, 'r') as zip_file:
-                        zip_file.extractall(zip_folder)
-            elif py7zr.is_7zfile(cache_file):
-                with py7zr.SevenZipFile(cache_file, 'r') as sz_file:
-                    sz_file.extractall(zip_folder)
-            elif name.endswith(".rar"):
-                with rarfile.RarFile(cache_file, 'r') as w:
-                    w.extractall(zip_folder)
-            else:
-                raise ValueError("Only ZIP and 7Z files are supported for extraction")
-
-        if is_archive:
-            for filename in target:
-                paths.append((os.path.join(zip_folder, filename), uri))
-        else:
-            paths.append((cache_file, uri))
-
-    return paths
-
-
 def stream_file(fs, src_uri, dst_file, chunk_size = 10 * 1024 * 1024):
     with fs.open(src_uri, mode='rb') as f:
         while True:
@@ -454,7 +125,7 @@ def normalize_geojson_properties(feature):
     return feature
 
 
-def read_geojson(path, **kwargs):
+def read_geojson(path, layer=None, **kwargs):
     with open(path, **kwargs) as f:
         obj = json.load(f)
 
@@ -465,4 +136,513 @@ def read_geojson(path, **kwargs):
 
     obj["features"] = list(map(normalize_geojson_properties, obj["features"]))
 
-    return gpd.GeoDataFrame.from_features(obj, crs = "EPSG:4326")
+    return gpd.GeoDataFrame.from_features(obj, crs="EPSG:4326")
+
+
+class BaseConverter:
+    bbox: Optional[tuple[float]] = None
+    id: str = None
+    short_name: str = None
+    title: str = None
+    license: str | dict[str, str] = None
+    attribution: str = None
+    description: str = None
+    providers: list[dict] = None
+
+    sources: Optional[dict[str, str] | str] = None
+    source_variants: Optional[dict[dict[str, str] | str]] = None
+    variant: str = None
+    open_options = {}
+
+    columns: dict[str, str] = None
+    column_additions: dict[str, str] = EMPTY_DICT
+    column_filters: dict[str, callable] = EMPTY_DICT
+    column_migrations: dict[str, callable] = EMPTY_DICT
+    missing_schemas: dict[str, str] = EMPTY_DICT
+    extensions: list[str] = tuple()
+
+    index_as_id = False
+
+    def __init__(self, **kwargs):
+        # This init method allows you to override all properties & methods
+        # It's a bit hacky but allows a gradual conversion from function-based to class-based converters
+        self.__dict__.update({k: v for k, v in kwargs.items() if v is not None})
+        for key in ("id", "short_name", "title", "license", "columns"):
+            assert getattr(self, key) is not None, f"{self.__class__.__name__} misses required attribute {key}"
+
+    @property
+    def ID(self):  # noqa backwards compatibility for function-based converters
+        return self.id
+
+    def migrate(self, gdf):
+        return gdf
+
+    def file_migration(self, gdf: gpd.GeoDataFrame, path: str, uri: str, layer: str = None) -> gpd.GeoDataFrame:  # noqa
+        return gdf
+
+    def layer_filter(self, layer, uri):  # noqa
+        return True
+
+    def post_migrate(self, gdf):
+        return gdf
+
+    def download_files(self, uris, cache_folder=None):
+        """Download (and cache) files from various sources"""
+        if cache_folder is None:
+            args = {}
+            if sys.version_info.major >= 3 and sys.version_info.minor >= 12:
+                args["delete"] = False  # only available in Python 3.12 and later
+            with TemporaryDirectory(**args) as tmp_folder:
+                cache_folder = tmp_folder
+
+        if isinstance(uris, str):
+            uris = {uris: name_from_uri(uris)}
+
+        paths = []
+        i = 0
+        for uri, target in uris.items():
+            i = i + 1
+            is_archive = isinstance(target, list)
+            if is_archive:
+                try:
+                    name = name_from_uri(uri)
+                    # if there's no file extension, it's likely a folder, which may not be unique
+                    if "." not in name:
+                        name = hashlib.sha256(uri.encode()).hexdigest()
+                except:
+                    name = hashlib.sha256(uri.encode()).hexdigest()
+            else:
+                name = target
+
+            source_fs = get_fs(uri)
+            cache_fs = get_fs(cache_folder)
+            if not cache_fs.exists(cache_folder):
+                cache_fs.makedirs(cache_folder)
+
+            if isinstance(source_fs, LocalFileSystem):
+                cache_file = uri
+            else:
+                cache_file = os.path.join(cache_folder, name)
+
+            zip_folder = os.path.join(cache_folder, "extracted." + os.path.splitext(name)[0])
+            must_extract = is_archive and not os.path.exists(zip_folder)
+
+            if (not is_archive or must_extract) and not cache_fs.exists(cache_file):
+                with cache_fs.open(cache_file, mode='wb') as file:
+                    stream_file(source_fs, uri, file)
+
+            if must_extract:
+                if zipfile.is_zipfile(cache_file):
+                    try:
+                        with zipfile.ZipFile(cache_file, 'r') as zip_file:
+                            zip_file.extractall(zip_folder)
+                    except NotImplementedError as e:
+                        if str(e) != "That compression method is not supported":
+                            raise
+                        import zipfile_deflate64
+                        with zipfile_deflate64.ZipFile(cache_file, 'r') as zip_file:
+                            zip_file.extractall(zip_folder)
+                elif py7zr.is_7zfile(cache_file):
+                    with py7zr.SevenZipFile(cache_file, 'r') as sz_file:
+                        sz_file.extractall(zip_folder)
+                elif rarfile.is_rarfile(cache_file):
+                    with rarfile.RarFile(cache_file, 'r') as w:
+                        w.extractall(zip_folder)
+                else:
+                    raise ValueError(f"Only ZIP and 7Z files are supported for extraction, fails for: {cache_file}")
+
+            if is_archive:
+                for filename in target:
+                    paths.append((os.path.join(zip_folder, filename), uri))
+            else:
+                paths.append((cache_file, uri))
+
+        return paths
+
+    def get_urls(self, **kwargs):
+        urls = self.sources
+        if not urls and self.source_variants:
+            if self.variant is None:
+                self.variant = next(iter(self.source_variants))
+                log(f"Choosing first variant {self.variant}", "warning")
+            if self.variant in self.source_variants:
+                urls = self.source_variants[self.variant]
+            else:
+                opts = ", ".join(self.source_variants.keys())
+                raise ValueError(f"Unknown variant '{self.variant}', choose from {opts}")
+        return urls
+
+    def read_data(self, paths, **kwargs):
+        gdfs = []
+        for path, uri in paths:
+            if "*" in path:
+                lst = glob(path)
+                assert len(lst) == 1, f"Can not match {path} to a single file"
+                path = lst[0]
+            log(f"Reading {path} into GeoDataFrame(s)")
+            is_parquet = path.endswith(".parquet") or path.endswith(".geoparquet")
+            is_json = path.endswith(".json") or path.endswith(".geojson")
+            layers = [None]
+            # Parquet doesn't support layers
+            if not is_parquet:
+                all_layers = gpd.list_layers(path)
+                layers = [layer for layer in all_layers["name"] if self.layer_filter(str(layer), path)]
+                if len(layers) == 0:
+                    log(f"No layers left for layering after filtering", "warning")
+
+            for layer in layers:
+                if layer is not None:
+                    kwargs["layer"] = layer
+                    log(f"- Reading layer {layer} into GeoDataFrame")
+
+                if is_parquet:
+                    data = gpd.read_parquet(path, **kwargs)
+                elif is_json:
+                    data = read_geojson(path, **kwargs)
+                else:
+                    data = gpd.read_file(path, **kwargs)
+
+                # 0. Run migration per file/layer
+                data = self.file_migration(data, path, uri, layer)
+                if not isinstance(data, gpd.GeoDataFrame):
+                    raise ValueError("Per-file/layer migration function must return a GeoDataFrame")
+
+                gdfs.append(data)
+
+        return pd.concat(gdfs)
+
+    def filter_rows(self, gdf):
+        if len(self.column_filters) > 0:
+            log("Applying filters")
+            for key, fn in self.column_filters.items():
+                if key in gdf.columns:
+                    result = fn(gdf[key])
+                    # If the result is a tuple, the second value is a flag to potentially invert the mask
+                    if isinstance(result, tuple):
+                        if result[1]:
+                            # Invert mask
+                            mask = ~result[0]
+                        else:
+                            # Use mask as is
+                            mask = result[0]
+                    else:
+                        # Just got a mask, proceed
+                        mask = result
+
+                    # Filter columns based on the mask
+                    gdf = gdf[mask]
+                else:
+                    log(f"Column '{key}' not found in dataset, skipping filter", "warning")
+        return gdf
+
+    def create_collection(self, gdf, source_coop_url):
+        """
+        Creates a collection for the field boundary datasets.
+        """
+        bbox = self.bbox
+        if bbox is None:
+            bbox = list(gpd.GeoSeries([box(*gdf.total_bounds)], crs=gdf.crs).to_crs(epsg=4326).total_bounds)
+
+        collection = {
+            "fiboa_version": fiboa_version,
+            "fiboa_extensions": self.extensions,
+            "type": "Collection",
+            "id": self.id.strip(),
+            "title": self.title.strip(),
+            "description": self.description.strip(),
+            "license": "proprietary",
+            "providers": self.providers,
+            "extent": {
+                "spatial": {
+                    "bbox": [bbox]
+                },
+            },
+            "links": []
+        }
+
+        if "determination_datetime" in gdf.columns:
+            dates = pd.to_datetime(gdf['determination_datetime'])
+            min_time = to_iso8601(dates.min())
+            max_time = to_iso8601(dates.max())
+
+            collection["extent"]["temporal"] = {
+                "interval": [[min_time, max_time]]
+            }
+            # Without temporal extent it's not valid STAC
+            collection["stac_version"] = "1.0.0"
+
+        # Add fiboa CLI to providers
+        collection["providers"].append({
+            "name": "fiboa CLI",
+            "roles": ["processor"],
+            "url": "https://pypi.org/project/fiboa-cli"
+        })
+
+        # Add source coop to providers if applicable
+        if source_coop_url is not None:
+            collection["providers"].append({
+                "name": "Source Cooperative",
+                "roles": ["host"],
+                "url": source_coop_url
+            })
+
+        # Update attribution
+        if self.attribution is not None:
+            collection["attribution"] = self.attribution
+
+        # Update license
+        if isinstance(self.license, dict):
+            collection["links"].append(self.license)
+        elif isinstance(self.license, str):
+            if self.license.lower() == "dl-de/by-2-0":
+                collection["links"].append({
+                    "href": "https://www.govdata.de/dl-de/by-2-0",
+                    "title": "Data licence Germany - attribution - Version 2.0",
+                    "type": "text/html",
+                    "rel": "license"
+                })
+            elif self.license.lower() == "dl-de/zero-2-0":
+                collection["links"].append({
+                    "href": "https://www.govdata.de/dl-de/zero-2-0",
+                    "title": "Data licence Germany - Zero - Version 2.0",
+                    "type": "text/html",
+                    "rel": "license"
+                })
+            elif re.match(r"^[\w\.-]+$", self.license):
+                collection["license"] = self.license
+            else:
+                log(f"Invalid license identifier: {self.license}", "warning")
+        else:
+            log(f"License information missing", "warning")
+
+        return collection
+
+    def convert(self, output_file, cache=None, input_files=None, source_coop_url=None, store_collection=False, variant=None, compression=None, geoparquet1=False, mapping_file=None, original_geometries=False, **kwargs):
+        columns = self.columns.copy()
+        self.variant = variant
+        """
+        Converts a field boundary datasets to fiboa.
+        """
+        if self.bbox is not None and len(self.bbox) != 4:
+            raise ValueError("If provided, the bounding box must consist of 4 numbers")
+
+        # Create output folder if it doesn't exist
+        directory = os.path.dirname(output_file)
+        if directory:
+            os.makedirs(directory, exist_ok=True)
+
+        if input_files is not None and isinstance(input_files, dict) and len(input_files) > 0:
+            log("Using user provided input file(s) instead of the pre-defined file(s)", "warning")
+            urls = input_files
+        elif (urls := self.get_urls(cache=cache)) is None:
+            raise ValueError("No input files provided")
+
+        log("Getting file(s) if not cached yet")
+        paths = self.download_files(urls, cache)
+
+        kwargs.update(self.open_options)
+        gdf = self.read_data(paths, **kwargs)
+
+        log("GeoDataFrame created from source(s):")
+        # Make it so that everything is shown, don't output ... if there are too many columns or rows
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.max_rows', None)
+        print(gdf.head())
+
+        if self.index_as_id:
+            gdf["id"] = gdf.index
+
+        hash_before = hash_df(gdf)
+        # 1. Run global migration
+        log("Applying global migrations")
+        gdf = self.migrate(gdf)
+        assert isinstance(gdf, gpd.GeoDataFrame), "Migration function must return a GeoDataFrame"
+
+        # 2. Run filters to remove rows that shall not be in the final data
+        gdf = self.filter_rows(gdf)
+
+        # 3. Add constant columns
+        if self.column_additions:
+            log("Adding columns")
+            for key, value in self.column_additions.items():
+                gdf[key] = value
+                columns[key] = key
+
+        # 4. Run column migrations
+        if self.column_migrations:
+            log("Applying column migrations")
+            for key, fn in self.column_migrations.items():
+                if key in gdf.columns:
+                    gdf[key] = fn(gdf[key])
+                else:
+                    log(f"Column '{key}' not found in dataset, skipping migration", "warning")
+
+        # 4b. For geometry column, fix geometries
+        if not original_geometries:
+            gdf.geometry = gdf.geometry.make_valid()
+            gdf = gdf.explode()
+            gdf = gdf[np.logical_and(gdf.geometry.type == "Polygon", gdf.geometry.is_valid)]
+
+        gdf = self.post_migrate(gdf)
+
+        if hash_before != hash_df(gdf):
+            log("GeoDataFrame after migrations and filters:")
+            print(gdf.head())
+
+        # 5. Duplicate columns if needed
+        actual_columns = {}
+        for old_key, new_key in columns.items():
+            if old_key in gdf.columns:
+                # If the new keys are a list, duplicate the column
+                if isinstance(new_key, list):
+                    for key in new_key:
+                        gdf[key] = gdf.loc[:, old_key]
+                        actual_columns[key] = key
+                # If the new key is a string, plan to rename the column
+                elif old_key in gdf.columns:
+                    actual_columns[old_key] = new_key
+            # If old key is not found, remove from the schema and warn
+            else:
+                log(f"Column '{old_key}' not found in dataset, removing from schema", "warning")
+
+        # 6. Rename columns
+        gdf.rename(columns = actual_columns, inplace = True)
+        geometry_renamed = any(True for k, v in actual_columns.items() if v == "geometry" and k != v)
+        if geometry_renamed:
+            gdf.set_geometry("geometry", inplace=True)
+
+        # 7. Remove all columns that are not listed
+        drop_columns = list(set(gdf.columns) - set(actual_columns.values()))
+        gdf.drop(columns = drop_columns, inplace = True)
+
+        log("GeoDataFrame fully migrated:")
+        print(gdf.head())
+
+        collection = self.create_collection(gdf, source_coop_url=source_coop_url)
+
+        log("Creating GeoParquet file: " + output_file)
+        config = {"fiboa_version": fiboa_version}
+        columns = list(actual_columns.values())
+        pq_fields = create_parquet(gdf, columns, collection, output_file, config, self.missing_schemas, compression, geoparquet1)
+        if store_collection:
+            external_collection = add_asset_to_collection(collection, output_file, rows = len(gdf), columns = pq_fields)
+            collection_file = os.path.join(os.path.dirname(output_file), "collection.json")
+            log("Creating Collection file: " + collection_file)
+            with open(collection_file, "w") as f:
+                json.dump(external_collection, f, indent=2)
+
+        log("Finished", "success")
+
+    def __call__(self, *args, **kwargs):
+        self.convert(*args, **kwargs)
+
+
+def hash_df(df):
+    # dataframe is unhashable, simple way to
+    buf = StringIO()
+    df.info(buf=buf)
+    return hash(buf.getvalue())
+
+
+class EsriRESTPregenerateConverterMixin:
+    # Mixin class for BaseConveter
+    # Requires self.rest_base_url, pointing to an ESRI Rest Mapservice
+    # Overrides self.get_urls() to discover available layers. Generates a list of paged source-urls
+    rest_base_url = None
+    rest_params = {"where": "OBJECTID>=0"}
+
+    def rest_layer_filter(self, layers):
+        return next(iter(layers))
+
+    def get_urls(self, **kwargs):
+        service_metadata = requests.get(f"{self.rest_base_url}/", {"f": "pjson"}).json()
+        layer = self.rest_layer_filter(service_metadata["layers"])
+        page_size = service_metadata["maxRecordCount"]
+
+        layer_url = f"{self.rest_base_url}/{layer['id']}/query"
+        count_params = self.rest_params | {"returnCountOnly": "true", "f": "pjson"}
+        layer_count = requests.get(layer_url, count_params).json()["count"]
+        nr_pages = (layer_count + page_size - 1) // page_size
+
+        get_dict = self.rest_params | {"outFields": "*", "returnGeometry": "true", "f": "geojson"}
+        return {
+            f"{layer_url}?{urlencode(get_dict | dict(resultRecordCount=page_size, resultOffset=page_size * page))}":
+                f"{self.id}_{self.variant or ''}_{page}.json"
+            for page in range(nr_pages)
+        }
+
+
+class EsriRESTConverterMixin:
+    cache_folder = None
+    rest_base_url = None
+    rest_params = {}
+    rest_attribute = "OBJECTID"  # orderable, filterable, indexed
+
+    def rest_layer_filter(self, layers):
+        return next(iter(layers))
+
+    def get_urls(self, **kwargs):
+        assert self.rest_base_url, "Either define {c}.rest_base_url or override {c}.get_urls()".format(c=self.__class__.__name__)
+        return {"REST": self.rest_base_url}
+
+    def download_files(self, uris, cache_folder=None):
+        # Read-data will just stream alle pages of rest-service
+        if next(iter(uris), "").startswith("REST"):
+            self.cache_folder = cache_folder
+            return list(uris.values())
+
+        # This happens when input_file param is used
+        return super().download_files(uris, cache_folder)
+
+    def read_data(self, paths, **kwargs):
+        if not paths[0].startswith("http"):
+            # This happens when input_file param is used
+            return super().read_data(paths, **kwargs)
+
+        base_url = paths[0]  # loop over paths to support more than 1 source
+
+        source_fs = get_fs(base_url)
+        cache_fs = None
+
+        if self.cache_folder:
+            cache_fs = get_fs(self.cache_folder)
+            if not cache_fs.exists(self.cache_folder):
+                cache_fs.makedirs(self.cache_folder)
+
+        service_metadata = requests.get(base_url, {"f": "pjson"}).json()
+        layer = self.rest_layer_filter(service_metadata["layers"])
+        page_size = service_metadata["maxRecordCount"]
+        layer_url = f"{base_url}/{layer['id']}/query"
+        get_dict = self.rest_params | {
+            "outFields": "*",
+            "returnGeometry": "true",
+            "f": "geojson",
+            "sortBy": self.rest_attribute,
+            "resultRecordCount": page_size
+        }
+        gdfs = []
+        last_id = -1
+        while True:
+            get_dict["where"] = f"{self.rest_attribute}>{last_id}"
+            url = f"{layer_url}?{urlencode(get_dict)}"
+            if cache_fs is not None:
+                cache_file = os.path.join(self.cache_folder, f"{self.id}_{layer['id']}_{last_id}.geojson")
+                if not cache_fs.exists(cache_file):
+                    with cache_fs.open(cache_file, mode='wb') as file:
+                        print(url)
+                        stream_file(source_fs, url, file)
+                url = cache_file
+
+            data = gpd.read_file(url)
+            print(f"Read {len(data)} features, page {len(gdfs)} from [{data.iloc[0, 0]} ... {data.iloc[-1, 0]}]")
+            last_id = data[self.rest_attribute].values[-1]
+
+            # 0. Run migration per file/layer
+            data = self.file_migration(data, base_url, base_url, layer["id"])
+            if not isinstance(data, gpd.GeoDataFrame):
+                raise ValueError("Per-file/layer migration function must return a GeoDataFrame")
+
+            gdfs.append(data)
+            if not len(data) >= page_size:
+                break
+        return pd.concat(gdfs)
