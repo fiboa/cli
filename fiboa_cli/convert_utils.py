@@ -205,9 +205,7 @@ class BaseConverter:
             uris = {uris: name_from_uri(uris)}
 
         paths = []
-        i = 0
         for uri, target in uris.items():
-            i = i + 1
             is_archive = isinstance(target, list)
             if is_archive:
                 try:
