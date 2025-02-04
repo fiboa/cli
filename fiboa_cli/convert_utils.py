@@ -282,8 +282,7 @@ class BaseConverter:
                 raise ValueError(f"Unknown year '{self.year}', choose from {opts}")
         return urls
 
-    def read_data(self, paths, **kwargs):
-        gdfs = []
+    def get_data(self, paths, **kwargs):
         for path, uri in paths:
             # e.g. allow "*.shp" to identify the single relevant file without knowing the name in advance
             if "*" in path:
@@ -313,12 +312,16 @@ class BaseConverter:
                 else:
                     data = gpd.read_file(path, **kwargs)
 
-                # 0. Run migration per file/layer
-                data = self.file_migration(data, path, uri, layer)
-                if not isinstance(data, gpd.GeoDataFrame):
-                    raise ValueError("Per-file/layer migration function must return a GeoDataFrame")
+                yield data, path, uri, layer
 
-                gdfs.append(data)
+    def read_data(self, paths, **kwargs):
+        gdfs = []
+        for data, path, uri, layer in self.get_data(paths, **kwargs):
+            # 0. Run migration per file/layer
+            data = self.file_migration(data, path, uri, layer)
+            if not isinstance(data, gpd.GeoDataFrame):
+                raise ValueError("Per-file/layer migration function must return a GeoDataFrame")
+            gdfs.append(data)
 
         return pd.concat(gdfs)
 

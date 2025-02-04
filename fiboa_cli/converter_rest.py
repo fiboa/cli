@@ -32,13 +32,12 @@ class EsriRESTConverterMixin:
         # This happens when input_file param is used
         return super().download_files(uris, cache_folder)
 
-    def read_data(self, paths, **kwargs):
+    def get_data(self, paths, **kwargs):
         if not paths[0].startswith("http"):
             # This happens when input_file param is used
-            return super().read_data(paths, **kwargs)
+            return super().get_data(paths, **kwargs)
 
         base_url = paths[0]  # loop over paths to support more than 1 source
-
         source_fs = get_fs(base_url)
         cache_fs, cache_folder = self.get_cache(self.cache_folder)
 
@@ -69,12 +68,7 @@ class EsriRESTConverterMixin:
             print(f"Read {len(data)} features, page {len(gdfs)} from [{data.iloc[0, 0]} ... {data.iloc[-1, 0]}]")
             last_id = data[self.rest_attribute].values[-1]
 
-            # 0. Run migration per file/layer
-            data = self.file_migration(data, base_url, base_url, layer["id"])
-            if not isinstance(data, gpd.GeoDataFrame):
-                raise ValueError("Per-file/layer migration function must return a GeoDataFrame")
+            yield data, base_url, base_url, layer["id"]
 
-            gdfs.append(data)
             if not len(data) >= page_size:
                 break
-        return pd.concat(gdfs)
