@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 import requests
 
+from .convert_utils import stream_file
 from .util import get_fs
 
 import os
@@ -39,12 +40,7 @@ class EsriRESTConverterMixin:
         base_url = paths[0]  # loop over paths to support more than 1 source
 
         source_fs = get_fs(base_url)
-        cache_fs = None
-
-        if self.cache_folder:
-            cache_fs = get_fs(self.cache_folder)
-            if not cache_fs.exists(self.cache_folder):
-                cache_fs.makedirs(self.cache_folder)
+        cache_fs, cache_folder = self.get_cache(self.cache_folder)
 
         service_metadata = requests.get(base_url, {"f": "pjson"}).json()
         layer = self.rest_layer_filter(service_metadata["layers"])
@@ -63,10 +59,9 @@ class EsriRESTConverterMixin:
             get_dict["where"] = f"{self.rest_attribute}>{last_id}"
             url = f"{layer_url}?{urlencode(get_dict)}"
             if cache_fs is not None:
-                cache_file = os.path.join(self.cache_folder, f"{self.id}_{layer['id']}_{last_id}.geojson")
+                cache_file = os.path.join(cache_folder, f"{self.id}_{layer['id']}_{last_id}.geojson")
                 if not cache_fs.exists(cache_file):
                     with cache_fs.open(cache_file, mode='wb') as file:
-                        print(url)
                         stream_file(source_fs, url, file)
                 url = cache_file
 

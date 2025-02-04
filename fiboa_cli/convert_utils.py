@@ -192,15 +192,23 @@ class BaseConverter:
     def post_migrate(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         return gdf
 
-    def download_files(self, uris, cache_folder=None):
-        """Download (and cache) files from various sources"""
+    def get_cache(self, cache_folder=None, force=False):
         if cache_folder is None:
-            args = {}
+            if not force:
+                return None, None
+            _kwargs = {}
             if sys.version_info.major >= 3 and sys.version_info.minor >= 12:
-                args["delete"] = False  # only available in Python 3.12 and later
-            with TemporaryDirectory(**args) as tmp_folder:
+                _kwargs["delete"] = False  # only available in Python 3.12 and later
+            with TemporaryDirectory(**_kwargs) as tmp_folder:
                 cache_folder = tmp_folder
 
+        cache_fs = get_fs(cache_folder)
+        if not cache_fs.exists(cache_folder):
+            cache_fs.makedirs(cache_folder)
+        return cache_fs, cache_folder
+
+    def download_files(self, uris, cache_folder=None):
+        """Download (and cache) files from various sources"""
         if isinstance(uris, str):
             uris = {uris: name_from_uri(uris)}
 
@@ -219,9 +227,7 @@ class BaseConverter:
                 name = target
 
             source_fs = get_fs(uri)
-            cache_fs = get_fs(cache_folder)
-            if not cache_fs.exists(cache_folder):
-                cache_fs.makedirs(cache_folder)
+            cache_fs, cache_folder = self.get_cache(cache_folder, force=True)
 
             if isinstance(source_fs, LocalFileSystem):
                 cache_file = uri
