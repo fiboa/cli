@@ -279,6 +279,7 @@ class BaseConverter:
     def read_data(self, paths, **kwargs):
         gdfs = []
         for path, uri in paths:
+            # e.g. allow "*.shp" to identify the single relevant file without knowing the name in advance
             if "*" in path:
                 lst = glob(path)
                 assert len(lst) == 1, f"Can not match {path} to a single file"
