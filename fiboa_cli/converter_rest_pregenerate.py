@@ -13,7 +13,7 @@ class EsriRESTPregenerateConverterMixin:
     def rest_layer_filter(self, layers):
         return next(iter(layers))
 
-    def get_urls(self, **kwargs):
+    def get_urls(self):
         service_metadata = requests.get(f"{self.rest_base_url}/", {"f": "pjson"}).json()
         layer = self.rest_layer_filter(service_metadata["layers"])
         page_size = service_metadata["maxRecordCount"]

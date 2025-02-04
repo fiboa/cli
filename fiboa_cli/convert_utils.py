@@ -263,7 +263,7 @@ class BaseConverter:
 
         return paths
 
-    def get_urls(self, **kwargs):
+    def get_urls(self):
         urls = self.sources
         if not urls and self.years:
             opts = ", ".join([str(s) for s in self.years.keys()])
@@ -443,8 +443,10 @@ class BaseConverter:
         if input_files is not None and isinstance(input_files, dict) and len(input_files) > 0:
             log("Using user provided input file(s) instead of the pre-defined file(s)", "warning")
             urls = input_files
-        elif (urls := self.get_urls(cache=cache)) is None:
-            raise ValueError("No input files provided")
+        else:
+            urls = self.get_urls()
+            if urls is None:
+                raise ValueError("No input files provided")
 
         log("Getting file(s) if not cached yet")
         paths = self.download_files(urls, cache)

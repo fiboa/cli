@@ -18,7 +18,7 @@ class EsriRESTConverterMixin:
     def rest_layer_filter(self, layers):
         return next(iter(layers))
 
-    def get_urls(self, **kwargs):
+    def get_urls(self):
         assert self.rest_base_url, "Either define {c}.rest_base_url or override {c}.get_urls()".format(c=self.__class__.__name__)
         return {"REST": self.rest_base_url}
 

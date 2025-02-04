@@ -39,7 +39,7 @@ class NCConverter(ESBaseConverter):
     use_code_attribute = "IDUSO24"
     index_as_id = True
 
-    def get_urls(self, cache=None):
+    def get_urls(self):
         # scrape HTML page for sources
         content = requests.get("https://sigpac.navarra.es/descargas/", verify=False).text
         base = re.search('var rutaBase = "(.*?)";', content).group(1)

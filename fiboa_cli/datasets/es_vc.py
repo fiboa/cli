@@ -50,7 +50,7 @@ class ESVCConverter(ESBaseConverter):
     }
     use_code_attribute = "USO_SIGPAC"
 
-    def get_urls(self, **kwargs):
+    def get_urls(self):
         if not self.variant:
             self.variant = next(iter(self.source_variants))
         self.column_additions["determination_datetime"] = datetime(int(self.variant), 1, 1)

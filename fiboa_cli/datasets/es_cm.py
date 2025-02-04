@@ -51,7 +51,7 @@ class ESCMConverter(EsriRESTConverterMixin, ESBaseConverter):
     rest_base_url = "https://geoservicios.castillalamancha.es/arcgis/rest/services/Vector"
     rest_attribute = "objectid_1"
 
-    def get_urls(self, **kwargs):
+    def get_urls(self):
         latest_variant = next(iter(self.source_variants))
         if not self.variant:
             self.variant = latest_variant

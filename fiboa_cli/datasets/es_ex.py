@@ -52,7 +52,7 @@ class EXConverter(ESBaseConverter):
     }
     source_variants = {"2024": "TODO", "2023": "TODO"}
 
-    def get_urls(self, **kwargs):
+    def get_urls(self):
         if not self.variant:
             self.variant = next(iter(self.source_variants))
 

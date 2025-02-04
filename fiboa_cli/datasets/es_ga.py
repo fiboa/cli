@@ -52,7 +52,7 @@ class ESGAConverter(EsriRESTConverterMixin, ESBaseConverter):
     def rest_layer_filter(self, layers):
         return next(layer for layer in layers if "recintos" in layer["name"].lower())
 
-    def get_urls(self, **kwargs):
+    def get_urls(self):
         if not self.variant:
             self.variant = next(iter(self.source_variants))
         return {"REST": self.rest_base_url.format(variant=self.variant)}

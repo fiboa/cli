@@ -59,7 +59,7 @@ class ESCLConverter(ESBaseConverter):
                 new.append((os.path.join(directory, p), uri))
         return new
 
-    def get_urls(self, **kwargs):
+    def get_urls(self):
         if not self.variant:
             self.variant = "2024"
             log(f"Choosing first variant {self.variant}", "warning")
