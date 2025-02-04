@@ -122,7 +122,7 @@ def normalize_geojson_properties(feature):
     return feature
 
 
-def read_geojson(path, layer=None, **kwargs):
+def read_geojson(path, **kwargs):
     with open(path, **kwargs) as f:
         obj = json.load(f)
 
@@ -289,8 +289,8 @@ class BaseConverter:
             is_parquet = path.endswith(".parquet") or path.endswith(".geoparquet")
             is_json = path.endswith(".json") or path.endswith(".geojson")
             layers = [None]
-            # Parquet doesn't support layers
-            if not is_parquet:
+            # Parquet and geojson don't support layers
+            if not (is_parquet or is_json):
                 all_layers = gpd.list_layers(path)
                 layers = [layer for layer in all_layers["name"] if self.layer_filter(str(layer), path)]
                 if len(layers) == 0:
