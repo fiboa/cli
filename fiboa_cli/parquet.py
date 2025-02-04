@@ -54,6 +54,7 @@ def create_parquet(data, columns, collection, output_file, config, missing_schem
         required_props = schemas.get("required", [])
         properties = schemas.get("properties", {})
         required = name in required_props
+        field = None
         if name in properties:
             prop_schema = properties[name]
             try:
