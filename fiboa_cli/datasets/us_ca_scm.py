@@ -39,7 +39,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         "crop:name": "crop:name",
         "COUNTY": "admin_level_2",
     }
-    add_columns = {
+    column_additions = {
         "determination_datetime": "2023-05-01T00:00:00Z",
         "crop:code_list": "https://fiboa.org/code/us/ca/scm.csv",
     }

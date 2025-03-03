@@ -34,7 +34,7 @@ class Converter(AdminConverterMixin, BaseConverter):
     ]
     # Both http://creativecommons.org/publicdomain/zero/1.0/deed.nl and http://creativecommons.org/publicdomain/mark/1.0/
     license = "CC0-1.0"
-    add_columns = {
+    column_additions = {
         "determination_datetime": "2023-06-15T00:00:00Z"
     }
     columns = {

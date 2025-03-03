@@ -57,7 +57,7 @@ class Converter(AdminConverterMixin, BaseConverter):
             },
         }
     }
-    add_columns = {
+    column_additions = {
         "determination_datetime": "2022-01-01T00:00:00Z"
     }
     column_migrations = {

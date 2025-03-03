@@ -47,7 +47,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         "micd": "planet:micd",  # From Planet extension for fiboa
         "qa": "planet:qa",  # From Planet extension for fiboa
     }
-    add_columns = {
+    column_additions = {
         "determination_method": "auto-imagery"
     }
     missing_schemas = {}

@@ -78,7 +78,7 @@ class TemplateConverter(BaseConverter):  # change this class name to your use ca
 
     # Add columns with constant values.
     # The key is the column name, the value is a constant value that's used for all rows.
-    add_columns = {
+    column_additions = {
     }
 
     # A list of implemented extension identifiers

@@ -45,6 +45,6 @@ class Converter(BaseConverter):
     column_migrations = {
         'area': lambda column: column / 10000
     }
-    add_columns = {
+    column_additions = {
         "determination_method": "auto-imagery"
     }

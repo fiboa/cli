@@ -51,7 +51,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         "GWSNAM_H": "crop_name",
     }
 
-    add_columns = {
+    column_additions = {
         "determination_datetime": "2024-03-28T00:00:00Z"
     }
 

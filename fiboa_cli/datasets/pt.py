@@ -27,7 +27,7 @@ class PTConverter(BaseConverter):
         "Shape_Area": "area",
         "Shape_Length": "perimeter"
     }
-    add_columns = {
+    column_additions = {
         "determination_datetime": "2023-01-01T00:00:00Z"
     }
     column_migrations = {
