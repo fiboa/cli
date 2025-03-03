@@ -61,21 +61,22 @@ class Converter(AdminConverterMixin, BaseConverter):
         """
         Perform migration on the GeoDataFrame by dissolving polygons by crop code
         and mapping crop names.
+
+        "dissolve": merge adjacent polygons with the same crop
+        geodataframe.Dissolve(method="unary") is **slow** for large datasets
+        So we're handling this huge dataset in blocks, states are a natural grouping-method
         """
-        # Handle large dataset in blocks grouped by state
         gdf = super().migrate(gdf)
         states = list(gdf["STATEFIPS"].unique())
         gdfs = []
         for state in states:
             log(f"Handling State {state}", "info")
             df = gdf[gdf["STATEFIPS"] == state].explode()
-            df = df.dissolve(by=["CDL2023"], aggfunc="first").explode()
+            # TODO is this correct, don't we need `df = df.dissolve?`
+            df.dissolve(by=["CDL2023"], aggfunc="first").explode()
             gdfs.append(df)
-
         gdf = pd.concat(gdfs)
         del gdfs
-
-        # Map crop names
         mapping = load_ec_mapping(url=join(dirname(__file__), "data-files", "us_usda_cropland.csv"))
         original_name_mapping = {int(e["original_code"]): e["original_name"] for e in mapping}
         gdf["crop:name"] = gdf["CDL2023"].map(original_name_mapping)
