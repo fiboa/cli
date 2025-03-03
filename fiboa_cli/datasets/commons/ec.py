@@ -58,6 +58,7 @@ In the data you'll find this as additional attributes:
 class EuroCropsConverterMixin:
     ec_mapping_csv = None
     mapping_file = None
+    ec_mapping = None
 
     def __init__(self, *args, year=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -80,11 +81,11 @@ class EuroCropsConverterMixin:
         return col if col.dtype == 'object' else col.astype(str)
 
     def add_hcat(self, gdf):
-        ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+        self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
         crop_code_col = self.get_code_column(gdf)
 
         def map_to(attribute):
-            return {e["original_code"]: e[attribute] for e in ec_mapping}
+            return {e["original_code"]: e[attribute] for e in self.ec_mapping}
 
         gdf['EC_trans_n'] = crop_code_col.map(map_to("translated_name"))
         gdf['EC_hcat_n'] = crop_code_col.map(map_to("HCAT3_name"))

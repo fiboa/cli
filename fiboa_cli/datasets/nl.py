@@ -1,89 +1,65 @@
-from ..convert_utils import convert as convert_
-from .commons.admin import add_admin
+from ..convert_utils import convert as convert_, BaseConverter
+from .commons.admin import add_admin, AdminConverterMixin
 
-SOURCES = "https://service.pdok.nl/rvo/referentiepercelen/atom/downloads/referentiepercelen.gpkg"
 
-ID = "nl"
-SHORT_NAME = "Netherlands"
-TITLE = "Field boundaries for The Netherlands"
-DESCRIPTION = """
-A field block (Dutch: "Referentieperceel"), formerly known as "AAN" (Agrarisch Areaal Nederland),
-is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or
-more farmers with one or more crops, is fully or partially set aside or is fully or partially
-taken out of production.
+class Converter(AdminConverterMixin, BaseConverter):
+    sources = "https://service.pdok.nl/rvo/referentiepercelen/atom/downloads/referentiepercelen.gpkg"
 
-The following field block types exist:
+    id = "nl"
+    short_name = "Netherlands"
+    title = "Field boundaries for The Netherlands"
+    description = """
+    A field block (Dutch: "Referentieperceel"), formerly known as "AAN" (Agrarisch Areaal Nederland),
+    is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or
+    more farmers with one or more crops, is fully or partially set aside or is fully or partially
+    taken out of production.
 
-- Woods (Hout)
-- Agricultural area (Landbouwgrond)
-- Other (Overig)
-- Water (Water)
+    The following field block types exist:
 
-We filter on "Agricultural area" in this converter.
-For crop data, look at BasisRegistratie gewasPercelen (BRP)
-"""
+    - Woods (Hout)
+    - Agricultural area (Landbouwgrond)
+    - Other (Overig)
+    - Water (Water)
 
-PROVIDERS = [
-    {
-        "name": "RVO / PDOK",
-        "url": "https://www.pdok.nl/introductie/-/article/referentiepercelen",
-        "roles": ["producer", "licensor"]
+    We filter on "Agricultural area" in this converter.
+    For crop data, look at BasisRegistratie gewasPercelen (BRP)
+    """
+
+    providers = [
+        {
+            "name": "RVO / PDOK",
+            "url": "https://www.pdok.nl/introductie/-/article/referentiepercelen",
+            "roles": ["producer", "licensor"]
+        }
+    ]
+    # Both http://creativecommons.org/publicdomain/zero/1.0/deed.nl and http://creativecommons.org/publicdomain/mark/1.0/
+    license = "CC0-1.0"
+    add_columns = {
+        "determination_datetime": "2023-06-15T00:00:00Z"
     }
-]
-ATTRIBUTION = None
-# Both http://creativecommons.org/publicdomain/zero/1.0/deed.nl and http://creativecommons.org/publicdomain/mark/1.0/
-LICENSE = "CC0-1.0"
-
-ADD_COLUMNS = {
-    "determination_datetime": "2023-06-15T00:00:00Z"
-}
-
-COLUMNS = {
-    'geometry': 'geometry',
-    'id': 'id',
-    'area': "area",
-    'versiebron': 'source'
-}
-
-COLUMN_FILTERS = {
-    # type = "Hout" | "Landbouwgrond" | "Overig" | "Water"
-    "type": lambda col: col == "Landbouwgrond"
-}
-
-def migrate(gdf):
-    # Projection is in CRS 28992 (RD New), this is the area calculation method of the source organization
-    # todo: remove in favor of generic solution for area calculation
-    gdf['area'] = gdf.area / 10000
-    return gdf
-
-MISSING_SCHEMAS = {
-    "properties": {
-        "source": {
-            "type": "string"
-        },
+    columns = {
+        'geometry': 'geometry',
+        'id': 'id',
+        'area': "area",
+        'versiebron': 'source'
     }
-}
+    column_filters = {
+        # type = "Hout" | "Landbouwgrond" | "Overig" | "Water"
+        "type": lambda col: col == "Landbouwgrond"
+    }
+    index_as_id = True
 
-COLUMNS, ADD_COLUMNS, EXTENSIONS = add_admin(vars(), "NL")
+    def migrate(self, gdf):
+        # Projection is in CRS 28992 (RD New), this is the area calculation method of the source organization
+        # todo: remove in favor of generic solution for area calculation
+        gdf = super().migrate(gdf)
+        gdf['area'] = gdf.area / 10000
+        return gdf
 
-
-def convert(output_file, cache = None, **kwargs):
-    convert_(
-        output_file,
-        cache,
-        SOURCES,
-        COLUMNS,
-        ID,
-        TITLE,
-        DESCRIPTION,
-        providers=PROVIDERS,
-        extensions=EXTENSIONS,
-        missing_schemas=MISSING_SCHEMAS,
-        column_additions=ADD_COLUMNS,
-        column_filters=COLUMN_FILTERS,
-        migration=migrate,
-        attribution=ATTRIBUTION,
-        license=LICENSE,
-        index_as_id=True,
-        **kwargs
-    )
+    missing_schemas = {
+        "properties": {
+            "source": {
+                "type": "string"
+            },
+        }
+    }

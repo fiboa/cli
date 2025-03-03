@@ -4,7 +4,7 @@ import pandas as pd
 
 
 class NZCropConverter(BaseConverter):
-    DATA_ACCESS = "Download manually from https://data.mfe.govt.nz/layer/105407-irrigated-land-area-raw-2020-update/"
+    data_access = "Download manually from https://data.mfe.govt.nz/layer/105407-irrigated-land-area-raw-2020-update/"
 
     id = "nz"
     short_name = "New Zealand"

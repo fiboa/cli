@@ -12,6 +12,7 @@ test_path = "tests/data-files/convert"
 extra_convert_parameters = {
     "ai4sf": ['-i', f'{test_path}/ai4sf/1_vietnam_areas.gpkg', '-i', f'{test_path}/ai4sf/4_cambodia_areas.gpkg'],
     "nl_crop": ["--year=2023"],
+    "be_vlg": ["--year=2023"],
     "br_ba_lem": ["-i", f"{test_path}/br_ba_lem/LEM_dataset.zip"],
     "ch": ["-i", f"{test_path}/ch/lwb_nutzungsflaechen_v2_0_lv95.gpkg"],
     "es_cat": ["-i", f"{test_path}/es_cat/Cultius_DUN2023_GPKG.zip"],

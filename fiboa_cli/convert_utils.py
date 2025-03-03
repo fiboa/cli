@@ -168,7 +168,7 @@ class BaseConverter:
         # todo remove this once class-based converters have been fully implemented
         self.__dict__.update({k: v for k, v in kwargs.items() if v is not None})
         for key in ("id", "short_name", "title", "license", "columns"):
-            assert getattr(self, key) is not None, f"{self.__class__.__name__} misses required attribute {key}"
+            assert getattr(self, key) is not None, f"{inspect.getfile(self.__class__)}:{self.__class__.__name__} misses required attribute {key}"
 
         # In BaseConverter and mixins we use class-based members as instance based-members
         # Every instance should be allowed to modify its member attributes, so here we make a copy of dicts/lists
