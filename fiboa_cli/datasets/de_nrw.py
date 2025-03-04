@@ -5,7 +5,6 @@ from ..convert_utils import BaseConverter
 class Converter(AdminConverterMixin, BaseConverter):
     sources = "https://www.opengeodata.nrw.de/produkte/umwelt_klima/bodennutzung/landwirtschaft/LFK-AKTI_EPSG25832_Shape.zip"
     id = "de_nrw"
-    admin_country_code = "DE"
     admin_subdivision_code = "NW"
     short_name = "Germany, North Rhine-Westphalia"
     title = "Field boundaries for North Rhine-Westphalia (NRW), Germany"

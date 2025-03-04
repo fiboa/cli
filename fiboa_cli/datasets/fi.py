@@ -1,3 +1,4 @@
+from .commons.ec import ec_url
 from ..convert_utils import BaseConverter
 from .commons.admin import AdminConverterMixin
 import pandas as pd
@@ -29,12 +30,16 @@ class Converter(AdminConverterMixin, BaseConverter):
         "LOHKONUMERO": "block_id",
         "area": "area",
         "VUOSI": "determination_datetime",
-        "KASVIKOODI": "crop_code",
-        "KASVIKOODI_SELITE_FI": "crop_name",
+        "KASVIKOODI": "crop:code",
+        "KASVIKOODI_SELITE_FI": "crop:name",
     }
     column_migrations = {
         # Make year (1st January) from column "VUOSI"
         "VUOSI": lambda col: pd.to_datetime(col, format='%Y'),
+    }
+    extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
+    column_additions = {
+        "crop:code_list": ec_url("fi_2020.csv")
     }
 
     def migrate(self, gdf):
@@ -45,12 +50,6 @@ class Converter(AdminConverterMixin, BaseConverter):
         "properties": {
             "block_id": {
                 "type": "int64"
-            },
-            "crop_name": {
-                "type": "string"
-            },
-            "crop_code": {
-                "type": "string"
             },
         }
     }

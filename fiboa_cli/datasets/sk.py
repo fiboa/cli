@@ -37,9 +37,6 @@ class Converter(AdminConverterMixin, BaseConverter):
         "LOKALITA_N": "municipality",
         "VYMERA": "area",
     }
-    column_migrations = {
-        "geometry": lambda col: col.make_valid()
-    }
     missing_schemas = {
         "properties": {
             "crop_name": {

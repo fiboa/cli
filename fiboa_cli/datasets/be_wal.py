@@ -1,6 +1,7 @@
 import geopandas as gpd
 
 from .commons.admin import AdminConverterMixin
+from .commons.ec import ec_url
 from ..convert_gml import gml_assure_columns
 from ..convert_utils import BaseConverter
 
@@ -42,28 +43,21 @@ class Converter(AdminConverterMixin, BaseConverter):
     }
     columns = {
         "geometry": "geometry",
-        "crop_name": "crop_name",
-        "crop_code": "crop_code",
+        "crop_name": "crop:name",
+        "crop_code": "crop:code",
         "id": "id",
         "determination_datetime": "determination_datetime",
     }
-    missing_schemas = {
-        "properties": {
-            "crop_code": {
-                "type": "string"
-            },
-            "crop_name": {
-                "type": "string"
-            },
-        }
-    }
     column_additions = {
-        "determination_datetime": "2022-01-01T00:00:00Z"
+        "determination_datetime": "2022-01-01T00:00:00Z",
+        "crop:code_list": ec_url("be_wal_all_years.csv")
     }
     column_migrations = {
         "crop_code": lambda col: col.str.extract(r'\.(\d+)$', expand=False),
         "crop_name": lambda col: col.str.strip()
     }
+    extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
+
     index_as_id = True
     def layer_filter(self, layer: str, uri: str) -> bool:
         return layer == "ExistingLandUseObject"

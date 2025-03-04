@@ -81,7 +81,8 @@ class EuroCropsConverterMixin:
         return col if col.dtype == 'object' else col.astype(str)
 
     def add_hcat(self, gdf):
-        self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+        if self.ec_mapping is None:
+            self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
         crop_code_col = self.get_code_column(gdf)
 
         def map_to(attribute):

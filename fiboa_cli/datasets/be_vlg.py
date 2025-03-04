@@ -1,4 +1,5 @@
 from .commons.admin import AdminConverterMixin
+from .commons.ec import ec_url
 from ..convert_utils import BaseConverter
 
 PREFIX = "https://www.landbouwvlaanderen.be/bestanden/gis/"
@@ -17,10 +18,9 @@ class Converter(AdminConverterMixin, BaseConverter):
     }
     id = "be_vlg"
     short_name = "Belgium, Flanders"
-    admin_country_code = "BE"
     admin_subdivision_code = "VLG"
     title = "Field boundaries for Flanders, Belgium"
-    description = """\
+    description = """
     Since 2020, the Department of Agriculture and Fisheries has been publishing a more extensive set of data related to agricultural use plots (from the 2008 campaign).
     From 2023, the downloadable dataset of agricultural use plots will also include the specialization given by the company (= company typology) and that is given to the plots of the company. Based on the typology, the companies are divided into 4 major specializations: arable farming, horticulture, livestock farming and mixed farms. The specialization of each company is calculated annually according to a European method and is based on the standard output of the various agricultural productions on the company. It is therefore an economic specialization and not a reflection of all agricultural production on the company.
     """
@@ -47,23 +47,18 @@ class Converter(AdminConverterMixin, BaseConverter):
         "BT_OMSCH": "typology",
         "GRAF_OPP": "area",
         "REF_ID": "id",
-        "GWSCOD_H": "crop_code",
-        "GWSNAM_H": "crop_name",
+        "GWSCOD_H": "crop:code",
+        "GWSNAM_H": "crop:name",
     }
-
+    extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
     column_additions = {
-        "determination_datetime": "2024-03-28T00:00:00Z"
+        "determination_datetime": "2024-03-28T00:00:00Z",
+        "crop:code_list": ec_url("be_vlg_2021.csv")
     }
 
     missing_schemas = {
         "properties": {
             "source": {
-                "type": "string"
-            },
-            "crop_code": {
-                "type": "string"
-            },
-            "crop_name": {
                 "type": "string"
             },
             "typology": {

@@ -10,7 +10,6 @@ class Converter(AdminConverterMixin, BaseConverter):
         ]
     }
     id = "de_sax"
-    admin_country_code = "DE"
     admin_subdivision_code = "SN"
     short_name = "Germany, Saxony"
     title = "Field boundaries for Saxony, Germany"

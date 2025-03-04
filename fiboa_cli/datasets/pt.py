@@ -16,7 +16,6 @@ class PTConverter(BaseConverter):
             "roles": ["producer", "licensor"]
         }
     ]
-    attribution = None
     license = {"title": "No conditions apply", "href": "https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply", "type": "text/html", "rel": "license"}
     columns = {
         "geometry": "geometry",

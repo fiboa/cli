@@ -1,8 +1,6 @@
 from ..convert_utils import BaseConverter
 from .commons.admin import AdminConverterMixin
 
-from ..convert_utils import convert as convert_
-
 
 class Converter(AdminConverterMixin, BaseConverter):
     sources = {
@@ -11,8 +9,9 @@ class Converter(AdminConverterMixin, BaseConverter):
     id = "de_mv"
     admin_subdivision_code = "MV"
     short_name = "Germany, Mecklenburg-Western Pomerania"
-    title = "Field block register of the Ministry of Agriculture and Environment M-V"
-    description = "Description not specified."  # Update as necessary
+    title = "Field boundaries for Mecklenburg-Western Pomerania, Germany"
+    description = "Field block register of the Ministry of Agriculture and Environment M-V"
+
     providers = [
         {
             "name": "Ministerium für Landwirtschaft und Umwelt M-V",
@@ -30,7 +29,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         "https://fiboa.github.io/flik-extension/v0.1.0/schema.yaml"
     }
 
-    COLUMNS = {
+    columns = {
         'geometry': 'geometry',
         'fbid': ['id', 'flik'], # make flik id a dedicated column to align with NRW etc.
         'dgl_jahr': 'dgl_jahr',
@@ -44,7 +43,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         'erwind_l': 'erwind_l',
         'erwater_l': 'erwater_l',
     }
-    ISO_SCHEMA = {
+    iso_schema = {
         'type': 'string',
         'enum': [
             'Enat0', # keine bis sehr geringe Erosionsgefährdung
@@ -62,7 +61,7 @@ class Converter(AdminConverterMixin, BaseConverter):
             '-', # Keine Angabe
         ]
     }
-    MISSING_SCHEMAS = {
+    missing_schemas = {
         'properties': {
             'dgl_jahr': {
                 'type': 'int16'
@@ -99,7 +98,7 @@ class Converter(AdminConverterMixin, BaseConverter):
                     '-', # keine Angabe
                 ]
             },
-            'erwind_l': ISO_SCHEMA,
-            'erwater_l': ISO_SCHEMA,
+            'erwind_l': iso_schema,
+            'erwater_l': iso_schema,
         }
     }
