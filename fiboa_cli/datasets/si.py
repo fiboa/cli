@@ -1,4 +1,5 @@
 from .commons.admin import AdminConverterMixin
+from .commons.ec import ec_url
 from ..convert_utils import BaseConverter
 
 
@@ -34,11 +35,14 @@ class Converter(AdminConverterMixin, BaseConverter):
         "ID": "id",
         "GERK_PID": "block_id",
         "AREA": "area",
-        "SIFRA_KMRS": "crop_code",
-        "RASTLINA": "crop_name",
-        "CROP_LAT_E": "crop_name_en",
+        "SIFRA_KMRS": "crop:code",
+        "RASTLINA": "crop:name",
+        "CROP_LAT_E": "crop:name_en",
     }
-
+    extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
+    column_additions = {
+        "crop:code_list": ec_url("si_2021.csv")
+    }
     column_migrations = {
         "AREA": lambda col: col / 10000,
         "geometry": lambda col: col.make_valid()
@@ -48,15 +52,6 @@ class Converter(AdminConverterMixin, BaseConverter):
         "properties": {
             "block_id": {
                 "type": "uint64"
-            },
-            "crop_name": {
-                "type": "string"
-            },
-            "crop_code": {
-                "type": "string"
-            },
-            "crop_name_en": {
-                "type": "string"
             },
         }
     }

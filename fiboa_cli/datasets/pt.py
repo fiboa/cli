@@ -1,3 +1,4 @@
+from .commons.ec import ec_url
 from ..convert_utils import BaseConverter
 
 class PTConverter(BaseConverter):
@@ -21,12 +22,14 @@ class PTConverter(BaseConverter):
         "geometry": "geometry",
         "OSA_ID": "id",
         "CUL_ID": "block_id",
-        "CUL_CODIGO": "crop_code",
-        "CT_português": "crop_name",
+        "CUL_CODIGO": "crop:code",
+        "CT_português": "crop:name",
         "Shape_Area": "area",
         "Shape_Length": "perimeter"
     }
+    extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
     column_additions = {
+        "crop:code_list": ec_url("pt_2021.csv"),
         "determination_datetime": "2023-01-01T00:00:00Z"
     }
     column_migrations = {
@@ -36,12 +39,6 @@ class PTConverter(BaseConverter):
         "properties": {
             "block_id": {
                 "type": "int64"
-            },
-            "crop_code": {
-                "type": "string"
-            },
-            "crop_name": {
-                "type": "string"
             },
         }
     }

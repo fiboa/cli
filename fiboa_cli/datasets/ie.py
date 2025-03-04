@@ -32,6 +32,7 @@ class IEConverter(AdminConverterMixin, BaseConverter):
         "localId": "id",
         "determination_datetime": "determination_datetime",
     }
+    # TODO use crop-extension, maybe with reverse mapping
 
     missing_schemas = {
         "properties": {

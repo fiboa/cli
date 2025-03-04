@@ -1,7 +1,7 @@
 import pandas as pd
 
 from .commons.admin import AdminConverterMixin
-from .commons.ec import load_ec_mapping
+from .commons.ec import load_ec_mapping, ec_url
 from ..convert_utils import BaseConverter
 
 
@@ -31,23 +31,17 @@ class Converter(AdminConverterMixin, BaseConverter):
         "geometry": "geometry",
         "id": "id",
         "faststalld": "area",
-        "grdkod_mar": "crop_code",
-        "crop_name": "crop_name",
+        "grdkod_mar": "crop:code",
+        "crop:name": "crop:name",
         "arslager": "determination_datetime",
+    }
+    extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
+    column_additions = {
+        "crop:code_list": ec_url("se_2021.csv")
     }
     column_migrations = {
         # Make year (1st January) from column "arslager"
         "arslager": lambda col: pd.to_datetime(col, format='%Y')
-    }
-    missing_schemas = {
-        "properties": {
-            "crop_name": {
-                "type": "string"
-            },
-            "crop_code": {
-                "type": "string"
-            },
-        }
     }
 
     def migrate(self, gdf):
@@ -58,6 +52,6 @@ class Converter(AdminConverterMixin, BaseConverter):
         original_name_mapping = {int(e["original_code"]): e["original_name"] for e in ec_mapping}
 
         gdf['id'] = gdf['blockid'] + "_" + gdf['skiftesbet']
-        gdf['crop_name'] = gdf['grdkod_mar'].map(original_name_mapping)
+        gdf['crop:name'] = gdf['grdkod_mar'].map(original_name_mapping)
         return gdf
 

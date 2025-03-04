@@ -1,5 +1,6 @@
 from .commons.data import read_data_csv
 from .commons.admin import AdminConverterMixin
+from .commons.ec import ec_url
 from ..convert_utils import BaseConverter
 import numpy as np
 
@@ -29,14 +30,14 @@ class Converter(AdminConverterMixin, BaseConverter):
 
     license = {"title": "Prostorni podaci i servisi", "href": "https://www.apprrr.hr/prostorni-podaci-servisi/", "type": "text/html", "rel": "license"}
     index_as_id = True
+
     columns = {
         'id': 'id',
-        'land_use_id': 'crop_code',
-        'crop_name': 'crop_name',
-        'crop_name_en': 'crop_name_en',
+        'land_use_id': 'crop:code',
+        'crop:name': 'crop:name',
+        'crop:name_en': 'crop:name_en',
         'area': 'area',
         'geometry': 'geometry',
-
         'home_name': 'home_name',
         'perim': 'perimeter',
         'slope': 'slope',
@@ -60,6 +61,11 @@ class Converter(AdminConverterMixin, BaseConverter):
         'irrigation_source': 'irrigation_source',
         'irrigation_type': 'irrigation_type',
         'jpaid': 'jpaid',
+    }
+
+    extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
+    column_additions = {
+        "crop:code_list": ec_url("hr_2020.csv")
     }
 
     missing_schemas = {
@@ -146,15 +152,6 @@ class Converter(AdminConverterMixin, BaseConverter):
             'jpaid': {
                 'type': 'string'
             },
-            'crop_code': {
-                'type': 'int32'
-            },
-            'crop_name': {
-                'type': 'string'
-            },
-            'crop_name_en': {
-                'type': 'string'
-            }
         }
     }
 
@@ -163,7 +160,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         rows = read_data_csv("hr_categories.csv", delimiter=";")
         mapping = {int(row["code"]): row["name"] for row in rows}
         mapping_en = {int(row["code"]): row["name_en"] for row in rows}
-        gdf['crop_name'] = gdf['land_use_id'].map(mapping)
-        gdf['crop_name_en'] = gdf['land_use_id'].map(mapping_en)
+        gdf['crop:name'] = gdf['land_use_id'].map(mapping)
+        gdf['crop:name_en'] = gdf['land_use_id'].map(mapping_en)
         gdf['area'] = np.where(gdf['area'] == 0, gdf['geometry'].area / 10000, gdf['area'] / 10000)
         return gdf

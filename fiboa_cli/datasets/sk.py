@@ -29,6 +29,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         }
     ]
     license = "CC-0"  # "Open Data"
+    # TODO look for a way to find codes for crop_name and implement crop-extension
     columns = {
         "geometry": "geometry",
         "KODKD": "id",
