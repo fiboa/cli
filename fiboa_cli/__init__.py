@@ -96,32 +96,11 @@ def describe(file, json, num=10, column=[]):
     ),
 )
 @click.option(
-    "--schema",
+    "--schemas",
     "-s",
-    type=click.STRING,
-    callback=valid_file_for_cli,
-    help="fiboa Schema to validate against. Can be a local file or a URL. If not provided, uses the fiboa version to load the schema for the released version.",
-)
-@click.option(
-    "--ext-schema",
-    "-e",
     multiple=True,
     callback=lambda ctx, param, value: check_ext_schema_for_cli(value, allow_none=False),
-    help="Maps a remote fiboa extension schema url to a local file. First the URL, then the local file path. Separated with a comma character. Example: https://example.com/schema.yaml,/path/to/schema.yaml",
-)
-@click.option(
-    "--fiboa-version",
-    "-f",
-    type=click.STRING,
-    help="The fiboa version to validate against. Default is the version given in the collection.",
-    default=None,
-)
-@click.option(
-    "--collection",
-    "-c",
-    type=click.Path(exists=True),
-    help="Points to the Collection that defines the fiboa version and extensions.",
-    default=None,
+    help="Maps a remote fiboa schema URL to a local file. First the URL, then the local file path. Separated with a comma character. Example: https://example.com/schema.yaml,/path/to/schema.yaml",
 )
 @click.option(
     "--data",
@@ -139,17 +118,14 @@ def describe(file, json, num=10, column=[]):
     default=False,
     hidden=True,
 )
-def validate(files, schema, ext_schema, fiboa_version, collection, data, timer):
+def validate(files, schemas, data, timer):
     """
     Validates a fiboa GeoParquet or GeoJSON file.
     """
     start = time.perf_counter()
     log(f"fiboa CLI {__version__} - Validator\n", "success")
     config = {
-        "schema": schema,
-        "extension_schemas": ext_schema,
-        "fiboa_version": fiboa_version,
-        "collection": collection,
+        "schemas": schemas,
         "data": data,
     }
 

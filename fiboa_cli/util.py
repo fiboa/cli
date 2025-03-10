@@ -19,7 +19,7 @@ from jsonschema.validators import Draft7Validator, Draft202012Validator
 from pyarrow import NativeFile
 from pyarrow.fs import FSSpecHandler, PyFileSystem
 
-from .const import GEOPARQUET_SCHEMA, LOG_STATUS_COLOR, STAC_COLLECTION_SCHEMA, SUPPORTED_PROTOCOLS
+from .const import GEOPARQUET_SCHEMA, LOG_STATUS_COLOR, SUPPORTED_PROTOCOLS
 from .version import fiboa_version
 
 file_cache = {}
@@ -324,13 +324,6 @@ def to_iso8601(dt):
         return iso + "Z"
 
 
-def load_collection_schema(obj):
-    if "stac_version" in obj:
-        return load_file(STAC_COLLECTION_SCHEMA.format(version=obj["stac_version"]))
-    else:
-        return None
-
-
 def load_geoparquet_schema(obj):
     if "version" in obj:
         return load_file(GEOPARQUET_SCHEMA.format(version=obj["version"]))
@@ -338,13 +331,20 @@ def load_geoparquet_schema(obj):
         return None
 
 
-def log_extensions(collection, logger):
-    extensions = collection.get("fiboa_extensions", [])
-    if len(extensions) == 0:
+def get_core_version(uri):
+    match = re.match(r"https://fiboa.github.io/specification/v([^/]+)/schema.yaml", uri)
+    return match.group(1) if match else None
+
+
+def log_extensions(schemas, logger):
+    schemas = schemas.sort()
+    if len(schemas) <= 1:
         logger("fiboa extensions: none")
     else:
         logger("fiboa extensions:")
-        for extension in extensions:
+        for extension in schemas:
+            if get_core_version(extension) is not None:
+                continue
             logger(f"  - {extension}")
 
 

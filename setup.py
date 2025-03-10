@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 def get_version():
     with open("fiboa_cli/version.py", "r") as file:
         content = file.read()
-        return re.match(r'__version__\s*=\s*"([^"]+)"', content)[1]
+        return re.search(r'__version__\s*=\s*"([^"]+)"', content)[1]
 
 
 def get_description():
@@ -38,6 +38,7 @@ setup(
         "py7zr>=0.21.0",
         "flatdict>=4.0",
         "rarfile>=4.0",
+        "semantic-version>=2.10.0",
     ],
     extras_require={
         # Optional dependencies for datasets converters go here

@@ -6,10 +6,8 @@ from .jsonschema import create_jsonschema
 from .types import PA_TYPE_CHECK
 from .util import (
     create_validator,
-    get_collection,
-    load_collection_schema,
+    get_core_version,
     load_datatypes,
-    load_fiboa_schema,
     load_file,
     load_geoparquet_schema,
     load_parquet_data,
@@ -20,6 +18,7 @@ from .util import (
 )
 from .util import log as log_
 from .validate_data import validate_column
+from .version import is_supported, supported_fiboa_versions
 
 
 def log(text: str, status="info", bullet=True):
@@ -35,91 +34,95 @@ def validate(file, config):
         return validate_parquet(file, config)
 
 
-def validate_collection(collection, config):
+def validate_schemas(schema_uris, config):
     valid = True
 
-    collection_version = collection.get("fiboa_version")
-    config_version = config.get("fiboa_version")
-
-    # Check fiboa version
-    if not isinstance(collection_version, str):
-        log("No fiboa_version string found in collection metadata", "error")
+    if not isinstance(schema_uris, list):
+        log("A list of schemas must be provied", "error")
         valid = False
 
-    log("fiboa version: " + config_version)
+    if len(schema_uris) == 0:
+        log("No schemas provided", "error")
+        valid = False
 
-    if isinstance(collection_version, str) and collection_version != config_version:
+    # Detect and check fiboa version
+    version = None
+    core_schema = None
+    for schema_uri in schema_uris:
+        version = get_core_version(schema_uri)
+        if version is not None:
+            core_schema = schema_uri
+            break
+
+    if version is None:
+        log("fiboa core schema not found in schemas, can't detect fiboa version", "error")
+        valid = False
+
+    # todo: use python-semanticversion to check for version ranges (e.g. allow 0.3.x)
+    if is_supported(version):
         log(
-            f"fiboa versions differs: Collection is {collection_version} and requested specification version is {config_version}",
+            f"fiboa versions differs: Schema reports {version} and supported version is {supported_fiboa_versions}",
             "warning",
         )
 
-    # Check STAC Collection
-    if not validate_colletion_schema(collection):
-        valid = False
+    # Check schemas (core and extensions)
+    schemas = {}
+    schema_map = config.get("schemas", {})
+    for uri in schema_uris:
+        try:
+            if uri in schema_map:
+                actual_location = schema_map[uri]
+                log(f"Redirecting {uri} to {actual_location}", "info")
+            else:
+                actual_location = uri
 
-    # Check extensions
-    extensions = {}
-    if "fiboa_extensions" in collection:
-        ext_list = collection.get("fiboa_extensions")
-        if not isinstance(ext_list, list):
-            log("fiboa_extensions must be a list", "error")
+            schemas[schema_uri] = load_file(actual_location)
+        except Exception as e:
+            log(f"Extension {uri} can't be loaded: {e}", "error")
             valid = False
-        else:
-            ext_map = config.get("extension_schemas", [])
-            for ext in ext_list:
-                try:
-                    if ext in ext_map:
-                        path = ext_map[ext]
-                        log(f"Redirecting {ext} to {path}", "info")
-                    else:
-                        path = ext
-                    extensions[ext] = load_file(path)
-                except Exception as e:
-                    log(f"Extension {ext} can't be loaded: {e}", "error")
-                    valid = False
 
-    log_extensions(collection, lambda x: log(x, "info", False))
+    log_extensions(schema_uris, lambda x: log(x, "info", False))
 
-    return valid, extensions
+    return valid, version, core_schema, schemas
 
 
 def validate_geojson(file, config):
-    valid = True
-    extensions = {}
-
     try:
         data = load_file(file)
     except Exception as error:
         log(error, "error")
         return False
 
-    collection = get_collection(data, config.get("collection"), file)
-    if collection is None:
-        log("No collection specified", "error")
-        valid = False
+    if not isinstance(data, dict):
+        log("Must be a JSON object", "error")
+        return False
 
-    if config.get("fiboa_version") is None and collection.get("fiboa_version") is not None:
-        config["fiboa_version"] = collection.get("fiboa_version")
+    schemas_uris = {}
+    collection = {}
+    feature_type = data.get("type")
+    if feature_type == "FeatureCollection":
+        collection = data.get("fiboa", {})
+        schemas_uris = collection.get("schemas", {})
+        features = data["features"]
+    elif feature_type == "Feature":
+        schemas_uris = data.get("properties", {}).get("schemas", {})
+        features = [data]
+    else:
+        log("Must be a GeoJSON Feature or FeatureCollection", "error")
+        return False
 
-    if collection is not None:
-        collection_valid, extensions = validate_collection(collection, config)
-        if not collection_valid:
-            valid = False
+    valid, version, core_schema_uri, schemas = validate_schemas(schemas_uris, config)
 
-    core_schema = load_fiboa_schema(config)
-    datatypes = load_datatypes(config["fiboa_version"])
+    core_schema = schemas[core_schema_uri]
+    datatypes = load_datatypes(version)
     schema = create_jsonschema(core_schema, datatypes)
 
     # Load extensions
     ext_errors = []
-    for ext in extensions:
+    extensions = {}
+    for ext in schemas:
         try:
-            uri = ext
-            if ext in config["extension_schemas"]:
-                uri = config["extension_schemas"][ext]
-            ext_schema = load_file(uri)
-            json_schema = create_jsonschema(ext_schema, datatypes)
+            json_schema = create_jsonschema(schemas[ext], datatypes)
             extensions[ext] = lambda obj: validate_json_schema(obj, json_schema)
         except Exception as error:
             extensions[ext] = None
@@ -129,21 +132,6 @@ def validate_geojson(file, config):
         log(error, "error")
 
     # Validate
-    if not isinstance(data, dict):
-        log("Must be a JSON object", "error")
-        return False
-
-    if data["type"] == "Feature":
-        features = [data]
-    elif data["type"] == "FeatureCollection":
-        features = data["features"]
-    elif data["type"] == "Collection":
-        # Skipping specific checks related to STAC Collection
-        return None
-    else:
-        log("Must be a GeoJSON Feature or FeatureCollection", "error")
-        return False
-
     if len(features) == 0:
         log("Must contain at least one Feature", "error")
         return False
@@ -176,41 +164,27 @@ def validate_geojson(file, config):
 
 def validate_parquet(file, config):
     parquet_schema = load_parquet_schema(file)
-    valid = True
-    extensions = {}
 
     # Validate geo metadata in Parquet header
     if b"geo" not in parquet_schema.metadata:
         log("Parquet file schema does not have 'geo' key", "error")
-        valid = False
+        return False
     else:
         geo = parse_metadata(parquet_schema, b"geo")
         if not validate_geoparquet_schema(geo):
-            valid = False
+            return False
 
     # Validate fiboa metadata in Parquet header
-    collection = {}
     if b"fiboa" not in parquet_schema.metadata:
-        log("Parquet file schema does not have a 'fiboa' key", "warning")
-        if not config.get("collection"):
-            log("No collection specified", "error")
-            valid = False
-        else:
-            collection = load_file(config.get("collection"))
-    else:
-        collection = parse_metadata(parquet_schema, b"fiboa")
+        log("Parquet file schema does not have a 'fiboa' key", "error")
+        return False
 
-    if config.get("fiboa_version") is None and collection.get("fiboa_version") is not None:
-        config["fiboa_version"] = collection.get("fiboa_version")
+    collection = parse_metadata(parquet_schema, b"fiboa")
+    schemas_uris = collection.get("schemas", {})
 
-    # Validate Collection
-    if len(collection) > 0:
-        valid_collection, extensions = validate_collection(collection, config)
-        if not valid_collection:
-            valid = False
+    valid, version, core_schema_uri, schemas = validate_schemas(schemas_uris, config)
 
-    # load the actual fiboa schema
-    fiboa_schema = load_fiboa_schema(config)
+    fiboa_schema = schemas[core_schema_uri]
 
     # Load data if needed
     gdf = None
@@ -223,7 +197,9 @@ def validate_parquet(file, config):
 
     # Compile all properties from the schemas
     schemas = fiboa_schema
-    for ext in extensions.values():
+    for ext in schemas.values():
+        if core_schema_uri == ext:
+            continue
         schemas = merge_schemas(schemas, ext)
 
     # Add custom schemas
@@ -324,22 +300,6 @@ def validate_geometry_column(key, prop_schema, geo, valid=True):
             valid = False
 
     return valid
-
-
-# todo: use stac_validator instead of our own validation routine
-def validate_colletion_schema(obj):
-    if "stac_version" in obj:
-        try:
-            schema = load_collection_schema(obj)
-            errors = validate_json_schema(obj, schema)
-            for error in errors:
-                log(f"Collection: {error.path}: {error.message}", "error")
-
-            return len(errors) == 0
-        except Exception as e:
-            log(f"Failed to validate STAC Collection due to an internal error: {e}", "warning")
-
-    return True
 
 
 # todo: use a geoparquet validator instead of our own validation routine
