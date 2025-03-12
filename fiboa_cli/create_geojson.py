@@ -13,7 +13,7 @@ def create_geojson(file, out, split=False, num=None, indent=None):
         os.makedirs(dir, exist_ok=True)
 
     schema = load_parquet_schema(file)
-    collection = parse_metadata(schema, b"fiboa")
+    collection = parse_metadata(schema, b"collection")
     geodata = load_parquet_data(file, nrows=num)
     geodata = geodata.to_crs(epsg=4326)
 
@@ -25,36 +25,30 @@ def create_geojson(file, out, split=False, num=None, indent=None):
     # it doesn't correctly coverts some data types which are present in the fiboa schema
     # e.g. lists of tuples into a dict
     if split:
-        if collection is not None:
-            collection_name = "collection.json"
-            collection_path = os.path.join(out, collection_name)
-            write_json(collection, collection_path, indent)
-
         i = 1
         for obj in geodata.iterfeatures():
             if (i % 1000) == 0:
                 log(f"{i}...", nl=(i % 10000) == 0)
 
-            obj = fix_geojson(obj)
+            if isinstance(collection, dict):
+                obj["properties"].update(collection)
 
-            if collection is not None:
-                links = obj.get("links", [])
-                links.append(
-                    {"href": collection_name, "rel": "collection", "type": "application/json"}
-                )
-                obj["links"] = links
+            obj = fix_geojson(obj)
 
             id = obj.get("id", i)
             path = os.path.join(out, f"{id}.json")
             write_json(obj, path, indent)
 
             i += 1
-
     else:
         obj = geodata.__geo_interface__
         del obj["bbox"]
+
         obj["features"] = list(map(fix_geojson, obj["features"]))
-        obj["fiboa"] = collection
+
+        if isinstance(collection, dict):
+            obj.update(collection)
+
         if os.path.isdir(out):
             out = os.path.join(out, "features.json")
         write_json(obj, out, indent)
