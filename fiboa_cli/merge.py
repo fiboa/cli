@@ -56,7 +56,7 @@ def merge(
             gdf["collection"] = os.path.splitext(os.path.basename(dataset))[0]
 
         # Merge custom schemas
-        custom_schema = collection.get("fiboa_custom_schemas", {})
+        custom_schema = collection.get("custom_schemas", {})
         custom_schemas = merge_schemas(custom_schemas, custom_schema)
 
         all_gdf.append(gdf)
@@ -77,7 +77,7 @@ def merge(
     # Add custom schemas
     custom_schemas = pick_schemas(custom_schemas, columns)
     if not is_schema_empty(custom_schemas):
-        collection["fiboa_custom_schemas"] = custom_schemas
+        collection["custom_schemas"] = custom_schemas
 
     # Write the merged dataset to the output file
     create_parquet(

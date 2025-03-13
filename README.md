@@ -89,7 +89,7 @@ you can for example run:
 - GeoJSON Features (with indentation and max. 100 features):
   `fiboa create-geojson example.parquet -o dest-folder -n 100 -i 2 -f`
 
-Check `fiboa create-geoparquet --help` for more details.
+Check `fiboa create-geojson --help` for more details.
 
 ### Inspect fiboa GeoParquet file
 

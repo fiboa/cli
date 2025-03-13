@@ -1,7 +1,5 @@
-import os
-
 from .parquet import create_parquet
-from .util import get_collection, load_file, log
+from .util import collection_from_featurecollection, load_file, log
 
 
 def create_geoparquet(config):
@@ -11,6 +9,7 @@ def create_geoparquet(config):
     features = []
     geojson = {}
     file = None
+    collection = {}
     files = config.get("files")
     for file in files:
         geojson = load_file(file)
@@ -18,32 +17,12 @@ def create_geoparquet(config):
             features.append(geojson)
         elif geojson["type"] == "FeatureCollection":
             features += geojson["features"]
+            collection = collection_from_featurecollection(geojson)
         else:
             log(f"{file}: Skipped - Unsupported GeoJSON type, must be Feature or FeatureCollection")
 
     if len(features) == 0:
         raise Exception("No valid features provided as input files")
-
-    # Add a STAC collection to the fiboa property to the Parquet metadata
-    # Note: for features this loads the collection of the last feature only
-    # if not provided specifically via collection parameter
-    collection = get_collection(geojson, config.get("collection"), file)
-
-    if collection is None:
-        # No collection found, create a default collection based on parameters
-        version = config.get("fiboa_version")
-        collection = {
-            "fiboa_version": version,
-            "fiboa_extensions": list(config.get("extension_schemas", {}).keys()),
-        }
-
-    # add a default id based on the output filename
-    if "id" not in collection or not collection["id"]:
-        collection["id"] = os.path.basename(output_file)
-
-    # Make the fiboa_version consistent with the collection
-    if "fiboa_version" in collection:
-        config["fiboa_version"] = collection["fiboa_version"]
 
     # Get a list of the properties/columns (without duplicates)
     columns = set(["id", "geometry"])

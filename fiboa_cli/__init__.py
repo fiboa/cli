@@ -6,7 +6,12 @@ import time
 import click
 import pandas as pd
 
-from .const import COMPRESSION_METHODS, CORE_COLUMNS
+from .const import (
+    COMPRESSION_METHODS,
+    CORE_COLUMNS,
+    FIBOA_GEOJSON_DATATYPES_SCHEMA,
+    FIBOA_SPECIFICAION_SCHEMA,
+)
 from .convert import convert as convert_
 from .convert import list_all_converter_ids, list_all_converters
 from .create_geojson import create_geojson as create_geojson_
@@ -96,19 +101,19 @@ def describe(file, json, num=10, column=[]):
     ),
 )
 @click.option(
-    "--schemas",
-    "-s",
-    multiple=True,
-    callback=lambda ctx, param, value: check_ext_schema_for_cli(value, allow_none=False),
-    help="Maps a remote fiboa schema URL to a local file. First the URL, then the local file path. Separated with a comma character. Example: https://example.com/schema.yaml,/path/to/schema.yaml",
-)
-@click.option(
     "--data",
     "-d",
     is_flag=True,
     type=click.BOOL,
     help="EXPERIMENTAL: Validate the data in the GeoParquet file. Enabling this might be slow or exceed memory. Default is False.",
     default=False,
+)
+@click.option(
+    "--schemas",
+    "-s",
+    multiple=True,
+    callback=lambda ctx, param, value: check_ext_schema_for_cli(value, allow_none=False),
+    help="Maps a remote fiboa schema URL to a local file. First the URL, then the local file path. Separated with a comma character. Example: https://example.com/schema.yaml,/path/to/schema.yaml",
 )
 @click.option(
     "--timer",
@@ -118,7 +123,7 @@ def describe(file, json, num=10, column=[]):
     default=False,
     hidden=True,
 )
-def validate(files, schemas, data, timer):
+def validate(files, data, schemas, timer):
     """
     Validates a fiboa GeoParquet or GeoJSON file.
     """
@@ -204,51 +209,21 @@ def validate_schema(files, metaschema):
     "--out", "-o", type=click.Path(exists=False), help="Path to write the file to.", required=True
 )
 @click.option(
-    "--collection",
-    "-c",
-    callback=valid_file_for_cli,
-    help="Points to the Collection that defines the fiboa version and extensions. Only applies if not provided in the GeoJSON file (embedded or as link).",
-    default=None,
-)
-@click.option(
-    "--schema",
+    "--schemas",
     "-s",
-    type=click.Path(exists=True),
-    help="fiboa Schema to work against. If not provided, uses the fiboa version from the collection to load the schema for the released version.",
-)
-@click.option(
-    "--ext-schema",
-    "-e",
     multiple=True,
-    callback=lambda ctx, param, value: check_ext_schema_for_cli(value, allow_none=True),
-    help="Applicable fiboa extensions as URLs. Can map a remote fiboa extension schema url to a local file by adding a local file path, separated by a comma. Example: https://example.com/schema.json,/path/to/schema.json",
+    callback=lambda ctx, param, value: check_ext_schema_for_cli(value, allow_none=False),
+    help="Maps a remote fiboa schema URL to a local file. First the URL, then the local file path. Separated with a comma character. Example: https://example.com/schema.yaml,/path/to/schema.yaml",
 )
-@click.option(
-    "--fiboa-version",
-    "-f",
-    type=click.STRING,
-    help="The applicable fiboa version if no collection is provided.",
-    show_default=True,
-    default=fiboa_version_,
-)
-def create_geoparquet(files, out, collection, schema, ext_schema, fiboa_version):
+def create_geoparquet(files, out, schemas):
     """
     Create a fiboa GeoParquet file from GeoJSON file(s).
-
-    The collection metadata has the following priority order:
-    1. Read from the last GeoJSON file/feature (embedded 'fiboa' property)
-    1. Read from the last GeoJSON file/feature (link with relation type 'collection')
-    2. Read from the collection parameter
-    3. Use fiboa_version and extension_schemas parameters
     """
     log(f"fiboa CLI {__version__} - Create GeoParquet\n", "success")
     config = {
         "files": files,
         "out": out,
-        "schema": schema,
-        "collection": collection,
-        "extension_schemas": ext_schema,
-        "fiboa_version": fiboa_version,
+        "schemas": schemas,
     }
     try:
         create_geoparquet_(config)
@@ -316,7 +291,18 @@ def create_geojson(file, out, features=False, num=None, indent=None):
     "-s",
     type=click.STRING,
     callback=valid_file_for_cli,
-    help="fiboa Schema to create the JSON Schema for. Can be a local file or a URL. If not provided, uses the fiboa version to load the schema for the released version.",
+    help=f"fiboa schema to create the JSON Schema for. Can be a local file or a URL. If not provided, loads the schema for fiboa version {fiboa_version_}.",
+    show_default=True,
+    default=FIBOA_SPECIFICAION_SCHEMA.format(version=fiboa_version_),
+)
+@click.option(
+    "--datatypes",
+    "-d",
+    type=click.STRING,
+    callback=valid_file_for_cli,
+    help=f"Schema for the fiboa GeoJSON datatypes. Can be a local file or a URL. If not provided, loads the GeoJSON datatypes for fiboa version {fiboa_version_}.",
+    show_default=True,
+    default=FIBOA_GEOJSON_DATATYPES_SCHEMA.format(version=fiboa_version_),
 )
 @click.option(
     "--out",
@@ -326,32 +312,20 @@ def create_geojson(file, out, features=False, num=None, indent=None):
     default=None,
 )
 @click.option(
-    "--fiboa-version",
-    "-f",
-    type=click.STRING,
-    help="The fiboa version to validate against.",
-    show_default=True,
-    default=fiboa_version_,
-)
-@click.option(
     "--id",
     "-i",
     "id_",
     type=click.STRING,
     help="The JSON Schema $id to use for the schema. If not provided, the $id will be omitted.",
+    default=None,
 )
-def jsonschema(schema, out, fiboa_version, id_):
+def jsonschema(schema, datatypes, out, id_):
     """
     Create a JSON Schema for a fiboa Schema
     """
     log(f"fiboa CLI {__version__} - Create JSON Schema\n", "success")
-    config = {
-        "schema": schema,
-        "fiboa_version": fiboa_version,
-        "id": id_,
-    }
     try:
-        schema = jsonschema_(config)
+        schema = jsonschema_(schema, datatypes, id_)
         if out:
             with open(out, "w", encoding="utf-8") as f:
                 json.dump(schema, f, indent=2)

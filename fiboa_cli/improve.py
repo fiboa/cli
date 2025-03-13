@@ -90,10 +90,10 @@ def improve(
         gdf["area"] = gdf_m["area"].fillna(gdf_m.geometry.area * 0.0001)
         gdf["perimeter"] = gdf_m["perimeter"].fillna(gdf_m.geometry.length)
 
-    custom_schemas = collection.get("fiboa_custom_schemas", {})
+    custom_schemas = collection.get("custom_schemas", {})
     custom_schemas = pick_schemas(custom_schemas, columns, rename_columns)
     if not is_schema_empty(custom_schemas):
-        collection["fiboa_custom_schemas"] = custom_schemas
+        collection["custom_schemas"] = custom_schemas
 
     # Write the merged dataset to the output file
     create_parquet(

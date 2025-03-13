@@ -19,8 +19,13 @@ from jsonschema.validators import Draft7Validator, Draft202012Validator
 from pyarrow import NativeFile
 from pyarrow.fs import FSSpecHandler, PyFileSystem
 
-from .const import GEOPARQUET_SCHEMA, LOG_STATUS_COLOR, SUPPORTED_PROTOCOLS
-from .version import fiboa_version
+from .const import (
+    FIBOA_SPECIFICAION_PATTERN,
+    FIBOA_SPECIFICAION_SCHEMA,
+    GEOPARQUET_SCHEMA,
+    LOG_STATUS_COLOR,
+    SUPPORTED_PROTOCOLS,
+)
 
 file_cache = {}
 
@@ -87,19 +92,16 @@ def load_parquet_data(uri: str, nrows=None, columns=None) -> pd.DataFrame:
         return table.to_pandas()
 
 
-def load_fiboa_schema(config):
+def load_fiboa_schema(version, config):
     """Load fiboa schema"""
-    schema_url = config.get("schema")
-    schema_version = config.get("fiboa_version", fiboa_version)
+    schema_url = config.get("schemas")
     if not schema_url:
-        schema_url = f"https://fiboa.github.io/specification/v{schema_version}/schema.yaml"
+        schema_url = FIBOA_SPECIFICAION_SCHEMA.format(version=version)
     return load_file(schema_url)
 
 
-def load_datatypes(version):
-    # todo: allow to define a seperate schema from a file (as in load_fiboa_schema)
-    dt_url = f"https://fiboa.github.io/specification/v{version}/geojson/datatypes.json"
-    response = load_file(dt_url)
+def load_geojson_datatypes(url):
+    response = load_file(url)
     return response["$defs"]
 
 
@@ -246,6 +248,27 @@ def parse_map(value, separator="="):
     return mapping
 
 
+def filter_dict(obj: dict, keys) -> dict:
+    """
+    Filters the given dictionary to only include keys that are in the given keys.
+
+    :param data: The dictionary to filter.
+    :param keys: The set of keys to keep.
+    :return: A new dictionary with only the keys that match the given keys.
+    """
+    return {k: v for k, v in obj.items() if k in keys}
+
+
+def collection_from_featurecollection(geojson: dict) -> dict:
+    """
+    Extract collection data from a FeatureCollection
+
+    :param geojson: The GeoJSON data to extract the collection from.
+    :return: The collection data.
+    """
+    return filter_dict(geojson, ["type", "features"])
+
+
 def name_from_uri(url):
     if "://" in url:
         try:
@@ -332,12 +355,22 @@ def load_geoparquet_schema(obj):
 
 
 def get_core_version(uri):
-    match = re.match(r"https://fiboa.github.io/specification/v([^/]+)/schema.yaml", uri)
+    match = re.match(FIBOA_SPECIFICAION_PATTERN, uri)
     return match.group(1) if match else None
 
 
+def get_core_schema(schema_uris):
+    for schema_uri in schema_uris:
+        version = get_core_version(schema_uri)
+        if version is not None:
+            return schema_uri, version
+
+    return None, None
+
+
 def log_extensions(schemas, logger):
-    schemas = schemas.sort()
+    schemas = schemas.copy()
+    schemas.sort()
     if len(schemas) <= 1:
         logger("fiboa extensions: none")
     else:

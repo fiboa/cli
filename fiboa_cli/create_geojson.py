@@ -75,6 +75,24 @@ def fix_geojson(obj):
         obj["bbox"] = [bbox["xmin"], bbox["ymin"], bbox["xmax"], bbox["ymax"]]
         del obj["properties"]["bbox"]
 
+    # Remove null values
+    obj["properties"] = fix_omit_nulled_properties(obj["properties"])
+
+    return obj
+
+
+def fix_omit_nulled_properties(obj):
+    for key in obj.keys():
+        if obj[key] is None:
+            del obj[key]
+        elif isinstance(obj[key], dict):
+            obj[key] = fix_omit_nulled_properties(obj[key])
+        elif isinstance(obj[key], list):
+            for i, item in enumerate(obj[key]):
+                if not isinstance(item, dict):
+                    continue
+                obj[key][i] = fix_omit_nulled_properties(item)
+
     return obj
 
 

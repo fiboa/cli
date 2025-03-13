@@ -36,7 +36,7 @@ def describe(file, display_json=False, num=10, columns=None):
         if "fiboa_extensions" in collection and isinstance(collection["fiboa_extensions"], list):
             log_extensions(collection["fiboa_extensions"], log)
 
-        custom_schemas = collection.get("fiboa_custom_schemas", {})
+        custom_schemas = collection.get("custom_schemas", {})
         if not is_schema_empty(custom_schemas):
             log("Custom schemas: " + ", ".join(custom_schemas["properties"].keys()))
 

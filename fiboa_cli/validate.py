@@ -2,13 +2,14 @@ import json
 
 import pyarrow.types as pat
 
+from .const import FIBOA_GEOJSON_DATATYPES_SCHEMA
 from .jsonschema import create_jsonschema
 from .types import PA_TYPE_CHECK
 from .util import (
     create_validator,
     get_core_version,
-    load_datatypes,
     load_file,
+    load_geojson_datatypes,
     load_geoparquet_schema,
     load_parquet_data,
     load_parquet_schema,
@@ -59,7 +60,7 @@ def validate_schemas(schema_uris, config):
         valid = False
 
     # todo: use python-semanticversion to check for version ranges (e.g. allow 0.3.x)
-    if is_supported(version):
+    if not is_supported(version):
         log(
             f"fiboa versions differs: Schema reports {version} and supported version is {supported_fiboa_versions}",
             "warning",
@@ -114,7 +115,7 @@ def validate_geojson(file, config):
     valid, version, core_schema_uri, schemas = validate_schemas(schemas_uris, config)
 
     core_schema = schemas[core_schema_uri]
-    datatypes = load_datatypes(version)
+    datatypes = load_geojson_datatypes(FIBOA_GEOJSON_DATATYPES_SCHEMA.format(version=version))
     schema = create_jsonschema(core_schema, datatypes)
 
     # Load extensions
@@ -203,7 +204,7 @@ def validate_parquet(file, config):
         schemas = merge_schemas(schemas, ext)
 
     # Add custom schemas
-    custom_schemas = collection.get("fiboa_custom_schemas", {})
+    custom_schemas = collection.get("custom_schemas", {})
     schemas = merge_schemas(schemas, custom_schemas)
 
     # Check that all required fields are present
