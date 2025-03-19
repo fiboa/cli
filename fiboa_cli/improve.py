@@ -27,9 +27,9 @@ def improve(
     if not out:
         out = input
     else:
-        dir = os.path.dirname(out)
-        if dir:
-            os.makedirs(dir, exist_ok=True)
+        directory = os.path.dirname(out)
+        if directory:
+            os.makedirs(directory, exist_ok=True)
 
     # Load the dataset
     schema = load_parquet_schema(input)

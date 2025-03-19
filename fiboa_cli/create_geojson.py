@@ -8,9 +8,9 @@ from .util import load_parquet_data, load_parquet_schema, log, parse_metadata, t
 
 
 def create_geojson(file, out, split=False, num=None, indent=None):
-    dir = os.path.dirname(out)
-    if dir:
-        os.makedirs(dir, exist_ok=True)
+    directory = os.path.dirname(out)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
 
     schema = load_parquet_schema(file)
     collection = parse_metadata(schema, b"fiboa")

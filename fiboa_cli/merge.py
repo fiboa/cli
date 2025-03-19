@@ -28,9 +28,9 @@ def merge(
     compression=None,
     geoparquet1=False,
 ):
-    dir = os.path.dirname(out)
-    if dir:
-        os.makedirs(dir, exist_ok=True)
+    directory = os.path.dirname(out)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
 
     columns = CORE_COLUMNS.copy()
     columns.extend(includes)
