@@ -1,16 +1,18 @@
-from datetime import date
-import os
-import sys
 import json
+import os
+import re
+import sys
+from datetime import date
 from functools import cache
 
 import requests
-import re
+
+from fiboa_cli import list_all_converter_ids, version
+from fiboa_cli.convert import convert
+from fiboa_cli.convert import read_converter as _read_converter
+from fiboa_cli.validate import validate
 
 from .util import log
-from fiboa_cli import list_all_converter_ids, version
-from fiboa_cli.convert import convert, read_converter as _read_converter
-from fiboa_cli.validate import validate
 
 STAC_EXTENSION = "https://stac-extensions.github.io/web-map-links/v1.2.0/schema.json"
 
@@ -24,6 +26,7 @@ def read_converter(converter_id):
             if not hasattr(converter, attr):
                 attr = attr.lower()
             return getattr(converter, attr)
+
     return Proxy()
 
 
@@ -41,21 +44,26 @@ def check_command(cmd, name=None):
 def get_data_survey(dataset):
     base = dataset.replace("_", "-").upper()
     # override data survey location with env variable, e.g. for unmerged pull-requests
-    data_survey = os.getenv("FIBOA_DATA_SURVEY") or \
-        f"https://raw.githubusercontent.com/fiboa/data-survey/refs/heads/main/data/{base}.md"
+    data_survey = (
+        os.getenv("FIBOA_DATA_SURVEY")
+        or f"https://raw.githubusercontent.com/fiboa/data-survey/refs/heads/main/data/{base}.md"
+    )
     response = requests.get(data_survey)
-    assert response.ok, f"Missing data survey {base}.md at {data_survey}. Can not auto-generate file"
+    assert response.ok, (
+        f"Missing data survey {base}.md at {data_survey}. Can not auto-generate file"
+    )
     return dict(re.findall(r"- \*\*(.+?):\*\* (.+?)\n", response.text))
 
 
 def readme_attribute_table(stac_data):
-    cols = (
-        [["Property", "**Data Type**", "Description"]] +
-        [[s['name'], re.search(r"\w+", s["type"])[0], ""] for s in stac_data["assets"]["data"]["table:columns"] if s['name'] != 'geometry']
-    )
+    cols = [["Property", "**Data Type**", "Description"]] + [
+        [s["name"], re.search(r"\w+", s["type"])[0], ""]
+        for s in stac_data["assets"]["data"]["table:columns"]
+        if s["name"] != "geometry"
+    ]
     widths = [max(len(c[i]) for c in cols) for i in range(3)]
     aligned_cols = [[f" {c:<{w}} " for c, w in zip(row, widths)] for row in cols]
-    aligned_cols.insert(1, ["-" * (w+2) for w in widths])
+    aligned_cols.insert(1, ["-" * (w + 2) for w in widths])
     return "\n".join(["|" + "|".join(cols) + "|" for cols in aligned_cols])
 
 
@@ -66,7 +74,9 @@ def make_license(dataset, **kwargs):
         text += props["license"] + "\n\n"
     converter = read_converter(dataset)
     if hasattr(converter, "LICENSE"):
-        text += converter.LICENSE["title"] if isinstance(converter.LICENSE, dict) else converter.LICENSE
+        text += (
+            converter.LICENSE["title"] if isinstance(converter.LICENSE, dict) else converter.LICENSE
+        )
     return text
 
 
@@ -79,17 +89,17 @@ def make_readme(dataset, file_name, stac, source_coop_extension):
     columns = readme_attribute_table(stac_data)
     props = get_data_survey(dataset)
     _download_urls = converter.get_urls().keys() or ["manually downloaded file"]
-    downloaded_urls = "\n".join([('  - ' + url) for url in _download_urls])
+    downloaded_urls = "\n".join([("  - " + url) for url in _download_urls])
 
     return f"""# Field boundaries for {converter.SHORT_NAME}
 
 Provides {count} official field boundaries from {converter.SHORT_NAME}.
-It has been converted to a fiboa GeoParquet file from data obtained from {props['Data Provider (Legal Entity)']}.
+It has been converted to a fiboa GeoParquet file from data obtained from {props["Data Provider (Legal Entity)"]}.
 
-- **Source Data Provider:** [{props['Data Provider (Legal Entity)']}]({props['Homepage']})
-- **Converted by:** {props['Submitter (Affiliation)']}
-- **License:** {props['License']}
-- **Projection:** {props['Projection']}
+- **Source Data Provider:** [{props["Data Provider (Legal Entity)"]}]({props["Homepage"]})
+- **Converted by:** {props["Submitter (Affiliation)"]}
+- **License:** {props["License"]}
+- **Projection:** {props["Projection"]}
 
 ---
 
@@ -134,19 +144,32 @@ def publish(dataset, directory, cache, source_coop_extension, input_files=None):
     source_coop_url = f"https://source.coop/fiboa/{source_coop_extension}/"
     source_coop_data = f"https://data.source.coop/fiboa/{source_coop_extension}/"
 
-    assert requests.get(f"https://source.coop/api/v1/repositories/fiboa/{source_coop_extension}").status_code == 200, \
-        f"Missing repo at {source_coop_url}"
+    assert (
+        requests.get(
+            f"https://source.coop/api/v1/repositories/fiboa/{source_coop_extension}"
+        ).status_code
+        == 200
+    ), f"Missing repo at {source_coop_url}"
 
     collection_file = os.path.join(directory, "collection.json")
 
     stac_directory = os.path.join(directory, "stac")
-    done_convert = os.path.exists(parquet_file) and os.path.exists(os.path.join(stac_directory, "collection.json"))
+    done_convert = os.path.exists(parquet_file) and os.path.exists(
+        os.path.join(stac_directory, "collection.json")
+    )
 
     if not done_convert:
         # fiboa convert xx_yy -o data/xx-yy.parquet -h https://data.source.coop/fiboa/xx-yy/ --collection
         log(f"Converting file for {dataset} to {parquet_file}\n", "success")
-        convert(dataset, parquet_file, cache=cache, source_coop_url=source_coop_url, collection=True, input_files=input_files)
-        log(f"Done\n", "success")
+        convert(
+            dataset,
+            parquet_file,
+            cache=cache,
+            source_coop_url=source_coop_url,
+            collection=True,
+            input_files=input_files,
+        )
+        log("Done\n", "success")
     else:
         log(f"Using existing file {parquet_file} for {dataset}\n", "success")
 
@@ -168,11 +191,13 @@ def publish(dataset, directory, cache, source_coop_extension, input_files=None):
 
         if STAC_EXTENSION not in data["stac_extensions"]:
             data["stac_extensions"].append(STAC_EXTENSION)
-            data["links"].append({
-                "href": f"{source_coop_data}{file_name}.pmtiles",
-                "type": "application/vnd.pmtiles",
-                "rel": "pmtiles"
-            })
+            data["links"].append(
+                {
+                    "href": f"{source_coop_data}{file_name}.pmtiles",
+                    "type": "application/vnd.pmtiles",
+                    "rel": "pmtiles",
+                }
+            )
 
         with open(stac_target, "w", encoding="utf-8") as f:
             json.dump(data, f)
@@ -183,9 +208,16 @@ def publish(dataset, directory, cache, source_coop_extension, input_files=None):
         if not os.path.exists(path):
             log(f"Missing {required}. Generating at {path}", "warning")
             if required == "README.md":
-                text = make_readme(dataset, file_name=file_name, stac=stac_target, source_coop_extension=source_coop_extension)
+                text = make_readme(
+                    dataset,
+                    file_name=file_name,
+                    stac=stac_target,
+                    source_coop_extension=source_coop_extension,
+                )
             else:
-                text = make_license(dataset, source_coop_url=source_coop_url, file_name=file_name, stac=stac_target)
+                text = make_license(
+                    dataset, source_coop_url=source_coop_url, file_name=file_name, stac=stac_target
+                )
             with open(path, "w") as f:
                 f.write(text)
             log(f"Please complete the {path} before continuing", "warning")
@@ -193,20 +225,27 @@ def publish(dataset, directory, cache, source_coop_extension, input_files=None):
 
     pm_file = os.path.join(directory, f"{file_name}.pmtiles")
     if not os.path.exists(pm_file):
-        log(f"Running ogr2ogr | tippecanoe", "info")
+        log("Running ogr2ogr | tippecanoe", "info")
         check_command("tippecanoe")
         check_command("ogr2ogr", name="GDAL")
-        exc(f"ogr2ogr -t_srs EPSG:4326 -f geojson /vsistdout/ {parquet_file} | tippecanoe -zg --projection=EPSG:4326 -o {pm_file} -l {dataset} --drop-densest-as-needed")
+        exc(
+            f"ogr2ogr -t_srs EPSG:4326 -f geojson /vsistdout/ {parquet_file} | tippecanoe -zg --projection=EPSG:4326 -o {pm_file} -l {dataset} --drop-densest-as-needed"
+        )
 
-    log(f"Uploading to aws", "info")
+    log("Uploading to aws", "info")
     if not os.environ.get("AWS_SECRET_ACCESS_KEY"):
         log(f"Get your credentials at {source_coop_url}manage/", "info")
         log("  Then press 'ACCESS DATA',\n  and click 'Create API Key',", "info")
-        log("  Run export AWS_ENDPOINT_URL=https://data.source.coop AWS_ACCESS_KEY_ID=<> AWS_SECRET_ACCESS_KEY=<>\n"
-            "  where you copy-past the access key and secret", "info")
+        log(
+            "  Run export AWS_ENDPOINT_URL=https://data.source.coop AWS_ACCESS_KEY_ID=<> AWS_SECRET_ACCESS_KEY=<>\n"
+            "  where you copy-past the access key and secret",
+            "info",
+        )
         log("Please set AWS_ env vars from source_coop", "error")
         sys.exit(1)
 
-    assert os.environ.get("AWS_ENDPOINT_URL") == "https://data.source.coop", "Missing AWS_ENDPOINT_URL env var"
+    assert os.environ.get("AWS_ENDPOINT_URL") == "https://data.source.coop", (
+        "Missing AWS_ENDPOINT_URL env var"
+    )
     check_command("aws")
     exc(f"aws s3 sync {directory} s3://fiboa/{source_coop_extension}/")
