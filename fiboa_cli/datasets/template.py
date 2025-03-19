@@ -51,11 +51,7 @@ class TemplateConverter(BaseConverter):  # change this class name to your use ca
     # This should be an array of Provider Objects:
     # https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object
     providers = [
-        {
-            "name": "ABC Corp",
-            "url": "https://abc.example",
-            "roles": ["producer", "licensor"]
-        }
+        {"name": "ABC Corp", "url": "https://abc.example", "roles": ["producer", "licensor"]}
     ]
 
     # Attribution (e.g. copyright or citation statement as requested by provider).
@@ -72,14 +68,11 @@ class TemplateConverter(BaseConverter):  # change this class name to your use ca
     # Map original column names to fiboa property names
     # You also need to list any column that you may have added in the MIGRATION function (see below).
     # GeoJSON: Nested objects can be accessed using a dot, e.g. "area.value" for {"area": {"value": 123}}
-    columns = {
-        "area_m": "area"
-    }
+    columns = {"area_m": "area"}
 
     # Add columns with constant values.
     # The key is the column name, the value is a constant value that's used for all rows.
-    add_columns = {
-    }
+    column_additions = {}
 
     # A list of implemented extension identifiers
     extensions = set()
@@ -89,16 +82,12 @@ class TemplateConverter(BaseConverter):  # change this class name to your use ca
     # to hectares as required for the area field in fiboa.
     # Function signature:
     #   func(column: pd.Series) -> pd.Series
-    column_migrations = {
-        "area_m": lambda column: column * 0.0001
-    }
+    column_migrations = {"area_m": lambda column: column * 0.0001}
 
     # Filter columns to only include the ones that are relevant for the collection,
     # e.g. only rows that contain the word "agriculture" but not "forest" in the column "land_cover_type".
     # Lamda function accepts a Pandas Series and returns a Series or a Tuple with a Series and True to inverse the mask.
-    column_filters = {
-        "land_cover_type": lambda col: (col.isin(["agrictulture"]), True)
-    }
+    column_filters = {"land_cover_type": lambda col: (col.isin(["agrictulture"]), True)}
 
     # Override to migrate the full GeoDataFrame if the other options are not sufficient
     # This should be the last resort!
@@ -117,12 +106,8 @@ class TemplateConverter(BaseConverter):  # change this class name to your use ca
     # Schemas for the fields that are not defined in fiboa
     # Keys must be the values from the COLUMNS dict, not the keys
     missing_schemas = {
-        "required": ["my_id"], # i.e. non-nullable properties
-        "properties": {
-            "my_id": {
-                "type": "string"
-            }
-        }
+        "required": ["my_id"],  # i.e. non-nullable properties
+        "properties": {"my_id": {"type": "string"}},
     }
 
     """

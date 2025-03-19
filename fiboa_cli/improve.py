@@ -2,10 +2,27 @@ import os
 
 from .const import CORE_COLUMNS
 from .parquet import create_parquet
-from .util import load_parquet_data, load_parquet_schema, log, parse_metadata, pick_schemas, is_schema_empty
+from .util import (
+    is_schema_empty,
+    load_parquet_data,
+    load_parquet_schema,
+    log,
+    parse_metadata,
+    pick_schemas,
+)
 
 
-def improve(input, out = None, rename_columns = {}, add_sizes = False, fix_geometries = False, explode_geometries = False, crs = None, compression = None, geoparquet1 = False):
+def improve(
+    input,
+    out=None,
+    rename_columns={},
+    add_sizes=False,
+    fix_geometries=False,
+    explode_geometries=False,
+    crs=None,
+    compression=None,
+    geoparquet1=False,
+):
     # Prepare and determine location of the output file
     if not out:
         out = input
@@ -20,7 +37,7 @@ def improve(input, out = None, rename_columns = {}, add_sizes = False, fix_geome
     columns = list(schema.names)
     # Remove the bbox column to avoid conflicts when writing GeoParquet file later
     columns.remove("bbox")
-    gdf = load_parquet_data(input, columns = columns)
+    gdf = load_parquet_data(input, columns=columns)
 
     # Change the CRS
     if crs is not None:
@@ -42,9 +59,15 @@ def improve(input, out = None, rename_columns = {}, add_sizes = False, fix_geome
         for col in rename_columns:
             columns[columns.index(col)] = rename_columns[col]
             if col in CORE_COLUMNS:
-                log(f"Column {col} is a fiboa core field - do you really want to rename it?", "warning")
+                log(
+                    f"Column {col} is a fiboa core field - do you really want to rename it?",
+                    "warning",
+                )
             if ":" in col:
-                log(f"Column {col} may be a fiboa extension field - do you really want to rename it?", "warning")
+                log(
+                    f"Column {col} may be a fiboa extension field - do you really want to rename it?",
+                    "warning",
+                )
         gdf.rename(columns=rename_columns, inplace=True)
         log("Renamed columns", "info")
 
@@ -72,7 +95,8 @@ def improve(input, out = None, rename_columns = {}, add_sizes = False, fix_geome
     if not is_schema_empty(custom_schemas):
         collection["fiboa_custom_schemas"] = custom_schemas
 
-
     # Write the merged dataset to the output file
-    create_parquet(gdf, columns, collection, out, {}, compression=compression, geoparquet1=geoparquet1)
+    create_parquet(
+        gdf, columns, collection, out, {}, compression=compression, geoparquet1=geoparquet1
+    )
     log(f"Wrote data to {out}", "success")

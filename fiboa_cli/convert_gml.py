@@ -1,7 +1,8 @@
 import os
 
-from fiboa_cli import log
 import geopandas
+
+from fiboa_cli import log
 
 
 def gml_assure_columns(data, path, uri, layer, **kwargs):
@@ -17,7 +18,7 @@ def gml_assure_columns(data, path, uri, layer, **kwargs):
         gfs_file = path[:-4] + ".gfs"
         assert os.path.exists(gfs_file), "Expected a local, generated GFS file by OGR-GML driver"
         # Fix GFS template file
-        with open(gfs_file, mode='r') as file:
+        with open(gfs_file, mode="r") as file:
             gfs_xml = file.read()
 
         for property in kwargs:
@@ -27,9 +28,8 @@ def gml_assure_columns(data, path, uri, layer, **kwargs):
         for property, elements in kwargs.items():
             element_str = "\n".join(f"<{k}>{v}</{k}>" for k, v in elements.items())
             lines.insert(-2, f"<PropertyDefn><Name>{property}</Name>{element_str}</PropertyDefn>")
-        with open(gfs_file, mode='w') as file:
+        with open(gfs_file, mode="w") as file:
             file.write("\n".join(lines))
 
         data = geopandas.read_file(path, layer=layer)
     return data
-

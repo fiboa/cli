@@ -46,13 +46,7 @@ DESCRIPTION = """Describe the dataset here."""
 # A list of providers that contributed to the data.
 # This should be an array of Provider Objects:
 # https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object
-PROVIDERS = [
-    {
-        "name": "ABC Corp",
-        "url": "https://abc.example",
-        "roles": ["producer", "licensor"]
-    }
-]
+PROVIDERS = [{"name": "ABC Corp", "url": "https://abc.example", "roles": ["producer", "licensor"]}]
 
 # Attribution (e.g. copyright or citation statement as requested by provider).
 # The attribution is usually shown on the map, in the lower right corner.
@@ -68,14 +62,11 @@ LICENSE = "CC-BY-4.0"
 # Map original column names to fiboa property names
 # You also need to list any column that you may have added in the MIGRATION function (see below).
 # GeoJSON: Nested objects can be accessed using a dot, e.g. "area.value" for {"area": {"value": 123}}
-COLUMNS = {
-    "area_m": "area"
-}
+COLUMNS = {"area_m": "area"}
 
 # Add columns with constant values.
 # The key is the column name, the value is a constant value that's used for all rows.
-ADD_COLUMNS = {
-}
+ADD_COLUMNS = {}
 
 # A list of implemented extension identifiers
 EXTENSIONS = set()
@@ -85,16 +76,12 @@ EXTENSIONS = set()
 # to hectares as required for the area field in fiboa.
 # Function signature:
 #   func(column: pd.Series) -> pd.Series
-COLUMN_MIGRATIONS = {
-    "area_m": lambda column: column * 0.0001
-}
+COLUMN_MIGRATIONS = {"area_m": lambda column: column * 0.0001}
 
 # Filter columns to only include the ones that are relevant for the collection,
 # e.g. only rows that contain the word "agriculture" but not "forest" in the column "land_cover_type".
 # Lamda function accepts a Pandas Series and returns a Series or a Tuple with a Series and True to inverse the mask.
-COLUMN_FILTERS = {
-    "land_cover_type": lambda col: (col.isin(["agrictulture"]), True)
-}
+COLUMN_FILTERS = {"land_cover_type": lambda col: (col.isin(["agrictulture"]), True)}
 
 # Custom function to migrate the full GeoDataFrame if the other options are not sufficient
 # This should be the last resort!
@@ -115,17 +102,13 @@ FILE_MIGRATION = None
 # Schemas for the fields that are not defined in fiboa
 # Keys must be the values from the COLUMNS dict, not the keys
 MISSING_SCHEMAS = {
-    "required": ["my_id"], # i.e. non-nullable properties
-    "properties": {
-        "my_id": {
-            "type": "string"
-        }
-    }
+    "required": ["my_id"],  # i.e. non-nullable properties
+    "properties": {"my_id": {"type": "string"}},
 }
 
 
 # Conversion function, usually no changes required
-def convert(output_file, cache = None, **kwargs):
+def convert(output_file, cache=None, **kwargs):
     """
     Converts the field boundary datasets to fiboa.
 
@@ -174,5 +157,5 @@ def convert(output_file, cache = None, **kwargs):
         license=LICENSE,
         # Other options:
         # index_as_id=True/False, # Adds a column "id" with the index of the GeoDataFrame
-        **kwargs
+        **kwargs,
     )

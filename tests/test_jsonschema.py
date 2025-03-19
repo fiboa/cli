@@ -1,6 +1,7 @@
-from fiboa_cli.util import load_file
 from fiboa_cli.jsonschema import jsonschema
+from fiboa_cli.util import load_file
 from fiboa_cli.version import fiboa_version
+
 
 def test_conversion():
     config = {

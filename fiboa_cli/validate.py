@@ -1,12 +1,28 @@
 import json
+
 import pyarrow.types as pat
 
-from .types import PA_TYPE_CHECK
 from .jsonschema import create_jsonschema
-from .util import create_validator, get_collection, log as log_, log_extensions, load_datatypes, load_file, load_fiboa_schema, load_parquet_data, load_parquet_schema, merge_schemas, parse_metadata, load_collection_schema, load_geoparquet_schema
+from .types import PA_TYPE_CHECK
+from .util import (
+    create_validator,
+    get_collection,
+    load_collection_schema,
+    load_datatypes,
+    load_fiboa_schema,
+    load_file,
+    load_geoparquet_schema,
+    load_parquet_data,
+    load_parquet_schema,
+    log_extensions,
+    merge_schemas,
+    parse_metadata,
+)
+from .util import log as log_
 from .validate_data import validate_column
 
-def log(text: str, status="info", bullet = True):
+
+def log(text: str, status="info", bullet=True):
     # Indent logs
     prefix = "  - " if bullet else "    "
     log_(prefix + str(text), status)
@@ -33,7 +49,10 @@ def validate_collection(collection, config):
     log("fiboa version: " + config_version)
 
     if isinstance(collection_version, str) and collection_version != config_version:
-        log(f"fiboa versions differs: Collection is {collection_version} and requested specification version is {config_version}", "warning")
+        log(
+            f"fiboa versions differs: Collection is {collection_version} and requested specification version is {config_version}",
+            "warning",
+        )
 
     # Check STAC Collection
     if not validate_colletion_schema(collection):
@@ -238,7 +257,10 @@ def validate_parquet(file, config):
         # Does the field (dis)allow null?
         nullable = key not in schemas.get("required", [])
         if nullable != pq_field.nullable:
-            log(f"{key}: Nullability differs, is {pq_field.nullable} but must be {nullable}", "error")
+            log(
+                f"{key}: Nullability differs, is {pq_field.nullable} but must be {nullable}",
+                "error",
+            )
             valid = False
 
         # Is the data type of the field correct?
@@ -280,7 +302,7 @@ def validate_parquet(file, config):
     return valid
 
 
-def validate_geometry_column(key, prop_schema, geo, valid = True):
+def validate_geometry_column(key, prop_schema, geo, valid=True):
     columns = geo.get("columns", {})
     if key not in columns:
         log(f"{key}: Geometry column not found in GeoParquet metadata", "error")
@@ -295,10 +317,14 @@ def validate_geometry_column(key, prop_schema, geo, valid = True):
             log(f"{key}: No geometry types specified in GeoParquet metadata", "warning")
 
         if schema_geo_types != gp_geo_types:
-            log(f"{key}: GeoParquet geometry types differ, is {gp_geo_types} but must be {schema_geo_types}", "error")
+            log(
+                f"{key}: GeoParquet geometry types differ, is {gp_geo_types} but must be {schema_geo_types}",
+                "error",
+            )
             valid = False
 
     return valid
+
 
 # todo: use stac_validator instead of our own validation routine
 def validate_colletion_schema(obj):
@@ -330,6 +356,7 @@ def validate_geoparquet_schema(obj):
             log(f"Failed to validate GeoParquet metadata due to an internal error: {e}", "error")
 
     return False
+
 
 def validate_json_schema(obj, schema):
     if isinstance(obj, (bytearray, bytes, str)):

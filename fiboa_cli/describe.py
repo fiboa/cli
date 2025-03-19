@@ -1,7 +1,17 @@
 import json
+
 import pandas as pd
 
-from .util import log, load_parquet_data, load_parquet_schema, load_parquet_metadata, parse_metadata, log_extensions, is_schema_empty
+from .util import (
+    is_schema_empty,
+    load_parquet_data,
+    load_parquet_metadata,
+    load_parquet_schema,
+    log,
+    log_extensions,
+    parse_metadata,
+)
+
 
 def describe(file, display_json=False, num=10, columns=None):
     metadata = load_parquet_metadata(file)
@@ -16,7 +26,7 @@ def describe(file, display_json=False, num=10, columns=None):
         columns_str = ", ".join(geo_columns)
         log(f"Geometry columns: {columns_str}")
 
-        if (display_json):
+        if display_json:
             log(json.dumps(geo, indent=2))
 
     log("\n== COLLECTION ==", "success")
@@ -30,10 +40,10 @@ def describe(file, display_json=False, num=10, columns=None):
         if not is_schema_empty(custom_schemas):
             log("Custom schemas: " + ", ".join(custom_schemas["properties"].keys()))
 
-        if (display_json):
+        if display_json:
             log(json.dumps(collection, indent=2))
         elif "stac_version" in collection:
-            log(f"STAC metadata included, add --json to show it", "warning")
+            log("STAC metadata included, add --json to show it", "warning")
 
     log(f"\n== SCHEMA (columns: {metadata.num_columns}) ==", "success")
     schema = load_parquet_schema(file)
@@ -42,8 +52,8 @@ def describe(file, display_json=False, num=10, columns=None):
     log(f"\n== DATA (rows: {metadata.num_rows}, groups: {metadata.num_row_groups}) ==", "success")
     if num > 0:
         # Make it so that everything is shown, don't output ... if there are too many columns or rows
-        pd.set_option('display.max_columns', None)
-        pd.set_option('display.max_rows', None)
+        pd.set_option("display.max_columns", None)
+        pd.set_option("display.max_rows", None)
         # Load data
         geodata = load_parquet_data(file, columns=columns)
         # Print to console

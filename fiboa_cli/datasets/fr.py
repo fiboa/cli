@@ -1,6 +1,6 @@
+from ..convert_utils import BaseConverter
 from .commons.admin import AdminConverterMixin
 from .commons.ec import EuroCropsConverterMixin, ec_url
-from ..convert_utils import BaseConverter
 
 
 class FRConverter(AdminConverterMixin, EuroCropsConverterMixin, BaseConverter):
@@ -9,23 +9,28 @@ class FRConverter(AdminConverterMixin, EuroCropsConverterMixin, BaseConverter):
         2022: {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FXX_2022-01-01/RPG_2-0__GPKG_LAMB93_FXX_2022-01-01.7z.001": [
                 "RPG_2-0__GPKG_LAMB93_FXX_2022-01-01/RPG/1_DONNEES_LIVRAISON_2023-08-01/RPG_2-0_GPKG_LAMB93_FXX-2022/PARCELLES_GRAPHIQUES.gpkg"
-            ]},
+            ]
+        },
         2023: {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01.7z": [
                 "RPG_2-2__GPKG_LAMB93_FXX_2023-01-01/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01.gpkg"
-            ]},
+            ]
+        },
         2021: {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FXX_2021-01-01/RPG_2-0__GPKG_LAMB93_FXX_2021-01-01.7z": [
                 "RPG_2-0__GPKG_LAMB93_FXX_2022-01-01/RPG/1_DONNEES_LIVRAISON_2021-08-01/RPG_2-0_GPKG_LAMB93_FXX-2021/PARCELLES_GRAPHIQUES.gpkg"
-            ]},
+            ]
+        },
         2020: {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FR_2020-01-01/RPG_2-0__GPKG_LAMB93_FR_2020-01-01.7z.001": [],
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FR_2020-01-01/RPG_2-0__GPKG_LAMB93_FR_2020-01-01.7z.002": []},
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FR_2020-01-01/RPG_2-0__GPKG_LAMB93_FR_2020-01-01.7z.002": [],
+        },
         2019: {
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0_GPKG_LAMB93_FR-2019/RPG_2-0_GPKG_LAMB93_FR-2019.7z": []},
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0_GPKG_LAMB93_FR-2019/RPG_2-0_GPKG_LAMB93_FR-2019.7z": []
+        },
         2018: {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__SHP_LAMB93_FR-2017_2017-01-01/RPG_2-0__SHP_LAMB93_FR-2017_2017-01-01.7z": []
-        }
+        },
     }
     id = "fr"
     short_name = "France"
@@ -40,7 +45,7 @@ class FRConverter(AdminConverterMixin, EuroCropsConverterMixin, BaseConverter):
         {
             "name": "Anstitut National de l'Information Géographique et Forestière",
             "url": "https://www.data.gouv.fr/en/datasets/registre-parcellaire-graphique-rpg-contours-des-parcelles-et-ilots-culturaux-et-leur-groupe-de-cultures-majoritaire/",
-            "roles": ["producer", "licensor"]
+            "roles": ["producer", "licensor"],
         }
     ]
     # Attribution example as described in the open license
@@ -49,18 +54,18 @@ class FRConverter(AdminConverterMixin, EuroCropsConverterMixin, BaseConverter):
         "title": "Licence Ouverte / Open Licence",
         "href": "https://etalab.gouv.fr/licence-ouverte-open-licence",
         "type": "text/html",
-        "rel": "license"
+        "rel": "license",
     }
     ec_mapping_csv = "fr_2018.csv"
     extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url(ec_mapping_csv)}
 
     columns = {
-        'geometry': 'geometry',
-        'id_parcel': 'id',
-        'surf_parc': 'area',
-        'code_cultu': 'crop:code',
-        'code_group': 'group_code',
+        "geometry": "geometry",
+        "id_parcel": "id",
+        "surf_parc": "area",
+        "code_cultu": "crop:code",
+        "code_group": "group_code",
     }
 
     column_filters = {
@@ -69,8 +74,6 @@ class FRConverter(AdminConverterMixin, EuroCropsConverterMixin, BaseConverter):
 
     missing_schemas = {
         "properties": {
-            "group_code": {
-                "type": "string"
-            },
+            "group_code": {"type": "string"},
         }
     }

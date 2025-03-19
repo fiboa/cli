@@ -1,4 +1,4 @@
-from ..convert_utils import convert as convert_, BaseConverter
+from ..convert_utils import BaseConverter
 
 
 class LacunaLabelsConverter(BaseConverter):
@@ -31,13 +31,9 @@ class LacunaLabelsConverter(BaseConverter):
         {
             "name": "Agricultural Impacts Research Group",
             "url": "https://github.com/agroimpacts/lacunalabels/",
-            "roles": ["producer"]
+            "roles": ["producer"],
         },
-        {
-            "name": "Planet Labs PBC",
-            "url": "https://www.planet.com/",
-            "roles": ["licensor"]
-        }
+        {"name": "Planet Labs PBC", "url": "https://www.planet.com/", "roles": ["licensor"]},
     ]
     attribution = "Planet Labs Inc."
 
@@ -45,19 +41,17 @@ class LacunaLabelsConverter(BaseConverter):
         "title": "Planet NICFI participant license agreement",
         "href": "https://go.planet.com/nicfi-pla-2024",
         "type": "text/html",
-        "rel": "license"
+        "rel": "license",
     }
 
     columns = {
         "geometry": "geometry",
-        "name": "id",
+        "id": "id",
         "category": "category",
     }
 
     missing_schemas = {
         "properties": {
-            "category": {
-                "type": "string"
-            },
+            "category": {"type": "string"},
         }
     }

@@ -1,4 +1,6 @@
-from .util import log as log_, load_file, create_validator
+from .util import create_validator, load_file
+from .util import log as log_
+
 
 def log(text: str, status="info"):
     # Indent logs
@@ -30,6 +32,7 @@ def validate_schema(file, config):
     else:
         log("VALID", "success")
         return True
+
 
 def validate_json_schema(obj, schema):
     validator = create_validator(schema)

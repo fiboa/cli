@@ -84,59 +84,51 @@ PROVIDERS = [
     {
         "name": "DATA Archiving and Networked Services (DANS)",
         "url": "https://research.tudelft.nl/en/publications/ai4smallfarms-a-dataset-for-crop-field-delineation-in-southeast-a",
-        "roles": ["producer", "licensor"]
+        "roles": ["producer", "licensor"],
     }
 ]
 ATTRIBUTION = "Persello, C., Grift, J., Fan, X., Paris, C., Hansch, R., Koeva, M., & Nelson, A. (2023). AI4SmallFarms: A Dataset for Crop Field Delineation in Southeast Asian Smallholder Farms. IEEE Geoscience and Remote Sensing Letters, 20, 1-5. Article 2505705. https://doi.org/10.1109/LGRS.2023.3323095"
 LICENSE = "CC-BY-4.0"
 
 COLUMNS = {
-    'fiboa_id': 'id',
-    'id' : 'group',
-    '_predicate' : '_predicate',
-    'country': 'admin:country_code',
-    'geometry' : 'geometry',
+    "fiboa_id": "id",
+    "id": "group",
+    "_predicate": "_predicate",
+    "country": "admin:country_code",
+    "geometry": "geometry",
 }
 
-EXTENSIONS = {
-    'https://fiboa.github.io/administrative-division-extension/v0.1.0/schema.yaml'
-}
+EXTENSIONS = {"https://fiboa.github.io/administrative-division-extension/v0.1.0/schema.yaml"}
 
-COLUMN_MIGRATIONS = {
-    'country': lambda col: col.map({'cambodia': 'KH', 'vietnam': 'VN'})
-}
+COLUMN_MIGRATIONS = {"country": lambda col: col.map({"cambodia": "KH", "vietnam": "VN"})}
 
 # Add columns with constant values.
 # The key is the column name, the value is a constant value that's used for all rows.
 ADD_COLUMNS = {
     "determination_datetime": "2021-08-01T00:00:00Z",
-    "determination_method": "auto-imagery"
+    "determination_method": "auto-imagery",
 }
+
 
 def migrate(gdf):
     # Create unique IDs from the dataset in the form "xx_xxxxx"
-    gdf['fiboa_id'] = gdf['id'].astype(str).str.zfill(2) + "_" + gdf.index.astype(str).str.zfill(5)
+    gdf["fiboa_id"] = gdf["id"].astype(str).str.zfill(2) + "_" + gdf.index.astype(str).str.zfill(5)
     return gdf
+
 
 MIGRATION = migrate
 
 MISSING_SCHEMAS = {
     "properties": {
-        "group": {
-            "type": "uint8"
-        },
-        "group_id": {
-            "type": "uint16"
-        },
-        "_predicate": {
-            "type": "string",
-            "enum": ["INTERSECTS"]
-        }
+        "group": {"type": "uint8"},
+        "group_id": {"type": "uint16"},
+        "_predicate": {"type": "string", "enum": ["INTERSECTS"]},
     }
 }
 
+
 # Conversion function, usually no changes required
-def convert(output_file, cache = None, **kwargs):
+def convert(output_file, cache=None, **kwargs):
     convert_(
         output_file,
         cache,
@@ -152,5 +144,5 @@ def convert(output_file, cache = None, **kwargs):
         migration=MIGRATION,
         attribution=ATTRIBUTION,
         license=LICENSE,
-        **kwargs
+        **kwargs,
     )

@@ -1,16 +1,26 @@
 import json
-import pyarrow as pa
 
+import pyarrow as pa
 from geopandas import GeoDataFrame
 from shapely.geometry import shape
 
-from .types import get_geopandas_dtype, get_pyarrow_type_for_geopandas, get_pyarrow_field
-from .util import log, load_fiboa_schema, load_file, merge_schemas, is_schema_empty
 from .geopandas import to_parquet
+from .types import get_geopandas_dtype, get_pyarrow_field, get_pyarrow_type_for_geopandas
+from .util import is_schema_empty, load_fiboa_schema, load_file, log, merge_schemas
 
 ROW_GROUP_SIZE = 25000
 
-def create_parquet(data, columns, collection, output_file, config, missing_schemas = {}, compression = None, geoparquet1 = False):
+
+def create_parquet(
+    data,
+    columns,
+    collection,
+    output_file,
+    config,
+    missing_schemas={},
+    compression=None,
+    geoparquet1=False,
+):
     # Load the data schema
     fiboa_schema = load_fiboa_schema(config)
     schemas = merge_schemas(missing_schemas, fiboa_schema)
@@ -54,21 +64,28 @@ def create_parquet(data, columns, collection, output_file, config, missing_schem
         required_props = schemas.get("required", [])
         properties = schemas.get("properties", {})
         required = name in required_props
+        field = None
         if name in properties:
             prop_schema = properties[name]
             try:
-                field = get_pyarrow_field(name, schema = prop_schema, required = required)
+                field = get_pyarrow_field(name, schema=prop_schema, required=required)
             except Exception as e:
                 log(f"{name}: Skipped - {e}", "warning")
         else:
-            pd_type = str(data[name].dtype) # pandas data type
+            pd_type = str(data[name].dtype)  # pandas data type
             try:
-                pa_type = get_pyarrow_type_for_geopandas(pd_type) # pyarrow data type
+                pa_type = get_pyarrow_type_for_geopandas(pd_type)  # pyarrow data type
                 if pa_type is not None:
-                    log(f"{name}: No schema defined, converting {pd_type} to nullable {pa_type}", "warning")
-                    field = get_pyarrow_field(name, pa_type = pa_type)
+                    log(
+                        f"{name}: No schema defined, converting {pd_type} to nullable {pa_type}",
+                        "warning",
+                    )
+                    field = get_pyarrow_field(name, pa_type=pa_type)
                 else:
-                    log(f"{name}: Skipped - pandas type can't be converted to pyarrow type", "warning")
+                    log(
+                        f"{name}: Skipped - pandas type can't be converted to pyarrow type",
+                        "warning",
+                    )
                     continue
             except Exception as e:
                 log(f"{name}: Skipped - {e}", "warning")
@@ -91,13 +108,13 @@ def create_parquet(data, columns, collection, output_file, config, missing_schem
     to_parquet(
         data,
         output_file,
-        schema = pq_schema,
-        index = False,
-        coerce_timestamps = "ms",
-        compression = compression,
-        schema_version = "1.0.0" if geoparquet1 else "1.1.0",
-        row_group_size = ROW_GROUP_SIZE,
-        write_covering_bbox = False if geoparquet1 else True
+        schema=pq_schema,
+        index=False,
+        coerce_timestamps="ms",
+        compression=compression,
+        schema_version="1.0.0" if geoparquet1 else "1.1.0",
+        row_group_size=ROW_GROUP_SIZE,
+        write_covering_bbox=False if geoparquet1 else True,
     )
 
     return pq_fields
@@ -141,7 +158,7 @@ def update_dataframe(data, columns, schema):
             elif callable(gp_type):
                 data[column] = gp_type(data[column])
             else:
-                data[column] = data[column].astype(gp_type, copy = False)
+                data[column] = data[column].astype(gp_type, copy=False)
         except Exception as e:
             log(f"{column}: Can't convert to {dtype}: {e}", "warning")
 

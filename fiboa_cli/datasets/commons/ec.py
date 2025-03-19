@@ -1,11 +1,14 @@
 import csv
 from io import StringIO
-from fiboa_cli.util import load_file
+
 import geopandas as gpd
+
+from fiboa_cli.util import load_file
+
 from .dictobject import DictObject
 
 
-def add_eurocrops(base, year = None):
+def add_eurocrops(base, year=None):
     if isinstance(base, dict):
         base = DictObject(base)
 
@@ -21,7 +24,9 @@ def add_eurocrops(base, year = None):
 
     SHORT_NAME = base.SHORT_NAME + SUFFIX
 
-    DESCRIPTION = base.DESCRIPTION.strip() + """
+    DESCRIPTION = (
+        base.DESCRIPTION.strip()
+        + """
 
 This dataset is an extended version of the original dataset, with additional columns and attributes added by the EuroCrops project.
 
@@ -32,21 +37,18 @@ In the data you'll find this as additional attributes:
 - `EC_hcat_n`: The machine-readable HCAT name of the crop
 - `EC_hcat_c`: The 10-digit HCAT code indicating the hierarchy of the crop
     """
+    )
 
     PROVIDERS = base.PROVIDERS + [
-        {
-            "name": "EuroCrops",
-            "url": "https://github.com/maja601/EuroCrops",
-            "roles": ["processor"]
-        }
+        {"name": "EuroCrops", "url": "https://github.com/maja601/EuroCrops", "roles": ["processor"]}
     ]
 
     EXTENSIONS = getattr(base, "EXTENSIONS", None) or set()
     EXTENSIONS.add("https://fiboa.github.io/hcat-extension/v0.1.0/schema.yaml")
     COLUMNS = base.COLUMNS | {
-        'EC_trans_n': 'ec:translated_name',
-        'EC_hcat_n': 'ec:hcat_name',
-        'EC_hcat_c': 'ec:hcat_code'
+        "EC_trans_n": "ec:translated_name",
+        "EC_hcat_n": "ec:hcat_name",
+        "EC_hcat_c": "ec:hcat_code",
     }
 
     LICENSE = "CC-BY-SA-4.0"
@@ -54,15 +56,19 @@ In the data you'll find this as additional attributes:
     return ID, SHORT_NAME, TITLE, DESCRIPTION, PROVIDERS, EXTENSIONS, COLUMNS, LICENSE
 
 
-
 class EuroCropsConverterMixin:
     ec_mapping_csv = None
     mapping_file = None
+    ec_mapping = None
 
     def __init__(self, *args, year=None, **kwargs):
         super().__init__(*args, **kwargs)
         # Some meta-magic to reuse existing add_eurocrops routine
-        attributes = "ID, SHORT_NAME, TITLE, DESCRIPTION, PROVIDERS, EXTENSIONS, COLUMNS, LICENSE".split(", ")
+        attributes = (
+            "ID, SHORT_NAME, TITLE, DESCRIPTION, PROVIDERS, EXTENSIONS, COLUMNS, LICENSE".split(
+                ", "
+            )
+        )
         base = {k: getattr(self, k.lower()) for k in attributes}
         for k, v in zip(attributes, add_eurocrops(base, year=year)):
             setattr(self, k.lower(), v)
@@ -70,25 +76,28 @@ class EuroCropsConverterMixin:
     def convert(self, *args, **kwargs):
         self.mapping_file = kwargs.get("mapping_file")
         if not self.mapping_file:
-            assert self.ec_mapping_csv is not None, "Specify ec_mapping_csv in Converter, e.g. find them at https://github.com/maja601/EuroCrops/tree/main/csvs/country_mappings"
+            assert self.ec_mapping_csv is not None, (
+                "Specify ec_mapping_csv in Converter, e.g. find them at https://github.com/maja601/EuroCrops/tree/main/csvs/country_mappings"
+            )
         return super().convert(*args, **kwargs)
 
     def get_code_column(self, gdf):
-        attribute = next(k for k, v in self.columns.items() if v == 'crop:code')
+        attribute = next(k for k, v in self.columns.items() if v == "crop:code")
         col = gdf[attribute]
         # Should be corrected in original parser
-        return col if col.dtype == 'object' else col.astype(str)
+        return col if col.dtype == "object" else col.astype(str)
 
     def add_hcat(self, gdf):
-        ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+        if self.ec_mapping is None:
+            self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
         crop_code_col = self.get_code_column(gdf)
 
         def map_to(attribute):
-            return {e["original_code"]: e[attribute] for e in ec_mapping}
+            return {e["original_code"]: e[attribute] for e in self.ec_mapping}
 
-        gdf['EC_trans_n'] = crop_code_col.map(map_to("translated_name"))
-        gdf['EC_hcat_n'] = crop_code_col.map(map_to("HCAT3_name"))
-        gdf['EC_hcat_c'] = crop_code_col.map(map_to("HCAT3_code"))
+        gdf["EC_trans_n"] = crop_code_col.map(map_to("translated_name"))
+        gdf["EC_hcat_n"] = crop_code_col.map(map_to("HCAT3_name"))
+        gdf["EC_hcat_c"] = crop_code_col.map(map_to("HCAT3_code"))
         return gdf
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
@@ -106,4 +115,4 @@ def load_ec_mapping(csv_file=None, url=None):
     if not url:
         url = ec_url(csv_file)
     content = load_file(url)
-    return list(csv.DictReader(StringIO(content.decode('utf-8'))))
+    return list(csv.DictReader(StringIO(content.decode("utf-8"))))

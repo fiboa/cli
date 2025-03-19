@@ -1,8 +1,9 @@
+import geopandas as gpd
+import pandas as pd
+
+from ..convert_utils import BaseConverter
 from .commons.admin import AdminConverterMixin
 from .commons.ec import ec_url
-from ..convert_utils import BaseConverter
-import pandas as pd
-import geopandas as gpd
 
 # see https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/basisregistratie_gewaspercelen_brp.xml
 base = "https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/downloads"
@@ -39,30 +40,30 @@ class NLCropConverter(AdminConverterMixin, BaseConverter):
         {
             "name": "RVO / PDOK",
             "url": "https://www.pdok.nl/introductie/-/article/basisregistratie-gewaspercelen-brp-",
-            "roles": ["producer", "licensor"]
+            "roles": ["producer", "licensor"],
         }
     ]
     # Both http://creativecommons.org/publicdomain/zero/1.0/deed.nl and http://creativecommons.org/publicdomain/mark/1.0/
     license = "CC0-1.0"
 
     columns = {
-        'geometry': 'geometry',
-        'id': 'id',
-        'area': "area",
-        'category': 'category',
-        'gewascode': 'crop:code',
-        'gewas': 'crop:name',
-        'jaar': 'determination_datetime'
+        "geometry": "geometry",
+        "id": "id",
+        "area": "area",
+        "category": "category",
+        "gewascode": "crop:code",
+        "gewas": "crop:name",
+        "jaar": "determination_datetime",
     }
 
     column_filters = {
         # category = "Grasland" | "Bouwland" | "Sloot" | "Landschapselement"
-        'category': lambda col: col.isin(["Grasland", "Bouwland"])
+        "category": lambda col: col.isin(["Grasland", "Bouwland"])
     }
 
     column_migrations = {
         # Add 15th of may to original "year" (jaar) column
-        'jaar': lambda col: pd.to_datetime(col, format='%Y') + pd.DateOffset(months=4, days=14)
+        "jaar": lambda col: pd.to_datetime(col, format="%Y") + pd.DateOffset(months=4, days=14)
     }
     extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("nl_2020.csv")}
@@ -71,14 +72,11 @@ class NLCropConverter(AdminConverterMixin, BaseConverter):
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         # Projection is in CRS 28992 (RD New), this is the area calculation method of the source organization
         # todo: remove in favor of generic solution for area calculation
-        gdf['area'] = gdf.area / 10000
+        gdf["area"] = gdf.area / 10000
         return gdf
 
     missing_schemas = {
         "properties": {
-            "category": {
-                "type": "string",
-                "enum": ["Grasland", "Bouwland"]
-            },
+            "category": {"type": "string", "enum": ["Grasland", "Bouwland"]},
         }
     }

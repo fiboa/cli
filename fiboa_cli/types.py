@@ -1,29 +1,43 @@
 import datetime
+
+import numpy as np
+import pandas as pd
 import pyarrow as pa
 import pyarrow.types as pat
-import pandas as pd
-import numpy as np
 from shapely.geometry.base import BaseGeometry
+
 
 def is_enum(schema):
     return isinstance(schema.get("enum"), list)
 
+
 def is_integer_type(dtype):
     return dtype.startswith("int") or dtype.startswith("uint")
+
 
 def is_floating_type(dtype):
     return dtype == "float" or dtype == "double"
 
+
 def is_numerical_type(dtype):
     return is_integer_type(dtype) or is_floating_type(dtype)
+
 
 def is_temporal_type(dtype):
     return dtype == "date" or dtype == "date-time"
 
-def is_scalar_type(dtype):
-    return dtype == "string" or dtype == "binary" or dtype == "boolean" or is_numerical_type(dtype) or is_temporal_type(dtype)
 
-def get_geopandas_dtype(type, required = False, schema = {}, return_category = False):
+def is_scalar_type(dtype):
+    return (
+        dtype == "string"
+        or dtype == "binary"
+        or dtype == "boolean"
+        or is_numerical_type(dtype)
+        or is_temporal_type(dtype)
+    )
+
+
+def get_geopandas_dtype(type, required=False, schema={}, return_category=False):
     """
     fiboa datatypes to geopandas datatypes
     """
@@ -85,7 +99,7 @@ def get_geopandas_dtype(type, required = False, schema = {}, return_category = F
         else:
             return "Float64"
     elif type == "binary":
-        return "bytearray" # todo: check
+        return "bytearray"  # todo: check
     elif type == "string":
         if required:
             return "str"
@@ -98,20 +112,20 @@ def get_geopandas_dtype(type, required = False, schema = {}, return_category = F
     elif type == "date" or type == "date-time":
         return lambda series: pd.to_datetime(series)
     elif type == "geometry":
-        return None, # not a column, don't convert geometry
+        return (None,)  # not a column, don't convert geometry
     elif type == "bounding-box":
         return "object"
     else:
         return None
 
 
-def get_pyarrow_field(name, pa_type = None, schema = None, required = False):
+def get_pyarrow_field(name, pa_type=None, schema=None, required=False):
     if pa_type is None:
         pa_type = get_pyarrow_type(schema)
     if pa_type is None:
         return None
     else:
-        return pa.field(name, pa_type, nullable = not required)
+        return pa.field(name, pa_type, nullable=not required)
 
 
 def get_pyarrow_type(schema):
@@ -146,8 +160,8 @@ def get_pyarrow_type(schema):
             required_props = schema.get("required", [])
             fields = []
             for name, schema in properties.items():
-               field = get_pyarrow_field(name, schema = schema, required = name in required_props)
-               fields.append(field)
+                field = get_pyarrow_field(name, schema=schema, required=name in required_props)
+                fields.append(field)
             return pa.struct(fields)
     elif dtype == "date":
         return pa.date32()
@@ -157,14 +171,17 @@ def get_pyarrow_type(schema):
         return pa.binary()
     elif dtype == "bounding-box":
         coord_schema = {"type": "float"}
-        return pa.struct([
-            get_pyarrow_field("xmin", schema = coord_schema, required = True),
-            get_pyarrow_field("ymin", schema = coord_schema, required = True),
-            get_pyarrow_field("xmax", schema = coord_schema, required = True),
-            get_pyarrow_field("ymax", schema = coord_schema, required = True),
-        ])
+        return pa.struct(
+            [
+                get_pyarrow_field("xmin", schema=coord_schema, required=True),
+                get_pyarrow_field("ymin", schema=coord_schema, required=True),
+                get_pyarrow_field("xmax", schema=coord_schema, required=True),
+                get_pyarrow_field("ymax", schema=coord_schema, required=True),
+            ]
+        )
     else:
         return None
+
 
 def get_pyarrow_type_for_geopandas(dtype):
     """
@@ -175,12 +192,19 @@ def get_pyarrow_type_for_geopandas(dtype):
         return pa.bool_()
     elif dtype == "string" or dtype == "|s0" or dtype == "<u0":
         return pa.string()
-    elif dtype == "float128" or dtype == "record" or dtype == "timedelta64" or dtype.startswith("complex"): # complex128/256/512
+    elif (
+        dtype == "float128"
+        or dtype == "record"
+        or dtype == "timedelta64"
+        or dtype.startswith("complex")
+    ):  # complex128/256/512
         raise Exception(f"Unsupported data type: {dtype}")
-    elif dtype.startswith("int") or dtype.startswith("uint") or dtype.startswith("float"): # float16/32/64
+    elif (
+        dtype.startswith("int") or dtype.startswith("uint") or dtype.startswith("float")
+    ):  # float16/32/64
         return getattr(pa, dtype)()
     elif dtype == "object":
-        return pa.string() # todo
+        return pa.string()  # todo
     elif dtype == "datetime64":
         return pa.timestamp("ms", tz="UTC")
     else:
@@ -207,7 +231,7 @@ PA_TYPE_CHECK = {
     "date": pat.is_date32,
     "date-time": pat.is_timestamp,
     "geometry": pat.is_binary,
-    "bounding-box": pat.is_struct
+    "bounding-box": pat.is_struct,
 }
 
 
@@ -231,14 +255,9 @@ PYTHON_TYPES = {
     "date": (datetime.date, np.datetime64),
     "date-time": (datetime.datetime, np.datetime64),
     "geometry": BaseGeometry,
-    "bounding-box": dict
+    "bounding-box": dict,
 }
 
-LOG_STATUS_COLOR = {
-    "info": "white",
-    "warning": "yellow",
-    "error": "red",
-    "success": "green"
-}
+LOG_STATUS_COLOR = {"info": "white", "warning": "yellow", "error": "red", "success": "green"}
 
 SUPPORTED_PROTOCOLS = ["http", "https", "s3", "gs"]

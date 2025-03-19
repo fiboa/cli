@@ -4,12 +4,30 @@ import pandas as pd
 
 from .const import CORE_COLUMNS
 from .parquet import create_parquet
-from .util import load_parquet_data, load_parquet_schema, log, merge_schemas, parse_metadata, pick_schemas, is_schema_empty
+from .util import (
+    is_schema_empty,
+    load_parquet_data,
+    load_parquet_schema,
+    log,
+    merge_schemas,
+    parse_metadata,
+    pick_schemas,
+)
 from .version import fiboa_version
 
 DEFAULT_CRS = "EPSG:4326"
 
-def merge(datasets, out, crs = DEFAULT_CRS, includes = [], excludes = [], extensions = set(), compression = None, geoparquet1 = False):
+
+def merge(
+    datasets,
+    out,
+    crs=DEFAULT_CRS,
+    includes=[],
+    excludes=[],
+    extensions=set(),
+    compression=None,
+    geoparquet1=False,
+):
     dir = os.path.dirname(out)
     if dir:
         os.makedirs(dir, exist_ok=True)
@@ -46,7 +64,7 @@ def merge(datasets, out, crs = DEFAULT_CRS, includes = [], excludes = [], extens
     merged = pd.concat(all_gdf, ignore_index=True)
 
     # Remove empty columns
-    merged.dropna(axis=1, how='all', inplace=True)
+    merged.dropna(axis=1, how="all", inplace=True)
     columns = list(merged.columns)
     columns.sort()
 
@@ -62,5 +80,7 @@ def merge(datasets, out, crs = DEFAULT_CRS, includes = [], excludes = [], extens
         collection["fiboa_custom_schemas"] = custom_schemas
 
     # Write the merged dataset to the output file
-    create_parquet(merged, columns, collection, out, {}, compression=compression, geoparquet1=geoparquet1)
+    create_parquet(
+        merged, columns, collection, out, {}, compression=compression, geoparquet1=geoparquet1
+    )
     log(f"Merged data to {out}", "success")

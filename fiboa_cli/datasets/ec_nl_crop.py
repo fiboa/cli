@@ -1,5 +1,5 @@
-from .nl_crop import NLCropConverter
 from .commons.ec import EuroCropsConverterMixin
+from .nl_crop import NLCropConverter
 
 
 class NLEuroCropConverter(EuroCropsConverterMixin, NLCropConverter):

@@ -1,7 +1,8 @@
 import os
 
 from .parquet import create_parquet
-from .util import get_collection, log, load_file
+from .util import get_collection, load_file, log
+
 
 def create_geoparquet(config):
     output_file = config.get("out")

@@ -1,19 +1,20 @@
 import json
 import os
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
-from .util import load_parquet_data, load_parquet_schema, parse_metadata, to_iso8601, log
+from .util import load_parquet_data, load_parquet_schema, log, parse_metadata, to_iso8601
 
 
-def create_geojson(file, out, split = False, num = None, indent = None):
+def create_geojson(file, out, split=False, num=None, indent=None):
     dir = os.path.dirname(out)
     if dir:
         os.makedirs(dir, exist_ok=True)
 
     schema = load_parquet_schema(file)
     collection = parse_metadata(schema, b"fiboa")
-    geodata = load_parquet_data(file, nrows = num)
+    geodata = load_parquet_data(file, nrows=num)
     geodata = geodata.to_crs(epsg=4326)
 
     if num is None:
@@ -32,17 +33,15 @@ def create_geojson(file, out, split = False, num = None, indent = None):
         i = 1
         for obj in geodata.iterfeatures():
             if (i % 1000) == 0:
-                log(f"{i}...", nl = (i % 10000) == 0)
+                log(f"{i}...", nl=(i % 10000) == 0)
 
             obj = fix_geojson(obj)
 
             if collection is not None:
                 links = obj.get("links", [])
-                links.append({
-                    "href": collection_name,
-                    "rel": "collection",
-                    "type": "application/json"
-                })
+                links.append(
+                    {"href": collection_name, "rel": "collection", "type": "application/json"}
+                )
                 obj["links"] = links
 
             id = obj.get("id", i)
@@ -61,9 +60,9 @@ def create_geojson(file, out, split = False, num = None, indent = None):
         write_json(obj, out, indent)
 
 
-def write_json(obj, path, indent = None):
+def write_json(obj, path, indent=None):
     with open(path, "w") as f:
-        json.dump(obj, f, allow_nan=False, indent = indent, cls = FiboaJSONEncoder)
+        json.dump(obj, f, allow_nan=False, indent=indent, cls=FiboaJSONEncoder)
 
 
 def fix_geojson(obj):
@@ -73,14 +72,13 @@ def fix_geojson(obj):
     del obj["properties"]["id"]
 
     # Fix bbox
-    if "bbox" not in obj and "bbox" in obj["properties"] and isinstance(obj["properties"]["bbox"], dict):
+    if (
+        "bbox" not in obj
+        and "bbox" in obj["properties"]
+        and isinstance(obj["properties"]["bbox"], dict)
+    ):
         bbox = obj["properties"]["bbox"]
-        obj["bbox"] = [
-            bbox["xmin"],
-            bbox["ymin"],
-            bbox["xmax"],
-            bbox["ymax"]
-        ]
+        obj["bbox"] = [bbox["xmin"], bbox["ymin"], bbox["xmax"], bbox["ymax"]]
         del obj["properties"]["bbox"]
 
     return obj

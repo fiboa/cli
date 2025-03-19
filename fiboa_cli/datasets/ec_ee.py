@@ -20,66 +20,51 @@ PROVIDERS = [
     {
         "name": "Põllumajanduse Registrite ja Informatsiooni Amet",
         "url": "http://data.europa.eu/88u/dataset/pria-pollud",
-        "roles": ["producer", "licensor"]
+        "roles": ["producer", "licensor"],
     }
 ]
 ATTRIBUTION = "© Põllumajanduse Registrite ja Informatsiooni Amet"
 
 COLUMNS = {
-    'geometry'   : 'geometry',
-    'pollu_id'   : 'id',
-    'taotlusaas' : 'determination_datetime', # year
-    'pindala_ha' : 'area', # area (in ha)
-    'taotletud_' : 'taotletud_kultuur', # requested crop culture
-    'taotletu_1' : 'taotletud_maakasutus', # requested land use
-    'taotletu_2' : 'taotletud_toetus', # requested support
-    'niitmise_t' : 'niitmise_tuvastamise_staatus', # mowing detection status
-    'niitmise_1' : 'niitmise_tuvast_ajavahemik', # mowing detection period
-    'viimase_mu' : 'viimase_muutmise_aeg', # Last edit time (date-date)
-    'taotleja_n' : 'taotleja_nimi', # name of applicant
-    'taotleja_r' : 'taotleja_registrikood', # applicant's registration code
+    "geometry": "geometry",
+    "pollu_id": "id",
+    "taotlusaas": "determination_datetime",  # year
+    "pindala_ha": "area",  # area (in ha)
+    "taotletud_": "taotletud_kultuur",  # requested crop culture
+    "taotletu_1": "taotletud_maakasutus",  # requested land use
+    "taotletu_2": "taotletud_toetus",  # requested support
+    "niitmise_t": "niitmise_tuvastamise_staatus",  # mowing detection status
+    "niitmise_1": "niitmise_tuvast_ajavahemik",  # mowing detection period
+    "viimase_mu": "viimase_muutmise_aeg",  # Last edit time (date-date)
+    "taotleja_n": "taotleja_nimi",  # name of applicant
+    "taotleja_r": "taotleja_registrikood",  # applicant's registration code
 }
-COLUMN_MIGRATIONS = {
-    'JAHR': lambda col: pd.to_datetime(col, format='%Y')
-}
+COLUMN_MIGRATIONS = {"JAHR": lambda col: pd.to_datetime(col, format="%Y")}
 MISSING_SCHEMAS = {
-    'required': [
-        'taotletud_kultuur',
-        'taotletud_maakasutus',
-        'viimase_muutmise_aeg',
-        'taotleja_nimi',
+    "required": [
+        "taotletud_kultuur",
+        "taotletud_maakasutus",
+        "viimase_muutmise_aeg",
+        "taotleja_nimi",
     ],
-    'properties': {
-        'taotletud_kultuur': {
-            'type': 'string'
-        },
-        'taotletud_maakasutus': {
-            'type': 'string'
-        },
-        'niitmise_tuvastamise_staatus': {
-            'type': 'string'
-        },
-        'niitmise_tuvast_ajavahemik': {
-            'type': 'string'
-        },
-        'viimase_muutmise_aeg': {
-            'type': 'string'
-        },
-        'taotletud_toetus': {
-            'type': 'string'
-        },
-        'taotleja_nimi': {
-            'type': 'string'
-        },
-        'taotleja_registrikood': {
-            'type': 'string'
-        }
-    }
+    "properties": {
+        "taotletud_kultuur": {"type": "string"},
+        "taotletud_maakasutus": {"type": "string"},
+        "niitmise_tuvastamise_staatus": {"type": "string"},
+        "niitmise_tuvast_ajavahemik": {"type": "string"},
+        "viimase_muutmise_aeg": {"type": "string"},
+        "taotletud_toetus": {"type": "string"},
+        "taotleja_nimi": {"type": "string"},
+        "taotleja_registrikood": {"type": "string"},
+    },
 }
 
-ID, SHORT_NAME, TITLE, DESCRIPTION, PROVIDERS, EXTENSIONS, COLUMNS, LICENSE = add_eurocrops(vars(), 2021)
+ID, SHORT_NAME, TITLE, DESCRIPTION, PROVIDERS, EXTENSIONS, COLUMNS, LICENSE = add_eurocrops(
+    vars(), 2021
+)
 
-def convert(output_file, cache = None, **kwargs):
+
+def convert(output_file, cache=None, **kwargs):
     convert_(
         output_file,
         cache,
@@ -94,5 +79,5 @@ def convert(output_file, cache = None, **kwargs):
         missing_schemas=MISSING_SCHEMAS,
         attribution=ATTRIBUTION,
         license=LICENSE,
-        **kwargs
+        **kwargs,
     )

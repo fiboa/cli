@@ -1,8 +1,9 @@
 import os
 import re
 
-from .util import log
 from .create_geoparquet import create_geoparquet
+from .util import log
+
 
 def replace_in_str(content, search, replace):
     if isinstance(search, list) and isinstance(replace, list) and len(search) != len(replace):
@@ -23,6 +24,7 @@ def replace_in_str(content, search, replace):
     else:
         raise ValueError(f"Invalid search type: {type(search)}")
 
+
 def replace_in_file(file, search, replace):
     try:
         with open(file, "r+") as f:
@@ -35,7 +37,8 @@ def replace_in_file(file, search, replace):
     except Exception as e:
         log(f"Can't update {file}: {e}", "error")
 
-def rename_extension(folder, title, slug, gh_org = "fiboa", prefix = None):
+
+def rename_extension(folder, title, slug, gh_org="fiboa", prefix=None):
     if prefix is None:
         prefix = "template"
 
@@ -54,14 +57,8 @@ def rename_extension(folder, title, slug, gh_org = "fiboa", prefix = None):
         PREFIX_CODE = f"{prefix}:"
         PREFIX_TITLE = prefix
 
-    GH_SEARCH = [
-        "/extension-template/",
-        "fiboa.github.io"
-    ]
-    GH_REPLACE = [
-        f"/{slug}/",
-        f"{gh_org}.github.io"
-    ]
+    GH_SEARCH = ["/extension-template/", "fiboa.github.io"]
+    GH_REPLACE = [f"/{slug}/", f"{gh_org}.github.io"]
     replace_in_file(PIPFILE, GH_SEARCH, GH_REPLACE)
     replace_in_file(JSON_COLLECTION, GH_SEARCH, GH_REPLACE)
 
@@ -75,13 +72,13 @@ def rename_extension(folder, title, slug, gh_org = "fiboa", prefix = None):
         "Template Extension",
         "- **Title:** Template",
         "- **Property Name Prefix:** template",
-        "| template:"
+        "| template:",
     ]
     README_REPLACE = GH_REPLACE + [
         f"{title} Extension",
         f"- **Title:** {title}",
         f"- **Property Name Prefix:** {PREFIX_TITLE}",
-        f"| {PREFIX_CODE}"
+        f"| {PREFIX_CODE}",
     ]
     replace_in_file(README, README_SEARCH, README_REPLACE)
 
@@ -91,9 +88,7 @@ def rename_extension(folder, title, slug, gh_org = "fiboa", prefix = None):
             "out": GEOPARQUET,
             "schema": None,
             "collection": JSON_COLLECTION,
-            "extension_schemas": {
-                f"https://{gh_org}.github.io/{slug}/v0.1.0/schema.yaml": SCHEMA
-            }
+            "extension_schemas": {f"https://{gh_org}.github.io/{slug}/v0.1.0/schema.yaml": SCHEMA},
         }
         create_geoparquet(config)
     except Exception as e:

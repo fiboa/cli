@@ -1,9 +1,10 @@
-from fiboa_cli import describe
 from click.testing import CliRunner
+
+from fiboa_cli import describe
 
 
 def test_describe():
-    path = f"tests/data-files/inspire.parquet"
+    path = "tests/data-files/inspire.parquet"
     runner = CliRunner()
     result = runner.invoke(describe, [path])
     assert result.exit_code == 0, result.output

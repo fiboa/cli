@@ -3,17 +3,11 @@
 # Code extracted from commit https://github.com/geopandas/geopandas/tree/80edc868454d3fae943b734ed1719c2197806815
 
 from geopandas._compat import import_optional_dependency
-from geopandas.io.arrow import _validate_dataframe, _create_metadata, _encode_metadata
+from geopandas.io.arrow import _create_metadata, _encode_metadata, _validate_dataframe
 from geopandas.io.file import _expand_user
 
 
-def _geopandas_to_arrow(
-    df,
-    index=None,
-    schema_version=None,
-    write_covering_bbox=None,
-    schema = None
-):
+def _geopandas_to_arrow(df, index=None, schema_version=None, write_covering_bbox=None, schema=None):
     """
     Helper function with main, shared logic for to_parquet/to_feather.
     """
@@ -30,17 +24,19 @@ def _geopandas_to_arrow(
     geo_metadata = _create_metadata(
         df,
         schema_version=schema_version,
-        geometry_encoding=geometry_encoding, # can also be removed then
+        geometry_encoding=geometry_encoding,  # can also be removed then
         write_covering_bbox=write_covering_bbox,
     )
 
     if any(df[col].array.has_z.any() for col in df.columns[df.dtypes == "geometry"]):
         raise ValueError("Cannot write 3D geometries")
 
-    bounds = df.bounds # Must be retrieved before we convert to WKB, otherwise there are no bounds left
+    bounds = (
+        df.bounds
+    )  # Must be retrieved before we convert to WKB, otherwise there are no bounds left
     df = df.to_wkb()
 
-    table = Table.from_pandas(df, schema = schema, preserve_index=index)
+    table = Table.from_pandas(df, schema=schema, preserve_index=index)
 
     if write_covering_bbox:
         if "bbox" in df.columns:
@@ -71,8 +67,8 @@ def to_parquet(
     compression="snappy",
     schema_version=None,
     write_covering_bbox=False,
-    schema = None,
-    **kwargs
+    schema=None,
+    **kwargs,
 ):
     """
     Write a GeoDataFrame to the Parquet format.
@@ -118,7 +114,6 @@ def to_parquet(
         index=index,
         schema_version=schema_version,
         write_covering_bbox=write_covering_bbox,
-        schema = schema
+        schema=schema,
     )
     parquet.write_table(table, path, compression=compression, **kwargs)
-

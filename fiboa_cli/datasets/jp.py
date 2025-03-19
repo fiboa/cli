@@ -1,5 +1,6 @@
-from ..convert_utils import convert as convert_, BaseConverter
 import pandas as pd
+
+from ..convert_utils import BaseConverter
 
 
 class JPConverter(BaseConverter):
@@ -24,39 +25,39 @@ class JPConverter(BaseConverter):
         {
             "name": "Japanese Ministry of Agriculture, Forestry and Fisheries (MAFF, 農林水産省)",
             "url": "https://www.maff.go.jp/",
-            "roles": ["licensor", "producer"]
+            "roles": ["licensor", "producer"],
         },
         {
             "name": "Hiroo Imaki, Pacific Spatial Solutions",
             "url": "https://pacificspatial.com/",
             "roles": ["processor"],
-        }
+        },
     ]
     attribution = "Fude Polygon Data (2021-2024). Japanese Ministry of Agriculture, Forestry and Fisheries. Processed by Pacific Spatial Solutions, Inc"
     license = "CC-BY-4.0"
 
     columns = {
         "GEOM": "geometry",
-        'polygon_uuid': 'id',
-        'land_type_en': "land_type_en",
-        'local_government_cd': 'admin_local_code',
+        "polygon_uuid": "id",
+        "land_type_en": "land_type_en",
+        "local_government_cd": "admin_local_code",
         "issue_year": "determination_datetime",
     }
     column_migrations = {
-        "issue_year": lambda col: pd.to_datetime(col, format='%Y'),
+        "issue_year": lambda col: pd.to_datetime(col, format="%Y"),
     }
 
     missing_schemas = {
-        'properties': {
-            'land_type_en': {
-                'type': 'string'
-            },
-            'admin_local_code': {
-                'type': 'string'
-            },
+        "properties": {
+            "land_type_en": {"type": "string"},
+            "admin_local_code": {"type": "string"},
         }
     }
 
     def convert(self, *args, **kwargs):
         # Open only these columns to limit memory usage
-        super().convert(*args, columns=["GEOM", "polygon_uuid", "land_type_en", "local_government_cd", "issue_year"], **kwargs)
+        super().convert(
+            *args,
+            columns=["GEOM", "polygon_uuid", "land_type_en", "local_government_cd", "issue_year"],
+            **kwargs,
+        )

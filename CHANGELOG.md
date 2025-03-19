@@ -7,11 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v0.10.0] - 2025-03-11
+
+### Added
+
+- Converter for Austrian crop fields
+- Converters for Spain: Aragon, Andalusia, Balearic Islands, Basque Country, Catalonia, Cantabria, Castilla y León, Castilla-La Mancha, Canary Islands, Extremadura, Galicia, Madrid, Navarra, Valencia
+- Use ruff format + linting for a uniform code style
+
 ### Changed
 
-- Rewrite to class-based converters
+- Refactored converters to use a class-based approach
+- Start to use `https://fiboa.org/code/` prefixed codes for our own code lists
 - Use only unix line-endings in source files
 - Use set instead of list for Converter.extensions
+- Converted datasets are hilbert-curve sorted
 
 ## [v0.9.0] - 2025-01-07
 
@@ -34,6 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Converter for Japan, currently based on supplied (non-fiboa) parquet files
 - Many converters implement the admin extension
 - Assure tests don't download external sources
+- `fiboa convert`: New parameter `--original-geometries` / `-og` to keep the original geometries
 - Command `fiboa publish` to automate source coop publication process
   - Checks for proper existing source coop url
   - Runs the converter to get the parquet file
@@ -42,7 +53,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Checks for LICENSE.txt, if missing generate one based on the converter file
   - Generates pmtiles file
   - Checks AWS-environment vars, synchronizes parquet + pmtiles + README/LICENSE to source coop repo
-- `fiboa convert`: New parameter `--original-geometries` / `-og` to keep the original geometries
 
 ### Changed
 
@@ -389,7 +399,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - First release
 
-[Unreleased]: <https://github.com/fiboa/cli/compare/v0.9.0...main>
+[Unreleased]: <https://github.com/fiboa/cli/compare/v0.10.0...main>
+[v0.10.0]: <https://github.com/fiboa/cli/compare/v0.9.0...v0.10.0>
 [v0.9.0]: <https://github.com/fiboa/cli/compare/v0.8.0...v0.9.0>
 [v0.8.0]: <https://github.com/fiboa/cli/compare/v0.7.0...v0.8.0>
 [v0.7.0]: <https://github.com/fiboa/cli/compare/v0.6.0...v0.7.0>
