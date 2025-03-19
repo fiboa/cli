@@ -2,7 +2,7 @@ from ..convert_utils import BaseConverter
 
 
 class LacunaLabelsConverter(BaseConverter):
-    sources = "https://zenodo.org/records/11060871/files/mapped_fields_final.parquet?download=1"
+    sources = "https://africa-field-boundary-labels.s3.us-west-2.amazonaws.com/mapped_fields_final.parquet"
     id = "lacuna"
     short_name = "Lacuna Labels"
     title = "A region-wide, multi-year set of crop field boundary labels for Africa"
@@ -22,7 +22,14 @@ class LacunaLabelsConverter(BaseConverter):
 
     Please refer to the [technical report](docs/report/technical-report.pdf)
     for more details on the methods used to develop the dataset, an analysis
-    of label quality, and usage guidelines.
+    of label quality, and usage guidelines, and the publication: 
+
+    Estes, L. D., Wussah, A., Asipunu, M., Gathigi, M., Kovačič, P., Muhando, J., 
+    Yeboah, B. V., Addai, F. K., Akakpo, E. S., Allotey, M. K., Amkoya, P., Amponsem, E., 
+    Donkoh, K. D., Ha, N., Heltzel, E., Juma, C., Mdawida, R., Miroyo, A., Mucha, J., 
+    Mugami, J., Mwawaza, F., Nyarko, D. A., Oduor, P., Ohemeng, K. N., Segbefia, S. I. D., 
+    Tumbula, T., Wambua, F., Xeflide, G. H., Ye, S., Yeboah, F.(2024). A region-wide, 
+    multi-year set of crop field boundary labels for Africa. arXiv:2412.18483.
 
     Data is published at https://zenodo.org/records/11060871 and can be used in accordance with
     [Planet’s participant license agreement for the NICFI contract](https://go.planet.com/nicfi-pla-2024).
@@ -45,13 +52,22 @@ class LacunaLabelsConverter(BaseConverter):
     }
 
     columns = {
-        "geometry": "geometry",
         "id": "id",
+        "name": "name",
+        "assignment_id": "assignment_id", 
+        "image_date": "image_date",
+        "completion_time": "completion_time",
         "category": "category",
+        "geometry": "geometry",
+        
     }
 
     missing_schemas = {
         "properties": {
+            "name": {"type": "string"},
             "category": {"type": "string"},
+            "assignment_id": {"type": "string"},
+            "image_date": {"type": "string"},    
+            "completion_time": {"type": "date-time"},
         }
     }
