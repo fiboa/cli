@@ -113,5 +113,8 @@ class Converter(BaseConverter):
     # Keys must be the values from the COLUMNS dict, not the keys
     missing_schemas = {
         "required": ["my_id"],  # i.e. non-nullable properties
-        "properties": {"some_col": {"type": "string"}, "category": {"type": "string", "enum", ["A", "B"]}},
+        "properties": {
+            "some_col": {"type": "string"},
+            "category": {"type": "string", "enum": ["A", "B"]},
+        },
     }
