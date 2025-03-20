@@ -104,9 +104,9 @@ It has been converted to a fiboa GeoParquet file from data obtained from {props[
 ---
 
 - [Download the data as fiboa GeoParquet]({source_coop_data}{file_name}.parquet)
-- [STAC Browser](https://radiantearth.github.io/stac-browser/#/external/data.source.coop/{source_coop_extension}/stac/collection.json)
-- [STAC Collection]({source_coop_data}{source_coop_extension}/stac/collection.json)
-- [PMTiles]({source_coop_data}{source_coop_extension}/{file_name}.pmtiles)
+- [STAC Browser](https://radiantearth.github.io/stac-browser/#/external/data.source.coop/fiboa/{source_coop_extension}/stac/collection.json)
+- [STAC Collection]({source_coop_data}stac/collection.json)
+- [PMTiles]({source_coop_data}{file_name}.pmtiles)
 
 ## Columns
 
