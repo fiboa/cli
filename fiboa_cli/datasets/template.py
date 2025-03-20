@@ -6,6 +6,8 @@
 
 from ..convert_utils import BaseConverter
 
+# You can remove attributes that you don't need.
+# Also, please remove all comments that you didn't add yourself from the template.
 
 class Converter(BaseConverter):
     # File(s) to read the data from, usually publicly accessible URLs.
@@ -54,10 +56,10 @@ class Converter(BaseConverter):
         {"name": "ABC Corp", "url": "https://abc.example", "roles": ["producer", "licensor"]}
     ]
 
-    # Attribution (e.g. copyright or citation statement as requested by provider).
+    # Attribution (e.g. copyright or citation statement as requested by provider) as a string.
     # The attribution is usually shown on the map, in the lower right corner.
     # Can be None if not applicable
-    # attribution = "© 2024 ABC Corp."
+    attribution = "© 2024 ABC Corp."
 
     # License of the data, either
     # 1. a SPDX license identifier (including "dl-de/by-2-0" / "dl-de/zero-2-0"), or
@@ -78,18 +80,18 @@ class Converter(BaseConverter):
     column_additions = {}
 
     # A set of implemented extension identifiers
-    # extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
+    extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
 
     # Functions to migrate data in columns to match the fiboa specification.
     # Example: You have a column area_m in square meters and want to convert
     # to hectares as required for the area field in fiboa.
     # requires: func(column: pd.Series) -> pd.Series
-    # column_migrations = {"area_m": lambda column: column * 0.0001}
+    column_migrations = {"area_m": lambda column: column * 0.0001}
 
     # Filter columns to only include the ones that are relevant for the collection,
     # e.g. only rows that contain the word "agriculture" but not "forest" in the column "land_cover_type".
     # Lamda function accepts a Pandas Series and returns a Series or a Tuple with a Series and True to inverse the mask.
-    # column_filters = {"land_cover_type": lambda col: (col.isin(["agrictulture"]), True)}
+    column_filters = {"land_cover_type": lambda col: (col.isin(["agrictulture"]), True)}
 
     # Override to migrate the full GeoDataFrame if the other options are not sufficient
     # This should be the last resort!
@@ -108,10 +110,10 @@ class Converter(BaseConverter):
 
     # Schemas for the fields that are not defined in the core or the used extensions
     # Keys must be the values from the COLUMNS dict, not the keys
-    # missing_schemas = {
-    #     "required": ["my_id"],  # i.e. non-nullable properties
-    #     "properties": {
-    #         "some_col": {"type": "string"}
-    #         "category": {"type": "category"}
-    #     },
-    # }
+    missing_schemas = {
+        "required": ["my_id"],  # i.e. non-nullable properties
+        "properties": {
+            "some_col": {"type": "string"}
+            "category": {"type": "category"}
+        },
+    }
