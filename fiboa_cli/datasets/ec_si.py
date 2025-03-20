@@ -3,6 +3,7 @@ from .commons.ec import EuroCropsConverterMixin
 
 
 class Converter(EuroCropsConverterMixin, BaseConverter):
+    ec_mapping_csv = "si_2021.csv"
     sources = {
         "https://zenodo.org/records/10118572/files/SI_2021.zip?download=1": ["SI_2021_EC21.shp"]
     }
@@ -46,3 +47,7 @@ class Converter(EuroCropsConverterMixin, BaseConverter):
             "EC_NUTS3": {"type": "string"},
         },
     }
+
+    def add_hcat(self, gdf):
+        # skip adding hcat
+        return gdf

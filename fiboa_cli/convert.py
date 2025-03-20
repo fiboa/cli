@@ -62,24 +62,15 @@ def list_all_converters(keys):
         obj = {}
         try:
             converter = read_converter(id)
-            # todo remove this if once class-based converters have been fully implemented
-            if isinstance(converter, BaseConverter):
-                assert converter.__class__.__name__ != "TemplateConverter", (
-                    f"Please change TemplateConverter for {id}"
-                )
 
             for key in keys:
-                # todo remove this if once class-based converters have been fully implemented
-                if isinstance(converter, BaseConverter):
-                    value = getattr(converter, key.lower())
-                else:
-                    value = getattr(converter, key, None)
+                value = getattr(converter, key.lower())
 
-                if key == "SOURCES" and isinstance(value, dict):
+                if key == "sources" and isinstance(value, dict):
                     value = ", ".join(list(value.keys()))
-                elif key == "LICENSE" and isinstance(value, dict):
+                elif key == "license" and isinstance(value, dict):
                     value = value["href"]
-                elif key == "PROVIDERS" and isinstance(value, list):
+                elif key == "providers" and isinstance(value, list):
                     value = ", ".join(list(map(lambda x: x["name"], value)))
 
                 obj[key] = value
@@ -93,17 +84,15 @@ def list_all_converters(keys):
 def read_converter(_id):
     module_name = f".datasets.{_id}"
     module = importlib.import_module(module_name, package="fiboa_cli")
-    # todo: remove conditional once class-based converters have been fully implemented
-    if not hasattr(module, "convert"):
-        try:
-            clazz = next(
-                v
-                for v in module.__dict__.values()
-                if type(v) is type
-                and issubclass(v, BaseConverter)
-                and "BaseConverter" not in v.__name__
-            )
-            return clazz()
-        except StopIteration:
-            log("Missing convert function or Converter class for module {_id}", "warning")
-    return module
+    try:
+        clazz = next(
+            v
+            for v in module.__dict__.values()
+            if type(v) is type
+            and issubclass(v, BaseConverter)
+            and "BaseConverter" not in v.__name__
+        )
+        return clazz()
+    except StopIteration:
+        log(f"Missing Converter class for module {_id}", "error")
+        raise ImportError(f"Missing Converter class for module {_id}")
