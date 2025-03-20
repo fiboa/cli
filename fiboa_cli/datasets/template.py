@@ -9,6 +9,7 @@ from ..convert_utils import BaseConverter
 # You can remove attributes that you don't need.
 # Also, please remove all comments that you didn't add yourself from the template.
 
+
 class Converter(BaseConverter):
     # File(s) to read the data from, usually publicly accessible URLs.
     # Can read any (zipped) tabular data format that GeoPandas can read through read_file() or read_parquet().
@@ -112,8 +113,5 @@ class Converter(BaseConverter):
     # Keys must be the values from the COLUMNS dict, not the keys
     missing_schemas = {
         "required": ["my_id"],  # i.e. non-nullable properties
-        "properties": {
-            "some_col": {"type": "string"}
-            "category": {"type": "category"}
-        },
+        "properties": {"some_col": {"type": "string"}, "category": {"type": "category"}},
     }
