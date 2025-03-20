@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+- Improve converter template usability
+
 ## [v0.10.0] - 2025-03-11
 
 ### Added
