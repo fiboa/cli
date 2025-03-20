@@ -38,10 +38,14 @@ class Converter(BaseConverter):
     # def layer_filter(self, layer: str, uri: str) -> bool:
     #     return True
 
-    id = "Unique identifier for the collection, e.g. abc"
-    short_name = "Geonames for the data (e.g. Country, Region, Source, Year)"
-    title = "Title of the collection; Field boundaries for Country, Region, etc."
-    description = "Describe the dataset here. Can be multiline and include CommonMark."
+    # Unique identifier for the collection
+    id = "abc"
+    # Geonames for the data (e.g. Country, Region, Source, Year)
+    short_name = "Country, Region, etc."
+    # Title of the collection
+    title = "Field boundaries for Country, Region, etc."
+    # Description of the collection. Can be multiline and include CommonMark.
+    description = """Describe the dataset here."""
 
     # A list of providers that contributed to the data.
     # This should be an array of Provider Objects:
