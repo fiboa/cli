@@ -28,7 +28,7 @@ def create_parquet(
     # Add the custom schemas to the collection for future use
     if not is_schema_empty(missing_schemas):
         collection = collection.copy()
-        collection["fiboa_custom_schemas"] = missing_schemas
+        collection["custom_schemas"] = missing_schemas
 
     # Load all extension schemas
     extensions = {}
