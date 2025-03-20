@@ -75,7 +75,7 @@ class Converter(BaseConverter):
 
     # Add columns with constant values.
     # The key is the column name, the value is a constant value that's used for all rows.
-    # column_additions = {"determination_datetime": "2025-05-01T00:00:00Z"}
+    column_additions = {}
 
     # A set of implemented extension identifiers
     # extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
