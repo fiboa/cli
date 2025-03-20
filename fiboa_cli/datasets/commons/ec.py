@@ -5,73 +5,57 @@ import geopandas as gpd
 
 from fiboa_cli.util import load_file
 
-from .dictobject import DictObject
-
-
-def add_eurocrops(base, year=None):
-    if isinstance(base, dict):
-        base = DictObject(base)
-
-    ID = base.ID
-    if not base.ID.startswith("ec_"):
-        ID = "ec_" + ID
-
-    SUFFIX = " - Eurocrops"
-    if year is not None:
-        SUFFIX += " " + str(year)
-
-    TITLE = base.TITLE + SUFFIX
-
-    SHORT_NAME = base.SHORT_NAME + SUFFIX
-
-    DESCRIPTION = (
-        base.DESCRIPTION.strip()
-        + """
-
-This dataset is an extended version of the original dataset, with additional columns and attributes added by the EuroCrops project.
-
-The project developed a new **Hierarchical Crop and Agriculture Taxonomy (HCAT)** that harmonises all declared crops across the European Union.
-In the data you'll find this as additional attributes:
-
-- `EC_trans_n`: The original crop name translated into English
-- `EC_hcat_n`: The machine-readable HCAT name of the crop
-- `EC_hcat_c`: The 10-digit HCAT code indicating the hierarchy of the crop
-    """
-    )
-
-    PROVIDERS = base.PROVIDERS + [
-        {"name": "EuroCrops", "url": "https://github.com/maja601/EuroCrops", "roles": ["processor"]}
-    ]
-
-    EXTENSIONS = getattr(base, "EXTENSIONS", None) or set()
-    EXTENSIONS.add("https://fiboa.github.io/hcat-extension/v0.1.0/schema.yaml")
-    COLUMNS = base.COLUMNS | {
-        "EC_trans_n": "ec:translated_name",
-        "EC_hcat_n": "ec:hcat_name",
-        "EC_hcat_c": "ec:hcat_code",
-    }
-
-    LICENSE = "CC-BY-SA-4.0"
-
-    return ID, SHORT_NAME, TITLE, DESCRIPTION, PROVIDERS, EXTENSIONS, COLUMNS, LICENSE
-
 
 class EuroCropsConverterMixin:
+    license = "CC-BY-SA-4.0"
+
     ec_mapping_csv = None
     mapping_file = None
     ec_mapping = None
 
     def __init__(self, *args, year=None, **kwargs):
         super().__init__(*args, **kwargs)
-        # Some meta-magic to reuse existing add_eurocrops routine
-        attributes = (
-            "ID, SHORT_NAME, TITLE, DESCRIPTION, PROVIDERS, EXTENSIONS, COLUMNS, LICENSE".split(
-                ", "
-            )
+        if not self.id.startswith("ec_"):
+            self.id = "ec_" + self.id
+
+        suffix = " - Eurocrops"
+        if year is not None:
+            suffix = f"{suffix} {year}"
+
+        self.title += suffix
+        self.short_name += suffix
+
+        self.description = (
+            self.description.strip()
+            + """
+
+    This dataset is an extended version of the original dataset, with additional columns and attributes added by the EuroCrops project.
+
+    The project developed a new **Hierarchical Crop and Agriculture Taxonomy (HCAT)** that harmonises all declared crops across the European Union.
+    In the data you'll find this as additional attributes:
+
+    - `EC_trans_n`: The original crop name translated into English
+    - `EC_hcat_n`: The machine-readable HCAT name of the crop
+    - `EC_hcat_c`: The 10-digit HCAT code indicating the hierarchy of the crop
+        """
         )
-        base = {k: getattr(self, k.lower()) for k in attributes}
-        for k, v in zip(attributes, add_eurocrops(base, year=year)):
-            setattr(self, k.lower(), v)
+
+        self.providers += [
+            {
+                "name": "EuroCrops",
+                "url": "https://github.com/maja601/EuroCrops",
+                "roles": ["processor"],
+            }
+        ]
+
+        self.extensions = getattr(self, "extensions", set())
+        self.extensions.add("https://fiboa.github.io/hcat-extension/v0.1.0/schema.yaml")
+        self.columns |= {
+            "EC_trans_n": "ec:translated_name",
+            "EC_hcat_n": "ec:hcat_name",
+            "EC_hcat_c": "ec:hcat_code",
+        }
+        self.license = "CC-BY-SA-4.0"
 
     def convert(self, *args, **kwargs):
         self.mapping_file = kwargs.get("mapping_file")

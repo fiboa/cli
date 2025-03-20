@@ -42,7 +42,7 @@ class Converter(EuroCropsConverterMixin, BaseConverter):
         "required": [
             "year",
             "parcel_id",
-            "crop_id",
+            "crop:code",
             "subsidy_type",
             "EC_NUTS3",
             #       'PRODUCT_DE',
@@ -50,7 +50,7 @@ class Converter(EuroCropsConverterMixin, BaseConverter):
         "properties": {
             "year": {"type": "uint16", "minLength": 4, "maxLength": 4},
             "parcel_id": {"type": "uint64", "minLength": 8, "maxLength": 8},
-            "crop_id": {"type": "uint16", "minLength": 3, "maxLength": 3},
+            "crop:code": {"type": "uint16", "minLength": 3, "maxLength": 3},
             "subsidy_type": {"type": "string"},
             "EC_NUTS3": {
                 "type": "string",
@@ -63,3 +63,7 @@ class Converter(EuroCropsConverterMixin, BaseConverter):
             # },
         },
     }
+
+    def add_hcat(self, gdf):
+        # skip adding hcat
+        return gdf
