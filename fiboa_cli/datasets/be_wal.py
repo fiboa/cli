@@ -8,10 +8,11 @@ from .commons.ec import ec_url
 
 class Converter(AdminConverterMixin, BaseConverter):
     sources = {
-        "https://geoservices.wallonie.be/geotraitement/spwdatadownload/get/2a0d9be0-ac3d-443e-9db0-a7cfb0f128e2/LU_ExistingLandUse_SIGEC2022.gml.zip?blocksize=0": [
+        "https://geoservices.wallonie.be/geotraitement/spwdatadownload/get/2a0d9be0-ac3d-443e-9db0-a7cfb0f128e2/LU_ExistingLandUse_SIGEC2022.gml.zip": [
             "LU_ExistingLandUse_SIGEC2022.gml"
         ]
     }
+    avoid_range_request = True
     id = "be_wal"
     admin_region_code = "WAL"
     short_name = "Belgium, Wallonia"

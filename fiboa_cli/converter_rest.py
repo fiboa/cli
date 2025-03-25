@@ -40,7 +40,7 @@ class EsriRESTConverterMixin:
             return super().get_data(paths, **kwargs)
 
         base_url = paths[0]  # loop over paths to support more than 1 source
-        source_fs = get_fs(base_url)
+        source_fs = get_fs(base_url, **kwargs)
         cache_fs, cache_folder = self.get_cache(self.cache_folder)
 
         service_metadata = requests.get(base_url, {"f": "pjson"}).json()

@@ -8,10 +8,11 @@ class ARConverter(ESBaseConverter):
     # These files can be annoying to download (web server failure, no http-range support for continuation)
     # Alternative is to download the files by municipality, check the atom.xml
     sources = {
-        "https://icearagon.aragon.es/datosdescarga/descarga.php?file=/CartoTema/sigpac/rec22_sigpac.shp.zip&blocksize=0": "rec22_sigpac.shp.zip",
-        "https://icearagon.aragon.es/datosdescarga/descarga.php?file=/CartoTema/sigpac/rec44_sigpac.shp.zip&blocksize=0": "rec44_sigpac.shp.zip",
-        "https://icearagon.aragon.es/datosdescarga/descarga.php?file=/CartoTema/sigpac/rec50_sigpac.shp.zip&blocksize=0": "rec50_sigpac.shp.zip",
+        "https://icearagon.aragon.es/datosdescarga/descarga.php?file=/CartoTema/sigpac/rec22_sigpac.shp.zip": "rec22_sigpac.shp.zip",
+        "https://icearagon.aragon.es/datosdescarga/descarga.php?file=/CartoTema/sigpac/rec44_sigpac.shp.zip": "rec44_sigpac.shp.zip",
+        "https://icearagon.aragon.es/datosdescarga/descarga.php?file=/CartoTema/sigpac/rec50_sigpac.shp.zip": "rec50_sigpac.shp.zip",
     }
+    avoid_range_request = True
 
     id = "es_ar"
     short_name = "Spain Aragon"
