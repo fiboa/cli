@@ -45,7 +45,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Converter for Latvia (from original source)
 - Converter for Japan, currently based on supplied (non-fiboa) parquet files
 - Many converters implement the admin extension
+- Assure tests don't download external sources
 - `fiboa convert`: New parameter `--original-geometries` / `-og` to keep the original geometries
+- Command `fiboa publish` to automate source coop publication process
+  - Checks for proper existing source coop url
+  - Runs the converter to get the parquet file
+  - Validates parquet file
+  - Checks for README.md, if missing generates one based on data-survey (if available) and converter
+  - Checks for LICENSE.txt, if missing generate one based on the converter file
+  - Generates pmtiles file
+  - Checks AWS-environment vars, synchronizes parquet + pmtiles + README/LICENSE to source coop repo
 
 ### Changed
 

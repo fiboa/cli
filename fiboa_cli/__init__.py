@@ -16,6 +16,7 @@ from .improve import improve as improve_
 from .jsonschema import jsonschema as jsonschema_
 from .merge import DEFAULT_CRS
 from .merge import merge as merge_
+from .publish import publish as publish_
 from .rename_extension import rename_extension as rename_extension_
 from .util import (
     check_ext_schema_for_cli,
@@ -753,6 +754,47 @@ def improve(
         sys.exit(1)
 
 
+## Publish
+@click.command()
+@click.argument("dataset", nargs=1, type=click.Choice(list_all_converter_ids()))
+@click.argument("directory", nargs=1, type=click.Path(exists=False))
+@click.option(
+    "--cache",
+    "-c",
+    type=click.Path(exists=False),
+    help="By default the CLI downloads the source data on every execution. Specify a local folder to avoid downloading the files again. If the files exist, reads from there, otherwise stores the files there.",
+    default=None,
+)
+@click.option(
+    "--source-coop-extension",
+    "-e",
+    type=click.STRING,
+    help="(Future) source_coop extension, will be used as https://beta.source.coop/fiboa/xx-yy/",
+    default=None,
+)
+@click.option(
+    "--input",
+    "-i",
+    type=click.STRING,
+    help="File(s) or URL(s) to read from. Can be used multiple times. Specific files from ZIP and 7Z archives can be picked by providing the archive path and the file path in the archive separated by a pipe sign. To pick multiple files from a single archive separate them by comma. Example: /path/to/archive.zip|file1.gpkg,subfolder/file2.gpkg",
+    callback=parse_converter_input_files,
+    multiple=True,
+    default=None,
+)
+def publish(dataset, directory, cache, source_coop_extension, input):
+    """
+    Publish a fiboa collection on
+    """
+    log(f"Trying to publish on source coop CLI {__version__}\n", "success")
+    try:
+        directory = os.path.abspath(directory)
+        publish_(dataset, directory, cache, source_coop_extension, input)
+        log(f"Dataset published from {directory}", "success")
+    except Exception as e:
+        log(e, "error")
+        sys.exit(1)
+
+
 cli.add_command(describe)
 cli.add_command(validate)
 cli.add_command(validate_schema)
@@ -763,6 +805,7 @@ cli.add_command(convert)
 cli.add_command(converters)
 cli.add_command(rename_extension)
 cli.add_command(merge)
+cli.add_command(publish)
 cli.add_command(improve)
 
 if __name__ == "__main__":
