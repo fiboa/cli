@@ -3,10 +3,9 @@ import os
 import re
 
 from ..convert_utils import BaseConverter
-from .commons.admin import AdminConverterMixin
 
 
-class Converter(AdminConverterMixin, BaseConverter):
+class Converter(BaseConverter):
     sources = None
     data_access = """
     Data must be obtained from the Planet subscriptions API, see
