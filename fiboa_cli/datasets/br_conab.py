@@ -1,8 +1,8 @@
-import numpy as np
 import math
 
 from ..convert_utils import BaseConverter
 from .commons.admin import AdminConverterMixin
+
 
 class Converter(AdminConverterMixin, BaseConverter):
     _sources = [
@@ -36,9 +36,11 @@ class Converter(AdminConverterMixin, BaseConverter):
         "Culturas_de_Verao_1_Safra/DF/CV-DF_Safra_2013_2014.zip",
         "Culturas_de_Verao_1_Safra/DF/CV-DF_Safra_2014_2015.zip",
         "Culturas_de_Verao_1_Safra/DF/CV-DF_Safra_2017_2018.zip",
-        "Culturas_de_Verao_1_Safra/TO/CV-TO_Safra_2019_2020.zip"
+        "Culturas_de_Verao_1_Safra/TO/CV-TO_Safra_2019_2020.zip",
     ]
-    sources = {"https://portaldeinformacoes.conab.gov.br/downloads/mapas/"+k: ["*.shp"] for k in _sources}
+    sources = {
+        "https://portaldeinformacoes.conab.gov.br/downloads/mapas/" + k: ["*.shp"] for k in _sources
+    }
     id = "br_conab"
     short_name = "Conab"
     title = "Brazil Crop Fields (CONAB)"
@@ -66,7 +68,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         "id": "id",
         "cd_mun": "admin_municipality_code",
         "nm_mun": "admin_municipality_name",
-        "area_ha": "area"
+        "area_ha": "area",
     }
 
     missing_schemas = {
@@ -76,7 +78,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         }
     }
 
-    def file_migration(self, gdf, path, uri, layer = None):
+    def file_migration(self, gdf, path, uri, layer=None):
         gdf = super().file_migration(gdf, path, uri, layer)
         # Harmonize projection or pd.concat will fail
         if gdf.crs.srs != "EPSG:4674":
@@ -85,11 +87,12 @@ class Converter(AdminConverterMixin, BaseConverter):
 
     def migrate(self, gdf):
         gdf = gdf.reset_index(drop=True)
-        gdf["area_ha"].combine_first(gdf["Hectares"]).combine_first(gdf["Shape_Area"] / 10000)#
+        gdf["area_ha"].combine_first(gdf["Hectares"]).combine_first(gdf["Shape_Area"] / 10000)  #
         gdf.loc[gdf["area_ha"] == 0, "area_ha"] = gdf.to_crs(31982).area / 10000
         gdf["cd_mun"] = gdf["cd_mun"].combine_first(gdf["CD_MUN"]).apply(fformat)
         gdf["nm_mun"] = gdf["nm_mun"].combine_first(gdf["NM_MUN"]).combine_first(gdf["NM_MUNIC"])
         return gdf
+
 
 def fformat(x):
     if isinstance(x, float):
