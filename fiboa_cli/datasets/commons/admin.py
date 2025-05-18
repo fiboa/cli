@@ -39,7 +39,7 @@ class AdminConverterMixin:
         if self.admin_country_code is None:
             # Taking country code from ID
             self.admin_country_code = self.id.split("_")[0].upper()
-        assert re.match("[A-Z]{2}", self.admin_country_code), (
+        assert re.match("^[A-Z]{2}$", self.admin_country_code), (
             f"Country code should be 2 uppercase letters, not {self.admin_country_code}"
         )
 
