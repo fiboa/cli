@@ -29,7 +29,7 @@ setup(
         "pyyaml>=6.0",
         "pyarrow>=14.0",
         "fsspec>=2024.0",
-        "click>=8.1",
+        "click==8.1.8",
         "geopandas>=1.0.0",
         "requests>=2.30",
         "aiohttp>=3.9",
