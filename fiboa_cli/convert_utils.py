@@ -6,6 +6,7 @@ import json
 import os
 import re
 import sys
+import tarfile
 import zipfile
 from copy import copy
 from glob import glob
@@ -281,6 +282,10 @@ class BaseConverter:
                         sz_file.extractall(zip_folder)
                 elif rarfile.is_rarfile(cache_file):
                     with rarfile.RarFile(cache_file, "r") as w:
+                        w.extractall(zip_folder)
+                elif tarfile.is_tarfile(cache_file):
+                    with tarfile.open(cache_file) as w:
+                        w = tarfile.open(cache_file, "r")
                         w.extractall(zip_folder)
                 else:
                     raise ValueError(
