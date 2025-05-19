@@ -60,7 +60,6 @@ class JecamConvert(BaseConverter):
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         gdf = super().migrate(gdf)
-        # Pick some CRS for missing area's, 32631 (central afrika) or 3857
-        gdf.loc[gdf["Area_ha"] == 0, "Area_ha"] = gdf.to_crs(32631).area / 10000
+        gdf.loc[gdf["Area_ha"] == 0, "Area_ha"] = None
         gdf["Irrigated"] = gdf["Irrigated"].astype(bool)
         return gdf
