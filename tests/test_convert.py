@@ -38,6 +38,7 @@ tests = [
     "lt",
     "si",
     "sk",
+    "jecam",
 ]
 test_path = "tests/data-files/convert"
 extra_convert_parameters = {
@@ -56,6 +57,7 @@ extra_convert_parameters = {
     "lv": ["-i", f"{test_path}/lv/1_100.xml", "-m", f"{test_path}/lv/lv_2021.csv"],
     "se": ["-m", f"{test_path}/se/se_2021.csv"],
     "nz": ["-i", f"{test_path}/nz/irrigated-land-area-raw-2020-update.zip"],
+    "jecam": ["-i", f"{test_path}/jecam/BD_JECAM_CIRAD_2023_feb.shp"],
 }
 
 
