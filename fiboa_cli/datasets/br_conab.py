@@ -62,7 +62,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         }
     ]
     attribution = "CONAB - conab.gov.br"
-    license = "CC-BY-NC"
+    license = "CC-BY-NC-4.0"
     columns = {
         "geometry": "geometry",
         "id": "id",
