@@ -32,9 +32,11 @@ from .validate_schema import validate_schema as validate_schema_
 from .version import __version__
 from .version import fiboa_version as fiboa_version_
 
+
 class LogError:
     def __enter__(self):
         pass
+
     def __exit__(self, exc_type, exc_value, exc_traceback):
         if exc_type is None:
             return
