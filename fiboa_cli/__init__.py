@@ -32,6 +32,17 @@ from .validate_schema import validate_schema as validate_schema_
 from .version import __version__
 from .version import fiboa_version as fiboa_version_
 
+class LogError:
+    def __enter__(self):
+        pass
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        if exc_type is None:
+            return
+        if os.environ.get("FIBOA_CLI_DEBUG", "").lower() in ("true", "1"):
+            raise exc_type(exc_value).with_traceback(exc_traceback)
+        log(f"Exception occurred: {exc_type.__name__} {exc_value}", "error")
+        sys.exit(1)
+
 
 @click.group()
 @click.version_option(version=__version__)
@@ -75,15 +86,12 @@ def describe(file, json, num=10, column=[]):
     Inspects the content of a fiboa GeoParquet file.
     """
     log(f"fiboa CLI {__version__} - Describe {file}\n", "success")
-    try:
+    with LogError():
         if len(column) == 0:
             columns = None
         else:
             columns = list(column)
         describe_(file, json, num, columns)
-    except Exception as e:
-        log(e, "error")
-        sys.exit(1)
 
 
 ## VALIDATE
@@ -274,11 +282,8 @@ def create_geoparquet(files, out, collection, schema, ext_schema, fiboa_version)
         "extension_schemas": ext_schema,
         "fiboa_version": fiboa_version,
     }
-    try:
+    with LogError():
         create_geoparquet_(config)
-    except Exception as e:
-        log(e, "error")
-        sys.exit(1)
 
 
 ## CREATE GEOJSON
@@ -324,13 +329,10 @@ def create_geojson(file, out, features=False, num=None, indent=None):
     Create a fiboa GeoJSON file(s) from a fiboa GeoParquet file
     """
     log(f"fiboa CLI {__version__} - Create GeoJSON\n", "success")
-    try:
+    with LogError():
         create_geojson_(file, out, features, num, indent)
         abs_path = os.path.abspath(out)
         log(f"Files written to {abs_path}", "success")
-    except Exception as e:
-        log(e, "error")
-        sys.exit(1)
 
 
 ## JSON SCHEMA
@@ -374,16 +376,13 @@ def jsonschema(schema, out, fiboa_version, id_):
         "fiboa_version": fiboa_version,
         "id": id_,
     }
-    try:
+    with LogError():
         schema = jsonschema_(config)
         if out:
             with open(out, "w", encoding="utf-8") as f:
                 json.dump(schema, f, indent=2)
         else:
             print(schema)
-    except Exception as e:
-        log(e, "error")
-        sys.exit(1)
 
 
 ## CONVERT
@@ -479,7 +478,7 @@ def convert(
     Converts existing field boundary datasets to fiboa.
     """
     log(f"fiboa CLI {__version__} - Convert '{dataset}'\n", "success")
-    try:
+    with LogError():
         convert_(
             dataset,
             out,
@@ -493,9 +492,6 @@ def convert(
             mapping_file,
             original_geometries,
         )
-    except Exception as e:
-        log(e, "error")
-        sys.exit(1)
 
 
 ## CONVERTERS
@@ -580,11 +576,8 @@ def rename_extension(folder, title, slug, org="fiboa", prefix=None):
     Updates placeholders in an extension folder to the new name.
     """
     log(f"fiboa CLI {__version__} - Rename placeholders in extensions\n", "success")
-    try:
+    with LogError():
         rename_extension_(folder, title, slug, gh_org=org, prefix=prefix)
-    except Exception as e:
-        log(e, "error")
-        sys.exit(1)
 
 
 ## MERGE
@@ -649,11 +642,8 @@ def merge(datasets, out, crs, include, exclude, extension, compression, geoparqu
     It adds a collection column to discriminate the source of the rows.
     """
     log(f"fiboa CLI {__version__} - Merge datasets\n", "success")
-    try:
+    with LogError():
         merge_(datasets, out, crs, include, exclude, list(extension), compression, geoparquet1)
-    except Exception as e:
-        log(e, "error")
-        sys.exit(1)
 
 
 ## IMPROVE (add area, perimeter, and fix geometries)
@@ -736,7 +726,7 @@ def improve(
     "Improves" a fiboa GeoParquet file according to the given parameters.
     """
     log(f"fiboa CLI {__version__} - Improve datasets\n", "success")
-    try:
+    with LogError():
         improve_(
             input,
             out,
@@ -748,9 +738,6 @@ def improve(
             compression,
             geoparquet1,
         )
-    except Exception as e:
-        log(e, "error")
-        sys.exit(1)
 
 
 cli.add_command(describe)
