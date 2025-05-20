@@ -13,6 +13,16 @@ LENGTH_CONVERSION_FACTORS = {  # target unit: meters
 }
 
 
+def convert_from_unit(row, prefix, conversion_factors):
+    value = row[f"{prefix}.value"]
+    unit = row[f"{prefix}.unit"]
+    factor = conversion_factors.get(unit)
+    if factor is not None:
+        return value * conversion_factors[unit]
+    else:
+        raise ValueError(f"Unknown unit '{unit}' in column '{prefix}.unit'")
+
+
 class Converter(BaseConverter):
     data_access = """
     Data must be obtained from the Varda API, saved as .json files. Easiest way to try it out is
@@ -51,15 +61,6 @@ class Converter(BaseConverter):
     # }
 
     def migrate(self, gdf):
-        def convert_from_unit(row, prefix, conversion_factors):
-            value = row[f"{prefix}.value"]
-            unit = row[f"{prefix}.unit"]
-            factor = conversion_factors.get(unit)
-            if factor is not None:
-                return value * conversion_factors[unit]
-            else:
-                raise ValueError(f"Unknown unit '{unit}' in column '{prefix}.unit'")
-
         gdf["area"] = gdf.apply(
             lambda row: convert_from_unit(row, "area", AREA_CONVERSION_FACTORS), axis=1
         )
