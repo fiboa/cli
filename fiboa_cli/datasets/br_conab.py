@@ -1,5 +1,7 @@
 import math
 
+import numpy as np
+
 from ..convert_utils import BaseConverter
 from .commons.admin import AdminConverterMixin
 
@@ -87,7 +89,7 @@ class Converter(AdminConverterMixin, BaseConverter):
 
     def migrate(self, gdf):
         gdf = gdf.reset_index(drop=True)
-        gdf["area_ha"].combine_first(gdf["Hectares"]).combine_first(gdf["Shape_Area"] / 10000)  #
+        gdf["area_ha"].combine_first(gdf["Hectares"]).replace(np.nan, None, inplace=True)
         gdf.loc[gdf["area_ha"] == 0, "area_ha"] = gdf.to_crs(31982).area / 10000
         gdf["cd_mun"] = gdf["cd_mun"].combine_first(gdf["CD_MUN"]).apply(fformat)
         gdf["nm_mun"] = gdf["nm_mun"].combine_first(gdf["NM_MUN"]).combine_first(gdf["NM_MUNIC"])
