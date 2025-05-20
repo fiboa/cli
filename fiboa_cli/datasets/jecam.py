@@ -1,6 +1,7 @@
 import geopandas as gpd
 
 from fiboa_cli.convert_utils import BaseConverter
+from fiboa_cli.datasets.commons.data import read_data_csv
 
 
 class JecamConvert(BaseConverter):
@@ -40,7 +41,7 @@ class JecamConvert(BaseConverter):
         "Id": "id",
         "Area_ha": "area",
         "AcquiDate": "determination_datetime",
-        "Country": "country_name",
+        "admin:country_code": "admin:country_code",
         "SiteName": "site_name",
         "CropType1": "crop:name",
         "Irrigated": "irrigated",
@@ -48,9 +49,9 @@ class JecamConvert(BaseConverter):
     column_additions = {
         "crop:code_list": "https://fiboa.org/code/jecam/crop.csv",
     }
+    extensions = {"https://fiboa.github.io/administrative-division-extension/v0.1.0/schema.yaml"}
     missing_schemas = {
         "properties": {
-            "country_name": {"type": "string"},
             "site_name": {"type": "string"},
             "crop:name": {"type": "string"},
             "crop:code_list": {"type": "string"},
@@ -60,6 +61,10 @@ class JecamConvert(BaseConverter):
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         gdf = super().migrate(gdf)
+        rows = read_data_csv("country_codes.csv")
+        mapping = {row["name"]: row["alpha-2"] for row in rows}
+        gdf["admin:country_code"] = gdf["Country"].map(mapping)
+
         gdf.loc[gdf["Area_ha"] == 0, "Area_ha"] = None
         gdf["Irrigated"] = gdf["Irrigated"].astype(bool)
         return gdf
