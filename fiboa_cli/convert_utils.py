@@ -521,6 +521,7 @@ class BaseConverter:
 
         if self.index_as_id:
             gdf["id"] = gdf.index
+            columns["id"] = "id"
 
         # 1. Run global migration
         log("Applying global migrations")
