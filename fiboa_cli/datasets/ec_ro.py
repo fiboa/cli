@@ -30,6 +30,7 @@ class Convert(EuroCropsConverterMixin, BaseConverter):
     }
     index_as_id = True
     columns = {
+        "id": "id",
         "geometry": "geometry",
         "AREA_HA": "area",
         "SOURCE": "source",
@@ -43,6 +44,6 @@ class Convert(EuroCropsConverterMixin, BaseConverter):
     column_filters = {
         # Fields
         # A=Arable Land, CAG=Covered Agricultural Land, N+G=Grassland, P=Trees, R=Rice, T=Trees
-        "LC_MAPCODE": lambda col: col.isin("A CAG G N P R T".split())
+        "LC_MAPCODE": lambda col: col.isin(["A", "CAG", "G", "N", "P", "R", "T"])
     }
     extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
