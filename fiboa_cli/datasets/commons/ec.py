@@ -82,7 +82,10 @@ class EuroCropsConverterMixin:
         return super().convert(*args, **kwargs)
 
     def get_code_column(self, gdf):
-        attribute = next(k for k, v in self.columns.items() if v == "crop:code")
+        try:
+            attribute = next(k for k, v in self.columns.items() if v == "crop:code")
+        except StopIteration:
+            raise Exception(f"Misssing crop:code column in converter {self.__class__.__name__}")
         col = gdf[attribute]
         # Should be corrected in original parser
         return col if col.dtype == "object" else col.astype(str)
