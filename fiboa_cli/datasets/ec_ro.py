@@ -1,5 +1,3 @@
-import pandas as pd
-
 from ..convert_utils import BaseConverter
 from .commons.ec import EuroCropsConverterMixin, ec_url
 
