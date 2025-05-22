@@ -7,6 +7,7 @@ from fiboa_cli import convert, validate
 
 """
 Create input files with: `ogr2ogr output.gpkg -limit 100 input.gpkg`
+Optionally use `-lco ENCODING=UTF-8` if you have character encoding issues.
 """
 
 tests = [
@@ -39,6 +40,7 @@ tests = [
     "si",
     "sk",
     "jecam",
+    "ec_ro",
 ]
 test_path = "tests/data-files/convert"
 extra_convert_parameters = {
