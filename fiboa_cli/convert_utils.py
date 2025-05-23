@@ -630,28 +630,3 @@ def hash_df(df):
     buf = StringIO()
     df.info(buf=buf)
     return hash(buf.getvalue())
-
-
-def datasource_makevalid(path_in, path_out):
-    """
-    Clone geospatial file and apply ST_MAKEVALID on each geometry
-    Returns True if success
-    """
-    if os.path.exists(path_out):
-        return True
-    try:
-        from osgeo import ogr
-    except ImportError:
-        log("Can not import gdal, skipping fix")
-        return False
-    ds = ogr.Open(path_in)
-    defn = ds.GetLayer().GetLayerDefn()
-    columns = [defn.GetFieldDefn(i).GetName() for i in range(defn.GetFieldCount())]
-    layer = ds.ExecuteSQL(
-        f"select ST_MAKEVALID(geometry) as geometry, {', '.join(columns)} FROM {ds.GetLayer().GetName()}",
-        dialect="SQLITE",
-    )
-    output = ds.GetDriver().CreateDataSource(path_out)
-    output.CopyLayer(layer, layer.GetName())
-    output.Close()
-    return True

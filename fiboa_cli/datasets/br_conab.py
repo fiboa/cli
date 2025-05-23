@@ -1,9 +1,8 @@
 import math
-from glob import glob
 
 import numpy as np
 
-from ..convert_utils import BaseConverter, datasource_makevalid
+from ..convert_utils import BaseConverter
 from .commons.admin import AdminConverterMixin
 
 
@@ -31,7 +30,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         "Cafe/GO/CAFE-GO_Safra_2018.zip",
         "Cafe/GO/CAFE-GO_Safra_2019.zip",
         "Cafe/PR/CAFE-PR_Safra_2017.zip",
-        "Cafe/MG/CAFE-MG_Safra_2017.zip",  # File with invalid geometry
+        "Cafe/MG/CAFE-MG_Safra_2017.zip",
         "Cafe/DF/DF_CAFE_24.zip",
         "Cafe/DF/DF_CAFE_24.zip",
         "Cafe/GO/GO_CAFE_21.zip",
@@ -91,26 +90,18 @@ class Converter(AdminConverterMixin, BaseConverter):
     def migrate(self, gdf):
         gdf = gdf.reset_index(drop=True)
         gdf["area_ha"].combine_first(gdf["Hectares"]).replace(np.nan, None, inplace=True)
-        gdf.loc[gdf["area_ha"] == 0, "area_ha"] = gdf.to_crs(31982).area / 10000
+        gdf.loc[gdf["area_ha"] == 0, "area_ha"] = None
         gdf["cd_mun"] = gdf["cd_mun"].combine_first(gdf["CD_MUN"]).apply(fformat)
         gdf["nm_mun"] = gdf["nm_mun"].combine_first(gdf["NM_MUN"]).combine_first(gdf["NM_MUNIC"])
         return gdf
 
-    def download_files(self, uris, cache_folder=None):
-        result = super().download_files(uris, cache_folder)
-        key = next(k for k in result if "CAFE-MG_Safra_2017" in k[1])
-        path, url = key
-        path = next(p for p in glob(path) if "_fixed" not in p)
-        path2 = path.replace(".shp", "_fixed.shp")
-        if datasource_makevalid(path, path2):
-            result[result.index(key)] = (path2, url)
-        else:
-            result.remove(key)
-        return result
+    def get_data(self, paths, **kwargs):
+        # Set invalid geometries to None in Cafe/MG/CAFE-MG_Safra_2017.zip
+        kwargs["on_invalid"] = "warn"
+        return super().get_data(paths, **kwargs)
 
 
 def fformat(x):
-    if isinstance(x, float):
-        if not math.isnan(x):
-            return f"{x:.0f}"
+    if isinstance(x, float) and not math.isnan(x):
+        return f"{x:.0f}"
     return x or None
