@@ -38,7 +38,7 @@ class EXConverter(ESBaseConverter):
 
     def migrate(self, gdf):
         gdf = super().migrate(gdf)
-        gdf["determination_datetime"] = datetime(year=int(self.variant), month=1, day=1)
+        gdf["determination_datetime"] = datetime(year=int(self.year), month=1, day=1)
         return gdf
 
     missing_schemas = {
@@ -47,11 +47,11 @@ class EXConverter(ESBaseConverter):
             "admin_municipality_code": {"type": "string"},
         }
     }
-    source_variants = {"2024": "TODO", "2023": "TODO"}
+    years = {"2024": "TODO", "2023": "TODO"}
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.source_variants))
+        if not self.year:
+            self.year = next(iter(self.years))
 
         from bs4 import BeautifulSoup
 
@@ -74,6 +74,6 @@ class EXConverter(ESBaseConverter):
             response = requests.post(f"{base}listadoresultados", data=form, headers=headers)
             soup = BeautifulSoup(response.content, "html.parser")
             matches = soup.find_all("a", href=re.compile(r"/SITEX/centrodescargas/descargar/"))
-            m = matches[1 if self.variant == "2023" else 0].get("href")
+            m = matches[1 if self.year == "2023" else 0].get("href")
             result[f"http://sitex.gobex.es/{m}"] = ["*.shp"]  # The single shapefile
         return result

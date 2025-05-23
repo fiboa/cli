@@ -46,8 +46,8 @@ class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
         }
     }
 
-    # See https://ideib.caib.es/geoserveis/rest/services/public/GOIB_SIGPAC_IB/MapServer/ for current variants
-    source_variants = {str(year): str(year) for year in range(2024, 2010 - 1, -1)}
+    # See https://ideib.caib.es/geoserveis/rest/services/public/GOIB_SIGPAC_IB/MapServer/ for current years
+    years = {str(year): str(year) for year in range(2024, 2010 - 1, -1)}
     use_code_attribute = "USO_SIGPAC"
 
     rest_base_url = "https://ideib.caib.es/geoserveis/rest/services/public/GOIB_SIGPAC_IB/MapServer"
@@ -56,7 +56,7 @@ class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
     }
 
     def rest_layer_filter(self, layers):
-        if not self.variant:
-            self.variant = next(iter(self.source_variants))
-        regex = re.compile("SIGPAC .* " + self.variant)
+        if not self.year:
+            self.year = next(iter(self.years))
+        regex = re.compile("SIGPAC .* " + self.year)
         return next(layer for layer in layers if regex.match(layer["name"]))

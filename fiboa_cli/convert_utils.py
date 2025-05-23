@@ -170,8 +170,6 @@ class BaseConverter:
     providers: list[dict] = []
 
     sources: Optional[dict[str, str] | str] = None
-    source_variants: Optional[dict[dict[str, str] | str]] = None
-    variant: str = None
     open_options = {}
     years: Optional[dict[dict[int, str] | str]] = None
     year: str = None
