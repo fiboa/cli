@@ -34,7 +34,6 @@ setup(
         "requests>=2.30",
         "aiohttp>=3.9",
         "shapely>=2.0",
-        "GDAL>=3.10.0",
         "numpy>=1.20.0",
         "py7zr>=0.21.0",
         "flatdict>=4.0",

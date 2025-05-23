@@ -102,8 +102,10 @@ class Converter(AdminConverterMixin, BaseConverter):
         path, url = key
         path = next(p for p in glob(path) if "_fixed" not in p)
         path2 = path.replace(".shp", "_fixed.shp")
-        datasource_makevalid(path, path2)
-        result[result.index(key)] = (path2, url)
+        if datasource_makevalid(path, path2):
+            result[result.index(key)] = (path2, url)
+        else:
+            result.remove(key)
         return result
 
 

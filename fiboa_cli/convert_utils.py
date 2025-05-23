@@ -21,7 +21,6 @@ import pandas as pd
 import py7zr
 import rarfile
 from fsspec.implementations.local import LocalFileSystem
-from osgeo import ogr
 from shapely.geometry import box
 
 from .const import STAC_TABLE_EXTENSION
@@ -636,9 +635,15 @@ def hash_df(df):
 def datasource_makevalid(path_in, path_out):
     """
     Clone geospatial file and apply ST_MAKEVALID on each geometry
+    Returns True if success
     """
     if os.path.exists(path_out):
-        return
+        return True
+    try:
+        from osgeo import ogr
+    except ImportError:
+        log("Can not import gdal, skipping fix")
+        return False
     ds = ogr.Open(path_in)
     defn = ds.GetLayer().GetLayerDefn()
     columns = [defn.GetFieldDefn(i).GetName() for i in range(defn.GetFieldCount())]
@@ -649,3 +654,4 @@ def datasource_makevalid(path_in, path_out):
     output = ds.GetDriver().CreateDataSource(path_out)
     output.CopyLayer(layer, layer.GetName())
     output.Close()
+    return True
