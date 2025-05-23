@@ -33,7 +33,7 @@ setup(
         "geopandas>=1.0.0",
         "requests>=2.30",
         "aiohttp>=3.9",
-        "shapely>=2.0",
+        "shapely>=2.1",
         "numpy>=1.20.0,<2.2.0",
         "py7zr>=0.21.0",
         "flatdict>=4.0",
