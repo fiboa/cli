@@ -42,22 +42,22 @@ class ESCMConverter(EsriRESTConverterMixin, ESBaseConverter):
             "admin_municipality_code": {"type": "string"},
         }
     }
-    source_variants = {str(year): str(year) for year in range(2024, 2018 - 1, -1)}
+    years = {str(year): str(year) for year in range(2024, 2018 - 1, -1)}
 
     rest_base_url = "https://geoservicios.castillalamancha.es/arcgis/rest/services/Vector"
     rest_attribute = "objectid_1"
 
     def get_urls(self):
-        latest_variant = next(iter(self.source_variants))
-        if not self.variant:
-            self.variant = latest_variant
-        if self.variant == latest_variant:
+        latest_year = next(iter(self.years))
+        if not self.year:
+            self.year = latest_year
+        if self.year == latest_year:
             layer = "Vector/Recintos_sigpac"
         else:
             services = requests.get(self.rest_base_url, {"f": "pjson"}).json()["services"]
             layer = next(
                 s["name"]
                 for s in services
-                if re.search(f"Recintos_sigpac_{self.variant}", s["name"], re.IGNORECASE)
+                if re.search(f"Recintos_sigpac_{self.year}", s["name"], re.IGNORECASE)
             )
         return {"REST": self.rest_base_url.replace("Vector", layer + "/MapServer")}

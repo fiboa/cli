@@ -6,7 +6,12 @@ from .commons.data import read_data_csv
 
 class ESCatConverter(BaseConverter):
     # Catalonia has its own coding list, not sublass of ESBaseConverter
-    source_variants = {
+    years = {
+        "2024": {
+            "https://analisi.transparenciacatalunya.cat/api/views/yh94-j2n9/files/d90f5fca-ddd8-405d-a0d5-90609985e98e?download=true&filename=Cultius_DUN2024_SHP.zip": [
+                "Cultius_DUN2024_GPKG/CULTIUS_DUN2024.gpkg"
+            ]
+        },
         "2023": {
             "https://analisi.transparenciacatalunya.cat/api/views/yh94-j2n9/files/b4299961-52ee-4fa0-a276-4594c8c094bc?download=true&filename=Cultius_DUN2023_GPKG.zip": [
                 "Cultius_DUN2023_GPKG/CULTIUS_DUN2023.gpkg"

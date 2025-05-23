@@ -25,6 +25,6 @@ class EsriRESTPregenerateConverterMixin:
 
         get_dict = self.rest_params | {"outFields": "*", "returnGeometry": "true", "f": "geojson"}
         return {
-            f"{layer_url}?{urlencode(get_dict | dict(resultRecordCount=page_size, resultOffset=page_size * page))}": f"{self.id}_{self.variant or ''}_{page}.json"
+            f"{layer_url}?{urlencode(get_dict | dict(resultRecordCount=page_size, resultOffset=page_size * page))}": f"{self.id}_{self.year or ''}_{page}.json"
             for page in range(nr_pages)
         }

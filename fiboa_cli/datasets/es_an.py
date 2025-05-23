@@ -6,7 +6,7 @@ from .es import ESBaseConverter
 
 
 class ANConverter(ESBaseConverter):
-    source_variants = {
+    years = {
         "2024": "https://www.juntadeandalucia.es/ssdigitales/festa/agriculturapescaaguaydesarrollorural/2024/SP24_REC_{code}.zip",
         "2023": "https://www.juntadeandalucia.es/ssdigitales/festa/agriculturapescaaguaydesarrollorural/2023/SP23_REC_{code}.zip",
         "2022": "https://www.juntadeandalucia.es/export/drupaljda/01_SP22_REC_PROV_{code}.zip",
@@ -76,16 +76,16 @@ class ANConverter(ESBaseConverter):
     }
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.source_variants))
-            log(f"Choosing first variant {self.variant}", "warning")
+        if not self.year:
+            self.year = next(iter(self.years))
+            log(f"Choosing first year {self.year}", "warning")
         else:
-            assert self.variant in self.source_variants, f"Wrong variant {self.variant}"
+            assert self.year in self.years, f"Wrong year {self.year}"
 
-        url = self.source_variants[self.variant]
+        url = self.years[self.year]
         data = read_data_csv("es_an_prv.csv")
 
         def fname(line):
-            return f"SP{int(self.variant) % 100}_REC_{line['code']}.shp"
+            return f"SP{int(self.year) % 100}_REC_{line['code']}.shp"
 
         return {url.format(**line): [fname(line)] for line in data}
