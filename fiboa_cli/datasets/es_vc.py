@@ -7,7 +7,7 @@ from .es import ESBaseConverter
 
 
 class ESVCConverter(ESBaseConverter):
-    source_variants = {str(year): str(year) for year in range(2024, 2016 - 1, -1)}
+    years = {str(year): str(year) for year in range(2024, 2016 - 1, -1)}
     id = "es_vc"
     short_name = "Spain Valencia"
     title = "Spain Valencia Crop Fields"
@@ -47,13 +47,13 @@ class ESVCConverter(ESBaseConverter):
     use_code_attribute = "USO_SIGPAC"
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.source_variants))
-        self.column_additions["determination_datetime"] = datetime(int(self.variant), 1, 1)
+        if not self.year:
+            self.year = next(iter(self.years))
+        self.column_additions["determination_datetime"] = datetime(int(self.year), 1, 1)
 
         from bs4 import BeautifulSoup
 
-        base = f"https://descargas.icv.gva.es/dcd/14_mediorural/03_pac/{self.variant}_SIGPAC_0050"
+        base = f"https://descargas.icv.gva.es/dcd/14_mediorural/03_pac/{self.year}_SIGPAC_0050"
         soup = BeautifulSoup(requests.get(f"{base}").content, "html.parser")
         result = {
             f"{base}/{e.get('href')}": ["*/RECINTO.shp"]

@@ -6,7 +6,7 @@ from .es import ESBaseConverter
 
 
 class ESPVConverter(ESBaseConverter):
-    source_variants = {
+    years = {
         str(
             year
         ): f"https://www.geo.euskadi.eus/cartografia/DatosDescarga/Agricultura/SIGPAC/SIGPAC_CAMPA%C3%91A_{year}_V1/"
@@ -44,19 +44,17 @@ class ESPVConverter(ESBaseConverter):
     index_as_id = True
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = "2024"
-            log(f"Choosing first variant {self.variant}", "warning")
+        if not self.year:
+            self.year = "2024"
+            log(f"Choosing first year {self.year}", "warning")
         else:
-            assert self.variant in self.source_variants
+            assert self.year in self.years
 
         from bs4 import BeautifulSoup
 
         # Parse list of zips in two steps from source url
         host = "https://www.geo.euskadi.eus"
-        base = (
-            f"/cartografia/DatosDescarga/Agricultura/SIGPAC/SIGPAC_CAMPA%C3%91A_{self.variant}_V1/"
-        )
+        base = f"/cartografia/DatosDescarga/Agricultura/SIGPAC/SIGPAC_CAMPA%C3%91A_{self.year}_V1/"
         soup = BeautifulSoup(requests.get(f"{host}/{base}").content, "html.parser")
         pages = [p["href"] for p in soup.find_all("a") if p["href"].startswith(base)]
         parsed = [

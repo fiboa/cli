@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Converter for JECAM datasets 
 - Converter for Romania, based on LandCover dataset
 - Converter for Brasil CONAB fields collection
+- Replace BaseConverter.source_variants by years
 
 ## [v0.10.0] - 2025-03-11
 

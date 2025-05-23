@@ -39,7 +39,7 @@ class ESCBConverter(EsriRESTConverterMixin, ESBaseConverter):
         }
     }
 
-    source_variants = {str(year): str(year) for year in range(2024, 2010 - 1, -1)}
+    years = {str(year): str(year) for year in range(2024, 2010 - 1, -1)}
     use_code_attribute = "USO_SIGPAC"
 
     # "https://geoservicios.cantabria.es/inspire/rest/services/SIGPAC/MapServer?f=json"
@@ -49,8 +49,8 @@ class ESCBConverter(EsriRESTConverterMixin, ESBaseConverter):
     # rest_params = {"where": "USO_SIGPAC NOT IN ('AG','CA','ED','FO','IM','IS','IV','TH','ZC','ZU','ZV','MT')"}
 
     def rest_layer_filter(self, layers):
-        if not self.variant:
-            self.variant = next(iter(self.source_variants))
+        if not self.year:
+            self.year = next(iter(self.years))
         self.column_additions["determination_datetime"] = ""
-        regex = re.compile("Recintos SIGPAC " + self.variant)
+        regex = re.compile("Recintos SIGPAC " + self.year)
         return next(layer for layer in layers if regex.match(layer["name"]))

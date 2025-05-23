@@ -40,15 +40,17 @@ class ESGAConverter(EsriRESTConverterMixin, ESBaseConverter):
         }
     }
 
-    source_variants = {str(year): str(year) for year in range(2024, 2010 - 1, -1)}
+    years = {str(year): str(year) for year in range(2024, 2010 - 1, -1)}
     use_code_attribute = "USO_SIGPAC"
 
-    rest_base_url = "https://ideg.xunta.gal/servizos/rest/services/ParcelasCatastrais/SIXPAC_{variant}/MapServer"
+    rest_base_url = (
+        "https://ideg.xunta.gal/servizos/rest/services/ParcelasCatastrais/SIXPAC_{year}/MapServer"
+    )
 
     def rest_layer_filter(self, layers):
         return next(layer for layer in layers if "recintos" in layer["name"].lower())
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.source_variants))
-        return {"REST": self.rest_base_url.format(variant=self.variant)}
+        if not self.year:
+            self.year = next(iter(self.years))
+        return {"REST": self.rest_base_url.format(year=self.year)}
