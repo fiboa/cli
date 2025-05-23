@@ -126,7 +126,7 @@ def add_asset_to_collection(collection, output_file, rows=None, columns=None):
 
 
 def stream_file(fs, src_uri, dst_file, chunk_size=10 * 1024 * 1024):
-    with fs.open(src_uri, mode="rb") as f:
+    with fs.open(src_uri, mode="rb", block_size=0) as f:
         while True:
             chunk = f.read(chunk_size)
             if not chunk:
@@ -173,6 +173,7 @@ class BaseConverter:
     source_variants: Optional[dict[dict[str, str] | str]] = None
     variant: str = None
     open_options = {}
+    avoid_range_request = False
     years: Optional[dict[dict[int, str] | str]] = None
     year: str = None
 
@@ -219,7 +220,7 @@ class BaseConverter:
     def post_migrate(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         return gdf
 
-    def get_cache(self, cache_folder=None, force=False):
+    def get_cache(self, cache_folder=None, force=False, **kwargs):
         if cache_folder is None:
             if not force:
                 return None, None
@@ -229,12 +230,12 @@ class BaseConverter:
             with TemporaryDirectory(**_kwargs) as tmp_folder:
                 cache_folder = tmp_folder
 
-        cache_fs = get_fs(cache_folder)
+        cache_fs = get_fs(cache_folder, **kwargs)
         if not cache_fs.exists(cache_folder):
             cache_fs.makedirs(cache_folder)
         return cache_fs, cache_folder
 
-    def download_files(self, uris, cache_folder=None):
+    def download_files(self, uris, cache_folder=None, **kwargs):
         """Download (and cache) files from various sources"""
         if isinstance(uris, str):
             uris = {uris: name_from_uri(uris)}
@@ -250,7 +251,7 @@ class BaseConverter:
             else:
                 name = target
 
-            source_fs = get_fs(uri)
+            source_fs = get_fs(uri, **kwargs)
             cache_fs, cache_folder = self.get_cache(cache_folder, force=True)
 
             if isinstance(source_fs, LocalFileSystem):
@@ -506,7 +507,10 @@ class BaseConverter:
                 raise ValueError("No input files provided")
 
         log("Getting file(s) if not cached yet")
-        paths = self.download_files(urls, cache)
+        request_args = {}
+        if self.avoid_range_request:
+            request_args["block_size"] = 0
+        paths = self.download_files(urls, cache, **request_args)
 
         kwargs.update(self.open_options)
         gdf = self.read_data(paths, **kwargs)

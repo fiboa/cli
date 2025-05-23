@@ -72,4 +72,4 @@ class NCConverter(ESBaseConverter):
         # Hostname has invalid SSL, prefill cache and avoid ssl-errors
         self.prefill_cache(uris, cache_folder)
 
-        return super().download_files(uris, cache_folder=cache_folder)
+        return super().download_files(uris, cache_folder)

@@ -103,28 +103,24 @@ def load_datatypes(version):
     return response["$defs"]
 
 
-def get_fs(url_or_path: str) -> AbstractFileSystem:
+def get_fs(url_or_path: str, **kwargs) -> AbstractFileSystem:
     """Choose fsspec filesystem by sniffing input url"""
     parsed = urlparse(url_or_path)
 
     if parsed.scheme in ("http", "https"):
-        if re.search(r"[?&]blocksize=0", url_or_path):
-            # We read in chunks. Some origin-server don't support http-range request
-            # Add an additional blocksize=0 parameter to your url for a workaround
-            return HTTPFileSystem(block_size=0)
-        return HTTPFileSystem()
+        return HTTPFileSystem(**kwargs)
 
     if parsed.scheme == "s3":
         from s3fs import S3FileSystem
 
-        return S3FileSystem()
+        return S3FileSystem(**kwargs)
 
     if parsed.scheme == "gs":
         from gcsfs import GCSFileSystem
 
-        return GCSFileSystem()
+        return GCSFileSystem(**kwargs)
 
-    return LocalFileSystem()
+    return LocalFileSystem(**kwargs)
 
 
 def is_valid_file_uri(uri, extensions=[]):

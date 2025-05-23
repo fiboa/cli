@@ -4,7 +4,7 @@ from .commons.admin import AdminConverterMixin
 
 class Converter(AdminConverterMixin, BaseConverter):
     sources = {
-        "https://data.slovensko.sk/download?id=e39ad227-1899-4cff-b7c8-734f90aa0b59&blocksize=0": [
+        "https://data.slovensko.sk/download?id=e39ad227-1899-4cff-b7c8-734f90aa0b59": [
             "HU2024_20240917shp/HU2024_20240917.shp"
         ]
     }
