@@ -1,4 +1,5 @@
 import math
+from pathlib import Path
 
 import numpy as np
 
@@ -82,6 +83,9 @@ class Converter(AdminConverterMixin, BaseConverter):
 
     def file_migration(self, gdf, path, uri, layer=None):
         gdf = super().file_migration(gdf, path, uri, layer)
+        # Create unique IDs
+        name = Path(path).stem
+        gdf["id"] = name + "_" + gdf.index.astype(str)
         # Harmonize projection or pd.concat will fail
         if gdf.crs.srs != "EPSG:4674":
             gdf.to_crs(crs="EPSG:4674", inplace=True)
