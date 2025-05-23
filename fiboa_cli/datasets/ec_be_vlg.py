@@ -1,8 +1,8 @@
-from .be_vlg import Converter as base
+from .be_vlg import Converter as BEVLGBaseConverter
 from .commons.ec import EuroCropsConverterMixin
 
 
-class ECConverter(EuroCropsConverterMixin, base):
+class ECConverter(EuroCropsConverterMixin, BEVLGBaseConverter):
     sources = {
         "https://zenodo.org/records/10118572/files/BE_VLG_2021.zip?download=1": [
             "BE_VLG_2021/BE_VLG_2021_EC21.shp"

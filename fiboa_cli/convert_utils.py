@@ -29,73 +29,6 @@ from .util import get_fs, log, name_from_uri, to_iso8601
 from .version import fiboa_version
 
 
-def convert(
-    output_file,
-    cache,
-    urls,
-    column_map,
-    id,
-    title,
-    description,
-    input_files=None,
-    bbox=None,
-    providers=[],
-    source_coop_url=None,
-    extensions=set(),
-    missing_schemas={},
-    column_additions={},
-    column_filters={},
-    column_migrations={},
-    migration=None,
-    file_migration=None,
-    layer_filter=None,
-    attribution=None,
-    store_collection=False,
-    license=None,
-    compression=None,
-    geoparquet1=False,
-    original_geometries=False,
-    index_as_id=False,
-    year=None,  # noqa unused
-    **kwargs,
-):
-    # this function is a (temporary) bridge from function-based converters to class-based converters
-    # todo: this convert-function should be removed once class-based converters have been fully implemented
-
-    converter = BaseConverter(
-        sources=urls,
-        columns=column_map,
-        id=id,
-        title=title,
-        description=description,
-        bbox=bbox,
-        providers=providers,
-        short_name=id,
-        extensions=extensions,
-        missing_schemas=missing_schemas,
-        column_additions=column_additions,
-        column_filters=column_filters,
-        column_migrations=column_migrations,
-        migrate=migration,
-        file_migration=file_migration,
-        layer_filter=layer_filter,
-        attribution=attribution,
-        license=license,
-        index_as_id=index_as_id,
-    )
-    converter.convert(
-        output_file,
-        cache,
-        input_files=input_files,
-        source_coop_url=source_coop_url,
-        store_collection=store_collection,
-        compression=compression,
-        geoparquet1=geoparquet1,
-        original_geometries=original_geometries,
-        **kwargs,
-    )
-
-
 def add_asset_to_collection(collection, output_file, rows=None, columns=None):
     c = collection.copy()
     if "assets" not in c or not isinstance(c["assets"], dict):
@@ -183,11 +116,7 @@ class BaseConverter:
 
     index_as_id = False
 
-    def __init__(self, **kwargs):
-        # This init method allows you to override all properties & methods
-        # It's a bit hacky but allows a gradual conversion from function-based to class-based converters
-        # todo remove this once class-based converters have been fully implemented
-        self.__dict__.update({k: v for k, v in kwargs.items() if v is not None})
+    def __init__(self):
         for key in ("id", "short_name", "title", "license", "columns"):
             assert getattr(self, key) is not None, (
                 f"{inspect.getfile(self.__class__)}:{self.__class__.__name__} misses required attribute {key}"
@@ -198,10 +127,6 @@ class BaseConverter:
         for key, item in inspect.getmembers(self):
             if not key.startswith("_") and isinstance(item, (list, dict, set)):
                 setattr(self, key, copy(item))
-
-    @property
-    def ID(self):  # noqa backwards compatibility for function-based converters
-        return self.id
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         return gdf
