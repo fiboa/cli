@@ -1,8 +1,9 @@
 import math
+from glob import glob
 
 import numpy as np
 
-from ..convert_utils import BaseConverter
+from ..convert_utils import BaseConverter, datasource_makevalid
 from .commons.admin import AdminConverterMixin
 
 
@@ -30,7 +31,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         "Cafe/GO/CAFE-GO_Safra_2018.zip",
         "Cafe/GO/CAFE-GO_Safra_2019.zip",
         "Cafe/PR/CAFE-PR_Safra_2017.zip",
-        # "Cafe/MG/CAFE-MG_Safra_2017.zip",  # File with invalid geometry
+        "Cafe/MG/CAFE-MG_Safra_2017.zip",  # File with invalid geometry
         "Cafe/DF/DF_CAFE_24.zip",
         "Cafe/DF/DF_CAFE_24.zip",
         "Cafe/GO/GO_CAFE_21.zip",
@@ -94,6 +95,16 @@ class Converter(AdminConverterMixin, BaseConverter):
         gdf["cd_mun"] = gdf["cd_mun"].combine_first(gdf["CD_MUN"]).apply(fformat)
         gdf["nm_mun"] = gdf["nm_mun"].combine_first(gdf["NM_MUN"]).combine_first(gdf["NM_MUNIC"])
         return gdf
+
+    def download_files(self, uris, cache_folder=None):
+        result = super().download_files(uris, cache_folder)
+        key = next(k for k in result if "CAFE-MG_Safra_2017" in k[1])
+        path, url = key
+        path = next(p for p in glob(path) if "_fixed" not in p)
+        path2 = path.replace(".shp", "_fixed.shp")
+        datasource_makevalid(path, path2)
+        result[result.index(key)] = (path2, url)
+        return result
 
 
 def fformat(x):
