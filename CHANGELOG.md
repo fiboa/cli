@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
 - Improve Converter template.py usability
 - Check proper 2-letter country-id for admin-extension
 - Converter for JECAM datasets 
 - Converter for Romania, based on LandCover dataset
 - Replace BaseConverter.source_variants by years
+- Remove functionality for function based converters
 
 ## [v0.10.0] - 2025-03-11
 

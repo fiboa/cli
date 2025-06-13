@@ -525,11 +525,11 @@ def converters(providers, sources, verbose):
     """
     log(f"fiboa CLI {__version__} - List of Converters\n", "success")
 
-    columns = {"SHORT_NAME": "Short Title", "LICENSE": "License"}
+    columns = {"short_name": "Short Title", "license": "License"}
     if providers:
-        columns["PROVIDERS"] = "Provider(s)"
+        columns["providers"] = "Provider(s)"
     if sources:
-        columns["SOURCES"] = "Source(s)"
+        columns["sources"] = "Source(s)"
 
     keys = list(columns.keys())
     converters = list_all_converters(keys)
