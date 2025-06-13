@@ -9,6 +9,7 @@ from .commons.ec import EuroCropsConverterMixin
 
 class Convert(EuroCropsConverterMixin, BaseConverter):
     ec_mapping_csv = "ee_2021.csv"
+    ec_year = 2021
     sources = "https://zenodo.org/records/14094196/files/EE_2021.zip?download=1"
     id = "ec_ee"
     short_name = "Estonia"

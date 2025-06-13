@@ -6,6 +6,7 @@ from .commons.ec import EuroCropsConverterMixin
 
 class Converter(EuroCropsConverterMixin, BaseConverter):
     ec_mapping_csv = "lv_2021.csv"
+    ec_year = 2021
     sources = {"https://zenodo.org/records/8229128/files/LV_2021.zip": ["LV_2021/LV_2021_EC21.shp"]}
     id = "ec_lv"
     short_name = "Latvia"

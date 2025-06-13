@@ -12,15 +12,16 @@ class EuroCropsConverterMixin:
     ec_mapping_csv = None
     mapping_file = None
     ec_mapping = None
+    ec_year = None
 
-    def __init__(self, *args, year=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not self.id.startswith("ec_"):
             self.id = "ec_" + self.id
 
         suffix = " - Eurocrops"
-        if year is not None:
-            suffix = f"{suffix} {year}"
+        if self.ec_year is not None:
+            suffix = f"{suffix} {self.ec_year}"
 
         self.title += suffix
         self.short_name += suffix

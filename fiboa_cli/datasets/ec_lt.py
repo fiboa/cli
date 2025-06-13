@@ -4,6 +4,7 @@ from .commons.ec import EuroCropsConverterMixin
 
 class Converter(EuroCropsConverterMixin, BaseConverter):
     ec_mapping_csv = "lt_2021.csv"
+    ec_year = 2021
     sources = {"https://zenodo.org/records/6868143/files/LT_2021.zip": ["LT/LT_2021_EC.shp"]}
 
     id = "ec_lt"
