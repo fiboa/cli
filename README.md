@@ -13,13 +13,35 @@ inspection, validation and file format conversions.
 
 ### Installation
 
-You will need to have **Python 3.9** or any later version installed.
+#### Using Pixi (Recommended)
 
-Run `pip install vecorel-cli` in the CLI to install the validator.
+This project uses [Pixi](https://pixi.sh/) for dependency management. Install Pixi first, then:
+
+```bash
+# Clone the repository and navigate to it
+git clone https://github.com/vecorel/cli.git
+cd cli
+
+# Install all dependencies
+pixi install
+
+# Run the CLI
+pixi run vec
+```
+
+> **Note**: This project recently migrated to Pixi. If you were using the old pip-based workflow, see [MIGRATION.md](MIGRATION.md) for details.
+
+#### Using pip
+
+Alternatively, you can install from PyPI with **Python 3.10** or any later version:
+
+```bash
+pip install vecorel-cli
+```
 
 ### Execute a command
 
-After the installation you should be able to run the following command: `vec`
+After the installation you should be able to run the following command: `vec` (or `pixi run vec` if using Pixi)
 
 You should see usage instructions and [available commands](#commands) for the CLI.
 
@@ -28,6 +50,8 @@ Vecorel CLI supports various commands to work with the files:
 - [Vecorel CLI](#vecorel-cli)
   - [Getting Started](#getting-started)
     - [Installation](#installation)
+      - [Using Pixi (Recommended)](#using-pixi-recommended)
+      - [Using pip](#using-pip)
     - [Execute a command](#execute-a-command)
   - [Commands](#commands)
     - [Validation](#validation)
@@ -57,9 +81,9 @@ Check `vec validate --help` for more details.
 The validator also supports remote files.
 
 - `http://` or `https://`: no further configuration is needed.
-- `s3://`: `s3fs` needs to be installed (run `pip install .[s3]`) and you may need to set environment variables.
-  Refer [here](https://s3fs.readthedocs.io/en/latest/#credentials) for how to define credentials.
-- `gs://`: `gcsfs` needs to be installed (run `pip install .[gcs]`).
+- `s3://`: With Pixi, run `pixi install -e s3` or with pip, run `pip install vecorel-cli[s3]` and you may need to set environment variables.
+  Refer to the [s3fs credentials documentation](https://s3fs.readthedocs.io/en/latest/#credentials) for how to define credentials.
+- `gs://`: With Pixi, run `pixi install -e gcs` or with pip, run `pip install vecorel-cli[gcs]`.
   By default, `gcsfs` will attempt to use your default gcloud credentials or, attempt to get credentials from the google metadata service, or fall back to anonymous access.
 
 ### Create Vecorel GeoParquet from GeoJSON
@@ -169,15 +193,29 @@ See [Implement a converter](#implement-a-converter) for details about how to
 
 ## Development
 
-To install in development mode run `pip install -e .` in this folder.
+This project uses [Pixi](https://pixi.sh/) for dependency management and development workflows.
 
-For the tests first run `pip install -r requirements-dev.txt` to install pytest.
-Then you can run `pytest` to execute the tests.
+```bash
+# Install all dependencies including development tools
+pixi install -e dev
 
-All code is formatted with a specific ruff style, so all code looks the same. Code
-will be formatted automatically. Your pull-requests will be tested for compliance.
-Run `pre-commit run --all-files` to format your local code manually (or configure it in your IDE).
-Install the pre-commit hook with `pre-commit install`, so you never commit incorrectly formatted code.
+# Install the package in editable mode
+pixi run install-dev
+
+# Run tests
+pixi run test
+
+# Format and lint code
+pixi run format
+pixi run lint
+
+# Run all checks (lint, format, test)
+pixi run check
+
+# Install and run pre-commit
+pixi run pre-commit-install
+pixi run pre-commit-run
+```
 
 ### Implement a converter
 
@@ -185,7 +223,7 @@ The following high-level description gives an idea how to implement a converter 
 
 1. Create a new file in `vecorel_cli/datasets` based on the `template.py`
 2. Implement the `convert()` function / test it / run it
-3. Add missing dependencies into a separate dependency group in `setup.py`
+3. Add missing dependencies into the appropriate feature group in `pixi.toml` (or `setup.py` for pip users)
 4. Add the converter to the list above
 5. Create a PR to submit your converter for review
 

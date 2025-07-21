@@ -1,3 +1,8 @@
+# DEPRECATED: This file is kept for backward compatibility.
+# The project now uses Pixi for dependency management.
+# Use "pixi install -e dev" instead.
+# See pixi.toml and MIGRATION.md for more information.
+
 pytest
 pre-commit
 ruff==0.9.6

@@ -1,3 +1,7 @@
+# DEPRECATED: This file is kept for backward compatibility.
+# The project now uses Pixi for dependency management.
+# See pixi.toml and MIGRATION.md for more information.
+
 import re
 from pathlib import Path
 

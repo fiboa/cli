@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-matrix:
+    name: Test on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up pixi
+      uses: prefix-dev/setup-pixi@v0.8.1
+      with:
+        pixi-version: v0.49.0
+        environments: dev
+
+    - name: Install project in editable mode
+      run: pixi run -e dev install-dev
+
+    - name: Test CLI command
+      run: pixi run -e dev vec --help
+
+    - name: Run linting
+      run: pixi run -e dev lint
+
+    - name: Run tests
+      run: pixi run -e dev test
+
+    - name: Build package
+      run: pixi run -e dev build
+
+  test-environments:
+    name: Test pixi environments
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up pixi
+      uses: prefix-dev/setup-pixi@v0.8.1
+      with:
+        pixi-version: v0.49.0
+        environments: dev cloud all
+
+    - name: Test default environment
+      run: |
+        pixi install
+        pixi run vec --help
+
+    - name: Test dev environment
+      run: |
+        pixi install -e dev
+        pixi run -e dev install-dev
+        pixi run -e dev vec --help
+
+    - name: Test cloud environment
+      run: |
+        pixi install -e cloud
+        pixi run -e cloud vec --help
+
+    - name: Test all environment
+      run: |
+        pixi install -e all
+        pixi run -e all vec --help

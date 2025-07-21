@@ -13,6 +13,10 @@ __pycache__/
 /.pytest_cache/
 /.ruff_cache/
 
+# Pixi
+.pixi/
+pixi.lock
+
 # Example files
 /*.parquet
 /tests/data-files/convert/*/extracted.*/

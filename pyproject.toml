@@ -1,3 +1,97 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vecorel-cli"
+version = "0.1.0"
+description = "CLI tools such as validation and file format conversion for vecorel."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Matthias Mohr"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.10"
+
+[project.scripts]
+vec = "vecorel_cli:vecorel_cli"
+
+[project.urls]
+"Homepage" = "https://github.com/vecorel/cli"
+"Bug Reports" = "https://github.com/vecorel/cli/issues"
+"Source" = "https://github.com/vecorel/cli"
+
+[tool.setuptools.packages.find]
+include = ["vecorel_cli*"]
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+
+[tool.pixi.dependencies]
+python = ">=3.10"
+pyyaml = ">=6.0,<7.0"
+click = ">=8.1,<9.0"
+geopandas = ">=1.0.0,<2.0"
+requests = ">=2.30,<3.0"
+shapely = ">=2.0,<3.0"
+numpy = ">=1.20.0,<2.0"
+pyarrow = ">=14.0,<15.0"
+py7zr = "==0.21.0"
+
+[tool.pixi.pypi-dependencies]
+fsspec = "==2025.7.0"
+jsonschema = {version = ">=4.20,<5.0", extras = ["format"]}
+aiohttp = ">=3.9,<4.0"
+rarfile = ">=4.0,<5.0"
+semantic-version = ">=2.10.0"
+json-stream = ">=2.3.0"
+
+# Editable install of the project itself
+vecorel-cli = {path = ".", editable = true}
+
+[tool.pixi.feature.dev.dependencies]
+pytest = ">=8.4.1,<9.0.0"
+pre-commit = ">=4.2.0,<5.0.0"
+ruff = "==0.9.6"
+
+[tool.pixi.feature.dev.pypi-dependencies]
+build = ">=1.0.0"
+
+[tool.pixi.feature.cloud.dependencies]
+s3fs = ">=2025.7.0"
+gcsfs = ">=2025.7.0"
+
+[tool.pixi.environments]
+default = {solve-group = "default"}
+dev = {features = ["dev"], solve-group = "default"}
+cloud = {features = ["cloud"], solve-group = "default"}
+all = {features = ["dev", "cloud"], solve-group = "default"}
+
+[tool.pixi.tasks]
+# Development tasks
+install-dev = "pip install -e ."
+test = "pytest"
+lint = "ruff check --fix"
+format = "ruff format"
+check = {depends-on = ["lint", "format", "test"]}
+build = "python -m build"
+
+# Pre-commit tasks
+pre-commit-install = "pre-commit install"
+pre-commit-run = "pre-commit run --all-files"
+
+# CLI entry point
+vec = "vec"
+
 [tool.ruff]
 exclude = [
     ".eggs",
@@ -15,7 +109,7 @@ exclude = [
 line-length = 100
 indent-width = 4
 
-target-version = "py311"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "W", "I"]  # "C901"
