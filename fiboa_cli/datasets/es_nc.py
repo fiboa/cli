@@ -8,8 +8,8 @@ from ..util import log, name_from_uri
 from .es import ESBaseConverter
 
 
-# SOURCES = "https://filescartografia.navarra.es/2_CARTOGRAFIA_TEMATICA/2_6_SIGPAC/" # FULL Download timeout
 class NCConverter(ESBaseConverter):
+    # sources = "https://filescartografia.navarra.es/2_CARTOGRAFIA_TEMATICA/2_6_SIGPAC/" # FULL Download timeout
     id = "es_nc"
     short_name = "Spain Navarra"
     title = "Spain Navarra Crop fields"
