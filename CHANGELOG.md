@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Converter for Romania, based on LandCover dataset
 - Replace BaseConverter.source_variants by years
 - Remove functionality for function based converters
+- Converter for India 10k dataset
 
 ## [v0.10.0] - 2025-03-11
 
