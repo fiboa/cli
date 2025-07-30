@@ -31,3 +31,4 @@ class IndiaConverter(AdminConverterMixin, BaseConverter):
         "area": "area",
     }
     column_additions = {"determination_datetime": "2022-11-12T00:00:00Z"}
+    area_factor = BaseConverter.FACTOR_M2_TO_HA
