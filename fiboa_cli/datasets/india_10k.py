@@ -1,7 +1,8 @@
 from fiboa_cli.convert_utils import BaseConverter
+from fiboa_cli.datasets.commons.admin import AdminConverterMixin
 
 
-class IndiaConverter(BaseConverter):
+class IndiaConverter(AdminConverterMixin, BaseConverter):
     sources = {"https://zenodo.org/api/records/7315090/files-archive": "india_10k.zip"}
     id = "in_10k"
     short_name = "India 10k"
