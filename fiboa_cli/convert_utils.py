@@ -93,6 +93,8 @@ def read_geojson(path, **kwargs):
 
 
 class BaseConverter:
+    FACTOR_M2_TO_HA = 0.0001  # 1 square meter = 0.0001 hectares
+
     bbox: Optional[tuple[float]] = None
     id: str = None
     short_name: str = None
@@ -113,6 +115,7 @@ class BaseConverter:
     column_migrations: dict[str, callable] = {}
     missing_schemas: dict[str, str] = {}
     extensions: set[str] = set()
+    area_factor = 1
 
     index_as_id = False
 
@@ -468,6 +471,10 @@ class BaseConverter:
                     gdf[key] = fn(gdf[key])
                 else:
                     log(f"Column '{key}' not found in dataset, skipping migration", "warning")
+
+        if self.area_factor != 1 and "area" in columns.values():
+            area_key = next(k for k, v in columns.items() if v == "area")
+            gdf[area_key] *= self.area_factor
 
         gdf = self.post_migrate(gdf)
 

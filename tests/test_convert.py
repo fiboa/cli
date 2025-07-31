@@ -41,6 +41,7 @@ tests = [
     "sk",
     "jecam",
     "ec_ro",
+    "india_10k",
 ]
 test_path = "tests/data-files/convert"
 extra_convert_parameters = {
