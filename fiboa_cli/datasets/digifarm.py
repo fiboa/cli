@@ -34,5 +34,5 @@ class Converter(BaseConverter):
         "rel": "license",
     }
     columns = {"id": "id", "geometry": "geometry", "area": "area"}
-    column_migrations = {"area": lambda column: column / 10000}
+    area_factor = BaseConverter.FACTOR_M2_TO_HA
     column_additions = {"determination_method": "auto-imagery"}

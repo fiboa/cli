@@ -39,7 +39,8 @@ class Converter(AdminConverterMixin, BaseConverter):
     }
     extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("si_2021.csv")}
-    column_migrations = {"AREA": lambda col: col / 10000, "geometry": lambda col: col.make_valid()}
+    column_migrations = {"geometry": lambda col: col.make_valid()}
+    area_factor = BaseConverter.FACTOR_M2_TO_HA
 
     missing_schemas = {
         "properties": {

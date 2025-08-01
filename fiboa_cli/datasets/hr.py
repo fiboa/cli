@@ -1,5 +1,3 @@
-import numpy as np
-
 from ..convert_utils import BaseConverter
 from .commons.admin import AdminConverterMixin
 from .commons.data import read_data_csv
@@ -111,6 +109,9 @@ class Converter(AdminConverterMixin, BaseConverter):
         },
     }
 
+    area_factor = BaseConverter.FACTOR_M2_TO_HA
+    area_fill_zero = True
+
     def migrate(self, gdf):
         gdf = super().migrate(gdf)
         rows = read_data_csv("hr_categories.csv", delimiter=";")
@@ -118,5 +119,4 @@ class Converter(AdminConverterMixin, BaseConverter):
         mapping_en = {int(row["code"]): row["name_en"] for row in rows}
         gdf["crop:name"] = gdf["land_use_id"].map(mapping)
         gdf["crop:name_en"] = gdf["land_use_id"].map(mapping_en)
-        gdf["area"] = np.where(gdf["area"] == 0, gdf["geometry"].area / 10000, gdf["area"] / 10000)
         return gdf

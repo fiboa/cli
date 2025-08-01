@@ -35,9 +35,7 @@ class ESVCConverter(ESBaseConverter):
         "crop:name": "crop:name",
         "crop:name_en": "crop:name_en",
     }
-    column_migrations = {
-        "DN_SURFACE": lambda x: x / 10000,
-    }
+    area_factor = ESBaseConverter.FACTOR_M2_TO_HA
     missing_schemas = {
         "properties": {
             "admin_province_code": {"type": "string"},

@@ -37,9 +37,7 @@ class Convert(EuroCropsConverterMixin, BaseConverter):
         "LC_MAPCODE": "crop:code",
         "LC_CLASS_N": "crop:name",
     }
-    column_migrations = {
-        "AREA_HA": lambda x: x / 10000,
-    }
+    area_factor = BaseConverter.FACTOR_M2_TO_HA
     missing_schemas = {"properties": {"source": {"type": "string"}}}
     column_filters = {
         # Fields
