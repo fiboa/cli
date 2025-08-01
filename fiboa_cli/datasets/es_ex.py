@@ -31,10 +31,7 @@ class EXConverter(ESBaseConverter):
         "dn_surface": "area",
         "determination_datetime": "determination_datetime",
     }
-
-    column_migrations = {
-        "dn_surface": lambda x: x / 10000,
-    }
+    area_factor = ESBaseConverter.FACTOR_M2_TO_HA
 
     def migrate(self, gdf):
         gdf = super().migrate(gdf)

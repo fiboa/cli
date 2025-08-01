@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Replace BaseConverter.source_variants by years
 - Remove functionality for function based converters
 - Converter for India 10k dataset
+- Scale and fill area values with Converter.area_factor and Converter.area_fill_zero
 
 ## [v0.10.0] - 2025-03-11
 

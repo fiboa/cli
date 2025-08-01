@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 from ..convert_utils import BaseConverter
@@ -29,7 +28,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         "geometry": "geometry",
         "PERUSLOHKOTUNNUS": "id",
         "LOHKONUMERO": "block_id",
-        "area": "area",
+        "PINTA_ALA": "area",
         "VUOSI": "determination_datetime",
         "KASVIKOODI": "crop:code",
         "KASVIKOODI_SELITE_FI": "crop:name",
@@ -40,10 +39,7 @@ class Converter(AdminConverterMixin, BaseConverter):
     }
     extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("fi_2020.csv")}
-
-    def migrate(self, gdf):
-        gdf["area"] = np.where(gdf["PINTA_ALA"] == 0, gdf.area / 10000, gdf["PINTA_ALA"])
-        return gdf
+    area_fill_zero = True
 
     missing_schemas = {
         "properties": {

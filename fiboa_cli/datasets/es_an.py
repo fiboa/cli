@@ -1,5 +1,3 @@
-import numpy as np
-
 from .. import log
 from .commons.data import read_data_csv
 from .es import ESBaseConverter
@@ -57,12 +55,8 @@ class ANConverter(ESBaseConverter):
         "crop:name_en": "crop:name_en",
     }
 
-    def migrate(self, gdf):
-        gdf = super().migrate(gdf)
-        gdf["NU_AREA"] = np.where(
-            gdf["NU_AREA"] == 0, gdf["geometry"].area / 10000, gdf["NU_AREA"] / 10000
-        )
-        return gdf
+    area_fill_zero = True
+    area_factor = ESBaseConverter.FACTOR_M2_TO_HA
 
     column_additions = ESBaseConverter.column_additions | {
         "determination_datetime": "2024-03-28T00:00:00Z",

@@ -43,13 +43,7 @@ class Converter(AdminConverterMixin, BaseConverter):
         "type": lambda col: col == "Landbouwgrond"
     }
     index_as_id = True
-
-    def migrate(self, gdf):
-        # Projection is in CRS 28992 (RD New), this is the area calculation method of the source organization
-        # todo: remove in favor of generic solution for area calculation
-        gdf = super().migrate(gdf)
-        gdf["area"] = gdf.area / 10000
-        return gdf
+    area_fill_zero = True
 
     missing_schemas = {
         "properties": {

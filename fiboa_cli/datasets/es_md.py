@@ -35,4 +35,4 @@ class ESCLConverter(ESBaseConverter):
     column_additions = ESBaseConverter.column_additions | {
         "determination_datetime": "2024-01-01T00:00:00Z"
     }
-    column_migrations = {"DN_SURFACE": lambda column: column / 10000}
+    area_factor = ESBaseConverter.FACTOR_M2_TO_HA

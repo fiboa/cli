@@ -36,9 +36,9 @@ class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
         "ANYS": "determination_datetime",
     }
     column_migrations = {
-        "DN_SURFACE": lambda x: x / 10000,
         "ANYS": lambda col: pd.to_datetime(col, format="%Y"),
     }
+    area_factor = ESBaseConverter.FACTOR_M2_TO_HA
     missing_schemas = {
         "properties": {
             "admin_province_code": {"type": "string"},

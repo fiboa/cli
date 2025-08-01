@@ -35,11 +35,11 @@ class PTConverter(BaseConverter):
         "Shape_Length": "perimeter",
     }
     extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
+    area_factor = BaseConverter.FACTOR_M2_TO_HA
     column_additions = {
         "crop:code_list": ec_url("pt_2021.csv"),
         "determination_datetime": "2023-01-01T00:00:00Z",
     }
-    column_migrations = {"Shape_Area": lambda col: col / 10000.0}
     missing_schemas = {
         "properties": {
             "block_id": {"type": "int64"},

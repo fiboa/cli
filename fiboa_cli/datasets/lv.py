@@ -1,5 +1,3 @@
-import numpy as np
-
 from ..convert_utils import BaseConverter
 from .commons.admin import AdminConverterMixin
 from .commons.ec import EuroCropsConverterMixin, ec_url
@@ -57,11 +55,10 @@ class Converter(AdminConverterMixin, EuroCropsConverterMixin, BaseConverter):
         }
     }
     ec_mapping_csv = "lv_2021.csv"
+    area_fill_zero = True
 
     def migrate(self, gdf):
         gdf = super().migrate(gdf)
-        gdf["area"] = np.where(gdf["AREA_DECLARED"] == 0, gdf.area / 10000, gdf["AREA_DECLARED"])
-
         original_name_mapping = {
             int(e["original_code"]): e["original_name"] for e in self.ec_mapping
         }
