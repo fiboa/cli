@@ -483,7 +483,9 @@ class BaseConverter:
                     gdf[area_key] == 0, gdf.area * self.FACTOR_M2_TO_HA, gdf[area_key]
                 )
             else:
-                assert gdf.crs.to_dict()['units'] == 'm', f"Dataset projection is not meter-based: {gdf.crs}"
+                assert gdf.crs.to_dict()["units"] == "m", (
+                    f"Dataset projection is not meter-based: {gdf.crs}"
+                )
                 gdf[area_key] = gdf.area * self.FACTOR_M2_TO_HA
 
         gdf = self.post_migrate(gdf)
