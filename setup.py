@@ -33,8 +33,9 @@ setup(
         "geopandas>=1.0.0",
         "requests>=2.30",
         "aiohttp>=3.9",
-        "shapely>=2.0",
-        "numpy>=1.20.0",
+        "shapely>=2.1",
+        # numpy is restricted <2.2.0 due to the lower supported Python version being 3.11 and we still cater for 3.10
+        "numpy>=1.20.0,<2.2.0",
         "py7zr>=0.21.0",
         "flatdict>=4.0",
         "rarfile>=4.0",
