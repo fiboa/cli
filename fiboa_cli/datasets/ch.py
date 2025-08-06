@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 from ..convert_utils import BaseConverter
@@ -49,9 +48,11 @@ class Converter(AdminConverterMixin, BaseConverter):
         "ist_ueberlagernd": lambda col: col == False,  # noqa: E712
     }
     column_migrations = {
-        "flaeche_m2": lambda column: np.where(column > 0, column / 10000, 0.001),
         "bezugsjahr": lambda col: pd.to_datetime(col, format="%Y"),
     }
+    area_fill_zero = True
+    area_factor = BaseConverter.FACTOR_M2_TO_HA
+
     missing_schemas = {
         "properties": {
             "crop_name": {"type": "string"},

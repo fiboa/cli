@@ -1,4 +1,3 @@
-import geopandas as gpd
 import pandas as pd
 
 from ..convert_utils import BaseConverter
@@ -68,12 +67,7 @@ class NLCropConverter(AdminConverterMixin, BaseConverter):
     extensions = {"https://fiboa.github.io/crop-extension/v0.1.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("nl_2020.csv")}
     index_as_id = True
-
-    def migrate(self, gdf) -> gpd.GeoDataFrame:
-        # Projection is in CRS 28992 (RD New), this is the area calculation method of the source organization
-        # todo: remove in favor of generic solution for area calculation
-        gdf["area"] = gdf.area / 10000
-        return gdf
+    area_fill_zero = True
 
     missing_schemas = {
         "properties": {

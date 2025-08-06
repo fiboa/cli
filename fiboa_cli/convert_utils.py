@@ -116,6 +116,7 @@ class BaseConverter:
     missing_schemas: dict[str, str] = {}
     extensions: set[str] = set()
     area_factor = 1
+    area_fill_zero = False
 
     index_as_id = False
 
@@ -472,9 +473,20 @@ class BaseConverter:
                 else:
                     log(f"Column '{key}' not found in dataset, skipping migration", "warning")
 
-        if self.area_factor != 1 and "area" in columns.values():
-            area_key = next(k for k, v in columns.items() if v == "area")
+        area_key = next((k for k, v in columns.items() if v == "area"), None)
+        if self.area_factor != 1 and area_key:
             gdf[area_key] *= self.area_factor
+
+        if self.area_fill_zero:
+            if area_key in gdf.columns:
+                gdf[area_key] = np.where(
+                    gdf[area_key] == 0, gdf.area * self.FACTOR_M2_TO_HA, gdf[area_key]
+                )
+            else:
+                # If CRS is not in meters, reproject to an equal-area projection for area calculation
+                crs_is_in_meters = gdf.crs.axis_info[0].unit_name in ("m", "metre", "meter")
+                base = gdf if crs_is_in_meters else gdf["geometry"].to_crs("EPSG:6933")
+                gdf[area_key] = base.area * self.FACTOR_M2_TO_HA
 
         gdf = self.post_migrate(gdf)
 

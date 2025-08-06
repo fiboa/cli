@@ -46,9 +46,9 @@ class ESCNConverter(BaseConverter):
         "AREA_M2": "area",
     }
     column_migrations = {
-        "AREA_M2": lambda column: column / 10000,
         "FECHA": lambda column: pd.to_datetime(column, format="%d/%m/%Y"),
     }
+    area_factor = BaseConverter.FACTOR_M2_TO_HA
     column_additions = {
         "admin:country_code": "ES",
         "admin:subdivision_code": "CB",
