@@ -483,10 +483,10 @@ class BaseConverter:
                     gdf[area_key] == 0, gdf.area * self.FACTOR_M2_TO_HA, gdf[area_key]
                 )
             else:
-                assert gdf.crs.to_dict()["units"] == "m", (
-                    f"Dataset projection is not meter-based: {gdf.crs}"
-                )
-                gdf[area_key] = gdf.area * self.FACTOR_M2_TO_HA
+                # If CRS is not in meters, reproject to an equal-area projection for area calculation
+                crs_is_in_meters = gdf.crs.axis_info[0].unit_name in ("m", "metre", "meter")
+                base = gdf if crs_is_in_meters else gdf["geometry"].to_crs("EPSG:6933")
+                gdf[area_key] = base.area * self.FACTOR_M2_TO_HA
 
         gdf = self.post_migrate(gdf)
 
