@@ -1,9 +1,11 @@
-from vecorel_cli.registry import VecorelRegistry, Registry
+from vecorel_cli.registry import Registry, VecorelRegistry
+
 
 class FiboaRegistry(VecorelRegistry):
     """
     The public package name of the library (e.g. on pypi).
     """
+
     name: str = "fiboa-cli"
 
     """
@@ -61,5 +63,6 @@ class FiboaRegistry(VecorelRegistry):
             ValidateData,
             ValidateSchema,
         ]
+
 
 Registry.instance = FiboaRegistry()
