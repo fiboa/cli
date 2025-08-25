@@ -7,18 +7,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v0.11.0] - 2025-08-25
+
 ### Added
+
+- Converter for JECAM datasets
+- Converter for Romania, based on LandCover dataset
+- Converter for Brasil CONAB fields collection
+- Converter for India 10k dataset
 
 ### Changed
 
 - Improve Converter template.py usability
 - Check proper 2-letter country-id for admin-extension
-- Converter for JECAM datasets 
-- Converter for Romania, based on LandCover dataset
-- Converter for Brasil CONAB fields collection
 - Replace BaseConverter.source_variants by years
+
+### Removed
+
 - Remove functionality for function based converters
-- Converter for India 10k dataset
 
 ## [v0.10.0] - 2025-03-11
 
@@ -403,7 +409,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - First release
 
-[Unreleased]: <https://github.com/fiboa/cli/compare/v0.10.0...main>
+[Unreleased]: <https://github.com/fiboa/cli/compare/v0.11.0...main>
+[v0.11.0]: <https://github.com/fiboa/cli/compare/v0.10.0...v0.11.0>
 [v0.10.0]: <https://github.com/fiboa/cli/compare/v0.9.0...v0.10.0>
 [v0.9.0]: <https://github.com/fiboa/cli/compare/v0.8.0...v0.9.0>
 [v0.8.0]: <https://github.com/fiboa/cli/compare/v0.7.0...v0.8.0>
