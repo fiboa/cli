@@ -1,7 +1,0 @@
-$schema: https://fiboa.github.io/schema/v0.1.0/schema.json
-required:
-  - inspire:id
-properties:
-  inspire:id:
-    type: string
-    format: uri

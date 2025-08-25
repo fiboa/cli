@@ -1,3 +1,88 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fiboa-cli"
+version = "0.20.0"
+description = "CLI tools such as validation and file format conversion for fiboa."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Matthias Mohr"},
+    {name = "Ivor Bosloper"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.10"
+# This is duplicate, must also be changed below in the pixi configuration
+dependencies = [
+    "vecorel-cli>=0.2.1"
+]
+
+[project.scripts]
+fiboa = "fiboa_cli:fiboa_cli"
+
+[project.urls]
+"Homepage" = "https://github.com/fiboa/cli"
+"Bug Reports" = "https://github.com/fiboa/cli/issues"
+"Source" = "https://github.com/fiboa/cli"
+
+[tool.setuptools.packages.find]
+include = ["fiboa_cli*"]
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+
+[tool.pixi.dependencies]
+python = ">=3.10"
+
+[tool.pixi.pypi-dependencies]
+# Editable install of the project itself
+fiboa-cli = {path = ".", editable = true}
+
+[tool.pixi.feature.dev.dependencies]
+pytest = ">=8.4.1,<9.0.0"
+pytest-cov = ">=6.0.0,<7.0.0"
+pre-commit = ">=4.2.0,<5.0.0"
+ruff = "==0.12.8"
+
+[tool.pixi.feature.dev.pypi-dependencies]
+build = ">=1.0.0,<2.0.0"
+
+[tool.pixi.feature.cloud.dependencies]
+s3fs = "==2025.7.0"
+gcsfs = "==2025.7.0"
+
+[tool.pixi.environments]
+default = {solve-group = "default"}
+dev = {features = ["dev"], solve-group = "default"}
+cloud = {features = ["cloud"], solve-group = "default"}
+all = {features = ["dev", "cloud"], solve-group = "default"}
+
+[tool.pixi.tasks]
+# Development tasks
+install-dev = "pip install -e ."
+test = "pytest --cov=fiboa_cli --cov-report=term-missing --cov-report=html --cov-report=xml"
+lint = "ruff check --fix"
+format = "ruff format"
+check = {depends-on = ["lint", "format", "test"]}
+build = "python -m build"
+
+# Pre-commit tasks
+pre-commit-install = "pre-commit install"
+pre-commit-run = "pre-commit run --all-files"
+
+# CLI entry point
+fiboa = "fiboa"
+
 [tool.ruff]
 exclude = [
     ".eggs",
@@ -10,15 +95,16 @@ exclude = [
     "build",
     "dist",
     "site-packages",
+    "tests/datasets/invalid_*.py",
 ]
 
 line-length = 100
 indent-width = 4
 
-target-version = "py311"
+target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E4", "E7", "E9", "F", "W", "I"]  # "C901"
+select = ["E4", "E7", "E9", "F", "W", "I", "NPY201"]  # "C901"
 ignore = []
 
 fixable = ["ALL"]
@@ -35,4 +121,32 @@ docstring-code-format = false
 docstring-code-line-length = "dynamic"
 
 [tool.coverage.run]
-omit = []
+source = ["fiboa_cli"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/.*",
+]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+precision = 2
+fail_under = 64
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.xml]
+output = "coverage.xml"

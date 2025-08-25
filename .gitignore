@@ -13,7 +13,18 @@ __pycache__/
 /.pytest_cache/
 /.ruff_cache/
 
+# Coverage
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Pixi
+.pixi/
+pixi.lock
+
 # Example files
 /*.parquet
 /tests/data-files/convert/*/extracted.*/
 /tests/data-files/convert/**/*.gfs
+*.tmp
