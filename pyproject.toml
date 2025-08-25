@@ -23,11 +23,11 @@ classifiers = [
 requires-python = ">=3.10"
 # This is duplicate, must also be changed below in the pixi configuration
 dependencies = [
-    "vecorel-cli>=0.2.1"
+    "vecorel-cli==0.2.2"
 ]
 
 [project.scripts]
-fiboa = "fiboa_cli:fiboa_cli"
+fiboa = "fiboa_cli.cli.setup:run"
 
 [project.urls]
 "Homepage" = "https://github.com/fiboa/cli"
