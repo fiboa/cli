@@ -1,6 +1,6 @@
 # fiboa CLI
 
-A command-line interface (CLI) for working with fiboa.
+A command-line interface (CLI) for working with fiboa files.
 
 - [Getting Started](#getting-started)
 - [Documentation / Commands](#commands)
@@ -13,21 +13,33 @@ inspection, validation and file format conversions.
 
 ### Installation
 
-You will need to have **Python 3.9** or any later version installed.
+#### Using Pixi (Recommended)
 
-Run `pip install fiboa-cli` in the CLI to install the validator.
+This project uses [Pixi](https://pixi.sh/) for dependency management. Install Pixi first, then:
 
-**Optional:** To install additional dependencies for specific [converters](#converter-for-existing-datasets),
-you can for example run: `pip install fiboa-cli[xyz]` with xyz being the converter name.
+```bash
+# Clone the repository and navigate to it
+git clone https://github.com/vecorel/cli.git
+cd cli
 
-**Note on versions:**
+# Install all dependencies
+pixi install
 
-- fiboa CLI >= 0.3.0 and < 0.11.0 works with fiboa version = 0.2.0
-- fiboa CLI < 0.3.0 works with fiboa version = 0.1.0
+# Run the CLI
+pixi run fiboa
+```
+
+#### Using pip
+
+Alternatively, you can install from PyPI with **Python 3.10** or any later version:
+
+```bash
+pip install fiboa-cli
+```
 
 ### Execute a command
 
-After the installation you should be able to run the following command: `fiboa`
+After the installation you should be able to run the following command: `fiboa` (or `pixi run fiboa` if using Pixi)
 
 You should see usage instructions and [available commands](#commands) for the CLI.
 
@@ -36,6 +48,8 @@ fiboa CLI supports various commands to work with the files:
 - [fiboa CLI](#fiboa-cli)
   - [Getting Started](#getting-started)
     - [Installation](#installation)
+      - [Using Pixi (Recommended)](#using-pixi-recommended)
+      - [Using pip](#using-pip)
     - [Execute a command](#execute-a-command)
   - [Commands](#commands)
     - [Validation](#validation)
@@ -44,7 +58,7 @@ fiboa CLI supports various commands to work with the files:
     - [Inspect fiboa GeoParquet file](#inspect-fiboa-geoparquet-file)
     - [Merge fiboa GeoParquet files](#merge-fiboa-geoparquet-files)
     - [Create JSON Schema from fiboa Schema](#create-json-schema-from-fiboa-schema)
-    - [Validate a fiboa Schema](#validate-a-fiboa-schema)
+    - [Validate a Vecorel Schema](#validate-a-vecorel-schema)
     - [Improve a fiboa Parquet file](#improve-a-fiboa-parquet-file)
     - [Update an extension template with new names](#update-an-extension-template-with-new-names)
     - [Converter for existing datasets](#converter-for-existing-datasets)
@@ -55,7 +69,7 @@ fiboa CLI supports various commands to work with the files:
 
 ### Validation
 
-To validate a fiboa GeoParquet or GeoJSON file, you can for example run:
+To validate a Vecorel GeoParquet or GeoJSON file, you can for example run:
 
 - GeoJSON: `fiboa validate example.json --collection collection.json`
 - GeoParquet: `fiboa validate example.parquet --data`
@@ -65,9 +79,9 @@ Check `fiboa validate --help` for more details.
 The validator also supports remote files.
 
 - `http://` or `https://`: no further configuration is needed.
-- `s3://`: `s3fs` needs to be installed (run `pip install .[s3]`) and you may need to set environment variables.
-  Refer [here](https://s3fs.readthedocs.io/en/latest/#credentials) for how to define credentials.
-- `gs://`: `gcsfs` needs to be installed (run `pip install .[gcs]`).
+- `s3://`: With Pixi, run `pixi install -e s3` or with pip, run `pip install fiboa-cli[s3]` and you may need to set environment variables.
+  Refer to the [s3fs credentials documentation](https://s3fs.readthedocs.io/en/latest/#credentials) for how to define credentials.
+- `gs://`: With Pixi, run `pixi install -e gcs` or with pip, run `pip install fiboa-cli[gcs]`.
   By default, `gcsfs` will attempt to use your default gcloud credentials or, attempt to get credentials from the google metadata service, or fall back to anonymous access.
 
 ### Create fiboa GeoParquet from GeoJSON
@@ -89,7 +103,9 @@ you can for example run:
 - GeoJSON Features (with indentation and max. 100 features):
   `fiboa create-geojson example.parquet -o dest-folder -n 100 -i 2 -f`
 
-Check `fiboa create-geoparquet --help` for more details.
+  `fiboa create-geojson example.parquet -o dest-folder -n 100 -i 2 -f`
+
+Check `fiboa create-geojson --help` for more details.
 
 ### Inspect fiboa GeoParquet file
 
@@ -103,7 +119,7 @@ Check `fiboa describe --help` for more details.
 
 Merges multiple fiboa datasets to a combined fiboa dataset:
 
-- `fiboa merge ec_ee.parquet ec_lv.parquet -o merged.parquet -e https://fiboa.github.io/hcat-extension/v0.1.0/schema.yaml -i ec:hcat_name -i ec:hcat_code -i ec:translated_name`
+- `fiboa merge ec_ee.parquet ec_lv.parquet -o merged.parquet -e https://fiboa.org/hcat-extension/v0.1.0/schema.yaml -i ec:hcat_name -i ec:hcat_code -i ec:translated_name`
 
 Check `fiboa merge --help` for more details.
 
@@ -111,13 +127,13 @@ Check `fiboa merge --help` for more details.
 
 To create a JSON Schema for a fiboa Schema YAML file, you can for example run:
 
-- `fiboa jsonschema example.json --id=https://fiboa.github.io/specification/v0.1.0/geojson/schema.json -o schema.json`
+- `fiboa jsonschema example.json --id=https://vecorel.org/specification/v0.3.0/geojson/schema.json -o schema.json`
 
 Check `fiboa jsonschema --help` for more details.
 
-### Validate a fiboa Schema
+### Validate a Vecorel Schema
 
-To validate a fiboa Schema YAML file, you can for example run:
+To validate a Vecorel Schema YAML file, you can for example run:
 
 - `fiboa validate-schema schema/schema.yaml`
 
@@ -147,15 +163,15 @@ to update all template placeholders with proper names.
 
 For example, if your extension is meant to have
 
-- the title "Timestamps Extension",
-- the prefix `ts` (e.g. field `ts:created` or `ts:updated`),
-- is hosted at `https://github.io/fiboa/timestamps-extension`
-  (organization: `fiboa`, repository `timestamps-extension`),
-- and you run fiboa in the folder of the extension.
+- the title "Administrative Division Extension",
+- the prefix `admin` (e.g. field `admin:country_code` or `admin:subdivision_code`),
+- is hosted at `https://github.io/vecorel/administrative-division-extension`
+  (organization: `vecorel`, repository `/administrative-division-extension`),
+- and you run Vecorel in the folder of the extension.
 
 Then the following command could be used:
 
-- `fiboa rename-extension . -t Timestamps -p ts -s timestamps-extension -o fiboa`
+- `fiboa rename-extension . -t "Administrative Division" -p admin -s administrative-division-extension -o vecorel`
 
 Check `fiboa rename-extension --help` for more details.
 
@@ -175,25 +191,36 @@ See [Implement a converter](#implement-a-converter) for details about how to
 
 ## Development
 
-To install in development mode run `pip install -e .` in this folder.
+This project uses [Pixi](https://pixi.sh/) for dependency management and development workflows.
 
-For the tests first run `pip install -r requirements-dev.txt` to install pytest.
-Then you can run `pytest` to execute the tests.
+```bash
+# Install all dependencies including development tools
+pixi install -e dev
 
-All code is formatted with a specific ruff style, so all code looks the same. Code
-will be formatted automatically. Your pull-requests will be tested for compliance.
-Run `pre-commit run --all-files` to format your local code manually (or configure it in your IDE).
-Install the pre-commit hook with `pre-commit install`, so you never commit incorrectly formatted code.
+# Install the package in editable mode
+pixi run install-dev
+
+# Run tests
+pixi run test
+
+# Format and lint code
+pixi run format
+pixi run lint
+
+# Run all checks (lint, format, test)
+pixi run check
+
+# Install and run pre-commit
+pixi run pre-commit-install
+pixi run pre-commit-run
+```
 
 ### Implement a converter
 
 The following high-level description gives an idea how to implement a converter in fiboa CLI:
 
-1. Create a new file in `fiboa_cli/datasets/your_file.py` based on the `template.py`
+1. Create a new file in `fiboa_cli/datasets` based on the `template.py`
 2. Fill in the required variables / test it / run it
-3. Add missing dependencies into a separate dependency group in `setup.py`
+3. Add missing dependencies into the appropriate feature group in `pixi.toml` (or `setup.py` for pip users)
 4. Add the converter to the list above
 5. Create a PR to submit your converter for review
-
-An in-depth guide how to create a cloud-native fiboa dataset using fiboa CLI is available at:
-<https://github.com/fiboa/data/blob/main/HOWTO.md>
