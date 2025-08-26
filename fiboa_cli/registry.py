@@ -17,6 +17,7 @@ class FiboaRegistry(VecorelRegistry):
         "determination:method",
         "determination:details",
     ]
+    ignored_datasets = VecorelRegistry.ignored_datasets + ["es.py"]
 
     def register_commands(self):
         super().register_commands()

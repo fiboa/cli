@@ -1,5 +1,6 @@
 from vecorel_cli.rename_extension import RenameExtension
 
+
 class RenameFiboaExtension(RenameExtension):
     template_org: str = "fiboa"
     template_domain: str = "fiboa.org"

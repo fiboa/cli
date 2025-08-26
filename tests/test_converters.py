@@ -1,13 +1,15 @@
-from click.testing import CliRunner
 from vecorel_cli.converters import Converters
 
 
-def test_describe():
-    runner = CliRunner()
-    result = runner.invoke(Converters.get_cli_command(Converters), [])
-    assert result.exit_code == 0, result.output
-    assert "Short Title" in result.output
-    assert "License" in result.output
-    assert "at" in result.output
-    assert "Austria" in result.output
-    # assert "None" not in result.output
+def test_describe(capsys):
+    from fiboa_cli import Registry  # noqa
+
+    Converters().converters()
+    out, err = capsys.readouterr()
+    output = out + err
+
+    assert "Short Title" in output
+    assert "License" in output
+    assert "at" in output
+    assert "Austria" in output
+    # assert "None" not in output
