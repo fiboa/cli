@@ -13,17 +13,19 @@ class FiboaRegistry(VecorelRegistry):
         "metrics:area",
         "metrics:perimeter",
         "category",
-        "determination_datetime",
-        "determination_method",
-        "determination_details",
+        "determination:datetime",
+        "determination:method",
+        "determination:details",
     ]
 
     def register_commands(self):
         super().register_commands()
 
         from .describe import DescribeFiboaFile
+        from .rename_extension import RenameFiboaExtension
 
         self.set_command(DescribeFiboaFile)
+        self.set_command(RenameFiboaExtension)
 
 
 Registry.instance = FiboaRegistry()
