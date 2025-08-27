@@ -46,8 +46,8 @@ class ESCNConverter(FiboaBaseConverter):
         "CULTIVO_NA": "crop:name",
         "AREA_M2": "metrics:area",
     }
+    area_is_in_ha = False
     column_migrations = {
-        "AREA_M2": lambda column: column / 10000,
         "FECHA": lambda column: pd.to_datetime(column, format="%d/%m/%Y"),
     }
     column_additions = {

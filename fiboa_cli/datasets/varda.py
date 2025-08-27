@@ -3,27 +3,9 @@
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
 
-# According to the Varda API the following values seem to be the only allowed values at this moment.
-# We keep the converter flexible though to allow for future changes.
-AREA_CONVERSION_FACTORS = {  # target unit: hectares
-    "m2": 1 / 10000,  # 1 square meter = 0.0001 hectares
-}
-LENGTH_CONVERSION_FACTORS = {  # target unit: meters
-    "m": 1,
-}
-
-
-def convert_from_unit(row, prefix, conversion_factors):
-    value = row[f"{prefix}.value"]
-    unit = row[f"{prefix}.unit"]
-    factor = conversion_factors.get(unit)
-    if factor is not None:
-        return value * conversion_factors[unit]
-    else:
-        raise ValueError(f"Unknown unit '{unit}' in column '{prefix}.unit'")
-
 
 class Converter(FiboaBaseConverter):
+    area_is_in_ha = False
     data_access = """
     Data must be obtained from the Varda API, saved as .json files. Easiest way to try it out is
     to use the UI at https://fieldid.varda.ag/ and find some fields and click 'download .json' file,
@@ -55,16 +37,3 @@ class Converter(FiboaBaseConverter):
         # "effective_until": "datetime:valid_until",
         # 0000-01-01T00:00:00.000Z and 9999-12-31T00:00:00.000Z should be converted to None
     }
-
-    # EXTENSIONS = {
-    #    "https://fiboa.org/timestamps-extension/v0.1.0/schema.yaml"
-    # }
-
-    def migrate(self, gdf):
-        gdf["area"] = gdf.apply(
-            lambda row: convert_from_unit(row, "area", AREA_CONVERSION_FACTORS), axis=1
-        )
-        gdf["perimeter"] = gdf.apply(
-            lambda row: convert_from_unit(row, "perimeter", LENGTH_CONVERSION_FACTORS), axis=1
-        )
-        return gdf

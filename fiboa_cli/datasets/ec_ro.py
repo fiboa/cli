@@ -37,9 +37,7 @@ class Convert(EuroCropsConverterMixin, FiboaBaseConverter):
         "LC_MAPCODE": "crop:code",
         "LC_CLASS_N": "crop:name",
     }
-    column_migrations = {
-        "AREA_HA": lambda x: x / 10000,
-    }
+    area_is_in_ha = False
     missing_schemas = {"properties": {"source": {"type": "string"}}}
     column_filters = {
         # Fields

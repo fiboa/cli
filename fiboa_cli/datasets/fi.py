@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
@@ -41,9 +40,8 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("fi_2020.csv")}
 
-    def migrate(self, gdf):
-        gdf["area"] = np.where(gdf["PINTA_ALA"] == 0, gdf.area / 10000, gdf["PINTA_ALA"])
-        return gdf
+    area_is_in_ha = False
+    area_calculate_missing = True
 
     missing_schemas = {
         "properties": {

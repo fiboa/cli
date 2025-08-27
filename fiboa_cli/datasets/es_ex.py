@@ -32,9 +32,7 @@ class EXConverter(ESBaseConverter):
         "determination:datetime": "determination:datetime",
     }
 
-    column_migrations = {
-        "dn_surface": lambda x: x / 10000,
-    }
+    area_is_in_ha = False
 
     def migrate(self, gdf):
         gdf = super().migrate(gdf)

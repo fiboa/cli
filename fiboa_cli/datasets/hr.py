@@ -1,4 +1,3 @@
-import numpy as np
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
@@ -118,5 +117,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         mapping_en = {int(row["code"]): row["name_en"] for row in rows}
         gdf["crop:name"] = gdf["land_use_id"].map(mapping)
         gdf["crop:name_en"] = gdf["land_use_id"].map(mapping_en)
-        gdf["area"] = np.where(gdf["area"] == 0, gdf["geometry"].area / 10000, gdf["area"] / 10000)
         return gdf
+
+    area_is_in_ha = False
+    area_calculate_missing = True

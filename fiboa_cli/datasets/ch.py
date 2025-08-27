@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
@@ -48,8 +47,9 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     column_filters = {
         "ist_ueberlagernd": lambda col: col == False,  # noqa: E712
     }
+    area_is_in_ha = False
+    area_calculate_missing = True
     column_migrations = {
-        "flaeche_m2": lambda column: np.where(column > 0, column / 10000, 0.001),
         "bezugsjahr": lambda col: pd.to_datetime(col, format="%Y"),
     }
     missing_schemas = {

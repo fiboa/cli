@@ -3,6 +3,7 @@ from .commons.ec import EuroCropsConverterMixin
 
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
+    area_is_in_ha = False
     ec_mapping_csv = "si_2021.csv"
     ec_year = 2021
     sources = {
@@ -34,8 +35,6 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
         "COLOR": "color",
         "EC_NUTS3": "EC_NUTS3",
     }
-
-    column_migrations = {"AREA": lambda column: column * 0.0001}
 
     missing_schemas = {
         "required": ["gerk_pid", "crop_type_class", "rastlina", "crop_lat_e", "color"],

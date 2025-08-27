@@ -87,7 +87,7 @@ class Converter(FiboaBaseConverter):
     # Example: You have a column area_m in square meters and want to convert
     # to hectares as required for the area field in fiboa.
     # requires: func(column: pd.Series) -> pd.Series
-    column_migrations = {"area_m": lambda column: column * 0.0001}
+    column_migrations = {"area_m": lambda column: column * 10_000}
 
     # Filter columns to only include the ones that are relevant for the collection,
     # e.g. only rows that contain the word "agriculture" but not "forest" in the column "land_cover_type".

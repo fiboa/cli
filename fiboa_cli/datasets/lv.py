@@ -1,4 +1,3 @@
-import numpy as np
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
@@ -58,9 +57,10 @@ class Converter(AdminConverterMixin, EuroCropsConverterMixin, FiboaBaseConverter
     }
     ec_mapping_csv = "lv_2021.csv"
 
+    area_calculate_missing = True
+
     def migrate(self, gdf):
         gdf = super().migrate(gdf)
-        gdf["area"] = np.where(gdf["AREA_DECLARED"] == 0, gdf.area / 10000, gdf["AREA_DECLARED"])
 
         original_name_mapping = {
             int(e["original_code"]): e["original_name"] for e in self.ec_mapping

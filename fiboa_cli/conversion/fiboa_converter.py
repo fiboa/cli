@@ -14,6 +14,8 @@ class FiboaBaseConverter(BaseConverter):
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
+
+        gdf_area_key = next((k for k, v in self.columns.items() if v == AREA_KEY), None)
         if self.area_calculate_missing:
             # If CRS is not in meters, reproject to an equal-area projection for area calculation
             crs_is_in_meters = gdf.crs.axis_info[0].unit_name in ("m", "metre", "meter")
@@ -21,13 +23,15 @@ class FiboaBaseConverter(BaseConverter):
             # Calculate geometry area; Use original geometries if crs_is_in_meters, else reproject to m-based projection
             base = gdf if crs_is_in_meters else gdf["geometry"].to_crs("EPSG:6933")
 
-            if AREA_KEY in gdf.columns:
+            if gdf_area_key in gdf.columns:
                 factor = 10_0000 if self.area_is_in_ha else 1
-                gdf[AREA_KEY] = np.where(gdf[AREA_KEY] == 0, base.area * factor, gdf[AREA_KEY])
+                gdf[gdf_area_key] = np.where(
+                    gdf[gdf_area_key] == 0, base.area * factor, gdf[gdf_area_key]
+                )
             else:
-                gdf[AREA_KEY] = base.area
-        elif self.area_is_in_ha and AREA_KEY in gdf.columns:
+                gdf[gdf_area_key] = base.area
+        elif self.area_is_in_ha and gdf_area_key in gdf.columns:
             # convert area in ha to meters
-            gdf[AREA_KEY] *= 10_0000
+            gdf[gdf_area_key] *= 10_0000
 
         return gdf

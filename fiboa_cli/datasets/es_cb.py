@@ -29,9 +29,7 @@ class ESCBConverter(EsriRESTConverterMixin, ESBaseConverter):
         "crop:name": "crop:name",
         "crop:name_en": "crop:name_en",
     }
-    column_migrations = {
-        "DN_SURFACE": lambda x: x / 10000,
-    }
+    area_is_in_ha = False
     missing_schemas = {
         "properties": {
             "admin_province_code": {"type": "string"},

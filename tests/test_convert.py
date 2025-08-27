@@ -3,6 +3,7 @@ import sys
 from csv import DictReader
 from unittest.mock import patch
 
+import pyarrow.parquet as pq
 from loguru import logger
 from pytest import mark
 from vecorel_cli.convert import ConvertData
@@ -91,3 +92,8 @@ def test_converter(load_ec_mock, capsys, tmp_parquet, converter, block_stream_fi
         raise AssertionError(f"Found error in output: '{error.group(0)}'\n\n{output}")
 
     ValidateData().validate(tmp_parquet.name)
+
+    df = pq.read_table(tmp_parquet.name).to_pandas()
+    if "metrics:area" in df.columns:
+        # Check for accidental hectare conversion; fields should be more than 25 square meters
+        assert (df["metrics:area"] > 25).all()

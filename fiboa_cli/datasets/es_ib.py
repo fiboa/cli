@@ -36,9 +36,9 @@ class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
         "ANYS": "determination:datetime",
     }
     column_migrations = {
-        "DN_SURFACE": lambda x: x / 10000,
         "ANYS": lambda col: pd.to_datetime(col, format="%Y"),
     }
+    area_is_in_ha = False
     missing_schemas = {
         "properties": {
             "admin_province_code": {"type": "string"},

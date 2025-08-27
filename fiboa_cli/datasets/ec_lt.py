@@ -3,6 +3,7 @@ from .commons.ec import EuroCropsConverterMixin
 
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
+    area_is_in_ha = False
     ec_mapping_csv = "lt_2021.csv"
     ec_year = 2021
     sources = {"https://zenodo.org/records/6868143/files/LT_2021.zip": ["LT/LT_2021_EC.shp"]}
@@ -32,7 +33,6 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
         "geometry": "geometry",
     }
     add_columns = {"determination:datetime": "2021-10-08T00:00:00Z"}
-    column_migrations = {"Shape_Area": lambda column: column * 0.0001}
     column_filters = {
         "GRUPE": lambda col: (
             col.isin(

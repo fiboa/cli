@@ -1,4 +1,3 @@
-import numpy as np
 from loguru import logger
 
 from .commons.data import read_data_csv
@@ -57,12 +56,8 @@ class ANConverter(ESBaseConverter):
         "crop:name_en": "crop:name_en",
     }
 
-    def migrate(self, gdf):
-        gdf = super().migrate(gdf)
-        gdf["NU_AREA"] = np.where(
-            gdf["NU_AREA"] == 0, gdf["geometry"].area / 10000, gdf["NU_AREA"] / 10000
-        )
-        return gdf
+    area_is_in_ha = False
+    area_calculate_missing = True
 
     column_additions = ESBaseConverter.column_additions | {
         "determination:datetime": "2024-03-28T00:00:00Z",

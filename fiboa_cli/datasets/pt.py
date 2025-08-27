@@ -39,7 +39,7 @@ class PTConverter(FiboaBaseConverter):
         "crop:code_list": ec_url("pt_2021.csv"),
         "determination:datetime": "2023-01-01T00:00:00Z",
     }
-    column_migrations = {"Shape_Area": lambda col: col / 10000.0}
+    area_is_in_ha = False
     missing_schemas = {
         "properties": {
             "block_id": {"type": "int64"},

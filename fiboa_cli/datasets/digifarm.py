@@ -34,5 +34,5 @@ class Converter(FiboaBaseConverter):
         "rel": "license",
     }
     columns = {"id": "id", "geometry": "geometry", "area": "metrics:area"}
-    column_migrations = {"area": lambda column: column / 10000}
+    area_is_in_ha = False
     column_additions = {"determination_method": "auto-imagery"}

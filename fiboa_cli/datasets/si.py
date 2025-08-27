@@ -40,8 +40,8 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("si_2021.csv")}
-    column_migrations = {"AREA": lambda col: col / 10000, "geometry": lambda col: col.make_valid()}
-
+    column_migrations = {"geometry": lambda col: col.make_valid()}
+    area_is_in_ha = False
     missing_schemas = {
         "properties": {
             "block_id": {"type": "uint64"},
