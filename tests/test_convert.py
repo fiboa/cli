@@ -19,10 +19,10 @@ tests = [
     "be_vlg",
     "br_ba_lem",
     "de_sh",
-    # "ec_lv",  needs ec-schema
-    # "ec_si",
+    "ec_lv",
+    "ec_si",
     "fi",
-    # "fr",  needs hcat-schema
+    "fr",
     "hr",
     "nl",
     "nl_crop",
@@ -35,15 +35,15 @@ tests = [
     "cz",
     "us_usda_cropland",
     "jp",
-    # "lv", needs hcat-schema
+    "lv",
     "ie",
     "es_cat",
     "nz",
-    # "lt", needs hcat-schema
+    "lt",
     "si",
     "sk",
     "jecam",
-    # "ec_ro", needs hcat-schema
+    "ec_ro",
     "india_10k",
 ]
 test_path = "tests/data-files/convert"
