@@ -81,7 +81,7 @@ class Converter(FiboaBaseConverter):
     column_additions = {}
 
     # A set of implemented extension identifiers
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
 
     # Functions to migrate data in columns to match the fiboa specification.
     # Example: You have a column area_m in square meters and want to convert

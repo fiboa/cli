@@ -49,11 +49,11 @@ class EuroCropsConverterMixin:
         ]
 
         self.extensions = getattr(self, "extensions", set())
-        self.extensions.add("https://fiboa.github.io/hcat-extension/v0.2.0/schema.yaml")
+        self.extensions.add("https://fiboa.org/hcat-extension/v0.3.0/schema.yaml")
         self.columns |= {
-            "EC_trans_n": "ec:translated_name",
-            "EC_hcat_n": "ec:hcat_name",
-            "EC_hcat_c": "ec:hcat_code",
+            "EC_trans_n": "hcat:name_en",
+            "EC_hcat_n": "hcat:name",
+            "EC_hcat_c": "hcat:code",
         }
         self.license = "CC-BY-SA-4.0"
 

@@ -30,7 +30,7 @@ class Converter(FiboaBaseConverter):
         "type": "text/html",
         "rel": "license",
     }
-    extensions = {"https://fiboa.github.io/planet-extension/v0.1.0/schema.yaml"}
+    extensions = {"https://fiboa.org/planet-extension/v0.1.0/schema.yaml"}
     columns = {
         "polygon_id": "id",  # fiboa core field
         "area_ha": "metrics:area",  # fiboa core field

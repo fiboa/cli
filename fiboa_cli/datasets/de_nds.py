@@ -19,7 +19,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     ]
     attribution = "© ML/SLA Niedersachsen (2024), dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), Daten bearbeitet"
     license = "dl-de/by-2-0"
-    extensions = {"https://fiboa.github.io/flik-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
     columns = {
         "geometry": "geometry",
         "FLIK": ["id", "flik"],

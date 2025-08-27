@@ -35,7 +35,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "crop:name": "crop:name",
         "arslager": "determination:datetime",
     }
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("se_2021.csv")}
     column_migrations = {
         # Make year (1st January) from column "arslager"

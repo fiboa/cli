@@ -38,7 +38,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "RASTLINA": "crop:name",
         "CROP_LAT_E": "crop:name_en",
     }
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("si_2021.csv")}
     column_migrations = {"AREA": lambda col: col / 10000, "geometry": lambda col: col.make_valid()}
 

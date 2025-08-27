@@ -34,7 +34,7 @@ class PTConverter(FiboaBaseConverter):
         "Shape_Area": "metrics:area",
         "Shape_Length": "metrics:perimeter",
     }
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {
         "crop:code_list": ec_url("pt_2021.csv"),
         "determination:datetime": "2023-01-01T00:00:00Z",

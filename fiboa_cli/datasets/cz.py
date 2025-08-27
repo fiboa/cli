@@ -30,7 +30,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         # 'OKRES_NAZE': 'admin:subdivision_code',
     }
     column_migrations = {"DATUM_REP": lambda col: pd.to_datetime(col, format="%d.%m.%Y")}
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("cz_2023.csv")}
     missing_schemas = {
         "properties": {

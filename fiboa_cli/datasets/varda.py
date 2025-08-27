@@ -57,7 +57,7 @@ class Converter(FiboaBaseConverter):
     }
 
     # EXTENSIONS = {
-    #    "https://fiboa.github.io/timestamps-extension/v0.1.0/schema.yaml"
+    #    "https://fiboa.org/timestamps-extension/v0.1.0/schema.yaml"
     # }
 
     def migrate(self, gdf):

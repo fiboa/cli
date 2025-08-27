@@ -47,7 +47,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     ]
     attribution = "©GDI-SL 2024"
     license = "cc-by-4.0"
-    extensions = {"https://fiboa.github.io/flik-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
     columns = {
         "geometry": "geometry",
         "identifier": "id",

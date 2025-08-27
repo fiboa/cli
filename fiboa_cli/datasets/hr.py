@@ -72,7 +72,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "jpaid": "jpaid",
     }
 
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("hr_2020.csv")}
 
     missing_schemas = {

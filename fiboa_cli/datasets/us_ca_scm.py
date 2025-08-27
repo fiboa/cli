@@ -24,7 +24,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     seek to address resource management issues, regulatory compliance issues, environmental impacts, ecosystem services,
     urban and economic development, and other issues.
     """
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     providers = [
         {
             "name": "California Department of Water Resources",

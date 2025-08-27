@@ -28,7 +28,7 @@ class Converter(AdminConverterMixin, EuroCropsConverterMixin, FiboaBaseConverter
 
     Relevant datasets are: Country blocks (Lauku Bloki), Fields (Lauki), and Landscape elements.
     """
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     providers = [
         {
             "name": "Rural Support Service Republic of Latvia (Lauku atbalsta dienests)",

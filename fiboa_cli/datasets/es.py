@@ -19,7 +19,7 @@ class ESBaseConverter(FiboaBaseConverter):
     use_code_attribute = "uso_sigpac"
 
     extensions = {
-        "https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml",
+        "https://fiboa.org/crop-extension/v0.2.0/schema.yaml",
         ADMIN_DIVISION,
     }
     column_additions = {

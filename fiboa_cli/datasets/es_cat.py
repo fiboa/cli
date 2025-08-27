@@ -52,7 +52,7 @@ class ESCatConverter(FiboaBaseConverter):
         "type": "text/html",
         "rel": "license",
     }
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {
         "crop:code_list": "https://fiboa.org/code/es/cat/crop.csv",
     }

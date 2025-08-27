@@ -48,6 +48,6 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     }
     column_additions = {"crop:code_list": ec_url("at_2021.csv")}
     extensions = {
-        "https://fiboa.github.io/inspire-extension/v0.3.0/schema.yaml",
-        "https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml",
+        "https://fiboa.org/inspire-extension/v0.3.0/schema.yaml",
+        "https://fiboa.org/crop-extension/v0.2.0/schema.yaml",
     }

@@ -46,4 +46,4 @@ class Convert(EuroCropsConverterMixin, FiboaBaseConverter):
         # A=Arable Land, CAG=Covered Agricultural Land, N+G=Grassland, P=Trees, R=Rice, T=Trees
         "LC_MAPCODE": lambda col: col.isin(["A", "CAG", "G", "N", "P", "R", "T"])
     }
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}

@@ -18,7 +18,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
             "roles": ["producer", "licensor"],
         }
     ]
-    extensions = {"https://fiboa.github.io/flik-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
 
     columns = {
         "geometry": "geometry",

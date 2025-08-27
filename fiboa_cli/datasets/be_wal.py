@@ -56,7 +56,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "crop_code": lambda col: col.str.extract(r"\.(\d+)$", expand=False),
         "crop_name": lambda col: col.str.strip(),
     }
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
 
     index_as_id = True
 

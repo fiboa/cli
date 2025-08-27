@@ -53,7 +53,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "GWSCOD_H": "crop:code",
         "GWSNAM_H": "crop:name",
     }
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {
         "determination:datetime": "2024-03-28T00:00:00Z",
         "crop:code_list": ec_url("be_vlg_2021.csv"),

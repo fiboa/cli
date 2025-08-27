@@ -22,8 +22,8 @@ class EuroLandBaseConverter(FiboaBaseConverter):
 
     crop_code_list = None  # e.g. ec_url(ec_mapping_csv)
     extensions = {
-        "https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml",
-        "https://fiboa.github.io/hcat-extension/v0.2.0/schema.yaml",
+        "https://fiboa.org/crop-extension/v0.2.0/schema.yaml",
+        "https://fiboa.org/hcat-extension/v0.3.0/schema.yaml",
     }
     columns = {
         "geometry": "geometry",
@@ -32,9 +32,9 @@ class EuroLandBaseConverter(FiboaBaseConverter):
         "crop:code_list": "crop:code_list",
         "crop_code": "crop:code",
         "crop_name": "crop:name",
-        "EC_trans_n": "ec:translated_name",
-        "EC_hcat_n": "ec:hcat_name",
-        "EC_hcat_c": "ec:hcat_code",
+        "EC_trans_n": "hcat:name_en",
+        "EC_hcat_n": "hcat:name",
+        "EC_hcat_c": "hcat:code",
         "organic": "organic",
         "field_size": "metrics:area",
         # "crop_area": "crop_area",

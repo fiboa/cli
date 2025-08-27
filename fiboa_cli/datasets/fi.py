@@ -38,7 +38,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         # Make year (1st January) from column "VUOSI"
         "VUOSI": lambda col: pd.to_datetime(col, format="%Y"),
     }
-    extensions = {"https://fiboa.github.io/crop-extension/v0.2.0/schema.yaml"}
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("fi_2020.csv")}
 
     def migrate(self, gdf):

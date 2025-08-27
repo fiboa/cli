@@ -39,7 +39,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "FART_ID": "fart_id",
         "GEO_DATERF": "determination:datetime",
     }
-    extensions = {"https://fiboa.github.io/inspire-extension/v0.3.0/schema.yaml"}
+    extensions = {"https://fiboa.org/inspire-extension/v0.3.0/schema.yaml"}
     missing_schemas = {
         "properties": {
             "ref_art": {"type": "string"},
