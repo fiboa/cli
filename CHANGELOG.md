@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v0.20.1] - 2025-08-27
+
+- Reimplementation some modules (e.g. converters)
+- Upgrade vecorel-cli dependency
+
+## [v0.20.0] - 2025-08-25
+
+- Reimplementation based on vecorel-cli
+- Upgrade to support fiboa >= 0.3
+- Removed support for fiboa < 0.3
+
 ## [v0.11.0] - 2025-08-25
 
 ### Added
