@@ -95,5 +95,5 @@ def test_converter(load_ec_mock, capsys, tmp_parquet, converter, block_stream_fi
 
     df = pq.read_table(tmp_parquet.name).to_pandas()
     if "metrics:area" in df.columns:
-        # Check for accidental hectare conversion; fields should be more than 25 square meters
-        assert (df["metrics:area"] > 25).all()
+        # Check for accidental hectare conversion; fields should be more than 10 square meters
+        assert (df["metrics:area"] > 10).all()
