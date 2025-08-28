@@ -25,12 +25,6 @@ def tmp_folder():
         yield folder
 
 
-@fixture
-def tmp_parquet():
-    with tempfile.NamedTemporaryFile(suffix=".parquet") as out:
-        yield out
-
-
 def raiser(message):
     def _method(*args, **kwargs):
         raise Exception(message)

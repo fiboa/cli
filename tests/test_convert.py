@@ -69,12 +69,12 @@ extra_convert_parameters = {
 
 @mark.parametrize("converter", tests)
 @patch("fiboa_cli.datasets.commons.ec.load_ec_mapping")
-def test_converter(load_ec_mock, capsys, tmp_parquet, converter, block_stream_file):
+def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
     from fiboa_cli import Registry  # noqa
 
     def load_ec(csv_file=None, url=None):
         path = url if url and "://" not in url else f"{test_path}/{converter}/{csv_file}"
-        return list(DictReader(open(path, "r")))
+        return list(DictReader(open(path, "r", encoding="utf-8")))
 
     load_ec_mock.side_effect = load_ec
     logger.remove()
@@ -83,7 +83,7 @@ def test_converter(load_ec_mock, capsys, tmp_parquet, converter, block_stream_fi
     path = f"tests/data-files/convert/{converter}"
     kwargs = extra_convert_parameters.get(converter, {})
 
-    ConvertData(converter).convert(target=tmp_parquet.name, cache=path, **kwargs)
+    ConvertData(converter).convert(target=tmp_parquet_file, cache=path, **kwargs)
     out, err = capsys.readouterr()
     output = out + err
 
@@ -91,9 +91,9 @@ def test_converter(load_ec_mock, capsys, tmp_parquet, converter, block_stream_fi
     if error:
         raise AssertionError(f"Found error in output: '{error.group(0)}'\n\n{output}")
 
-    ValidateData().validate(tmp_parquet.name)
+    ValidateData().validate(tmp_parquet_file)
 
-    df = pq.read_table(tmp_parquet.name).to_pandas()
+    df = pq.read_table(tmp_parquet_file).to_pandas()
     if "metrics:area" in df.columns:
         # Check for accidental hectare conversion; fields should be more than 10 square meters
         assert (df["metrics:area"] > 10).all()
