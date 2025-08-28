@@ -8,7 +8,7 @@ PREFIX = "https://www.landbouwvlaanderen.be/bestanden/gis/"
 
 class Converter(AdminConverterMixin, FiboaBaseConverter):
     variants = {
-        k: {PREFIX + v: [v.replace("_GPKG.zip", ".gpkg")]}
+        str(k): {PREFIX + v: [v.replace("_GPKG.zip", ".gpkg")]}
         for k, v in (
             (2024, "Landbouwgebruikspercelen_2024_-_Voorlopig_(extractie_15-10-2024)_GPKG.zip"),
             (2023, "Landbouwgebruikspercelen_2023_-_Definitief_(extractie_28-03-2024)_GPKG.zip"),
