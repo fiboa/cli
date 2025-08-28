@@ -9,14 +9,11 @@ base = "https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/downloads"
 
 
 class NLCropConverter(AdminConverterMixin, FiboaBaseConverter):
-    area_is_in_ha = False
+    area_calculate_missing = True
     variants = {
-        2024: f"{base}/brpgewaspercelen_concept_2024.gpkg",
-        2023: f"{base}/brpgewaspercelen_definitief_2023.gpkg",
-        2022: f"{base}/brpgewaspercelen_definitief_2022.gpkg",
-        2021: f"{base}/brpgewaspercelen_definitief_2021.gpkg",
-        2020: f"{base}/brpgewaspercelen_definitief_2020.gpkg",
-        # {r: {base}/brpgewaspercelen_definitief_{r}.zip for r in range(2009, 2020)}
+        str(2025): f"{base}/brpgewaspercelen_concept_2025.gpkg",
+        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.gpkg" for y in range(2024, 2020, -1)},
+        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.zip" for y in range(2020, 2009, -1)},
     }
 
     id = "nl_crop"
