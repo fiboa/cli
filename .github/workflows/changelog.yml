@@ -1,0 +1,23 @@
+name: Check changelog for non-trivial PRs
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+    - name: Check for changelog modification for non-trivial PR
+      run: |
+        git fetch origin main:main
+        if [ $(git diff main HEAD fiboa_cli | wc -l) -gt 20 ]; then
+           if [ -z $(git diff --name-only main HEAD | grep CHANGELOG.md) ]; then
+             echo "::error::Missing CHANGELOG.md for non-trivial change" && exit 1
+           fi
+        fi
