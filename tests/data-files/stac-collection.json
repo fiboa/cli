@@ -1,0 +1,26 @@
+{
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/processing/v1.1.0/schema.json"
+  ],
+  "type": "Collection",
+  "id": "de_nrw",
+  "title": "de_nrw",
+  "description": "Feldbloecke aus NRW",
+  "license": "other",
+  "extent": {
+    "spatial": { "bbox": [[7.8752433, 51.7469574, 9.2813352, 51.9261403]] },
+    "temporal": {
+      "interval": [["2005-01-28T00:00:00Z", "2005-02-28T00:00:00Z"]]
+    }
+  },
+  "assets": {
+    "data": {
+      "roles": ["data"],
+      "href": "file://C:/Dev/fiboa-cli/tests/data-files/fiboa-example.json",
+      "processing:software": { "fiboa-cli": "0.20.1" },
+      "type": "application/geo+json"
+    }
+  },
+  "links": []
+}

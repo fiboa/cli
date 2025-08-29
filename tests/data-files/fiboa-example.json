@@ -10,6 +10,7 @@
     ]
   },
   "admin:country_code": "DE",
+  "description": "Feldbloecke aus NRW",
   "features": [
     {
       "id": "12324",

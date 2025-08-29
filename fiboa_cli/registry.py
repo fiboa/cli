@@ -1,4 +1,8 @@
+import re
+
 from vecorel_cli.registry import Registry, VecorelRegistry
+
+from fiboa_cli.fiboa.version import spec_pattern
 
 
 class FiboaRegistry(VecorelRegistry):
@@ -17,6 +21,7 @@ class FiboaRegistry(VecorelRegistry):
         "determination:method",
         "determination:details",
     ]
+    required_extensions = [re.compile(spec_pattern)]
     ignored_datasets = VecorelRegistry.ignored_datasets + ["es.py"]
 
     def register_commands(self):
