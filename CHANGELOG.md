@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v0.20.2] - 2025-08-29
+
 - Reimplementation tests and CI
 - Update extensions namespace to fiboa.org, use vecorel schemas
 - Calibrate ha and m2 calculation in converters
@@ -425,7 +427,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - First release
 
-[Unreleased]: <https://github.com/fiboa/cli/compare/v0.11.0...main>
+[Unreleased]: <https://github.com/fiboa/cli/compare/v0.20.2...main>
+[v0.20.2]: <https://github.com/fiboa/cli/compare/v0.20.1...v0.20.2>
+[v0.20.1]: <https://github.com/fiboa/cli/compare/v0.20.0...v0.20.1>
+[v0.20.0]: <https://github.com/fiboa/cli/compare/v0.11.0...v0.20.0>
 [v0.11.0]: <https://github.com/fiboa/cli/compare/v0.10.0...v0.11.0>
 [v0.10.0]: <https://github.com/fiboa/cli/compare/v0.9.0...v0.10.0>
 [v0.9.0]: <https://github.com/fiboa/cli/compare/v0.8.0...v0.9.0>

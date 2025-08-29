@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fiboa-cli"
-version = "0.20.1"
+version = "0.20.2"
 description = "CLI tools such as validation and file format conversion for fiboa."
 readme = "README.md"
 license = "Apache-2.0"
@@ -43,6 +43,9 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 [tool.pixi.dependencies]
 python = ">=3.10"
 pyproj = ">=3.6,<4.0"
+# rar is a bit difficult. vecorel-cli needs it for extracting some rar files in converters
+# but needs a rar cmd tool, which we need to install from conda explictly.
+unrar = ">=0.4"
 
 [tool.pixi.pypi-dependencies]
 # Editable install of the project itself
