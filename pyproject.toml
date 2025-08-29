@@ -43,6 +43,7 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 [tool.pixi.dependencies]
 python = ">=3.10"
 unrar = "==0.4" # todo: can be removed once we update to vecorel-cli >= 0.2.5
+pyproj = ">=3.6,<4.0"
 
 [tool.pixi.pypi-dependencies]
 # Editable install of the project itself
