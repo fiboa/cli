@@ -22,9 +22,11 @@ class FiboaRegistry(VecorelRegistry):
     def register_commands(self):
         super().register_commands()
 
+        from .create_stac import CreateFiboaStacCollection
         from .describe import DescribeFiboaFile
         from .rename_extension import RenameFiboaExtension
 
+        self.set_command(CreateFiboaStacCollection)
         self.set_command(DescribeFiboaFile)
         self.set_command(RenameFiboaExtension)
 

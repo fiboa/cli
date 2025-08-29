@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Reimplementation tests and CI
+- Update extensions namespace to fiboa.org, use vecorel schemas
+- Calibrate ha and m2 calculation in converters
+- Adapt `create-stac-collection` to fiboa
+
 ## [v0.20.1] - 2025-08-27
 
 - Reimplementation some modules (e.g. converters)
