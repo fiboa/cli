@@ -1,7 +1,7 @@
 from vecorel_cli.converters import Converters
 
 
-def test_describe(capsys):
+def test_converters(capsys):
     from fiboa_cli import Registry  # noqa
 
     Converters().converters()
