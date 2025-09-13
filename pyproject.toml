@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fiboa-cli"
-version = "0.20.2"
+version = "0.20.3"
 description = "CLI tools such as validation and file format conversion for fiboa."
 readme = "README.md"
 license = "Apache-2.0"
@@ -22,7 +22,7 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "vecorel-cli==0.2.7"
+    "vecorel-cli==0.2.8"
 ]
 
 [project.scripts]

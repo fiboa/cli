@@ -18,7 +18,7 @@
     "data": {
       "roles": ["data"],
       "href": "file://C:/Dev/fiboa-cli/tests/data-files/fiboa-example.json",
-      "processing:software": { "fiboa-cli": "0.20.1" },
+      "processing:software": { "fiboa-cli": "0.20.3" },
       "type": "application/geo+json"
     }
   },
