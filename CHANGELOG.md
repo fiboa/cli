@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 - Fix to vecorel: converter.license and provider should be string
+- Command `fiboa publish` to automate source coop publication process
+  - Run the converter to get the parquet file
+  - Validate parquet file
+  - Check for README.md, if missing generates one based on data-survey (if available) and converter
+  - Check for LICENSE.txt, if missing generate one based on the converter file
+  - Generate pmtiles file
+  - Check AWS-environment vars
+  - Synchronize parquet + pmtiles + README/LICENSE to source coop repo
 
 ## [v0.20.3] - 2025-09-13
 
