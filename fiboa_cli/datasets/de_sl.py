@@ -38,13 +38,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "Germany, Saarland"
     title = "Field boundaries for Saarland, Germany"
     description = """This dataset contains data transformed into the INSPIRE data model “Land Use” of the IACS areas applied for within the framework of agricultural land promotion (GIS application) from the Saarland."""
-    providers = [
-        {
-            "name": "Ministerium für Umwelt, Klima, Mobilität, Agrar und Verbraucherschutz",
-            "url": "https://geoportal.saarland.de",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Ministerium für Umwelt, Klima, Mobilität, Agrar und Verbraucherschutz <https://geoportal.saarland.de>"
     attribution = "©GDI-SL 2024"
     license = "cc-by-4.0"
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}

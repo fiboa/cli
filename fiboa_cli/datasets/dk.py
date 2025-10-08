@@ -18,18 +18,7 @@ class DKConverter(AdminConverterMixin, FiboaBaseConverter):
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {"crop:code_list": ec_url("nl_2020.csv")}
 
-    providers = [
-        {
-            "name": "Ministry of Food, Agriculture and Fisheries of Denmark",
-            "url": "https://fvm.dk/",
-            "roles": ["licensor"],
-        },
-        {
-            "name": "Danish Agricultural Agency",
-            "url": "https://lbst.dk/",
-            "roles": ["producer", "licensor"],
-        },
-    ]
+    provider = "Danish Agricultural Agency <https://lbst.dk/>"
 
     license = "CC-0"
     columns = {

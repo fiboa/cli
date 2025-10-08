@@ -21,13 +21,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     information about 1854 fields from October 2019 to September 2020 from Luís Eduardo Magalhães (LEM) and other
     municipalities in the west of Bahia state, Brazil. The majority of the 16 land uses classes are related to crops.
     """
-    providers = [
-        {
-            "name": "Mendeley Data",
-            "url": "https://data.mendeley.com/datasets/vz6d7tw87f/1#file-5ac1542b-12ef-4dce-8258-113b5c5d87c9",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Mendeley Data <https://data.mendeley.com/datasets/vz6d7tw87f/1#file-5ac1542b-12ef-4dce-8258-113b5c5d87c9>"
     attribution = "Copyright © 2024 Elsevier inc, its licensors, and contributors."
     license = "CC-BY-4.0"
     columns = {

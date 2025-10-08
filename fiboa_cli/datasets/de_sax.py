@@ -15,13 +15,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "Germany, Saxony"
     title = "Field boundaries for Saxony, Germany"
     description = "Feldblöcke und förderfähige Elemente in Sachsen 2024"
-    providers = [
-        {
-            "name": "Sächsisches Landesamt für Umwelt, Landwirtschaft und Geologie",
-            "url": "https://geoportal.sachsen.de/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Sächsisches Landesamt für Umwelt, Landwirtschaft und Geologie <https://geoportal.sachsen.de>"
     attribution = "Sächsisches Landesamt für Umwelt, Landwirtschaft und Geologie"
     license = "dl-de/by-2-0"
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}

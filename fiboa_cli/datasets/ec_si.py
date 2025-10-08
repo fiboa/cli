@@ -15,13 +15,7 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     title = "Field boundaries for Slovenia"
     description = "This dataset contains the field boundaries for all of Slovenia in 2021. The data was collected by the Slovenian government."
 
-    providers = [
-        {
-            "name": "Ministrstvo za kmetijstvo, gozdarstvo in prehrano",
-            "url": "https://rkg.gov.si/vstop/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Ministrstvo za kmetijstvo, gozdarstvo in prehrano <https://rkg.gov.si/vstop/>"
     attribution = "Ministrstvo za kmetijstvo, gozdarstvo in prehrano"
 
     columns = {

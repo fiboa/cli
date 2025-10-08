@@ -20,18 +20,7 @@ contain significant irrigated areas. The spatial dataset is an update of the nat
 created in 2017. The current update has incorporated data from the 2019 – 2020 irrigation season.
 """
 
-    providers = [
-        {
-            "name": "NZ Ministry for the environment",
-            "url": "https://environment.govt.nz/",
-            "roles": ["producer"],
-        },
-        {
-            "name": "Aqualinc Research Limited",
-            "url": "https://environment.govt.nz/publications/national-irrigated-land-spatial-dataset-2020-update",
-            "roles": ["licensor"],
-        },
-    ]
+    provider = "Aqualinc Research Limited <https://environment.govt.nz/publications/national-irrigated-land-spatial-dataset-2020-update>"
     license = "CC-BY-4.0"
     extensions = {ADMIN_DIVISION}
     index_as_id = True

@@ -19,24 +19,13 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     and supporting sustainable land use practices.
     """
 
-    providers = [
-        {
-            "name": "Agencija za plaćanja u poljoprivredi, ribarstvu i ruralnom razvoju",
-            "url": "https://www.apprrr.hr/prostorni-podaci-servisi/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Agencija za plaćanja u poljoprivredi, ribarstvu i ruralnom razvoju <https://www.apprrr.hr/prostorni-podaci-servisi/>"
 
     attribution = (
         "copyright © 2024. Agencija za plaćanja u poljoprivredi, ribarstvu i ruralnom razvoju"
     )
 
-    license = {
-        "title": "Prostorni podaci i servisi",
-        "href": "https://www.apprrr.hr/prostorni-podaci-servisi/",
-        "type": "text/html",
-        "rel": "license",
-    }
+    license = "Prostorni podaci i servisi <https://www.apprrr.hr/prostorni-podaci-servisi/>"
     index_as_id = True
 
     columns = {

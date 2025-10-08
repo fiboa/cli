@@ -20,13 +20,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
 
     Reference parcel: is the physical block that can be clearly delimited from the outside (e.g. forest, roads, water bodies) and is formed by contiguous agricultural areas that are recognizable in nature.
     """
-    providers = [
-        {
-            "name": "Agrarmarkt Austria",
-            "url": "https://geometadatensuche.inspire.gv.at/metadatensuche/inspire/api/records/9db8a0c3-e92a-4df4-9d55-8210e326a7ed",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Agrarmarkt Austria <https://geometadatensuche.inspire.gv.at/metadatensuche/inspire/api/records/9db8a0c3-e92a-4df4-9d55-8210e326a7ed>"
     license = "CC-BY-4.0"
     columns = {
         "geometry": "geometry",

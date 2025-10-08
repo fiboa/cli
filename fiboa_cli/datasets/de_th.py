@@ -30,13 +30,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     To produce the DGK-Lw, (official) orthophotos from the Thuringian Land Registry and Surveying Administration (TLBG) and orthophotos from the TLLLR's own aerial surveys are interpreted. The origin of this image data is 50% of the state area each year, so that up-to-date image data is available for the entire Thuringian state area every year.
     """
 
-    providers = [
-        {
-            "name": "Thüringer Landesamt für Landwirtschaft und Ländlichen Raum",
-            "url": "https://geomis.geoportal-th.de/geonetwork/srv/ger/catalog.search#/metadata/D872F2D6-60BC-11D6-B67D-00E0290F5BA0",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Thüringer Landesamt für Landwirtschaft und Ländlichen Raum <https://geomis.geoportal-th.de/geonetwork/srv/ger/catalog.search#/metadata/D872F2D6-60BC-11D6-B67D-00E0290F5BA0>"
     attribution = "© GDI-Th"
     license = "dl-de/by-2-0"
 

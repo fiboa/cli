@@ -13,13 +13,7 @@ class ESGAConverter(EsriRESTConverterMixin, ESBaseConverter):
     """
     license = "CC-BY-4.0"  # https://mapas.xunta.gal/gl/aviso-legal
     attribution = "Información procedente do FOGGA"
-    providers = [
-        {
-            "name": "Virtual Office for Rural Environment",
-            "url": "https://ovmediorural.xunta.gal/es/consultas-publicas/sixpac",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Virtual Office for Rural Environment <https://ovmediorural.xunta.gal/es/consultas-publicas/sixpac>"
     columns = {
         "DN_OID": "id",
         "geometry": "geometry",

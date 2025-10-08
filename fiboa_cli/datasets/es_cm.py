@@ -16,13 +16,7 @@ class ESCMConverter(EsriRESTConverterMixin, ESBaseConverter):
     the identification basis for any type of aid related to the surface area."""
     license = "CC-BY-SA-4.0"  # see https://datosabiertos.castillalamancha.es/dataset/sistema-de-informaci%C3%B3n-geogr%C3%A1fica-de-parcelas-agr%C3%ADcolas-de-castilla-la-mancha-sigpac  # https://mapas.xunta.gal/gl/aviso-legal
     attribution = "Unidad de Cartografía. Secretaría General. Consejería de Agricultura , Ganadería y Desarrollo Rural."
-    providers = [
-        {
-            "name": "Unidad de Cartografía. Secretaría General. Consejería de Agricultura , Ganadería y Desarrollo Rural.",
-            "url": "https://datosabiertos.castillalamancha.es/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Unidad de Cartografía. Secretaría General. Consejería de Agricultura , Ganadería y Desarrollo Rural. <https://datosabiertos.castillalamancha.es>"
     columns = {
         "dn_oid": "id",
         "geometry": "geometry",

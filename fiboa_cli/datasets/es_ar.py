@@ -21,13 +21,7 @@ class ARConverter(ESBaseConverter):
 
     Crop Fields of Spain province Aragon
     """
-    providers = [
-        {
-            "name": "Gobierno de Aragon",
-            "url": "https://www.aragon.es/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Gobierno de Aragon <https://www.aragon.es>"
 
     # License: https://idearagon.aragon.es/portal/politica-privacidad.jsp
     license = "CC-BY-4.0"

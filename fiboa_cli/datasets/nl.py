@@ -28,13 +28,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     For crop data, look at BasisRegistratie gewasPercelen (BRP)
     """
 
-    providers = [
-        {
-            "name": "RVO / PDOK",
-            "url": "https://www.pdok.nl/introductie/-/article/referentiepercelen",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "RVO / PDOK <https://www.pdok.nl/introductie/-/article/referentiepercelen>"
     # Both http://creativecommons.org/publicdomain/zero/1.0/deed.nl and http://creativecommons.org/publicdomain/mark/1.0/
     license = "CC0-1.0"
     column_additions = {"determination:datetime": "2023-06-15T00:00:00Z"}

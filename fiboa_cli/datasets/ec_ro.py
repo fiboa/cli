@@ -16,13 +16,7 @@ class Convert(EuroCropsConverterMixin, FiboaBaseConverter):
 
         The dataset is in line with the conceptual framework described in the Land Cover Data Specifications for the Implementation of the INSPIRE Directive (version 3.0). The information layer was developed based on a methodology developed within the project, which was carried out as follows: - analysis and harmonisation of the land cover classification system; - acquisition and processing of the reference data, listed below; - verification and validation of the quality of the spatial data produced;
     """
-    providers = [
-        {
-            "name": "Ministry of Regional Development and Public Administration",
-            "url": "http://spatial.mdrap.ro",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Ministry of Regional Development and Public Administration <http://spatial.mdrap.ro>"
     license = "CC-0"
     column_additions = {
         "determination:datetime": "2017-01-01T00:00:00Z",

@@ -20,13 +20,7 @@ class IEConverter(AdminConverterMixin, FiboaBaseConverter):
     Yearly information provided through the beneficiary declaration.
     """
 
-    providers = [
-        {
-            "name": "Ireland Department of Agriculture, Food and the Marine",
-            "url": "https://inspire.geohive.ie/geoportal/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Department of Agriculture, Food and the Marine <https://www.gov.ie/en/organisation/department-of-agriculture-food-and-the-marine/>"
     attribution = "Ireland Department of Agriculture, Food and the Marine"
     license = "CC-BY-4.0"
     columns = {

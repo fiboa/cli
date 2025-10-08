@@ -84,13 +84,7 @@ class Converter(FiboaBaseConverter):
     Multi-temporal composites of Sentinel-2 (S2) images are provided to ensure cloud-free data.
     """
 
-    providers = [
-        {
-            "name": "DATA Archiving and Networked Services (DANS)",
-            "url": "https://research.tudelft.nl/en/publications/ai4smallfarms-a-dataset-for-crop-field-delineation-in-southeast-a",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "DATA Archiving and Networked Services (DANS) <https://research.tudelft.nl/en/publications/ai4smallfarms-a-dataset-for-crop-field-delineation-in-southeast-a>"
     attribution = "Persello, C., Grift, J., Fan, X., Paris, C., Hansch, R., Koeva, M., & Nelson, A. (2023). AI4SmallFarms: A Dataset for Crop Field Delineation in Southeast Asian Smallholder Farms. IEEE Geoscience and Remote Sensing Letters, 20, 1-5. Article 2505705. https://doi.org/10.1109/LGRS.2023.3323095"
     license = "CC-BY-4.0"
 

@@ -13,19 +13,8 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     title = "Field boundaries for Mecklenburg-Western Pomerania, Germany"
     description = "Field block register of the Ministry of Agriculture and Environment M-V"
 
-    providers = [
-        {
-            "name": "Ministerium für Landwirtschaft und Umwelt M-V",
-            "url": "https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34",
-            "roles": ["producer", "licensor"],
-        }
-    ]
-    license = {
-        "title": "No restrictions apply",
-        "href": "https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34",
-        "type": "text/html",
-        "rel": "license",
-    }
+    provider = "Ministerium für Landwirtschaft und Umwelt M-V <https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34>"
+    license = "No restrictions apply <https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34>"
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
 
     columns = {

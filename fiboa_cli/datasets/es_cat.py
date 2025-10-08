@@ -38,20 +38,9 @@ class ESCatConverter(FiboaBaseConverter):
         The Department of Agriculture, Livestock, Fisheries and Food makes available to the public the data from the crop map of Catalonia.
         This map allows you to locate the crops declared in the Agrarian Declaration - DUN submitted to the DACC.
     """
-    providers = [
-        {
-            "name": "Catalonia Department of Agriculture, Livestock, Fisheries and Food",
-            "url": "https://agricultura.gencat.cat/ca/ambits/desenvolupament-rural/sigpac/mapa-cultius/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Catalonia Department of Agriculture, Livestock, Fisheries and Food <https://agricultura.gencat.cat/ca/ambits/desenvolupament-rural/sigpac/mapa-cultius/>"
     attribution = "Catalonia Department of Agriculture, Livestock, Fisheries and Food"
-    license = {
-        "title": "The Open Information Use License - Catalonia",
-        "href": "https://administraciodigital.gencat.cat/ca/dades/dades-obertes/informacio-practica/llicencies/",
-        "type": "text/html",
-        "rel": "license",
-    }
+    license = "The Open Information Use License - Catalonia <https://administraciodigital.gencat.cat/ca/dades/dades-obertes/informacio-practica/llicencies/>"
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {
         "crop:code_list": "https://fiboa.org/code/es/cat/crop.csv",

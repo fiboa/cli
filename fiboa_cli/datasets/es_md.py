@@ -13,13 +13,7 @@ class ESCLConverter(ESBaseConverter):
     description = """
     SIGPAC is the Agricultural Parcel Identification System implemented throughout the European Union for the application of CAP (Common Agricultural Policy) aid to farmers and ranchers.
     """
-    providers = [
-        {
-            "name": "Comunidad de Madrid",
-            "url": "https://www.comunidad.madrid/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Comunidad de Madrid <https://www.comunidad.madrid>"
     license = "CC-0"  # No-limits
 
     columns = {

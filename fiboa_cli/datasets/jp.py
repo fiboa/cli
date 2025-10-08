@@ -5,10 +5,10 @@ from ..conversion.fiboa_converter import FiboaBaseConverter
 
 class JPConverter(FiboaBaseConverter):
     variants = {
-        2024: "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2024.parquet",
-        2023: "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2023.parquet",
-        2022: "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2022.parquet",
-        2021: "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2021.parquet",
+        "2024": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2024.parquet",
+        "2023": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2023.parquet",
+        "2022": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2022.parquet",
+        "2021": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2021.parquet",
     }
 
     id = "jp"
@@ -21,18 +21,7 @@ class JPConverter(FiboaBaseConverter):
     current conditions. Fude Polygons are created for the purpose of roughly indicating the locations of farmland.
     """
 
-    providers = [
-        {
-            "name": "Japanese Ministry of Agriculture, Forestry and Fisheries (MAFF, 農林水産省)",
-            "url": "https://www.maff.go.jp/",
-            "roles": ["licensor", "producer"],
-        },
-        {
-            "name": "Hiroo Imaki, Pacific Spatial Solutions",
-            "url": "https://pacificspatial.com/",
-            "roles": ["processor"],
-        },
-    ]
+    provider = "Japanese Ministry of Agriculture, Forestry and Fisheries (MAFF, 農林水産省) <https://www.maff.go.jp/>"
     attribution = "Fude Polygon Data (2021-2024). Japanese Ministry of Agriculture, Forestry and Fisheries. Processed by Pacific Spatial Solutions, Inc"
     license = "CC-BY-4.0"
 

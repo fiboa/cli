@@ -28,13 +28,7 @@ class JecamConvert(FiboaBaseConverter):
     "Harmonized in situ JECAM datasets for agricultural land use mapping and monitoring in tropical countries",
     https://doi.org/10.18167/DVN1/P7OLAP, CIRAD Dataverse, V4
     """
-    providers = [
-        {
-            "name": "Centre de coopération Internationale en Recherche Agronomique pour le Développement (Cirad)",
-            "url": "http://www.cirad.fr",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "IEEE GRSS <http://www.grss-ieee.org/community/technical-committees/data-fusion/>"
     attribution = "JECAM SIRAD, https://doi.org/10.18167/DVN1/P7OLAP"
     license = "CC-BY-4.0"
     columns = {

@@ -18,13 +18,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     Swedish Agency for Agriculture via a SAM application. The data set contains parcels where the area
     applied for and the area decided on are the same. The data is published at the end of a year.
     """
-    providers = [
-        {
-            "name": "Jordbruksverket (The Swedish Board of Agriculture)",
-            "url": "https://jordbruksverket.se/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Jordbruksverket (The Swedish Board of Agriculture) <https://jordbruksverket.se>"
     attribution = "Jordbruksverket"
     license = "CC-0"  # "Open Data"
     columns = {

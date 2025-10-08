@@ -24,13 +24,7 @@ class ESCNConverter(FiboaBaseConverter):
     this work having been addressed within the Strategic Plan for Innovation and Continuous Improvement
     of the Ministry of Agriculture, Livestock and Fisheries.
     """
-    providers = [
-        {
-            "name": "Gobierno de Canarias - Consejería de Agricultura, Ganadería, Pesca y Soberanía Alimentaria",
-            "url": "https://www.gobiernodecanarias.org/agpsa/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Gobierno de Canarias - Consejería de Agricultura, Ganadería, Pesca y Soberanía Alimentaria <https://www.gobiernodecanarias.org/agpsa/>"
     license = "CC-BY-4.0"  # as stated in https://datos.canarias.es/portal/aviso-legal-y-condiciones-de-uso
     attribution = "Gobierno de Canarias"
     extensions = {

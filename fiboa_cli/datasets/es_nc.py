@@ -19,13 +19,7 @@ class NCConverter(ESBaseConverter):
     """
     license = "CC-BY-4.0"  # https://sigpac.navarra.es/descargas/
     attribution = "Comunidad Foral de Navarra"
-    providers = [
-        {
-            "name": "Comunidad Foral de Navarra",
-            "url": "https://gobiernoabierto.navarra.es/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Comunidad Foral de Navarra <https://gobiernoabierto.navarra.es>"
     columns = {
         "id": "id",
         "geometry": "geometry",

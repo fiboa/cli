@@ -13,13 +13,7 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     title = "Field boundaries for Latvia"
     description = "This dataset contains the field boundaries for all of Latvia in 2021. The data was collected by the Latvian government."
 
-    providers = [
-        {
-            "name": "Lauku atbalsta dienests",
-            "url": "https://www.lad.gov.lv/lv/lauku-registra-dati",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Lauku atbalsta dienests <https://www.lad.gov.lv/lv/lauku-registra-dati>"
     attribution = "Lauku atbalsta dienests"
 
     columns = {

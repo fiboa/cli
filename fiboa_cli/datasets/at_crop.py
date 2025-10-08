@@ -6,13 +6,13 @@ from .commons.ec import ec_url
 
 class Converter(AdminConverterMixin, FiboaBaseConverter):
     variants = {
-        2024: "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2024-2_polygon.gpkg.zip",
-        2023: "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2023-2_polygon.gpkg.zip",
-        2022: "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2022_polygon.gpkg.zip",
-        2021: "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2021_polygon.gpkg.zip",
-        2020: "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2020_polygon.gpkg.zip",
-        2019: "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2019_polygon.gpkg.zip",
-        2018: "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2018_polygon.gpkg.zip",
+        "2024": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2024-2_polygon.gpkg.zip",
+        "2023": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2023-2_polygon.gpkg.zip",
+        "2022": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2022_polygon.gpkg.zip",
+        "2021": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2021_polygon.gpkg.zip",
+        "2020": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2020_polygon.gpkg.zip",
+        "2019": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2019_polygon.gpkg.zip",
+        "2018": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2018_polygon.gpkg.zip",
     }
 
     id = "at_crop"
@@ -29,13 +29,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     StF: BGBl. II No. 100/2015 or is simply maintained in good agricultural and ecological condition in accordance with
     Art. 94 of Regulation (EU) No. 1306/2013 and is digitized in the GIS as a polygon or as a point.
     """
-    providers = [
-        {
-            "name": "Agrarmarkt Austria",
-            "url": "https://geometadatensuche.inspire.gv.at/metadatensuche/inspire/api/records/9db8a0c3-e92a-4df4-9d55-8210e326a7ed",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Agrarmarkt Austria <https://geometadatensuche.inspire.gv.at/metadatensuche/inspire/api/records/9db8a0c3-e92a-4df4-9d55-8210e326a7ed>"
     license = "CC-BY-4.0"
     columns = {
         "GEO_ID": "id",
