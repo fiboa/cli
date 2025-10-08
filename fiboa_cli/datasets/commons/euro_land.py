@@ -14,7 +14,7 @@ class EuroLandBaseConverter(FiboaBaseConverter):
     short_name = ""
     title = ""
     description = ""
-    providers = []
+    provider = ""
 
     # And additionally declare a crop_code_list
     crop_code_list = ec_url(ec_mapping_csv)
