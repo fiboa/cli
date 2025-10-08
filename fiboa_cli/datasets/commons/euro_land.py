@@ -52,4 +52,4 @@ class EuroLandBaseConverter(FiboaBaseConverter):
         assert self.crop_code_list, f"Please declare a crop_code_list attribute on {self.__class__}"
         self.column_additions["crop:code_list"] = self.crop_code_list
         provider = "Europe-LAND HE Project <https://doi.org/10.5281/zenodo.14230620>"
-        self.provider = (f"{self.provider} , {provider}") if self.provider else provider
+        self.provider = (f"{self.provider}, {provider}") if self.provider else provider

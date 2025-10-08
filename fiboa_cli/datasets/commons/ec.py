@@ -40,7 +40,7 @@ class EuroCropsConverterMixin:
         """
         )
         provider = "EuroCrops <https://github.com/maja601/EuroCrops>"
-        self.provider = (f"{self.provider} , {provider}") if self.provider else provider
+        self.provider = (f"{self.provider}, {provider}") if self.provider else provider
         self.license = "CC-BY-SA-4.0"
 
         self.extensions = getattr(self, "extensions", set())
