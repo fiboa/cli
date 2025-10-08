@@ -19,7 +19,7 @@ This project uses [Pixi](https://pixi.sh/) for dependency management. Install Pi
 
 ```bash
 # Clone the repository and navigate to it
-git clone https://github.com/vecorel/cli.git
+git clone https://github.com/fiboa/cli.git
 cd cli
 
 # Install all dependencies
@@ -69,7 +69,7 @@ fiboa CLI supports various commands to work with the files:
 
 ### Validation
 
-To validate a Vecorel GeoParquet or GeoJSON file, you can for example run:
+To validate a fiboa GeoParquet or GeoJSON file, you can for example run:
 
 - GeoJSON: `fiboa validate example.json --collection collection.json`
 - GeoParquet: `fiboa validate example.parquet --data`
