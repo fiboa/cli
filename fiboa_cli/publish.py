@@ -135,8 +135,7 @@ class Publish(BaseCommand):
                 text += "\n" + self.converter.license + "\n"
 
             if "<(https://" not in text:
-                # Include full-license text? E.g. CC-0 text
-                # pip install spdx-license-list
+                # Include full-license text
                 import spdx_license_list
 
                 if text in spdx_license_list.LICENSES:
