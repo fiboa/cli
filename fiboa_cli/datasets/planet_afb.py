@@ -20,16 +20,9 @@ class Converter(FiboaBaseConverter):
     works on a monthly basis and is available for the entire globe. The data is provided in GeoPackage format.
     For more information, see the [field boundaries technical specification](https://planet.widen.net/s/5vq8w5wjvf/2403.08_mar-9444-field-boundaries-technical-specification-sheet-3)
     """
-    providers = [
-        {"name": "Planet Labs, PBC", "url": "https://planet.com", "roles": ["producer", "licensor"]}
-    ]
+    provider = "Planet Labs Inc. <https://www.planet.com>"
     attribution = "© 2024 Planet Labs, PBC"
-    license = {
-        "title": "Proprietary License",
-        "href": "https://www.planet.com/licensing-information/",
-        "type": "text/html",
-        "rel": "license",
-    }
+    license = "Proprietary License <https://www.planet.com/licensing-information/>"
     extensions = {"https://fiboa.org/planet-extension/v0.1.0/schema.yaml"}
     columns = {
         "polygon_id": "id",  # fiboa core field

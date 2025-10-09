@@ -11,7 +11,7 @@ base = "https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/downloads"
 class NLCropConverter(AdminConverterMixin, FiboaBaseConverter):
     area_calculate_missing = True
     variants = {
-        str(2025): f"{base}/brpgewaspercelen_concept_2025.gpkg",
+        "2025": f"{base}/brpgewaspercelen_concept_2025.gpkg",
         **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.gpkg" for y in range(2024, 2020, -1)},
         **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.zip" for y in range(2020, 2009, -1)},
     }
@@ -33,13 +33,9 @@ class NLCropConverter(AdminConverterMixin, FiboaBaseConverter):
     Data is currently available for the years 2009 to 2024.
     """
 
-    providers = [
-        {
-            "name": "RVO / PDOK",
-            "url": "https://www.pdok.nl/introductie/-/article/basisregistratie-gewaspercelen-brp-",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = (
+        "RVO / PDOK <https://www.pdok.nl/introductie/-/article/basisregistratie-gewaspercelen-brp->"
+    )
     # Both http://creativecommons.org/publicdomain/zero/1.0/deed.nl and http://creativecommons.org/publicdomain/mark/1.0/
     license = "CC0-1.0"
 

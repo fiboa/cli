@@ -17,13 +17,7 @@ class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
     # see https://intranet.caib.es/opendatacataleg/dataset/sigpac-2024/resource/3a0bc2e0-3f37-45b7-a7d4-1e8c7cf09bc8
     license = "CC-BY-4.0"  # http://www.opendefinition.org/licenses/cc-by
     attribution = "Govern de les Illes Balears"
-    providers = [
-        {
-            "name": "Govern de les Illes Balears",
-            "url": "https://gobiernoabierto.navarra.es/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Govern de les Illes Balears <https://gobiernoabierto.navarra.es/>"
     columns = {
         "DN_OID": "id",
         "geometry": "geometry",

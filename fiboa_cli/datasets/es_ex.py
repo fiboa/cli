@@ -13,13 +13,7 @@ class EXConverter(ESBaseConverter):
     description = """SIGPAC Crop fields of Spain - Extremadura"""
     license = "CC-BY-4.0"  # See http://sitex.gobex.es/SITEX/files/CondicionesUsoCICTEX.pdf
     attribution = "Junta de Extremadura"
-    providers = [
-        {
-            "name": "Junta de Extremadura",
-            "url": "https://www.juntaex.es/lajunta/consejeria-de-infraestructuras-transporte-y-vivienda",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Junta de Extremadura <https://www.juntaex.es/lajunta/consejeria-de-infraestructuras-transporte-y-vivienda>"
     columns = {
         "geometry": "geometry",
         "id": "id",
@@ -45,7 +39,6 @@ class EXConverter(ESBaseConverter):
             "admin_municipality_code": {"type": "string"},
         }
     }
-    variants = {"2024": "TODO", "2023": "TODO"}
 
     def get_urls(self):
         if not self.variant:

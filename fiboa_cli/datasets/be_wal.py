@@ -28,19 +28,8 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     but no public distribution) or at the European Commission data portal (no limitations). We use the
     free-licensed version for this converter.
     """
-    providers = [
-        {
-            "name": "Inspire Geoportal of the European Commission",
-            "url": "https://inspire-geoportal.ec.europa.eu/srv/eng/catalog.search#/metadata/2a0d9be0-ac3d-443e-9db0-a7cfb0f128e2",
-            "roles": ["host", "processor"],
-        }
-    ]
-    license = {
-        "title": "No conditions apply to access and use. Distributed through Inspire guidelines",
-        "href": "https://inspire-geoportal.ec.europa.eu/srv/eng/catalog.search#/metadata/2a0d9be0-ac3d-443e-9db0-a7cfb0f128e2",
-        "type": "text/html",
-        "rel": "license",
-    }
+    provider = "Inspire Geoportal of the European Commission <https://inspire-geoportal.ec.europa.eu/srv/eng/catalog.search#/metadata/2a0d9be0-ac3d-443e-9db0-a7cfb0f128e2>"
+    license = "No conditions apply to access and use. Distributed through Inspire guidelines <https://inspire-geoportal.ec.europa.eu/srv/eng/catalog.search#/metadata/2a0d9be0-ac3d-443e-9db0-a7cfb0f128e2>"
     columns = {
         "geometry": "geometry",
         "crop_name": "crop:name",

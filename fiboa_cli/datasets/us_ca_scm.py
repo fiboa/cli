@@ -25,13 +25,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     urban and economic development, and other issues.
     """
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    providers = [
-        {
-            "name": "California Department of Water Resources",
-            "url": "https://water.ca.gov/",
-            "roles": ["licensor", "producer"],
-        }
-    ]
+    provider = "County of Santa Clara <https://www.sccgov.org/sites/dpd/DocsForms/Documents/Ag_Preserves_Laminated_map.pdf>"
     license = "CC-0"
     columns = {
         "geometry": "geometry",

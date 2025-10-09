@@ -8,13 +8,7 @@ class LTConverter(EuroLandBaseConverter):
     title = "Lithuania crop fields"
     description = "Collection of data on agricultural land and crop areas, cultivated crops in the territory of the Republic of Lithuania"
 
-    providers = [
-        {
-            "name": "Nacionalinė mokėjimo agentūra prie Žemės ūkio ministerijos",
-            "url": "https://www.nma.lt/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Nacionalinė mokėjimo agentūra prie Žemės ūkio ministerijos <https://www.nma.lt>"
     attribution = "Nacionalinė mokėjimo agentūra prie Žemės ūkio ministerijos"
     crop_code_list = ec_url("lt_2021.csv")
     sources = {

@@ -22,13 +22,7 @@ class ESPVConverter(ESBaseConverter):
     all Member States. Sigpac began to be used from February 1, 2005, together with the beginning of
     the 2005 community aid application period.
     """
-    providers = [
-        {
-            "name": "Basque Government",
-            "url": "https://www.euskadi.eus/gobierno-vasco/inicio/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Gobierno Vasco <https://www.euskadi.eus/web01-tramite/es/contenidos/tramite_servicio/datos_geograficos_sigpac/es_def/index.shtml>"
     attribution = "Basque Government / Gobierno Vasco"
     license = "CC-BY-4.0"
     columns = {

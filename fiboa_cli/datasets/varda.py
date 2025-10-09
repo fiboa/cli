@@ -18,14 +18,9 @@ class Converter(FiboaBaseConverter):
     title = "Varda Global FieldID"
     description = """Field Boundaries from the Global FieldID system from Varda."""
 
-    providers = [{"name": "Varda", "url": "https://www.varda.ag/", "roles": ["licensor"]}]
+    provider = "Varda <https://www.varda.ag>"
     attribution = "© 2024 Varda"
-    license = {
-        "title": "Varda Terms of use",
-        "href": "https://fieldid.varda.ag/help/terms-conditions",
-        "type": "text/html",
-        "rel": "license",
-    }
+    license = "Varda Terms of use <https://fieldid.varda.ag/help/terms-conditions>"
 
     columns = {
         "geometry": "geometry",

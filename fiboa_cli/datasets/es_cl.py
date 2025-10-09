@@ -22,19 +22,8 @@ class ESCLConverter(ESBaseConverter):
     Data provided by: Department of Agriculture, Livestock and Rural Development. Regional Government of Castile and Leon.
     Free use of the data is permitted, but commercial exploitation is prohibited.
     """
-    providers = [
-        {
-            "name": "Department of Agriculture, Livestock and Rural Development. Regional Government of Castile and Leon",
-            "url": "https://www.itacyl.es/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
-    license = {
-        "title": "CC-NC: Free use of the data is permitted, but commercial exploitation is prohibited",
-        "href": "http://ftp.itacyl.es/cartografia/LICENCIA-IGCYL-NC-2012.pdf",
-        "type": "application/pdf",
-        "rel": "license",
-    }
+    provider = "Junta de Castilla y León <https://datos.jcyl.es/web/jcyl/set/es/sector-publico/sigpac/1284212629849>"
+    license = "CC-NC: Free use of the data is permitted, but commercial exploitation is prohibited <http://ftp.itacyl.es/cartografia/LICENCIA-IGCYL-NC-2012.pdf>"
 
     columns = {
         "DN_OID": "id",

@@ -18,13 +18,7 @@ class IndiaConverter(AdminConverterMixin, FiboaBaseConverter):
       The model was trained in MXNet 1.6.0 and can be loaded with the "model.load_parameters()" function.
     """
     index_as_id = True
-    providers = [
-        {
-            "name": "Zenodo",
-            "url": "https://zenodo.org/",
-            "roles": ["licensor", "producer"],
-        }
-    ]
+    provider = "Zenodo <https://zenodo.org>"
     attribution = "https://doi.org/10.5281/zenodo.7315090"
     license = "CC-BY-4.0"
     columns = {

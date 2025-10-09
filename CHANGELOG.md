@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Fix to vecorel: converter.license and provider should be string
+
 ## [v0.20.3] - 2025-09-13
 
 - Update vecorel-cli to solve issues with resolving schemas

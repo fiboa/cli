@@ -29,22 +29,10 @@ class ANConverter(ESBaseConverter):
     support for these and their subdivisions (ENCLOSURES) with defined agricultural uses or
     developments.
     """
-    providers = [
-        {
-            "name": "Junta de Andalucía",
-            "url": "https://www.juntadeandalucia.es/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Junta de Andalucía <https://www.juntadeandalucia.es>"
     attribution = "©Junta de Andalucía"
     # The end user is required to be informed, ..., that the cartography and geographic information is available free of charge on the website of the Ministry of Agriculture, Fisheries and Rural Development.
-    license = {
-        # CC-SA-BY-ND
-        "title": "Pursuant to Law 37/2007 of 16 November on the reuse of public sector information and Law 3/2013 of 24 July approving the Statistical and Cartographic Plan of Andalusia 2013-2017, the geographic information of SIGPAC is made available to the public.",
-        "href": "https://www.juntadeandalucia.es/organismos/agriculturapescaaguaydesarrollorural/servicios/sigpac/visor/paginas/sigpac-descarga-informacion-geografica-shapes-provincias.html#toc-condiciones-de-uso-para-la-licencia-de-uso-comercial",
-        "type": "text/html",
-        "rel": "license",
-    }
+    license = "Pursuant to Law 37/2007 of 16 November on the reuse of public sector information and Law 3/2013 of 24 July approving the Statistical and Cartographic Plan of Andalusia 2013-2017, the geographic information of SIGPAC is made available to the public. <https://www.juntadeandalucia.es/organismos/agriculturapescaaguaydesarrollorural/servicios/sigpac/visor/paginas/sigpac-descarga-informacion-geografica-shapes-provincias.html#toc-condiciones-de-uso-para-la-licencia-de-uso-comercial>"
     columns = {
         "geometry": "geometry",
         "ID_RECINTO": "id",

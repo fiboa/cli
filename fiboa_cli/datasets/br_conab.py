@@ -57,13 +57,9 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
 
     Further information or suggestions can be sent to the email address conab.geote@conab.gov.br
     """
-    providers = [
-        {
-            "name": "Conab",
-            "url": "https://portaldeinformacoes.conab.gov.br/mapeamentos-agricolas-downloads.html",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = (
+        "Conab <https://portaldeinformacoes.conab.gov.br/mapeamentos-agricolas-downloads.html>"
+    )
     attribution = "CONAB - conab.gov.br"
     license = "CC-BY-NC-4.0"
     columns = {

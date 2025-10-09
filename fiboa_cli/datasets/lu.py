@@ -15,13 +15,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
 
     To ensure that payments are regular, the CAP relies on the Integrated Administration and Control System (IACS), a set of comprehensive administrative and on-the-spot checks on subsidy applications, which is managed by the Member States. The Land Parcel Identification System (LPIS) is a key component of the IACS. It is an IT system based on ortho imagery (aerial or satellite photographs) which records all agricultural parcels in the Member States.
     """
-    providers = [
-        {
-            "name": "Luxembourg ministry of Agriculture",
-            "url": "https://agriculture.public.lu/",
-            "roles": ["licensor", "producer"],
-        }
-    ]
+    provider = "Administration des services techniques de l'agriculture <https://asta.etat.lu/en>"
     attribution = "Luxembourg ministry of Agriculture"
     license = "CC-BY-4.0"
     columns = {

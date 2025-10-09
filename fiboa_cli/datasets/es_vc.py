@@ -16,13 +16,7 @@ class ESVCConverter(ESBaseConverter):
     Geographic Information System (SIGPAC) in the Valencian Community valid for the SIGPAC 2024 campaign
     (data dated 15-01-2024).
     """
-    providers = [
-        {
-            "name": "Spanish Agricultural Guarantee Fund (FEGA) of the Ministry of Agriculture, Fisheries and Food",
-            "url": "https://www.fega.gob.es/es/PwfGcp/es/el_fega/index.jsp",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Spanish Agricultural Guarantee Fund (FEGA) of the Ministry of Agriculture, Fisheries and Food <https://www.fega.gob.es/es/PwfGcp/es/el_fega/index.jsp>"
     attribution = "© Institut Cartogràfic Valencià, Generalitat"
     license = "CC-BY-4.0"  # see http://www.icv.gva.es/condiciones-de-uso-de-la-geoinformacion-icv
     columns = {

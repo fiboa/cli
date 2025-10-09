@@ -15,13 +15,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     more specifically in this context the "Field parcel register" and "Agricultural parcel containing spatial data".
     A set called "Agricultural land: arable land, permanent grassland or permanent crop (land use)".
     """
-    providers = [
-        {
-            "name": "Finnish Food Authority",
-            "url": "https://www.ruokavirasto.fi/en/about-us/open-information/spatial-data-sets/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Finnish Food Authority <https://www.ruokavirasto.fi/en/about-us/open-information/spatial-data-sets/>"
     attribution = "Finnish Food Authority"
     license = "CC-BY-4.0"
     columns = {

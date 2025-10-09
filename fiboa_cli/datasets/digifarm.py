@@ -23,16 +23,9 @@ class Converter(FiboaBaseConverter):
     from super-resolved satellite imagery. The results are available through an API, covering over 200 million hectares across 30+ countries.
     The data is provided through the DigiFarm API at https://api-docs.digifarm.io/, as GeoJSON. For more information see https://digifarm.io/products/field-boundaries
     """
-    providers = [
-        {"name": "DigiFarm", "url": "https://digifarm.io", "roles": ["producer", "licensor"]}
-    ]
+    provider = "DigiFarm <https://digifarm.io>"
     attribution = "© 2024 digifarm.io"
-    license = {
-        "title": "DigiFarm Terms and Conditions",
-        "href": "https://digifarm.io/legal/tc",
-        "type": "text/html",
-        "rel": "license",
-    }
+    license = "DigiFarm Terms and Conditions <https://digifarm.io/legal/tc>"
     columns = {"id": "id", "geometry": "geometry", "area": "metrics:area"}
     area_is_in_ha = False
     column_additions = {"determination_method": "auto-imagery"}

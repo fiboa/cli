@@ -25,19 +25,8 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     CSB represents non-confidential single crop field boundaries over a set time frame. It does not contain personal identifying information. The boundaries captured are of crops grown only, not ownership boundaries or tax parcels (unit of property). The data are from satellite imagery and publicly available data, it does not come from producers or agencies like the Farm Service Agency.
     """
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    providers = [
-        {
-            "name": "United States Department of Agriculture",
-            "url": "https://www.nass.usda.gov/",
-            "roles": ["licensor", "producer"],
-        }
-    ]
-    license = {
-        "title": "License and Liability",
-        "href": "https://gee-community-catalog.org/projects/csb/#license-and-liability",
-        "type": "text/html",
-        "rel": "license",
-    }
+    provider = "United States Department of Agriculture <https://www.nass.usda.gov>"
+    license = "License and Liability <https://gee-community-catalog.org/projects/csb/#license-and-liability>"
     columns = {
         "geometry": "geometry",
         "CSBID": "id",

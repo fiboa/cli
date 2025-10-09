@@ -39,14 +39,9 @@ class EuroCropsConverterMixin:
     - `EC_hcat_c`: The 10-digit HCAT code indicating the hierarchy of the crop
         """
         )
-
-        self.providers += [
-            {
-                "name": "EuroCrops",
-                "url": "https://github.com/maja601/EuroCrops",
-                "roles": ["processor"],
-            }
-        ]
+        provider = "EuroCrops <https://github.com/maja601/EuroCrops>"
+        self.provider = (f"{self.provider}, {provider}") if self.provider else provider
+        self.license = "CC-BY-SA-4.0"
 
         self.extensions = getattr(self, "extensions", set())
         self.extensions.add("https://fiboa.org/hcat-extension/v0.3.0/schema.yaml")
@@ -55,7 +50,6 @@ class EuroCropsConverterMixin:
             "EC_hcat_n": "hcat:name",
             "EC_hcat_c": "hcat:code",
         }
-        self.license = "CC-BY-SA-4.0"
 
     def convert(self, *args, **kwargs):
         self.mapping_file = kwargs.get("mapping_file")

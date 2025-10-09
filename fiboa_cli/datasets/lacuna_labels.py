@@ -34,22 +34,10 @@ class LacunaLabelsConverter(FiboaBaseConverter):
     Data is published at https://zenodo.org/records/11060871 and can be used in accordance with
     [Planet’s participant license agreement for the NICFI contract](https://go.planet.com/nicfi-pla-2024).
     """
-    providers = [
-        {
-            "name": "Agricultural Impacts Research Group",
-            "url": "https://github.com/agroimpacts/lacunalabels/",
-            "roles": ["producer"],
-        },
-        {"name": "Planet Labs PBC", "url": "https://www.planet.com/", "roles": ["licensor"]},
-    ]
+    provider = "Planet Labs PBC <https://www.planet.com>"
     attribution = "Planet Labs Inc."
 
-    license = {
-        "title": "Planet NICFI participant license agreement",
-        "href": "https://go.planet.com/nicfi-pla-2024",
-        "type": "text/html",
-        "rel": "license",
-    }
+    license = "Planet NICFI participant license agreement <https://go.planet.com/nicfi-pla-2024>"
 
     columns = {
         "id": "id",

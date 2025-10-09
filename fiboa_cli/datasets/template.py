@@ -33,8 +33,8 @@ class Converter(FiboaBaseConverter):
     # The dict-key can be used on the cli command line, the value will be used as 'sources'
     #
     # variants = {
-    #    2023: "https://fiboa.example/file_2023.xyz"
-    #    2024: "https://fiboa.example/file_2023.xyz"
+    #    "2023": "https://fiboa.example/file_2023.xyz"
+    #    "2024": "https://fiboa.example/file_2024.xyz"
     # }
 
     # Override filter function for the layer in the file(s) to read.
@@ -50,12 +50,10 @@ class Converter(FiboaBaseConverter):
     # Description of the collection. Can be multiline and include CommonMark.
     description = """Describe the dataset here."""
 
-    # A list of providers that contributed to the data.
-    # This should be an array of Provider Objects:
-    # https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object
-    providers = [
-        {"name": "ABC Corp", "url": "https://abc.example", "roles": ["producer", "licensor"]}
-    ]
+    # The provider of the data.
+    # A string that contains the provider name and optionally a URL.
+    # Either "Name" or "Name <URL>".
+    provider = "ABC Corp <https://abc.example>"
 
     # Attribution (e.g. copyright or citation statement as requested by provider) as a string.
     # The attribution is usually shown on the map, in the lower right corner.
@@ -64,9 +62,8 @@ class Converter(FiboaBaseConverter):
 
     # License of the data, either
     # 1. a SPDX license identifier (including "dl-de/by-2-0" / "dl-de/zero-2-0"), or
+    # 2. a string with license name and URL, e.g. "My License <https://my.com/license>"
     license = "CC-BY-4.0"
-    # 2. a STAC Link Object with relation type "license"
-    # license = {"title": "CC-BY-4.0", "href": "https://creativecommons.org/licenses/by/4.0/", "type": "text/html", "rel": "license"}
 
     # Map original column names to fiboa property names
     # You also need to list any column that you may have added in the MIGRATION function (see below).

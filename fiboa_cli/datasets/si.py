@@ -14,20 +14,9 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     This converter uses the KRMS dataset, which includes CAP applications of the last year and discerns
     around 150 different crop categories.
     """
-    providers = [
-        {
-            "name": "Ministry of Agriculture, Forestry and Food (Ministrstvo za kmetijstvo, gozdarstvo in prehrano)",
-            "url": "https://www.gov.si/drzavni-organi/ministrstva/ministrstvo-za-kmetijstvo-gozdarstvo-in-prehrano/",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Ministry of Agriculture, Forestry and Food (Ministrstvo za kmetijstvo, gozdarstvo in prehrano) <https://www.gov.si/drzavni-organi/ministrstva/ministrstvo-za-kmetijstvo-gozdarstvo-in-prehrano/>"
 
-    license = {
-        "title": "Javno dostopni podatki: Publicly available data",
-        "href": "https://rkg.gov.si/vstop/",
-        "type": "text/html",
-        "rel": "license",
-    }
+    license = "Javno dostopni podatki: Publicly available data <https://rkg.gov.si/vstop/>"
 
     columns = {
         "geometry": "geometry",
