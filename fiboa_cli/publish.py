@@ -19,6 +19,7 @@ from .registry import Registry
 STAC_EXTENSION = "https://stac-extensions.github.io/web-map-links/v1.2.0/schema.json"
 DESCRIPTIONS = {
     "id": "Unique identifier",
+    "collection": "The collection identifier",
     "metrics:area": "Field area in square meters",
     "metrics:perimeter": "Field perimeter in square meters",
     "crop:code_list": "A link to the code list",
@@ -88,16 +89,35 @@ class Publish(BaseCommand):
             or f"https://raw.githubusercontent.com/fiboa/data-survey/refs/heads/main/data/{base}.md"
         )
         response = requests.get(data_survey)
+        data, properties = {}, {}
         if not response.ok:
             self.warning(
                 f"Missing data survey {base}.md at {data_survey}. Can not auto-generate file"
             )
-            return {}
-        return dict(re.findall(r"- \*\*(.+?):\*\* (.+?)\n", response.text))
+        else:
+            data = dict(re.findall(r"- \*\*(.+?):\*\* (.+?)\n", response.text))
+            properties = {
+                a: b.strip()
+                for a, b in re.findall(r"\n\|\s*(\w+)[^|]*\|[^|]*\|[^|]*\|([^|]*)\|", response.text)
+            }
+        return data, properties
 
-    def readme_attribute_table(self, stac_data):
+    def readme_attribute_table(self, stac_data, properties):
+        def description(name):
+            m = self.converter.columns
+            reverse = dict(zip(m.values(), m.keys()))
+            return (
+                properties.get(reverse.get(name))
+                or properties.get(name)
+                or DESCRIPTIONS.get(name, "")
+            )
+
         cols = [["Property", "**Data Type**", "Description"]] + [
-            [s["name"], re.search(r"\w+", s["type"])[0], DESCRIPTIONS.get(s["name"], "")]
+            [
+                s["name"],
+                re.search(r"\w+", s["type"])[0],
+                description(s["name"]),
+            ]
             for s in stac_data["assets"]["data"]["table:columns"]
             if s["name"] not in ("geometry", "bbox", "collection")
         ]
@@ -109,16 +129,24 @@ class Publish(BaseCommand):
     def make_license(self):
         text = ""
         try:
-            props = self.get_data_survey()
-            text = props["License"] + "\n"
+            data, properties = self.get_data_survey()
+            text = data["License"] + "\n"
             if hasattr(self.converter, "license"):
                 text += "\n" + self.converter.license + "\n"
 
-            # Include full-license text? E.g. CC-0 text
-            # if m := re.search(r"<(https://.*?)>", text):
-            #     response = requests.get(m.group(1))
-            #     if response.ok:
-            #         text += response.text + "\n"
+            if "<(https://" not in text:
+                # Include full-license text? E.g. CC-0 text
+                # pip install spdx-license-list
+                import spdx_license_list
+
+                if text in spdx_license_list.LICENSES:
+                    response = requests.get(
+                        f"https://raw.githubusercontent.com/spdx/license-list-data/refs/heads/main/text/{text}.txt"
+                    )
+                    if response.ok:
+                        text += f"\n\n{response.text}\n"
+                else:
+                    self.warning(f"License {text} not be found in SPDX license list")
 
         except Exception as e:
             self.exception(e)
@@ -129,20 +157,20 @@ class Publish(BaseCommand):
         converter = self.converter
         stac_data = json.load(open(stac))
         count = stac_data["assets"]["data"]["table:row_count"]
-        columns = self.readme_attribute_table(stac_data)
-        props = self.get_data_survey()
+        data, properties = self.get_data_survey()
+        columns = self.readme_attribute_table(stac_data, properties)
         _download_urls = converter.get_urls().keys() or ["manually downloaded file"]
         downloaded_urls = "\n".join([("  - " + url) for url in _download_urls])
 
         return f"""# Field boundaries for {converter.short_name}
 
 Provides {count} official field boundaries from {converter.short_name}.
-It has been converted to a fiboa GeoParquet file from data obtained from {props["Data Provider (Legal Entity)"]}.
+It has been converted to a fiboa GeoParquet file from data obtained from {data["Data Provider (Legal Entity)"]}.
 
-- **Source Data Provider:** [{props["Data Provider (Legal Entity)"]}]({props["Homepage"]})
-- **Converted by:** {props["Submitter (Affiliation)"]}
-- **License:** {props["License"]}
-- **Projection:** {props["Projection"]}
+- **Source Data Provider:** [{data["Data Provider (Legal Entity)"]}]({data["Homepage"]})
+- **Converted by:** {data["Submitter (Affiliation)"]}
+- **License:** {data["License"]}
+- **Projection:** {data["Projection"]}
 
 ---
 
@@ -283,7 +311,17 @@ It has been converted to a fiboa GeoParquet file from data obtained from {props[
                     )
                 else:
                     text = self.make_license()
+                self.info(
+                    f"\nGenerated the following file {required}:\n{'-' * 80}\n\n{text}\n{'-' * 80}\n"
+                )
+                action = input("Do you want to Continue (C), Edit (E) or Abort (A)?")
+                if action.lower() not in "ce":
+                    self.warning("Bailing out")
+                    sys.exit(1)
                 with open(path, "w") as f:
                     f.write(text)
-                self.warning(f"Please complete the {path} before continuing")
-                sys.exit(1)
+                if action.lower() == "e":
+                    with open(path, "w") as f:
+                        f.write(text)
+                    editor = os.getenv("EDITOR") or "nano"
+                    os.system(f"{editor} {path}")
