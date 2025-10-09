@@ -7,7 +7,7 @@ from .commons.ec import ec_url
 
 class DKConverter(AdminConverterMixin, FiboaBaseConverter):
     variants = {
-        variant: f"https://landbrugsgeodata.fvm.dk/Download/Marker/Marker_{variant}.zip"
+        str(variant): f"https://landbrugsgeodata.fvm.dk/Download/Marker/Marker_{variant}.zip"
         for variant in range(2024, 2008 - 1, -1)
     }
     id = "dk"
