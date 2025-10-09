@@ -83,23 +83,35 @@ class Publish(BaseCommand):
     @cache
     def get_data_survey(self):
         base = self.dataset.replace("_", "-").upper()
+        mapping = {
+            "Data Provider (Legal Entity)": "provider",
+            "Submitter (Affiliation)": "submitter",
+        }
         # override data survey location with env variable, e.g. for unmerged pull-requests
         data_survey = (
             os.getenv("FIBOA_DATA_SURVEY")
             or f"https://raw.githubusercontent.com/fiboa/data-survey/refs/heads/main/data/{base}.md"
         )
         response = requests.get(data_survey)
-        data, properties = {}, {}
+        data = {
+            "provider": self.converter.provider,
+            "license": self.converter.license,
+            "projection": "",
+            "homepage": "",
+            "submitter": "Fiboa project",
+        }
+        properties = {}
         if not response.ok:
             self.warning(
                 f"Missing data survey {base}.md at {data_survey}. Can not auto-generate file"
             )
         else:
-            data = dict(re.findall(r"- \*\*(.+?):\*\* (.+?)\n", response.text))
+            data.update(dict(re.findall(r"- \*\*(.+?):\*\* (.+?)\n", response.text)))
             properties = {
-                a: b.strip()
+                mapping.get(a.lower(), a.lower()): b.strip()
                 for a, b in re.findall(r"\n\|\s*(\w+)[^|]*\|[^|]*\|[^|]*\|([^|]*)\|", response.text)
             }
+
         return data, properties
 
     def readme_attribute_table(self, stac_data, properties):
@@ -130,8 +142,8 @@ class Publish(BaseCommand):
         text = ""
         try:
             data, properties = self.get_data_survey()
-            text = data["License"] + "\n"
-            if hasattr(self.converter, "license"):
+            text = data["license"]
+            if getattr(self.converter, "license") not in (None, "", data["license"]):
                 text += "\n" + self.converter.license + "\n"
 
             if "<(https://" not in text:
@@ -145,7 +157,7 @@ class Publish(BaseCommand):
                     if response.ok:
                         text += f"\n\n{response.text}\n"
                 else:
-                    self.warning(f"License {text} not be found in SPDX license list")
+                    self.warning(f"License {text} could not be found in SPDX license list")
 
         except Exception as e:
             self.exception(e)
@@ -158,18 +170,19 @@ class Publish(BaseCommand):
         count = stac_data["assets"]["data"]["table:row_count"]
         data, properties = self.get_data_survey()
         columns = self.readme_attribute_table(stac_data, properties)
-        _download_urls = converter.get_urls().keys() or ["manually downloaded file"]
-        downloaded_urls = "\n".join([("  - " + url) for url in _download_urls])
+        urls = converter.get_urls() or "manually downloaded file"
+        urls = urls.keys() if isinstance(urls, dict) else [urls]
+        downloaded_urls = "\n".join([("  - " + url) for url in urls])
 
         return f"""# Field boundaries for {converter.short_name}
 
 Provides {count} official field boundaries from {converter.short_name}.
-It has been converted to a fiboa GeoParquet file from data obtained from {data["Data Provider (Legal Entity)"]}.
+It has been converted to a fiboa GeoParquet file from data obtained from {data["provider"]}.
 
-- **Source Data Provider:** [{data["Data Provider (Legal Entity)"]}]({data["Homepage"]})
-- **Converted by:** {data["Submitter (Affiliation)"]}
-- **License:** {data["License"]}
-- **Projection:** {data["Projection"]}
+- **Source Data Provider:** [{data["provider"]}]({data["homepage"]})
+- **Converted by:** {data["submitter"]}
+- **License:** {data["license"]}
+- **Projection:** {data["projection"]}
 
 ---
 
@@ -266,13 +279,12 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         )
 
     def create_stac_collection(self, target, file_name, parquet_file, stac_file):
-        if (
-            Path(stac_file).exists()
-            and Path(stac_file).stat().st_mtime >= Path(parquet_file).stat().st_mtime
-        ):
+        p_stac = Path(stac_file)
+        if p_stac.exists() and p_stac.stat().st_mtime >= Path(parquet_file).stat().st_mtime:
             return
 
-        self.success("Creating STAC collection.json for {parquet_file}")
+        self.success(f"Creating STAC collection.json for {parquet_file}")
+        p_stac.parent.mkdir(exist_ok=True)
         CreateStacCollection().create_cli(parquet_file, stac_file)
 
         os.makedirs(os.path.join(target, "stac"), exist_ok=True)
