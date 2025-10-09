@@ -12,7 +12,9 @@ class PTConverter(FiboaBaseConverter):
     def layer_filter(self, layer, uri):
         return layer.startswith("Culturas_")
 
-    provider = "IPAP - Instituto de Financiamento da Agricultura e Pescas <https://www.ifap.pt/isip/ows/>"
+    provider = (
+        "IPAP - Instituto de Financiamento da Agricultura e Pescas <https://www.ifap.pt/isip/ows/>"
+    )
     license = "No conditions apply <https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply>"
     columns = {
         "geometry": "geometry",

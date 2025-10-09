@@ -22,7 +22,9 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "Switzerland"
     title = "Field boundaries for Switzerland"
     description = "The cropfields of Switzerland (Nutzungsflächen) are published per administrative subdivision called Canton."
-    provider = "Konferenz der kantonalen Geoinformations- und Katasterstellen <https://www.kgk-cgc.ch>"
+    provider = (
+        "Konferenz der kantonalen Geoinformations- und Katasterstellen <https://www.kgk-cgc.ch>"
+    )
     index_as_id = True
     license = "opendata.swiss terms of use <https://opendata.swiss/en/terms-of-use>"
     columns = {

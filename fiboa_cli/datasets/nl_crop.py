@@ -33,7 +33,9 @@ class NLCropConverter(AdminConverterMixin, FiboaBaseConverter):
     Data is currently available for the years 2009 to 2024.
     """
 
-    provider = "RVO / PDOK <https://www.pdok.nl/introductie/-/article/basisregistratie-gewaspercelen-brp->"
+    provider = (
+        "RVO / PDOK <https://www.pdok.nl/introductie/-/article/basisregistratie-gewaspercelen-brp->"
+    )
     # Both http://creativecommons.org/publicdomain/zero/1.0/deed.nl and http://creativecommons.org/publicdomain/mark/1.0/
     license = "CC0-1.0"
 
