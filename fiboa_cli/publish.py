@@ -4,7 +4,9 @@ import re
 import sys
 from datetime import date
 from functools import cache
+from pathlib import Path
 
+import click
 import requests
 from vecorel_cli.basecommand import BaseCommand, runnable
 from vecorel_cli.cli.options import VECOREL_TARGET
@@ -15,6 +17,18 @@ from vecorel_cli.validate import ValidateData
 from .registry import Registry
 
 STAC_EXTENSION = "https://stac-extensions.github.io/web-map-links/v1.2.0/schema.json"
+DESCRIPTIONS = {
+    "id": "Unique identifier",
+    "metrics:area": "Field area in square meters",
+    "metrics:perimeter": "Field perimeter in square meters",
+    "crop:code_list": "A link to the code list",
+    "crop:code": "The crop code",
+    "crop:name": "Crop name in the original language",
+    "crop:name_en": "Crop name in English",
+    "hcat:name": "The machine-readable HCAT name of the crop",
+    "hcat:code": "The 10-digit HCAT code indicating the hierarchy of the crop",
+    "hcat:name_en": "The HCAT crop name translated into English",
+}
 
 
 class Publish(BaseCommand):
@@ -27,6 +41,14 @@ class Publish(BaseCommand):
         return {
             **ConvertData.get_cli_args(),
             "target": VECOREL_TARGET(folder=True),
+            "generate_meta": click.option(
+                "--generate-meta",
+                "-gm",
+                is_flag=True,
+                type=click.BOOL,
+                help="Generate README.txt and LICENSE.txt for the dataset if not present.",
+                default=False,
+            ),
         }
 
     @staticmethod
@@ -66,16 +88,18 @@ class Publish(BaseCommand):
             or f"https://raw.githubusercontent.com/fiboa/data-survey/refs/heads/main/data/{base}.md"
         )
         response = requests.get(data_survey)
-        assert response.ok, (
-            f"Missing data survey {base}.md at {data_survey}. Can not auto-generate file"
-        )
+        if not response.ok:
+            self.warning(
+                f"Missing data survey {base}.md at {data_survey}. Can not auto-generate file"
+            )
+            return {}
         return dict(re.findall(r"- \*\*(.+?):\*\* (.+?)\n", response.text))
 
     def readme_attribute_table(self, stac_data):
         cols = [["Property", "**Data Type**", "Description"]] + [
-            [s["name"], re.search(r"\w+", s["type"])[0], ""]
+            [s["name"], re.search(r"\w+", s["type"])[0], DESCRIPTIONS.get(s["name"], "")]
             for s in stac_data["assets"]["data"]["table:columns"]
-            if s["name"] != "geometry"
+            if s["name"] not in ("geometry", "bbox", "collection")
         ]
         widths = [max(len(c[i]) for c in cols) for i in range(3)]
         aligned_cols = [[f" {c:<{w}} " for c, w in zip(row, widths)] for row in cols]
@@ -83,17 +107,21 @@ class Publish(BaseCommand):
         return "\n".join(["|" + "|".join(cols) + "|" for cols in aligned_cols])
 
     def make_license(self):
-        props = self.get_data_survey()
         text = ""
-        if "license" in props:
-            text += props["license"] + "\n\n"
-        converter = self.converter
-        if hasattr(converter, "LICENSE"):
-            text += (
-                converter.LICENSE["title"]
-                if isinstance(converter.LICENSE, dict)
-                else converter.LICENSE
-            )
+        try:
+            props = self.get_data_survey()
+            text = props["License"] + "\n"
+            if hasattr(self.converter, "license"):
+                text += "\n" + self.converter.license + "\n"
+
+            # Include full-license text? E.g. CC-0 text
+            # if m := re.search(r"<(https://.*?)>", text):
+            #     response = requests.get(m.group(1))
+            #     if response.ok:
+            #         text += response.text + "\n"
+
+        except Exception as e:
+            self.exception(e)
         return text
 
     def make_readme(self, file_name, stac):
@@ -118,10 +146,10 @@ It has been converted to a fiboa GeoParquet file from data obtained from {props[
 
 ---
 
-- [Download the data as fiboa GeoParquet]({self.source_coop_data}{file_name}.parquet)
+- [Download the data as fiboa GeoParquet]({self.source_coop_data}/{file_name}.parquet)
 - [STAC Browser](https://radiantearth.github.io/stac-browser/#/external/data.source.coop/fiboa/data/{self.dataset}/stac/collection.json)
-- [STAC Collection]({self.source_coop_data}stac/collection.json)
-- [PMTiles]({self.source_coop_data}{file_name}.pmtiles)
+- [STAC Collection]({self.source_coop_data}/stac/collection.json)
+- [PMTiles]({self.source_coop_data}/{file_name}.pmtiles)
 
 ## Columns
 
@@ -138,11 +166,10 @@ It has been converted to a fiboa GeoParquet file from data obtained from {props[
     def publish(
         self,
         target,
+        generate_meta=False,
         **kwargs,
     ):
         """
-        Implement https://github.com/fiboa/data/blob/main/HOWTO.md#each-time-you-update-the-dataset
-
         You need GDAL 3.8 or later (for ogr2ogr) with libgdal-arrow-parquet, tippecanoe, and AWS CLI
         - https://gdal.org/
         - https://github.com/felt/tippecanoe
@@ -158,75 +185,29 @@ It has been converted to a fiboa GeoParquet file from data obtained from {props[
         parquet_file = os.path.join(target, f"{file_name}.parquet")
 
         has_write_access = bool(
-            os.environ.get("AWS_SECRET_ACCESS_KEY")
-            and os.environ.get("AWS_ENDPOINT_URL") == "https://data.source.coop"
-        )
-        os.environ["AWS_ENDPOINT_URL"] = "https://data.source.coop"
-        os.environ["AWS_REQUEST_CHECKSUM_CALCULATION"] = "WHEN_REQUIRED"
-
-        collection_file = os.path.join(target, "collection.json")
-        stac_directory = os.path.join(target, "stac")
-        done_convert = os.path.exists(parquet_file) and os.path.exists(
-            os.path.join(stac_directory, "collection.json")
+            os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY")
         )
 
-        if not done_convert:
-            # fiboa convert xx_yy -o data/xx-yy.parquet -h https://data.source.coop/fiboa/xx-yy/ --collection
-            self.success(f"Converting file for {self.dataset} to {parquet_file}")
-            # ConvertData(self.dataset).run(parquet_file, **kwargs)
-            try:
-                CreateStacCollection().create_cli(parquet_file, collection_file)
-            except Exception:
-                import traceback
+        stac_file = os.path.join(target, "stac", "collection.json")
 
-                traceback.print_exc()
-            self.success("Done")
+        ## Create parquet file
+        if not os.path.exists(parquet_file):
+            self.info(f"Converting file for {self.dataset} to {parquet_file}")
+            ConvertData(self.dataset).run(parquet_file, **kwargs)
+            self.success(f"Converted file for {self.dataset} to {parquet_file}")
         else:
             self.success(f"Using existing file {parquet_file} for {self.dataset}")
 
-        # fiboa validate data/xx-yy.parquet --data
+        ## Validate parquet file, we only want to publish valid files
         self.info(f"Validating {parquet_file}")
         ValidateData().validate(parquet_file, num=-1)
         self.log("\n  => VALID\n", "success")
 
-        # mkdir data/stac; mv data/collection.json data/stac
-        stac_target = os.path.join(stac_directory, "collection.json")
-        if not done_convert:
-            os.makedirs(stac_directory, exist_ok=True)
-            data = json.load(open(collection_file))
-            assert data["id"] == self.dataset, (
-                f"Wrong collection dataset id: {data['id']} != {self.dataset}"
-            )
+        ## Create STAC collection.json
+        self.create_stac_collection(target, file_name, parquet_file, stac_file)
 
-            if STAC_EXTENSION not in data["stac_extensions"]:
-                data["stac_extensions"].append(STAC_EXTENSION)
-                data["links"].append(
-                    {
-                        "href": f"{self.source_coop_data}{file_name}.pmtiles",
-                        "type": "application/vnd.pmtiles",
-                        "rel": "pmtiles",
-                    }
-                )
-
-            with open(stac_target, "w", encoding="utf-8") as f:
-                json.dump(data, f)
-            os.remove(collection_file)
-
-        for required in ("README.md", "LICENSE.txt"):
-            path = os.path.join(target, required)
-            if not os.path.exists(path):
-                self.warning(f"Missing {required}. Generating at {path}")
-                if required == "README.md":
-                    text = self.make_readme(
-                        file_name=file_name,
-                        stac=stac_target,
-                    )
-                else:
-                    text = self.make_license()
-                with open(path, "w") as f:
-                    f.write(text)
-                self.warning(f"Please complete the {path} before continuing")
-                sys.exit(1)
+        if generate_meta:
+            self.generate_meta(target, file_name, stac_file)
 
         pm_file = os.path.join(target, f"{file_name}.pmtiles")
         if not os.path.exists(pm_file):
@@ -239,14 +220,70 @@ It has been converted to a fiboa GeoParquet file from data obtained from {props[
 
         self.info("Uploading to aws")
         if not has_write_access:
-            self.info(f"Get your credentials at {self.source_coop_data}manage/")
-            self.info("  Then press 'ACCESS DATA',\n  and click 'Create API Key',")
+            self.info("Get your credentials through the source coop organization.")
+            self.info("Login to AWS Console and generate an access key:")
             self.info(
-                "  Run export AWS_ENDPOINT_URL=https://data.source.coop AWS_ACCESS_KEY_ID=<> AWS_SECRET_ACCESS_KEY=<>\n"
-                "  where you copy-past the access key and secret",
+                "  - In AWS console, click on account (right top) press 'Security credentials',"
+            )
+            self.info("  - Go to 'Access keys' and press 'Create access key'")
+            self.info(
+                "  - Run export WS_ACCESS_KEY_ID=<> AWS_SECRET_ACCESS_KEY=<>\n"
+                "    where you copy-past the access key and secret",
             )
             self.error("Please set AWS_ env vars from source_coop")
             sys.exit(1)
 
         self.check_command("aws")
-        self.exc(f"aws s3 sync {target} s3://fiboa/data/{self.dataset}/")
+        self.exc(
+            f"aws s3 sync {target} s3://us-west-2.opendata.source.coop/fiboa/data/{self.dataset}/"
+        )
+
+    def create_stac_collection(self, target, file_name, parquet_file, stac_file):
+        if (
+            Path(stac_file).exists()
+            and Path(stac_file).stat().st_mtime >= Path(parquet_file).stat().st_mtime
+        ):
+            return
+
+        self.success("Creating STAC collection.json for {parquet_file}")
+        CreateStacCollection().create_cli(parquet_file, stac_file)
+
+        os.makedirs(os.path.join(target, "stac"), exist_ok=True)
+        data = json.load(open(stac_file, "r"))
+        assert data["id"] == self.dataset, (
+            f"Wrong collection dataset id: {data['id']} != {self.dataset}, for {stac_file}"
+        )
+
+        data["assets"]["data"]["href"] = f"{self.source_coop_data}/{file_name}.parquet"
+
+        if STAC_EXTENSION not in data["stac_extensions"]:
+            data["stac_extensions"].append(STAC_EXTENSION)
+
+        if not any(d.get("rel") == "pmtiles" for d in data["links"]):
+            data["links"].append(
+                {
+                    "href": f"{self.source_coop_data}/{file_name}.pmtiles",
+                    "type": "application/vnd.pmtiles",
+                    "rel": "pmtiles",
+                }
+            )
+
+        with open(stac_file, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+
+    def generate_meta(self, target, file_name, stac_file):
+        for required in ("README.md", "LICENSE.txt"):
+            path = os.path.join(target, required)
+            if not os.path.exists(path):
+                self.warning(f"Missing {required}. Generating at {path}")
+                if required == "README.md":
+                    text = self.make_readme(
+                        file_name=file_name,
+                        stac=stac_file,
+                    )
+                else:
+                    text = self.make_license()
+                with open(path, "w") as f:
+                    f.write(text)
+                self.warning(f"Please complete the {path} before continuing")
+                sys.exit(1)
