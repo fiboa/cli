@@ -41,7 +41,7 @@ channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tool.pixi.dependencies]
-python = ">=3.10"
+python = ">=3.10,<3.14"
 pyproj = ">=3.6,<4.0"
 # rar is a bit difficult. vecorel-cli needs it for extracting some rar files in converters
 # but needs a rar cmd tool, which we need to install from conda explictly.
