@@ -121,7 +121,9 @@ class Publish(BaseCommand):
                 f"Missing data survey {base}.md at {data_survey}. Can not auto-generate file"
             )
         else:
-            data.update(dict(re.findall(r"- \*\*(.+?):\*\* (.+?)\n", response.text)))
+            data.update(
+                {a.lower(): b for a, b in re.findall(r"- \*\*(.+?):\*\* (.+?)\n", response.text)}
+            )
             properties = {
                 mapping.get(a.lower(), a.lower()): b.strip()
                 for a, b in re.findall(r"\n\|\s*(\w+)[^|]*\|[^|]*\|[^|]*\|([^|]*)\|", response.text)
@@ -161,25 +163,30 @@ class Publish(BaseCommand):
             if getattr(self.converter, "license") not in (None, "", data["license"]):
                 text += "\n" + self.converter.license + "\n"
 
-            if "<(https://" not in text:
+            found = False
+            for _license in (data["license"], self.converter.license):
+                if not _license or "<(https://" in _license:
+                    continue
                 # Include full-license text
                 import spdx_license_list
 
-                if text in spdx_license_list.LICENSES:
+                if _license in spdx_license_list.LICENSES:
                     response = requests.get(
-                        f"https://raw.githubusercontent.com/spdx/license-list-data/refs/heads/main/text/{text}.txt"
+                        f"https://raw.githubusercontent.com/spdx/license-list-data/refs/heads/main/text/{_license}.txt"
                     )
                     if response.ok:
+                        found = True
                         text += f"\n\n{response.text}\n"
-                else:
-                    self.warning(f"License {text} could not be found in SPDX license list")
+                        break
+            if not found:
+                self.warning(f"License {text} could not be found in SPDX license list")
 
         except Exception as e:
             self.exception(e)
         return text
 
     def make_readme(self, file_name, stac):
-        version = "0.3.0"  # TODO HOW TO GET VERSION?
+        version = Registry.get_version()
         converter = self.converter
         stac_data = json.load(open(stac))
         count = stac_data["assets"]["data"]["table:row_count"]
