@@ -20,6 +20,8 @@ STAC_EXTENSION = "https://stac-extensions.github.io/web-map-links/v1.2.0/schema.
 DESCRIPTIONS = {
     "id": "Unique identifier",
     "collection": "The collection identifier",
+    "inspire:id": "The INSPIRE identifier",
+    "determination:datetime": "Timestamp of the determination of the field boundary",
     "metrics:area": "Field area in square meters",
     "metrics:perimeter": "Field perimeter in square meters",
     "crop:code_list": "A link to the code list",
