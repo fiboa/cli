@@ -53,12 +53,12 @@ class Publish(BaseCommand):
                 default=False,
             ),
             "data_url": click.option(
-                "--variant",
+                "--data-url",
                 type=click.STRING,
                 help="When generating documentation, this is the link to the data.",
             ),
             "s3_upload_path": click.option(
-                "--variant",
+                "--s3-upload-path",
                 type=click.STRING,
                 help="Upload to this path on S3. By default it's the source coop fiboa data repository.",
             ),
