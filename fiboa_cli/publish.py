@@ -37,7 +37,7 @@ DESCRIPTIONS = {
 class Publish(BaseCommand):
     cmd_name = "publish"
     cmd_help = f"Convert and publish a {Registry.project} dataset to source coop."
-    source_coop = "https://data.source.coop/fiboa/data"
+    url_base = "https://data.source.coop/fiboa/data"
 
     @staticmethod
     def get_cli_args():
@@ -52,6 +52,16 @@ class Publish(BaseCommand):
                 help="Generate README.txt and LICENSE.txt for the dataset if not present.",
                 default=False,
             ),
+            "data_url": click.option(
+                "--variant",
+                type=click.STRING,
+                help="When generating documentation, this is the link to the data.",
+            ),
+            "s3_upload_path": click.option(
+                "--variant",
+                type=click.STRING,
+                help="Upload to this path on S3. By default it's the source coop fiboa data repository.",
+            ),
         }
 
     @staticmethod
@@ -61,11 +71,14 @@ class Publish(BaseCommand):
 
         return callback
 
-    def __init__(self, dataset: str):
+    def __init__(self, dataset: str, data_url=None, s3_upload_path=None):
         super().__init__()
         self.cmd_title = f"Convert {dataset}"
         self.dataset = dataset
-        self.source_coop_data = f"{self.source_coop}/{self.dataset}"
+        self.data_url = data_url or f"{self.url_base}/{self.dataset}"
+        self.s3_upload_path = (
+            s3_upload_path or f"s3://us-west-2.opendata.source.coop/fiboa/data/{self.dataset}/"
+        )
 
         if ConvertData.converters.is_converter(self.dataset):
             raise Exception(f"'{self.dataset}' is not a converter")
@@ -188,10 +201,10 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
 
 ---
 
-- [Download the data as fiboa GeoParquet]({self.source_coop_data}/{file_name}.parquet)
+- [Download the data as fiboa GeoParquet]({self.data_url}/{file_name}.parquet)
 - [STAC Browser](https://radiantearth.github.io/stac-browser/#/external/data.source.coop/fiboa/data/{self.dataset}/stac/collection.json)
-- [STAC Collection]({self.source_coop_data}/stac/collection.json)
-- [PMTiles]({self.source_coop_data}/{file_name}.pmtiles)
+- [STAC Collection]({self.data_url}/stac/collection.json)
+- [PMTiles]({self.data_url}/{file_name}.pmtiles)
 
 ## Columns
 
@@ -272,13 +285,11 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
                 "  - Run export WS_ACCESS_KEY_ID=<> AWS_SECRET_ACCESS_KEY=<>\n"
                 "    where you copy-past the access key and secret",
             )
-            self.error("Please set AWS_ env vars from source_coop")
+            self.error("Please set AWS_ env vars for uploading")
             sys.exit(1)
 
         self.check_command("aws")
-        self.exc(
-            f"aws s3 sync {target} s3://us-west-2.opendata.source.coop/fiboa/data/{self.dataset}/"
-        )
+        self.exc(f"aws s3 sync {target} {self.s3_upload_path}")
 
     def create_stac_collection(self, target, file_name, parquet_file, stac_file):
         p_stac = Path(stac_file)
@@ -295,7 +306,7 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
             f"Wrong collection dataset id: {data['id']} != {self.dataset}, for {stac_file}"
         )
 
-        data["assets"]["data"]["href"] = f"{self.source_coop_data}/{file_name}.parquet"
+        data["assets"]["data"]["href"] = f"{self.data_url}/{file_name}.parquet"
 
         if STAC_EXTENSION not in data["stac_extensions"]:
             data["stac_extensions"].append(STAC_EXTENSION)
@@ -303,7 +314,7 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         if not any(d.get("rel") == "pmtiles" for d in data["links"]):
             data["links"].append(
                 {
-                    "href": f"{self.source_coop_data}/{file_name}.pmtiles",
+                    "href": f"{self.data_url}/{file_name}.pmtiles",
                     "type": "application/vnd.pmtiles",
                     "rel": "pmtiles",
                 }
