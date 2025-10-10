@@ -8,6 +8,7 @@ from pathlib import Path
 
 import click
 import requests
+import spdx_license_list
 from vecorel_cli.basecommand import BaseCommand, runnable
 from vecorel_cli.cli.options import VECOREL_TARGET
 from vecorel_cli.convert import ConvertData
@@ -167,9 +168,9 @@ class Publish(BaseCommand):
             for _license in (data["license"], self.converter.license):
                 if not _license or "<(https://" in _license:
                     continue
-                # Include full-license text
-                import spdx_license_list
 
+                # Include full-license text
+                _license = _license.upper()
                 if _license in spdx_license_list.LICENSES:
                     response = requests.get(
                         f"https://raw.githubusercontent.com/spdx/license-list-data/refs/heads/main/text/{_license}.txt"
