@@ -2,8 +2,13 @@ from vecorel_cli.vecorel.schemas import CollectionSchemas
 from vecorel_cli.vecorel.version import check_versions
 
 supported_fiboa_versions = ">=0.3.0,<0.4.0"
+fiboa_version = "0.3.0"
 spec_pattern = r"https://fiboa.org/specification/v([^/]+)/schema.yaml"
 spec_schema = "https://fiboa.org/specification/v{version}/schema.yaml"
+
+
+def get_fiboa_uri() -> str:
+    return spec_schema.format(version=fiboa_version)
 
 
 def is_supported(version, raise_exception=False) -> bool:

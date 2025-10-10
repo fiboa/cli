@@ -1,6 +1,8 @@
 import numpy as np
 from vecorel_cli.conversion.base import BaseConverter
 
+from ..fiboa.version import get_fiboa_uri
+
 AREA_KEY = "metrics:area"
 
 
@@ -10,7 +12,7 @@ class FiboaBaseConverter(BaseConverter):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.extensions.add("https://fiboa.org/specification/v0.3.0/schema.yaml")
+        self.extensions.add(get_fiboa_uri())
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
