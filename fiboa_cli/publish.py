@@ -100,8 +100,8 @@ class Publish(BaseCommand):
     def get_data_survey(self):
         base = self.dataset.replace("_", "-").upper()
         mapping = {
-            "Data Provider (Legal Entity)": "provider",
-            "Submitter (Affiliation)": "submitter",
+            "data provider (legal entity)": "provider",
+            "submitter (affiliation)": "submitter",
         }
         # override data survey location with env variable, e.g. for unmerged pull-requests
         data_survey = (
