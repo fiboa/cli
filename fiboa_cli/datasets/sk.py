@@ -23,7 +23,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     Dataset Hranice užívania contains the use declared by applicants for direct support.
     """
     provider = "Pôdohospodárska platobná agentúra <https://www.apa.sk>"
-    license = "CC-0"  # "Open Data"
+    license = "CC0-1.0"  # "Open Data"
     # TODO look for a way to find codes for crop_name and implement crop-extension
     columns = {
         "geometry": "geometry",

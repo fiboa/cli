@@ -6,6 +6,7 @@ from .commons.ec import ec_url
 
 class Converter(AdminConverterMixin, FiboaBaseConverter):
     variants = {
+        "2025": "https://inspire.lfrz.gv.at/009501/ds/inspire_referenzen_2025-1_polygon.gpkg.zip",
         "2024": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2024-2_polygon.gpkg.zip",
         "2023": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2023-2_polygon.gpkg.zip",
         "2022": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2022_polygon.gpkg.zip",
@@ -20,7 +21,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "Austria"
     title = "Field boundaries for Austria"
     description = """
-    **Crop Field boundaries for Austria - INVEKOS Schläge Österreich 2021.**
+    **Crop Field boundaries for Austria - INVEKOS Schläge Österreich 2025.**
 
     This layer includes all field uses recorded by the applicants, which serve as the basis for the funding process. A field
     is a contiguous area of a piece of land that is cultivated for a growing season with only one crop (field use type) and
