@@ -43,7 +43,7 @@ class NLCropConverter(AdminConverterMixin, FiboaBaseConverter):
         "geometry": "geometry",
         "id": "id",
         "area": "metrics:area",
-        "category": "category",
+        "category": "coverage",
         "gewascode": "crop:code",
         "gewas": "crop:name",
         "jaar": "determination:datetime",
@@ -64,7 +64,6 @@ class NLCropConverter(AdminConverterMixin, FiboaBaseConverter):
 
     missing_schemas = {
         "properties": {
-            # TODO unclear why category type should be array instead of string
-            "category": {"type": "array", "enum": ["Grasland", "Bouwland"]},
+            "coverage": {"type": "string", "enum": ["Grasland", "Bouwland"]},
         }
     }
