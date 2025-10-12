@@ -1,3 +1,4 @@
+import spdx_license_list
 from vecorel_cli.converters import Converters
 
 
@@ -19,5 +20,15 @@ def test_changed_properties():
     c = Converters()
     for _id in Converters().list_ids():
         converter = c.load(_id)
-        assert getattr(converter, "license") is None or isinstance(converter.license, str)
-        assert getattr(converter, "provider") is None or isinstance(converter.provider, str)
+        assert converter.license is None or isinstance(converter.license, str)
+        assert converter.provider is None is None or isinstance(converter.provider, str)
+
+
+def test_valid_license():
+    c = Converters()
+    for _id in Converters().list_ids():
+        converter = c.load(_id)
+        if converter.license and "<" not in converter.license:
+            assert converter.license.upper() in spdx_license_list.LICENSES, (
+                f"Converter {_id} has invalid license {converter.license}"
+            )

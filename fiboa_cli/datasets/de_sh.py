@@ -11,7 +11,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     title = "Field boundaries for Schleswig-Holstein (SH), Germany"
     description = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
     provider = "Land Schleswig-Holstein <https://sh-mis.gdi-sh.de/catalog/#/datasets/iso/21f67269-780f-4f3c-8f66-03dde27acfe7>"
-    license = "dl-de/zero-2-0"
+    license = "DL-DE-ZERO-2.0"
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
     columns = {
         "geometry": "geometry",

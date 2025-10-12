@@ -26,7 +26,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     """
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     provider = "County of Santa Clara <https://www.sccgov.org/sites/dpd/DocsForms/Documents/Ag_Preserves_Laminated_map.pdf>"
-    license = "CC-0"
+    license = "CC0-1.0"
     columns = {
         "geometry": "geometry",
         "UniqueID": "id",
