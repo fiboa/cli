@@ -6,6 +6,7 @@ from .es import ESBaseConverter
 
 class ANConverter(ESBaseConverter):
     variants = {
+        "2025": "https://www.juntadeandalucia.es/ssdigitales/festa/agriculturapescaaguaydesarrollorural/2025/SP25_REC_PROV_{code}.zip",
         "2024": "https://www.juntadeandalucia.es/ssdigitales/festa/agriculturapescaaguaydesarrollorural/2024/SP24_REC_{code}.zip",
         "2023": "https://www.juntadeandalucia.es/ssdigitales/festa/agriculturapescaaguaydesarrollorural/2023/SP23_REC_{code}.zip",
         "2022": "https://www.juntadeandalucia.es/export/drupaljda/01_SP22_REC_PROV_{code}.zip",

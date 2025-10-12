@@ -51,12 +51,10 @@ class ESCLConverter(ESBaseConverter):
 
     def get_urls(self):
         if not self.variant:
-            self.variant = "2024"
+            self.variant = "2025"
             logger.warning(f"Choosing first year {self.variant}")
         else:
-            assert self.variant in "2024 2023 2022 2021 2020 2019".split(), (
-                f"Wrong year {self.variant}"
-            )
+            assert 2019 <= int(self.variant) <= 2025, f"Wrong year {self.variant}"
         base = f"http://ftp.itacyl.es/cartografia/05_SIGPAC/{self.variant}_ETRS89/Parcelario_SIGPAC_CyL_Provincias/"
         response = requests.get(base)
         assert response.status_code == 200, f"Error getting urls {response}\n{response.content}"
