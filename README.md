@@ -224,3 +224,24 @@ The following high-level description gives an idea how to implement a converter 
 3. Add missing dependencies into the appropriate feature group in `pixi.toml` (or `setup.py` for pip users)
 4. Add the converter to the list above
 5. Create a PR to submit your converter for review
+
+
+## Run in Docker
+
+There's a Dockerfile based on a modern Ubuntu+GDAL image. This will help you avoid upgrading 
+your local GDAL to support geoparquet for instance. Example usage (mounting /tmp/fiboa as a volume)
+
+
+```
+docker build . -t fiboa
+docker run -it --rm -v /tmp/fiboa:/fiboa fiboa bash
+
+fiboa convert de_nrw -o /fiboa/de_nrw.parquet
+```
+
+If you want to temporarily work on a specific branch of fiboa-cli, you can use the following in the container. 
+This works because the fiboa-cli is pip-installed with `-e` (in-place):
+
+```
+cd fiboa && git checkout <branch>
+```
