@@ -112,6 +112,6 @@ class Converter(FiboaBaseConverter):
         "required": ["my_id"],  # i.e. non-nullable properties
         "properties": {
             "some_col": {"type": "string"},
-            "category": {"type": "string", "enum": ["A", "B"]},
+            "some_category": {"type": "string", "enum": ["A", "B"]},
         },
     }

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - AddHCATMixin assures hcat-extension validity and csv-based data-conversion if required
   - EuroCropsConverterMixin is a BaseClass for EuroCrops-provided datasets
   - EuroLandBaseConverter is a BaseClass for Euroland-provided datasets
+- Avoid base property schema override
 
 ## [v0.20.3] - 2025-09-13
 
