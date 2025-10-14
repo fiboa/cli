@@ -37,7 +37,6 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
         "required": [
             "year",
             "parcel_id",
-            "crop:code",
             "subsidy_type",
             "EC_NUTS3",
             #       'PRODUCT_DE',
@@ -45,7 +44,6 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
         "properties": {
             "year": {"type": "uint16", "minLength": 4, "maxLength": 4},
             "parcel_id": {"type": "uint64", "minLength": 8, "maxLength": 8},
-            "crop:code": {"type": "uint16", "minLength": 3, "maxLength": 3},
             "subsidy_type": {"type": "string"},
             "EC_NUTS3": {
                 "type": "string",
@@ -53,9 +51,6 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
                 "maxLength": 5,
                 "pattern": "^[A-Z]{2}[0-9]{3}",
             },
-            # 'PRODUCT_DE': {
-            #     'type': 'string'
-            # },
         },
     }
 

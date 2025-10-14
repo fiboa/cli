@@ -1,10 +1,10 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import ec_url
+from .commons.ec import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
         "2024": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2024-2_polygon.gpkg.zip",
         "2023": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2023-2_polygon.gpkg.zip",
@@ -40,8 +40,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "SL_FLAECHE_BRUTTO_HA": "metrics:area",
         "GEOM_DATE_CREATED": "determination:datetime",
     }
-    column_additions = {"crop:code_list": ec_url("at_2021.csv")}
+    ec_mapping_csv = "at_2021.csv"
     extensions = {
         "https://fiboa.org/inspire-extension/v0.3.0/schema.yaml",
-        "https://fiboa.org/crop-extension/v0.2.0/schema.yaml",
     }

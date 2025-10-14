@@ -17,7 +17,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     description = "Feldblöcke und förderfähige Elemente in Sachsen 2024"
     provider = "Sächsisches Landesamt für Umwelt, Landwirtschaft und Geologie <https://geoportal.sachsen.de>"
     attribution = "Sächsisches Landesamt für Umwelt, Landwirtschaft und Geologie"
-    license = "dl-de/by-2-0"
+    license = "DL-DE-BY-2.0"
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
     columns = {
         "geometry": "geometry",

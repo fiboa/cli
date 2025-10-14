@@ -11,8 +11,8 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     title = "Field boundaries for Lower Saxony / Bremen / Hamburg, Germany"
     description = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
     provider = "ML/SLA Niedersachsen <https://sla.niedersachsen.de/landentwicklung/LEA/>"
-    attribution = "© ML/SLA Niedersachsen (2024), dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), Daten bearbeitet"
-    license = "dl-de/by-2-0"
+    attribution = "© ML/SLA Niedersachsen (2024), DL-DE-BY-2.0 (www.govdata.de/DL-DE-BY-2.0), Daten bearbeitet"
+    license = "DL-DE-BY-2.0"
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
     columns = {
         "geometry": "geometry",

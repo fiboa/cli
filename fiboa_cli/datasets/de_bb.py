@@ -10,7 +10,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "Germany, Berlin/Brandenburg"
     title = "Field boundaries for Berlin / Brandenburg, Germany"
     description = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
-    license = "dl-de/by-2-0"
+    license = "DL-DE-BY-2.0"
     provider = "Land Brandenburg <https://geobroker.geobasis-bb.de/gbss.php?MODE=GetProductInformation&PRODUCTID=9e95f21f-4ecf-4682-9a44-e5f7609f6fa0>"
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
 

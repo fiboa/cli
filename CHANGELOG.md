@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Generate pmtiles file
   - Check AWS-environment vars
   - Synchronize parquet + pmtiles + README/LICENSE to source coop repo
+- Check for license validity, either SPDX string or custom with url
+- Seperate concerns for HCAT utility classes; 
+  - AddHCATMixin assures hcat-extension validity and csv-based data-conversion if required
+  - EuroCropsConverterMixin is a BaseClass for EuroCrops-provided datasets
+  - EuroLandBaseConverter is a BaseClass for Euroland-provided datasets
+- Avoid base property schema override
 
 ## [v0.20.3] - 2025-09-13
 
