@@ -22,8 +22,8 @@ def test_publish(tmp_folder):
         body=open(f"tests/data-files/publish/{base}-survey.md").read(),
     )
     responses.add(rsp1)
-    TestPublish.get_cli_callback(None)(
-        converter, variant="2023", target=tmp_folder, cache=path, generate_meta=True, yes=True
+    TestPublish(converter).run(
+        variant="2023", target=tmp_folder, cache=path, generate_meta=True, yes=True
     )
     files = [f.name for f in tmp_folder.iterdir() if f.is_file()]
     for f in ("README.md", "LICENSE.txt", "be_vlg-2023.parquet"):
