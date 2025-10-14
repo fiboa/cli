@@ -20,7 +20,7 @@ class DKConverter(AdminConverterMixin, FiboaBaseConverter):
 
     provider = "Danish Agricultural Agency <https://lbst.dk/>"
 
-    license = "CC-0"
+    license = "CC0-1.0"
     columns = {
         "geometry": "geometry",
         "Marknr": "id",

@@ -19,7 +19,7 @@ class Convert(EuroCropsConverterMixin, FiboaBaseConverter):
     provider = (
         "Ministry of Regional Development and Public Administration <http://spatial.mdrap.ro>"
     )
-    license = "CC-0"
+    license = "CC0-1.0"
     column_additions = {
         "determination:datetime": "2017-01-01T00:00:00Z",
         "crop:code_list": ec_url("ro_no_year.csv"),

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 - Fix to vecorel: converter.license and provider should be string
+- Check for license validity, either SPDX string or custom with url
 - Seperate concerns for HCAT utility classes; 
   - AddHCATMixin assures hcat-extension validity and csv-based data-conversion if required
   - EuroCropsConverterMixin is a BaseClass for EuroCrops-provided datasets

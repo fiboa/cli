@@ -61,7 +61,7 @@ class Converter(FiboaBaseConverter):
     attribution = "© 2024 ABC Corp."
 
     # License of the data, either
-    # 1. a SPDX license identifier (including "dl-de/by-2-0" / "dl-de/zero-2-0"), or
+    # 1. a SPDX license identifier (including "DL-DE-BY-2.0" / "DL-DE-ZERO-2.0"), or
     # 2. a string with license name and URL, e.g. "My License <https://my.com/license>"
     license = "CC-BY-4.0"
 
