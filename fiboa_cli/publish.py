@@ -53,6 +53,14 @@ class Publish(BaseCommand):
                 help="Generate README.txt and LICENSE.txt for the dataset if not present.",
                 default=False,
             ),
+            "yes": click.option(
+                "--yes",
+                "-y",
+                is_flag=True,
+                type=click.BOOL,
+                help="Answer yes to all questions.",
+                default=False,
+            ),
             "data_url": click.option(
                 "--data-url",
                 type=click.STRING,
@@ -96,19 +104,28 @@ class Publish(BaseCommand):
             self.error(f"Missing command {cmd}. Please install {name or cmd}")
             sys.exit(1)
 
-    @cache
-    def get_data_survey(self):
-        base = self.dataset.replace("_", "-").upper()
-        mapping = {
-            "data provider (legal entity)": "provider",
-            "submitter (affiliation)": "submitter",
-        }
-        # override data survey location with env variable, e.g. for unmerged pull-requests
+    def download_data_survey(self, base):
         data_survey = (
             os.getenv("FIBOA_DATA_SURVEY")
             or f"https://raw.githubusercontent.com/fiboa/data-survey/refs/heads/main/data/{base}.md"
         )
         response = requests.get(data_survey)
+        if not response.ok:
+            self.warning(
+                f"Missing data survey {base}.md at {data_survey}. Can not auto-generate file"
+            )
+        else:
+            return response.text
+
+    @cache
+    def get_data_survey(self):
+        base = self.dataset.replace("_", "-").upper()
+        text = self.download_data_survey(base)
+        mapping = {
+            "data provider (legal entity)": "provider",
+            "submitter (affiliation)": "submitter",
+        }
+        # override data survey location with env variable, e.g. for unmerged pull-requests
         data = {
             "provider": self.converter.provider,
             "license": self.converter.license,
@@ -117,17 +134,11 @@ class Publish(BaseCommand):
             "submitter": "Fiboa project",
         }
         properties = {}
-        if not response.ok:
-            self.warning(
-                f"Missing data survey {base}.md at {data_survey}. Can not auto-generate file"
-            )
-        else:
-            data.update(
-                {a.lower(): b for a, b in re.findall(r"- \*\*(.+?):\*\* (.+?)\n", response.text)}
-            )
+        if text:
+            data.update({a.lower(): b for a, b in re.findall(r"- \*\*(.+?):\*\* (.+?)\n", text)})
             properties = {
                 mapping.get(a.lower(), a.lower()): b.strip()
-                for a, b in re.findall(r"\n\|\s*(\w+)[^|]*\|[^|]*\|[^|]*\|([^|]*)\|", response.text)
+                for a, b in re.findall(r"\n\|\s*(\w+)[^|]*\|[^|]*\|[^|]*\|([^|]*)\|", text)
             }
 
         return data, properties
@@ -230,6 +241,7 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         self,
         target,
         generate_meta=False,
+        yes=False,
         **kwargs,
     ):
         """
@@ -270,18 +282,9 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         self.create_stac_collection(target, file_name, parquet_file, stac_file)
 
         if generate_meta:
-            self.generate_meta(target, file_name, stac_file)
+            self.generate_meta(target, file_name, stac_file, yes=yes)
 
-        pm_file = os.path.join(target, f"{file_name}.pmtiles")
-        if not os.path.exists(pm_file):
-            self.info("Running ogr2ogr | tippecanoe")
-            self.check_command("tippecanoe")
-            self.check_command("ogr2ogr", name="GDAL")
-            self.exc(
-                f"ogr2ogr -t_srs EPSG:4326 -f geojson /vsistdout/ {parquet_file} | tippecanoe -zg --projection=EPSG:4326 -o {pm_file} -l {self.dataset} --drop-densest-as-needed"
-            )
-
-        self.info("Uploading to aws")
+        self.generate_pmtiles(target, file_name, parquet_file)
         if not has_write_access:
             self.info("Get your credentials through the source coop organization.")
             self.info("Login to AWS Console and generate an access key:")
@@ -294,10 +297,8 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
                 "    where you copy-past the access key and secret",
             )
             self.error("Please set AWS_ env vars for uploading")
-            sys.exit(1)
-
-        self.check_command("aws")
-        self.exc(f"aws s3 sync {target} {self.s3_upload_path}")
+            return
+        self.upload_to_aws(target)
 
     def create_stac_collection(self, target, file_name, parquet_file, stac_file):
         p_stac = Path(stac_file)
@@ -331,7 +332,7 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         with open(stac_file, "w", encoding="utf-8") as f:
             json.dump(data, f)
 
-    def generate_meta(self, target, file_name, stac_file):
+    def generate_meta(self, target, file_name, stac_file, yes=False):
         for required in ("README.md", "LICENSE.txt"):
             path = os.path.join(target, required)
             if not os.path.exists(path):
@@ -346,7 +347,9 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
                 self.info(
                     f"\nGenerated the following file {required}:\n{'-' * 80}\n\n{text}\n{'-' * 80}\n"
                 )
-                action = input("Do you want to Continue (C), Edit (E) or Abort (A)?")
+                action = (
+                    "C" if yes else input("Do you want to Continue (C), Edit (E) or Abort (A)?")
+                )
                 if action.lower() not in "ce":
                     self.warning("Bailing out")
                     sys.exit(1)
@@ -357,3 +360,19 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
                         f.write(text)
                     editor = os.getenv("EDITOR") or "nano"
                     os.system(f"{editor} {path}")
+
+    def generate_pmtiles(self, target, file_name, parquet_file):
+        pm_file = os.path.join(target, f"{file_name}.pmtiles")
+        if not os.path.exists(pm_file):
+            self.info("Running ogr2ogr | tippecanoe")
+            self.check_command("tippecanoe")
+            self.check_command("ogr2ogr", name="GDAL")
+            self.exc(
+                f"ogr2ogr -t_srs EPSG:4326 -f geojson /vsistdout/ {parquet_file} | tippecanoe -zg --projection=EPSG:4326 -o {pm_file} -l {self.dataset} --drop-densest-as-needed"
+            )
+
+    def upload_to_aws(self, target):
+        self.info("Uploading to aws")
+
+        self.check_command("aws")
+        self.exc(f"aws s3 sync {target} {self.s3_upload_path}")
