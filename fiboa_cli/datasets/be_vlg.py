@@ -1,12 +1,12 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import ec_url
+from .commons.ec import AddHCATMixin
 
 PREFIX = "https://www.landbouwvlaanderen.be/bestanden/gis/"
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
         str(k): {PREFIX + v: [v.replace("_GPKG.zip", ".gpkg")]}
         for k, v in (
@@ -42,10 +42,9 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "GWSCOD_H": "crop:code",
         "GWSNAM_H": "crop:name",
     }
-    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {
         "determination:datetime": "2024-03-28T00:00:00Z",
-        "crop:code_list": ec_url("be_vlg_2021.csv"),
     }
+    ec_mapping_csv = "be_vlg_2021.csv"
 
     missing_schemas = {"properties": {"source": {"type": "string"}, "typology": {"type": "string"}}}

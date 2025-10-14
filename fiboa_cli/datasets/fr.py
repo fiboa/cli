@@ -1,10 +1,10 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import EuroCropsConverterMixin, ec_url
+from .commons.ec import AddHCATMixin
 
 
-class FRConverter(AdminConverterMixin, EuroCropsConverterMixin, FiboaBaseConverter):
+class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # TODO, 2022 works, check (or discover) paths for other years
     variants = {
         "2022": {
@@ -47,8 +47,6 @@ class FRConverter(AdminConverterMixin, EuroCropsConverterMixin, FiboaBaseConvert
     attribution = "IGN — Original data from https://geoservices.ign.fr/rpg"
     license = "Licence Ouverte / Open Licence <https://etalab.gouv.fr/licence-ouverte-open-licence>"
     ec_mapping_csv = "fr_2018.csv"
-    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    column_additions = {"crop:code_list": ec_url(ec_mapping_csv)}
 
     columns = {
         "geometry": "geometry",
