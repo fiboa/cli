@@ -1,7 +1,8 @@
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+from fiboa_cli.datasets.commons.hcat import AddHCATMixin
 
 
-class EuroLandBaseConverter(FiboaBaseConverter):
+class EuroLandBaseConverter(AddHCATMixin, FiboaBaseConverter):
     """
     Datasets have been published by the
     [Euroland project](https://europe-land.eu/news/harmonized-database-of-european-land-use-data-published/)
@@ -15,16 +16,14 @@ class EuroLandBaseConverter(FiboaBaseConverter):
     title = ""
     description = ""
     provider = ""
-
-    # And additionally declare a crop_code_list
-    crop_code_list = ec_url(ec_mapping_csv)
     """
 
-    crop_code_list = None  # e.g. ec_url(ec_mapping_csv)
-    extensions = {
-        "https://fiboa.org/crop-extension/v0.2.0/schema.yaml",
-        "https://fiboa.org/hcat-extension/v0.3.0/schema.yaml",
+    hcat_columns = {
+        "EC_trans_n": "hcat:name_en",
+        "EC_hcat_n": "hcat:name",
+        "EC_hcat_c": "hcat:code",
     }
+
     columns = {
         "geometry": "geometry",
         "field_id": "id",
@@ -32,9 +31,6 @@ class EuroLandBaseConverter(FiboaBaseConverter):
         "crop:code_list": "crop:code_list",
         "crop_code": "crop:code",
         "crop_name": "crop:name",
-        "EC_trans_n": "hcat:name_en",
-        "EC_hcat_n": "hcat:name",
-        "EC_hcat_c": "hcat:code",
         "organic": "organic",
         "field_size": "metrics:area",
         # "crop_area": "crop_area",
@@ -49,7 +45,5 @@ class EuroLandBaseConverter(FiboaBaseConverter):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        assert self.crop_code_list, f"Please declare a crop_code_list attribute on {self.__class__}"
-        self.column_additions["crop:code_list"] = self.crop_code_list
         provider = "Europe-LAND HE Project <https://doi.org/10.5281/zenodo.14230620>"
         self.provider = (f"{self.provider}, {provider}") if self.provider else provider

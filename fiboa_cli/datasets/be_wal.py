@@ -3,10 +3,10 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.convert_gml import gml_assure_columns
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import ec_url
+from .commons.ec import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     sources = {
         "https://geoservices.wallonie.be/geotraitement/spwdatadownload/get/2a0d9be0-ac3d-443e-9db0-a7cfb0f128e2/LU_ExistingLandUse_SIGEC2022.gml.zip?blocksize=0": [
             "LU_ExistingLandUse_SIGEC2022.gml"
@@ -37,16 +37,14 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "id": "id",
         "determination:datetime": "determination:datetime",
     }
+    ec_mapping_csv = "be_wal_all_years.csv"
     column_additions = {
         "determination:datetime": "2022-01-01T00:00:00Z",
-        "crop:code_list": ec_url("be_wal_all_years.csv"),
     }
     column_migrations = {
         "crop_code": lambda col: col.str.extract(r"\.(\d+)$", expand=False),
         "crop_name": lambda col: col.str.strip(),
     }
-    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-
     index_as_id = True
 
     def layer_filter(self, layer: str, uri: str) -> bool:
