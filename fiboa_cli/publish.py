@@ -330,7 +330,7 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
             )
 
         with open(stac_file, "w", encoding="utf-8") as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=2)
 
     def generate_meta(self, target, file_name, stac_file, yes=False):
         for required in ("README.md", "LICENSE.txt"):
