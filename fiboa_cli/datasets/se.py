@@ -20,7 +20,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     """
     provider = "Jordbruksverket (The Swedish Board of Agriculture) <https://jordbruksverket.se>"
     attribution = "Jordbruksverket"
-    license = "CC-0"  # "Open Data"
+    license = "CC0-1.0"  # "Open Data"
     columns = {
         "geometry": "geometry",
         "id": "id",

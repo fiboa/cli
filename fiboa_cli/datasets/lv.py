@@ -1,12 +1,12 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import EuroCropsConverterMixin, ec_url
+from .commons.ec import AddHCATMixin, ec_url
 
 count = 3000
 
 
-class Converter(AdminConverterMixin, EuroCropsConverterMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     sources = {
         "https://karte.lad.gov.lv/arcgis/services/lauki/MapServer/WFSServer"
         f"?request=GetFeature&service=wfs&version=2.0.0&typeNames=Lauki&count={count}&startindex={count * i}": f"lv_{i}_{count}.xml"

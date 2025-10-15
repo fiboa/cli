@@ -45,14 +45,14 @@ class LacunaLabelsConverter(FiboaBaseConverter):
         "assignment_id": "assignment_id",
         "image_date": "image_date",
         "completion_time": "completion_time",
-        "category": "category",
+        "category": "land_type",
         "geometry": "geometry",
     }
 
     missing_schemas = {
         "properties": {
             "name": {"type": "string"},
-            "category": {"type": "string", "enum": ["annualcropland"]},
+            "land_type": {"type": "string", "enum": ["annualcropland"]},
             "assignment_id": {"type": "string"},
             "image_date": {"type": "string"},
             "completion_time": {"type": "date-time"},

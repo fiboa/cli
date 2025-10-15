@@ -12,7 +12,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     title = "Field boundaries for Czech"
     description = "The cropfields of Czech (Plodina)"
     provider = "Czech Ministry of Agriculture (Ministr Zemědělství) <https://mze.gov.cz/public/portal/mze/farmar/LPIS>"
-    license = "CC-0"
+    license = "CC0-1.0"
     columns = {
         "geometry": "geometry",
         "ZAKRES_ID": "id",

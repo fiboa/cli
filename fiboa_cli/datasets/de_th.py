@@ -32,7 +32,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
 
     provider = "Thüringer Landesamt für Landwirtschaft und Ländlichen Raum <https://geomis.geoportal-th.de/geonetwork/srv/ger/catalog.search#/metadata/D872F2D6-60BC-11D6-B67D-00E0290F5BA0>"
     attribution = "© GDI-Th"
-    license = "dl-de/by-2-0"
+    license = "DL-DE-BY-2.0"
 
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
 
