@@ -9,10 +9,12 @@ RUN ./aws/install
 
 USER ubuntu
 WORKDIR /home/ubuntu
+RUN curl -fsSL https://pixi.sh/install.sh | sh
+RUN echo 'eval "$(~/.pixi/bin/pixi shell-hook)"' >> .bashrc
 RUN git clone https://github.com/fiboa/cli.git
-RUN python3 -m venv .venv
-RUN .venv/bin/pip install -e cli
-RUN echo "source ~/.venv/bin/activate" >> .bashrc
+
+WORKDIR /home/ubuntu/cli
+RUN ~/.pixi/bin/pixi install
 
 SHELL ["/bin/bash", "-c"]
 CMD bash
