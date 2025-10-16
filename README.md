@@ -207,6 +207,10 @@ will be filled with the following files:
 
 This directory is synchronized to the s3 repository (default source.coop/fiboa/data).
 
+**Requirements**: Requires the [aws CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) to be installed, 
+and `AWS_ACCESS_KEY_ID` with `AWS_SECRET_ACCESS_KEY` environment variables. Also, for generating the pmtiles file, 
+it requires [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) and [tippecanoe](https://github.com/mapbox/tippecanoe).
+
 The command executes the following steps:
 
 - `fiboa convert` to generate a fiboa parquet dataset. All convert parameters are passed to the converter.
