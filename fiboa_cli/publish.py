@@ -89,8 +89,6 @@ class Publish(BaseCommand):
             s3_upload_path or f"s3://us-west-2.opendata.source.coop/fiboa/data/{self.dataset}/"
         )
 
-        if ConvertData.converters.is_converter(self.dataset):
-            raise Exception(f"'{self.dataset}' is not a converter")
         try:
             self.converter = ConvertData.converters.load(self.dataset)
         except (ImportError, NameError, OSError, RuntimeError, SyntaxError) as e:
