@@ -13,6 +13,7 @@ from vecorel_cli.basecommand import BaseCommand, runnable
 from vecorel_cli.cli.options import VECOREL_TARGET
 from vecorel_cli.convert import ConvertData
 from vecorel_cli.create_stac import CreateStacCollection
+from vecorel_cli.encoding.auto import create_encoding
 from vecorel_cli.validate import ValidateData
 
 from .registry import Registry
@@ -110,20 +111,14 @@ class Publish(BaseCommand):
         response = requests.get(data_survey)
         if not response.ok:
             self.warning(
-                f"Missing data survey {base}.md at {data_survey}. Can not auto-generate file"
+                f"Missing data survey {base}.md at {data_survey}. Falling back to converter declared properties."
             )
         else:
             return response.text
 
     @cache
-    def get_data_survey(self):
+    def collect_meta_data(self, parquet_file):
         base = self.dataset.replace("_", "-").upper()
-        text = self.download_data_survey(base)
-        mapping = {
-            "data provider (legal entity)": "provider",
-            "submitter (affiliation)": "submitter",
-        }
-        # override data survey location with env variable, e.g. for unmerged pull-requests
         data = {
             "provider": self.converter.provider,
             "license": self.converter.license,
@@ -131,14 +126,30 @@ class Publish(BaseCommand):
             "homepage": "",
             "submitter": "Fiboa project",
         }
+        text = self.download_data_survey(base)
+        mapping = {
+            "data provider (legal entity)": "provider",
+            "submitter (affiliation)": "submitter",
+        }
         properties = {}
         if text:
-            data.update({a.lower(): b for a, b in re.findall(r"- \*\*(.+?):\*\* (.+?)\n", text)})
+            data.update(
+                {
+                    mapping.get(a.lower(), a.lower()): b
+                    for a, b in re.findall(r"- \*\*(.+?):\*\* (.+?)\n", text)
+                }
+            )
             properties = {
-                mapping.get(a.lower(), a.lower()): b.strip()
+                a.lower(): b.strip()
                 for a, b in re.findall(r"\n\|\s*(\w+)[^|]*\|[^|]*\|[^|]*\|([^|]*)\|", text)
             }
-
+        try:
+            # Try read projection from parquet metadata
+            meta = create_encoding(parquet_file).get_geoparquet_metadata()
+            crs = meta["columns"]["geometry"]["crs"]
+            data["projection"] = f"{crs['id']['authority']}:{crs['id']['code']} ({crs['name']})"
+        except Exception:
+            pass
         return data, properties
 
     def readme_attribute_table(self, stac_data, properties):
@@ -165,10 +176,10 @@ class Publish(BaseCommand):
         aligned_cols.insert(1, ["-" * (w + 2) for w in widths])
         return "\n".join(["|" + "|".join(cols) + "|" for cols in aligned_cols])
 
-    def make_license(self):
+    def make_license(self, parquet_file):
         text = ""
         try:
-            data, properties = self.get_data_survey()
+            data, properties = self.collect_meta_data(parquet_file)
             text = data["license"]
             if getattr(self.converter, "license") not in (None, "", data["license"]):
                 text += "\n" + self.converter.license + "\n"
@@ -195,12 +206,12 @@ class Publish(BaseCommand):
             self.exception(e)
         return text
 
-    def make_readme(self, file_name, stac):
+    def make_readme(self, parquet_file, file_name, stac):
         version = Registry.get_version()
         converter = self.converter
         stac_data = json.load(open(stac))
         count = stac_data["assets"]["data"]["table:row_count"]
-        data, properties = self.get_data_survey()
+        data, properties = self.collect_meta_data(parquet_file)
         columns = self.readme_attribute_table(stac_data, properties)
         urls = converter.get_urls() or "manually downloaded file"
         urls = urls.keys() if isinstance(urls, dict) else [urls]
@@ -331,17 +342,19 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
             json.dump(data, f, indent=2)
 
     def generate_meta(self, target, file_name, stac_file, yes=False):
+        parquet_file = os.path.join(target, f"{file_name}.parquet")
         for required in ("README.md", "LICENSE.txt"):
             path = os.path.join(target, required)
             if not os.path.exists(path):
                 self.warning(f"Missing {required}. Generating at {path}")
                 if required == "README.md":
                     text = self.make_readme(
+                        parquet_file,
                         file_name=file_name,
                         stac=stac_file,
                     )
                 else:
-                    text = self.make_license()
+                    text = self.make_license(parquet_file)
                 self.info(
                     f"\nGenerated the following file {required}:\n{'-' * 80}\n\n{text}\n{'-' * 80}\n"
                 )
