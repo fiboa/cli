@@ -53,6 +53,7 @@ unrar = ">=0.4"
 fiboa-cli = {path = ".", editable = true}
 
 [tool.pixi.feature.dev.dependencies]
+responses = ">=0.25.8"
 pytest = ">=8.4.1,<9.0.0"
 pytest-cov = ">=6.0.0,<7.0.0"
 pre-commit = ">=4.2.0,<5.0.0"
