@@ -125,6 +125,7 @@ class Publish(BaseCommand):
             "projection": "",
             "homepage": "",
             "submitter": "Fiboa project",
+            "header": "",
         }
         text = self.download_data_survey(base)
         mapping = {
@@ -133,6 +134,9 @@ class Publish(BaseCommand):
         }
         properties = {}
         if text:
+            data["header"] = (
+                f"\n- **Data Survey:** https://github.com/fiboa/data-survey/blob/main/data/{base}.md"
+            )
             data.update(
                 {
                     mapping.get(a.lower(), a.lower()): b
@@ -226,7 +230,7 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
 - **Source Data Provider:** [{data["provider"]}]({data["homepage"]})
 - **Converted by:** {data["submitter"]}
 - **License:** {data["license"]}
-- **Projection:** {data["projection"]}
+- **Projection:** {data["projection"]}{data["header"]}
 
 ---
 
