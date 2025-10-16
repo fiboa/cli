@@ -12,6 +12,7 @@ import spdx_license_list
 from vecorel_cli.basecommand import BaseCommand, runnable
 from vecorel_cli.cli.options import VECOREL_TARGET
 from vecorel_cli.convert import ConvertData
+from vecorel_cli.converters import Converters
 from vecorel_cli.create_stac import CreateStacCollection
 from vecorel_cli.encoding.auto import create_encoding
 from vecorel_cli.validate import ValidateData
@@ -91,7 +92,7 @@ class Publish(BaseCommand):
         )
 
         try:
-            self.converter = ConvertData.converters.load(self.dataset)
+            self.converter = Converters().load(self.dataset)
         except (ImportError, NameError, OSError, RuntimeError, SyntaxError) as e:
             raise Exception(f"Converter for '{self.dataset}' not available or faulty: {e}") from e
 
