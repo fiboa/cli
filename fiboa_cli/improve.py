@@ -46,7 +46,7 @@ class Improve(ImproveData):
             metadata = input_encoding.get_metadata()
             if b"fiboa" in metadata:
                 fiboa_2 = json.loads(metadata[b"fiboa"].decode("utf-8"))
-                geodata, collection = self.migrate_fiboa_2(geodata, fiboa_2)
+                geodata, collection = self.migrate_fiboa_2(geodata, fiboa_2, source.name)
 
         geodata, collection = self.improve(geodata, collection=collection, **kwargs)
 
@@ -89,7 +89,9 @@ class Improve(ImproveData):
 
         return HCAT().add_hcat(gdf), collection
 
-    def migrate_fiboa_2(self, geodata, original: Collection) -> tuple[GeoDataFrame, Collection]:
+    def migrate_fiboa_2(
+        self, geodata, original: Collection, file_name: str
+    ) -> tuple[GeoDataFrame, Collection]:
         if original["fiboa_version"] != "0.2.0":
             self.warning(
                 f"Not migrating from fiboa version {original['fiboa_version']}, can only migrate fiboa from 0.2.0"
@@ -103,8 +105,10 @@ class Improve(ImproveData):
                 schemas.add(EXTENSION_MAPPING[e])
 
         base = {k: original[k] for k in ("title", "description", "attribution") if k in original}
+        collection_id = original.get("id") or file_name.split(".")[0]
+
         collection = Collection(
-            {"schemas": {original["id"]: list(schemas)}, "collection": original["id"]} | base
+            {"schemas": {collection_id: list(schemas)}, "collection": collection_id} | base
         )
 
         # Migrate custom schemas
