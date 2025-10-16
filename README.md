@@ -189,6 +189,49 @@ Use any of the IDs from the list to convert an existing dataset to fiboa:
 
 See [Implement a converter](#implement-a-converter) for details about how to
 
+### Publish datasets to source coop or your own s3 repository
+
+`fiboa publish <dataset> -o <target>`
+
+The publish converts and publishes a fiboa dataset to source coop or your own s3 repository. The target directory 
+will be filled with the following files:
+
+```
+<target>/
+  <dataset>.parquet
+  <dataset>.pmtiles      # requires working ogr2ogr and tippecanoe
+  stac/collection.json
+  README.md              # generated if --generate-meta/-gm flag is present
+  LICENSE.txt            # generated if --generate-meta/-gm flag is present
+```
+
+This directory is synchronized to the s3 repository (default source.coop/fiboa/data).
+
+**Requirements**: Requires the [aws CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) to be installed, 
+and `AWS_ACCESS_KEY_ID` with `AWS_SECRET_ACCESS_KEY` environment variables. Also, for generating the pmtiles file, 
+it requires [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) and [tippecanoe](https://github.com/mapbox/tippecanoe).
+
+The command executes the following steps:
+
+- `fiboa convert` to generate a fiboa parquet dataset. All convert parameters are passed to the converter.
+- `fiboa validate` to validate the fiboa dataset
+- creates a <dataset>.pmtiles from the parquet file. Uses ogr2ogr and tippecanoe
+- `fiboa create-stac-collection` to create a STAC collection
+- `fiboa publish` to publish the fiboa dataset to a source coop or your own s3 repository
+
+Examples:
+
+- `fiboa publish at_crop -o data/at_crop`
+- `fiboa publish -c /tmp/cache -gm br_conab -o data/br_conab`
+
+Relevant parameters:
+
+- `--generate-meta/-gm` Generatse the README.md and LICENSE.txt files if absent, based on data-survey and converter properties.
+- `--data-url` The URL to the data repository, used when generating the README
+- `--s3-upload-path` The `aws s3 sync` target. Defaults to `s3://source.coop/fiboa/data` . Uploading requires the `aws` CLI, and `AWS_ACCESS_KEY_ID` with `AWS_SECRET_ACCESS_KEY` environment variables.
+
+Check `fiboa publish --help` for more details.
+
 ## Development
 
 This project uses [Pixi](https://pixi.sh/) for dependency management and development workflows.
@@ -224,3 +267,25 @@ The following high-level description gives an idea how to implement a converter 
 3. Add missing dependencies into the appropriate feature group in `pixi.toml` (or `setup.py` for pip users)
 4. Add the converter to the list above
 5. Create a PR to submit your converter for review
+
+## Run in Docker
+
+There's a Dockerfile based on a modern Ubuntu+GDAL image. With the Dockerfile, you can run the CLI in a container.
+This can be handy if you lack the required dependencies on you local machine (e.g. a modern GDAL capable of 
+reading GeoParquet files).
+
+Example usage (mounting /tmp/fiboa as a volume)
+
+```
+docker build . -t fiboa
+docker run -it --rm -v /tmp/fiboa:/fiboa fiboa bash
+
+fiboa convert de_nrw -o /fiboa/de_nrw.parquet
+```
+
+If you want to temporarily work on a specific branch of fiboa-cli, you can use the following in the container. 
+This works because the fiboa-cli is pip-installed with `-e` (in-place):
+
+```
+cd fiboa && git checkout <branch>
+```
