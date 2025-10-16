@@ -32,12 +32,14 @@ class FiboaRegistry(VecorelRegistry):
         from .create_stac import CreateFiboaStacCollection
         from .describe import DescribeFiboaFile
         from .improve import Improve
+        from .publish import Publish
         from .rename_extension import RenameFiboaExtension
 
         self.set_command(CreateFiboaStacCollection)
         self.set_command(DescribeFiboaFile)
         self.set_command(RenameFiboaExtension)
         self.set_command(Improve)
+        self.set_command(Publish)
 
 
 Registry.instance = FiboaRegistry()

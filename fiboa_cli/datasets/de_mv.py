@@ -19,7 +19,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
 
     columns = {
         "geometry": "geometry",
-        "fbid": ["id", "flik"],  # make flik id a dedicated column to align with NRW etc.
+        "fbid": ("id", "flik"),  # make flik id a dedicated column to align with NRW etc.
         "dgl_jahr": "dgl_jahr",
         # TODO implement crop:code extension
         "bodennutzu": "bodennutzu",  # Bodennutzungsart

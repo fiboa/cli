@@ -26,7 +26,7 @@ class FiboaBaseConverter(BaseConverter):
             base = gdf if crs_is_in_meters else gdf["geometry"].to_crs("EPSG:6933")
 
             if gdf_area_key in gdf.columns:
-                factor = 10_0000 if self.area_is_in_ha else 1
+                factor = 10_000 if self.area_is_in_ha else 1
                 gdf[gdf_area_key] = np.where(
                     gdf[gdf_area_key] == 0, base.area * factor, gdf[gdf_area_key]
                 )
@@ -34,6 +34,5 @@ class FiboaBaseConverter(BaseConverter):
                 gdf[gdf_area_key] = base.area
         elif self.area_is_in_ha and gdf_area_key in gdf.columns:
             # convert area in ha to meters
-            gdf[gdf_area_key] *= 10_0000
-
+            gdf[gdf_area_key] = gdf[gdf_area_key].astype(float) * 10_000
         return gdf
