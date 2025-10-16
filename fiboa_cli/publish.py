@@ -260,23 +260,23 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         - https://github.com/felt/tippecanoe
         - https://aws.amazon.com/cli/
         """
-        os.makedirs(target, exist_ok=True)
+        Path(target).mkdir(parents=True, exist_ok=True)
 
         file_name = self.dataset
         if not kwargs["variant"] and self.converter.variants:
             kwargs["variant"] = next(iter(self.converter.variants))
         if kwargs["variant"]:
             file_name += f"-{kwargs['variant']}"
-        parquet_file = os.path.join(target, f"{file_name}.parquet")
+        parquet_file = Path(target) / f"{file_name}.parquet"
 
         has_write_access = bool(
             os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY")
         )
 
-        stac_file = os.path.join(target, "stac", "collection.json")
+        stac_file = Path(target) / "stac" / "collection.json"
 
         ## Create parquet file
-        if not os.path.exists(parquet_file):
+        if not parquet_file.exists():
             self.info(f"Converting file for {self.dataset} to {parquet_file}")
             ConvertData(self.dataset).run(parquet_file, **kwargs)
             self.success(f"Converted file for {self.dataset} to {parquet_file}")
@@ -319,7 +319,7 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         p_stac.parent.mkdir(exist_ok=True)
         CreateStacCollection().create_cli(parquet_file, stac_file)
 
-        os.makedirs(os.path.join(target, "stac"), exist_ok=True)
+        Path(target, "stac").mkdir(parents=True, exist_ok=True)
         data = json.load(open(stac_file, "r"))
         assert data["id"] == self.dataset, (
             f"Wrong collection dataset id: {data['id']} != {self.dataset}, for {stac_file}"
@@ -343,10 +343,10 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
             json.dump(data, f, indent=2)
 
     def generate_meta(self, target, file_name, stac_file, yes=False):
-        parquet_file = os.path.join(target, f"{file_name}.parquet")
+        parquet_file = Path(target) / f"{file_name}.parquet"
         for required in ("README.md", "LICENSE.txt"):
-            path = os.path.join(target, required)
-            if not os.path.exists(path):
+            path = Path(target) / required
+            if not path.exists():
                 self.warning(f"Missing {required}. Generating at {path}")
                 if required == "README.md":
                     text = self.make_readme(
@@ -374,13 +374,13 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
                     os.system(f"{editor} {path}")
 
     def generate_pmtiles(self, target, file_name, parquet_file):
-        pm_file = os.path.join(target, f"{file_name}.pmtiles")
-        if not os.path.exists(pm_file):
+        pm_file = Path(target) / f"{file_name}.pmtiles"
+        if not pm_file.exists():
             self.info("Running ogr2ogr | tippecanoe")
             self.check_command("tippecanoe")
             self.check_command("ogr2ogr", name="GDAL")
             self.exc(
-                f"ogr2ogr -t_srs EPSG:4326 -f geojson /vsistdout/ {parquet_file} | tippecanoe -zg --projection=EPSG:4326 -o {pm_file} -l {self.dataset} --drop-densest-as-needed"
+                f"ogr2ogr -t_srs EPSG:4326 -f geojson /vsistdout/ {str(parquet_file)} | tippecanoe -zg --projection=EPSG:4326 -o {str(pm_file)} -l {self.dataset} --drop-densest-as-needed"
             )
 
     def upload_to_aws(self, target):
