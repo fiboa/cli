@@ -264,12 +264,24 @@ The following high-level description gives an idea how to implement a converter 
 4. Add the converter to the list above
 5. Create a PR to submit your converter for review
 
-## Docker
+## Run in Docker
 
-With the Dockerfile, you can run the CLI in a container. This can be handy if you lack the required dependencies on
-you local machine (e.g. a modern GDAL capable of reading GeoParquet files).
+There's a Dockerfile based on a modern Ubuntu+GDAL image. With the Dockerfile, you can run the CLI in a container.
+This can be handy if you lack the required dependencies on you local machine (e.g. a modern GDAL capable of 
+reading GeoParquet files).
+
+Example usage (mounting /tmp/fiboa as a volume)
 
 ```
-docker build -t fiboa-cli .
-docker run -it fiboa-cli bash
+docker build . -t fiboa
+docker run -it --rm -v /tmp/fiboa:/fiboa fiboa bash
+
+fiboa convert de_nrw -o /fiboa/de_nrw.parquet
+```
+
+If you want to temporarily work on a specific branch of fiboa-cli, you can use the following in the container. 
+This works because the fiboa-cli is pip-installed with `-e` (in-place):
+
+```
+cd fiboa && git checkout <branch>
 ```
