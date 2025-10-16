@@ -209,7 +209,8 @@ class Publish(BaseCommand):
     def make_readme(self, parquet_file, file_name, stac):
         version = Registry.get_version()
         converter = self.converter
-        stac_data = json.load(open(stac))
+        with open(stac) as f:
+            stac_data = json.load(f)
         count = stac_data["assets"]["data"]["table:row_count"]
         data, properties = self.collect_meta_data(parquet_file)
         columns = self.readme_attribute_table(stac_data, properties)
