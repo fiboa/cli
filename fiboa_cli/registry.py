@@ -4,6 +4,8 @@ from vecorel_cli.registry import Registry, VecorelRegistry
 
 from fiboa_cli.fiboa.version import spec_pattern
 
+FIBOA_SPECIFICATION = "https://fiboa.org/specification/v0.3.0/schema.yaml"
+
 
 class FiboaRegistry(VecorelRegistry):
     name: str = "fiboa-cli"
@@ -29,12 +31,14 @@ class FiboaRegistry(VecorelRegistry):
 
         from .create_stac import CreateFiboaStacCollection
         from .describe import DescribeFiboaFile
+        from .improve import Improve
         from .publish import Publish
         from .rename_extension import RenameFiboaExtension
 
         self.set_command(CreateFiboaStacCollection)
         self.set_command(DescribeFiboaFile)
         self.set_command(RenameFiboaExtension)
+        self.set_command(Improve)
         self.set_command(Publish)
 
 
