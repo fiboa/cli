@@ -155,6 +155,8 @@ class Publish(BaseCommand):
             data["projection"] = f"{crs['id']['authority']}:{crs['id']['code']} ({crs['name']})"
         except Exception:
             pass
+        if os.environ.get("FIBOA_CONVERTED_BY"):
+            data["submitter"] = os.environ["FIBOA_CONVERTED_BY"]
         return data, properties
 
     def readme_attribute_table(self, stac_data, properties):
