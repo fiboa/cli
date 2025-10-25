@@ -396,4 +396,4 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         self.info("Uploading to aws")
 
         self.check_command("aws")
-        self.exc(f"aws s3 sync {target} {self.s3_upload_path}")
+        self.exc(f"aws s3 sync --exclude '.*' {target} {self.s3_upload_path}")
