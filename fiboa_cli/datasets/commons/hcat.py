@@ -57,7 +57,7 @@ class AddHCATMixin:
             if self.ec_mapping is None:
                 self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
 
-            from_code = "orginal_code"
+            from_code = "original_code"
             if from_code not in self.ec_mapping[0]:
                 # Some code lists have no code, only a crop_name
                 from_code = "original_name"
