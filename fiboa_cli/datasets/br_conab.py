@@ -93,7 +93,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         gdf.loc[gdf["area_ha"] == 0, "area_ha"] = None
         gdf["cd_mun"] = gdf["cd_mun"].combine_first(gdf["CD_MUN"]).apply(fformat)
         gdf["nm_mun"] = gdf["nm_mun"].combine_first(gdf["NM_MUN"]).combine_first(gdf["NM_MUNIC"])
-        return gdf
+        return super().migrate(gdf)
 
     def get_data(self, paths, **kwargs):
         # Set invalid geometries to None in Cafe/MG/CAFE-MG_Safra_2017.zip

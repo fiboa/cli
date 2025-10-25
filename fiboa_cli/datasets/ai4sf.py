@@ -111,7 +111,7 @@ class Converter(FiboaBaseConverter):
         gdf["fiboa_id"] = (
             gdf["id"].astype(str).str.zfill(2) + "_" + gdf.index.astype(str).str.zfill(5)
         )
-        return gdf
+        return super().migrate(gdf)
 
     missing_schemas = {
         "properties": {

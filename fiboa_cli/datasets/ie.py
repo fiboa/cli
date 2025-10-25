@@ -42,7 +42,7 @@ class IEConverter(AdminConverterMixin, FiboaBaseConverter):
         gdf["crop_name"] = gdf["crop_name"].str.split(", ").str.get(0)
         gdf = gdf[gdf["crop_name"] != "Void"]  # Exclude non-agriculture fields
         gdf["determination:datetime"] = gdf["observationDate"].str.replace("+01:00", "T00:00:00Z")
-        return gdf
+        return super().migrate(gdf)
 
     def file_migration(
         self, gdf: gpd.GeoDataFrame, path: str, uri: str, layer: str = None

@@ -47,4 +47,4 @@ class ESBaseConverter(FiboaBaseConverter):
         mapping_en = {row["original_code"]: row["name_en"] for row in rows}
         gdf["crop:name"] = gdf[self.use_code_attribute].map(mapping)
         gdf["crop:name_en"] = gdf[self.use_code_attribute].map(mapping_en)
-        return gdf
+        return super().migrate(gdf)

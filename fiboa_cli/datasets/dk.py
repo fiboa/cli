@@ -31,4 +31,4 @@ class DKConverter(AdminConverterMixin, FiboaBaseConverter):
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         gdf["determination:datetime"] = f"{self.variant}-01-01T00:00:00Z"
-        return gdf
+        return super().migrate(gdf)

@@ -49,4 +49,4 @@ created in 2017. The current update has incorporated data from the 2019 – 2020
         rows = read_data_csv("nz_region_codes.csv")
         mapping = {row["Subdivision name"]: row["3166-2 code"][len("NZ-") :] for row in rows}
         gdf["Region"] = gdf["Region"].map(mapping)
-        return gdf
+        return super().migrate(gdf)

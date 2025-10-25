@@ -67,7 +67,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     def migrate(self, gdf):
         col = "GEO_UPDAT"
         gdf[col] = pd.to_datetime(gdf[col], format="%d.%m.%Y", utc=True)
-        return gdf
+        return super().migrate(gdf)
 
     column_filters = {"LF": lambda col: col == "LF"}
 
