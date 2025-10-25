@@ -1,42 +1,30 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.hcat import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
-    sources = {"https://data.geobasis-bb.de/geofachdaten/Landwirtschaft/dfbk.zip": ["DFBK_FB.shp"]}
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    sources = "https://data.geobasis-bb.de/geofachdaten/Landwirtschaft/antrag.zip"
     id = "de_bb"
     admin_subdivision_code = "BB"  # TODO Berlin is also in here, check each row
     short_name = "Germany, Berlin/Brandenburg"
     title = "Field boundaries for Berlin / Brandenburg, Germany"
-    description = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
+    description = """A Crop Field (German: "Schlaege") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated with a single crop."""
     license = "DL-DE-BY-2.0"
     provider = "Land Brandenburg <https://geobroker.geobasis-bb.de/gbss.php?MODE=GetProductInformation&PRODUCTID=9e95f21f-4ecf-4682-9a44-e5f7609f6fa0>"
-    extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
+    ec_mapping_csv = "de.csv"
 
     columns = {
         "geometry": "geometry",
-        "FB_ID": ["flik", "id"],
-        "FGUE_JAHR": "fgue_jahr",
-        "FL_BRUTTO_": "metrics:area",
-        "FL_NETTO_H": "net_area",
-        "GUELTVON_F": "determination:datetime",
-        "GUELTBIS_F": "expiry_datetime",
-        "KREIS_NR": "kreis_nr",
-        "TK10_BLATT": "tk10",
-        "HBN_KAT": "hbn",
-        "SHAPE_LEN": "metrics:perimeter",
+        "ref_ident": "farmer_id",
+        "groesse": "metrics:area",
+        "guelt_von": "determination:datetime",
+        "code_bez": "crop:name",
+        "code": "crop:code",
     }
     missing_schemas = {
         "properties": {
-            "hbn": {"type": "string"},
-            "fgue_jahr": {"type": "string"},
-            "net_area": {"type": "float", "exclusiveMinimum": 0},
-            "expiry_datetime": {"type": "date-time"},
-            "kreis_nr": {"type": "uint16"},
-            "tk10": {"type": "string"},
+            "farmer_id": {"type": "string"},
         }
     }
-
-    def layer_filter(self, layer: str, uri: str) -> bool:
-        return layer == "DFBK_FB"
