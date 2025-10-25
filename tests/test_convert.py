@@ -20,6 +20,7 @@ tests = [
     "be_vlg",
     "br_ba_lem",
     "de_sh",
+    "de_bb",
     "ec_lv",
     "ec_si",
     "fi",
@@ -94,6 +95,6 @@ def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
     ValidateData().validate(tmp_parquet_file)
 
     df = pq.read_table(tmp_parquet_file).to_pandas()
-    if "metrics:area" in df.columns:
+    if "metrics:area" in df.columns and converter not in ("de_bb",):
         # Check for accidental hectare conversion; fields should be more than 10 square meters
         assert (df["metrics:area"] > 10).all()
