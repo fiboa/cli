@@ -16,7 +16,7 @@ Optionally use `-lco ENCODING=UTF-8` if you have character encoding issues.
 
 tests = [
     "at",
-    "at_crop",
+    "at_block",
     "be_vlg",
     "br_ba_lem",
     "de_sh",
@@ -27,7 +27,7 @@ tests = [
     "fr",
     "hr",
     "nl",
-    "nl_crop",
+    "nl_block",
     "pt",
     "dk",
     "be_wal",
@@ -57,7 +57,8 @@ def _input_files(converter, *names):
 
 extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
-    "nl_crop": {"variant": "2023"},
+    "nl": {"variant": "2023"},
+    "se": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
     "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),

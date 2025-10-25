@@ -1,46 +1,69 @@
+import pandas as pd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.ec import ec_url
+
+# see https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/basisregistratie_gewaspercelen_brp.xml
+base = "https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/downloads"
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
-    sources = (
-        "https://service.pdok.nl/rvo/referentiepercelen/atom/downloads/referentiepercelen.gpkg"
-    )
+class NLCropConverter(AdminConverterMixin, FiboaBaseConverter):
+    area_calculate_missing = True
+    variants = {
+        "2025": f"{base}/brpgewaspercelen_concept_2025.gpkg",
+        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.gpkg" for y in range(2024, 2020, -1)},
+        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.zip" for y in range(2020, 2009, -1)},
+    }
 
     id = "nl"
-    short_name = "Netherlands"
-    title = "Field boundaries for The Netherlands"
+    short_name = "Netherlands (Crops)"
+    title = "BRP Crop Field Boundaries for The Netherlands (CAP-based)"
     description = """
-    A field block (Dutch: "Referentieperceel"), formerly known as "AAN" (Agrarisch Areaal Nederland),
-    is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or
-    more farmers with one or more crops, is fully or partially set aside or is fully or partially
-    taken out of production.
+    BasisRegistratie Percelen (BRP) combines the location of
+    agricultural plots with the crop grown. The data set
+    is published by RVO (Netherlands Enterprise Agency). The boundaries of the agricultural plots
+    are based within the reference parcels (formerly known as AAN). A user an agricultural plot
+    annually has to register his crop fields with crops (for the Common Agricultural Policy scheme).
+    A dataset is generated for each year with reference date May 15.
+    A view service and a download service are available for the most recent BRP crop plots.
 
-    The following field block types exist:
+    <https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/index.xml>
 
-    - Woods (Hout)
-    - Agricultural area (Landbouwgrond)
-    - Other (Overig)
-    - Water (Water)
-
-    We filter on "Agricultural area" in this converter.
-    For crop data, look at BasisRegistratie gewasPercelen (BRP)
+    Data is currently available for the years 2009 to 2024.
     """
 
-    provider = "RVO / PDOK <https://www.pdok.nl/introductie/-/article/referentiepercelen>"
+    provider = (
+        "RVO / PDOK <https://www.pdok.nl/introductie/-/article/basisregistratie-gewaspercelen-brp->"
+    )
     # Both http://creativecommons.org/publicdomain/zero/1.0/deed.nl and http://creativecommons.org/publicdomain/mark/1.0/
     license = "CC0-1.0"
-    column_additions = {"determination:datetime": "2023-06-15T00:00:00Z"}
-    columns = {"geometry": "geometry", "id": "id", "area": "metrics:area", "versiebron": "source"}
-    column_filters = {
-        # type = "Hout" | "Landbouwgrond" | "Overig" | "Water"
-        "type": lambda col: col == "Landbouwgrond"
+
+    columns = {
+        "geometry": "geometry",
+        "id": "id",
+        "area": "metrics:area",
+        "category": "coverage",
+        "gewascode": "crop:code",
+        "gewas": "crop:name",
+        "jaar": "determination:datetime",
     }
+
+    column_filters = {
+        # category = "Grasland" | "Bouwland" | "Sloot" | "Landschapselement"
+        "category": lambda col: col.isin(["Grasland", "Bouwland"])
+    }
+
+    column_migrations = {
+        # Add 15th of may to original "year" (jaar) column
+        "jaar": lambda col: pd.to_datetime(col, format="%Y") + pd.DateOffset(months=4, days=14)
+    }
+    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
+    column_additions = {"crop:code_list": ec_url("nl_2020.csv")}
     index_as_id = True
-    area_calculate_missing = True
+
     missing_schemas = {
         "properties": {
-            "source": {"type": "string"},
+            "coverage": {"type": "string", "enum": ["Grasland", "Bouwland"]},
         }
     }
