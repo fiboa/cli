@@ -2,12 +2,17 @@ import pandas as pd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import ec_url, load_ec_mapping
+from .commons.hcat import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
-    sources = {
-        "http://epub.sjv.se/inspire/inspire/wfs?SERVICE=WFS%20&REQUEST=GetFeature%20&VERSION=1.0.0%20&TYPENAMES=inspire:arslager_skifte%20&outputFormat=shape-zip%20&CQL_FILTER=arslager=%272023%27%20%20and%20geom%20is%20not%20null%20&format_options=CHARSET:UTF-8": "se2023.zip"
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    variants = {
+        "2024": {
+            "http://epub.sjv.se/inspire/inspire/wfs?SERVICE=WFS%20&REQUEST=GetFeature%20&VERSION=1.0.0%20&TYPENAMES=inspire:arslager_skifte%20&outputFormat=shape-zip%20&CQL_FILTER=arslager=%272024%27%20%20and%20geom%20is%20not%20null%20&format_options=CHARSET:UTF-8": "se2024.zip"
+        },
+        "2023": {
+            "http://epub.sjv.se/inspire/inspire/wfs?SERVICE=WFS%20&REQUEST=GetFeature%20&VERSION=1.0.0%20&TYPENAMES=inspire:arslager_skifte%20&outputFormat=shape-zip%20&CQL_FILTER=arslager=%272023%27%20%20and%20geom%20is%20not%20null%20&format_options=CHARSET:UTF-8": "se2023.zip"
+        },
     }
     id = "se"
     short_name = "Sweden"
@@ -26,23 +31,15 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "id": "id",
         "faststalld": "metrics:area",
         "grdkod_mar": "crop:code",
-        "crop:name": "crop:name",
         "arslager": "determination:datetime",
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    column_additions = {"crop:code_list": ec_url("se_2021.csv")}
+    ec_mapping_csv = "se_2021.csv"
     column_migrations = {
         # Make year (1st January) from column "arslager"
         "arslager": lambda col: pd.to_datetime(col, format="%Y")
     }
 
     def migrate(self, gdf):
-        """
-        Perform migration of the GeoDataFrame (migrate step).
-        """
-        ec_mapping = load_ec_mapping("se_2021.csv")
-        original_name_mapping = {int(e["original_code"]): e["original_name"] for e in ec_mapping}
-
         gdf["id"] = gdf["blockid"] + "_" + gdf["skiftesbet"]
-        gdf["crop:name"] = gdf["grdkod_mar"].map(original_name_mapping)
-        return gdf
+        return super().migrate(gdf)

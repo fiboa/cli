@@ -1,11 +1,10 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.data import read_data_csv
-from .commons.ec import ec_url
+from .commons.hcat import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     sources = "https://www.apprrr.hr/wp-content/uploads/nipp/land_parcels.gpkg"
     id = "hr"
     short_name = "Croatia"
@@ -31,8 +30,6 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     columns = {
         "id": "id",
         "land_use_id": "crop:code",
-        "crop:name": "crop:name",
-        "crop:name_en": "crop:name_en",
         "area": "metrics:area",
         "geometry": "geometry",
         "home_name": "home_name",
@@ -60,8 +57,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "jpaid": "jpaid",
     }
 
-    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    column_additions = {"crop:code_list": ec_url("hr_2020.csv")}
+    ec_mapping_csv = "hr_2020.csv"
 
     missing_schemas = {
         "required": [
@@ -98,15 +94,6 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
             "jpaid": {"type": "string"},
         },
     }
-
-    def migrate(self, gdf):
-        gdf = super().migrate(gdf)
-        rows = read_data_csv("hr_categories.csv", delimiter=";")
-        mapping = {int(row["code"]): row["name"] for row in rows}
-        mapping_en = {int(row["code"]): row["name_en"] for row in rows}
-        gdf["crop:name"] = gdf["land_use_id"].map(mapping)
-        gdf["crop:name_en"] = gdf["land_use_id"].map(mapping_en)
-        return gdf
 
     area_is_in_ha = False
     area_calculate_missing = True

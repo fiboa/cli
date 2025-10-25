@@ -1,10 +1,10 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import ec_url
+from .commons.hcat import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     sources = {"https://rkg.gov.si/razno/portal_analysis/KMRS_2023.rar": ["KMRS_2023.shp"]}
     id = "si"
     short_name = "Slovenia"
@@ -27,8 +27,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "RASTLINA": "crop:name",
         "CROP_LAT_E": "crop:name_en",
     }
-    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    column_additions = {"crop:code_list": ec_url("si_2021.csv")}
+    ec_mapping_csv = "si_2021.csv"
     column_migrations = {"geometry": lambda col: col.make_valid()}
     area_is_in_ha = False
     missing_schemas = {

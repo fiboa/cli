@@ -1,9 +1,10 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.hcat import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     sources = {
         "https://www.geodaten-mv.de/dienste/gdimv_feldblock_wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&TYPENAME=mv:feldbloecke&OUTPUTFORMAT=shape-zip": "gdimv_feldblock_wfs.zip"
     }
@@ -16,13 +17,13 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     provider = "Ministerium für Landwirtschaft und Umwelt M-V <https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34>"
     license = "No restrictions apply <https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34>"
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
+    ec_mapping_csv = "de.csv"
 
     columns = {
         "geometry": "geometry",
         "fbid": ("id", "flik"),  # make flik id a dedicated column to align with NRW etc.
         "dgl_jahr": "dgl_jahr",
-        # TODO implement crop:code extension
-        "bodennutzu": "bodennutzu",  # Bodennutzungsart
+        "bodennutzu": "crop:code",  # Bodennutzungsart
         "bez_kreis": "bez_kreis",  # Kreisbezeichnung
         "groesse_p": "metrics:area",  # Produktive Fläche des FB in Hektar (Nettofläche)
         "perimeter": "metrics:perimeter",  # Polygonumfang

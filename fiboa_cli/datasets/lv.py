@@ -1,7 +1,7 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import AddHCATMixin, ec_url
+from .commons.ec import AddHCATMixin
 
 count = 3000
 
@@ -37,10 +37,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "geometry": "geometry",
         "DATA_CHANGED_DATE": "determination:datetime",
         "area": "metrics:area",
-        "crop:code_list": "crop:code_list",
         "PRODUCT_CODE": "crop:code",
-        "crop:name": "crop:name",
-        "crop:name_en": "crop:name_en",
     }
     missing_schemas = {
         "properties": {
@@ -52,15 +49,3 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     ec_mapping_csv = "lv_2021.csv"
 
     area_calculate_missing = True
-
-    def migrate(self, gdf):
-        gdf = super().migrate(gdf)
-
-        original_name_mapping = {
-            int(e["original_code"]): e["original_name"] for e in self.ec_mapping
-        }
-        name_mapping = {int(e["original_code"]): e["translated_name"] for e in self.ec_mapping}
-        gdf["crop:code_list"] = ec_url("lv_2021.csv")
-        gdf["crop:name"] = gdf["PRODUCT_CODE"].map(original_name_mapping)
-        gdf["crop:name_en"] = gdf["PRODUCT_CODE"].map(name_mapping)
-        return gdf
