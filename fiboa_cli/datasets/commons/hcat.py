@@ -17,7 +17,7 @@ class AddHCATMixin:
 
     ec_mapping_csv: Optional[str] = None  # TODO rename to hcat_mapping_csv
     mapping_file = None
-    ec_mapping: Optional[dict] = None  # TODO rename to hcat_mapping
+    ec_mapping: Optional[list[dict]] = None  # TODO rename to hcat_mapping
 
     hcat_columns = {
         "hcat:name_en": "hcat:name_en",
@@ -38,11 +38,11 @@ class AddHCATMixin:
             )
         return super().convert(*args, **kwargs)
 
-    def get_code_column(self, gdf):
+    def get_code_column(self, gdf, code="crop:code"):
         try:
-            attribute = next(k for k, v in self.columns.items() if v == "crop:code")
+            attribute = next(k for k, v in self.columns.items() if v == code)
         except StopIteration:
-            raise Exception(f"Misssing crop:code column in converter {self.__class__.__name__}")
+            raise Exception(f"Misssing {code} column in converter {self.__class__.__name__}")
         col = gdf[attribute]
         # Should be corrected in original parser
         return col if col.dtype == "object" else col.astype(str)
@@ -56,15 +56,23 @@ class AddHCATMixin:
 
             if self.ec_mapping is None:
                 self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
-            crop_code_col = self.get_code_column(gdf)
+
+            from_code = "orginal_code"
+            if from_code not in self.ec_mapping[0]:
+                # Some code lists have no code, only a crop_name
+                from_code = "original_name"
+                crop_code_col = self.get_code_column(gdf, "crop:name")
+            else:
+                crop_code_col = self.get_code_column(gdf)
 
             def map_to(attribute):
-                return {e["original_code"]: e[attribute] for e in self.ec_mapping}
+                return {e[from_code]: e[attribute] for e in self.ec_mapping}
 
             for k, v in zip(
                 self.hcat_columns.keys(), ("translated_name", "HCAT3_name", "HCAT3_code")
             ):
-                gdf[k] = crop_code_col.map(map_to(v))
+                if v in self.ec_mapping[0]:
+                    gdf[k] = crop_code_col.map(map_to(v))
 
         if "crop:code_list" not in gdf.columns:
             gdf["crop:code_list"] = (
