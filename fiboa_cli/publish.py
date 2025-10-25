@@ -34,6 +34,8 @@ DESCRIPTIONS = {
     "hcat:name": "The machine-readable HCAT name of the crop",
     "hcat:code": "The 10-digit HCAT code indicating the hierarchy of the crop",
     "hcat:name_en": "The HCAT crop name translated into English",
+    "admin:country_code": "ISO 3166-1 alpha-2 country code.",
+    "admin:subdivision_code": "ISO 3166-2 principal subdivision code (e.g. province or state)",
 }
 
 
@@ -84,7 +86,7 @@ class Publish(BaseCommand):
 
     def __init__(self, dataset: str, data_url=None, s3_upload_path=None):
         super().__init__()
-        self.cmd_title = f"Convert {dataset}"
+        self.cmd_title = f"Publish {dataset}"
         self.dataset = dataset
         self.data_url = data_url or f"{self.url_base}/{self.dataset}"
         self.s3_upload_path = (
