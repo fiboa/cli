@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Extend create_stac, include include fiboa data
 - Fix to vecorel: converter.license and provider should be string
 - Added a Dockerfile to simplify working with fiboa
 - Command `fiboa publish` to automate source coop publication process
