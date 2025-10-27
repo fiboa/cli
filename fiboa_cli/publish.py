@@ -13,10 +13,10 @@ from vecorel_cli.basecommand import BaseCommand, runnable
 from vecorel_cli.cli.options import VECOREL_TARGET
 from vecorel_cli.convert import ConvertData
 from vecorel_cli.converters import Converters
-from vecorel_cli.create_stac import CreateStacCollection
 from vecorel_cli.encoding.auto import create_encoding
 from vecorel_cli.validate import ValidateData
 
+from .create_stac import CreateFiboaStacCollection
 from .registry import Registry
 
 STAC_EXTENSION = "https://stac-extensions.github.io/web-map-links/v1.2.0/schema.json"
@@ -322,7 +322,7 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
 
         self.success(f"Creating STAC collection.json for {parquet_file}")
         p_stac.parent.mkdir(exist_ok=True)
-        CreateStacCollection().create_cli(parquet_file, stac_file)
+        CreateFiboaStacCollection().create_cli(parquet_file, stac_file)
 
         Path(target, "stac").mkdir(parents=True, exist_ok=True)
         data = json.load(open(stac_file, "r"))
