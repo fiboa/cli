@@ -139,7 +139,7 @@ class Improve(ImproveData):
             for k, v in (
                 ("determination_datetime", "determination:datetime"),
                 ("determination_method", "determination:method"),
-                ("metrics_perimeter", "metrics:perimeter"),
+                ("perimeter", "metrics:perimeter"),
             )
             if k in original
         }
