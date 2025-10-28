@@ -14,9 +14,7 @@ class NCConverter(ESBaseConverter):
     id = "es_nc"
     short_name = "Spain Navarra"
     title = "Spain Navarra Crop fields"
-    description = """
-    SIGPAC Crop fields of Spain - Navarra
-    """
+    description = "SIGPAC Crop fields of Spain - Navarra"
     license = "CC-BY-4.0"  # https://sigpac.navarra.es/descargas/
     attribution = "Comunidad Foral de Navarra"
     provider = "Comunidad Foral de Navarra <https://gobiernoabierto.navarra.es>"

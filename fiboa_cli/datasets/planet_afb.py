@@ -16,9 +16,9 @@ class Converter(FiboaBaseConverter):
     short_name = "Planet Field Boundaries"
     title = "Field boundaries created by Planet's Automated Field Boundary detection algorithm"
     description = """
-    These field boundaries are created by Planet Labs, using an automated process using satellite imagery. The algorithm
-    works on a monthly basis and is available for the entire globe. The data is provided in GeoPackage format.
-    For more information, see the [field boundaries technical specification](https://planet.widen.net/s/5vq8w5wjvf/2403.08_mar-9444-field-boundaries-technical-specification-sheet-3)
+These field boundaries are created by Planet Labs, using an automated process using satellite imagery. The algorithm
+works on a monthly basis and is available for the entire globe. The data is provided in GeoPackage format.
+For more information, see the [field boundaries technical specification](https://planet.widen.net/s/5vq8w5wjvf/2403.08_mar-9444-field-boundaries-technical-specification-sheet-3)
     """
     provider = "Planet Labs Inc. <https://www.planet.com>"
     attribution = "© 2024 Planet Labs, PBC"

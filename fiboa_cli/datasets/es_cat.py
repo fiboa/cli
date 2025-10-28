@@ -35,8 +35,8 @@ class ESCatConverter(FiboaBaseConverter):
     short_name = "Catalonia"
     title = "Catalonia Crop Fields (Mapa de cultius)"
     description = """
-        The Department of Agriculture, Livestock, Fisheries and Food makes available to the public the data from the crop map of Catalonia.
-        This map allows you to locate the crops declared in the Agrarian Declaration - DUN submitted to the DACC.
+The Department of Agriculture, Livestock, Fisheries and Food makes available to the public the data from the crop map of Catalonia.
+This map allows you to locate the crops declared in the Agrarian Declaration - DUN submitted to the DACC.
     """
     provider = "Catalonia Department of Agriculture, Livestock, Fisheries and Food <https://agricultura.gencat.cat/ca/ambits/desenvolupament-rural/sigpac/mapa-cultius/>"
     attribution = "Catalonia Department of Agriculture, Livestock, Fisheries and Food"

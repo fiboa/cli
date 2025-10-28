@@ -9,20 +9,20 @@ class ESCNConverter(FiboaBaseConverter):
     short_name = "Spain Canary Islands"
     title = "Spain Crop fields of Canary Islands"
     description = """
-    The Canary Islands Crop Map is a cartographic dataset developed by the Department of Agriculture, Livestock,
-    Fisheries and Water of the Government of the Canary Islands, to understand the reality of the available
-    agricultural surface of the Canary Islands. This tool has been developed from 1998 to the present.
+The Canary Islands Crop Map is a cartographic dataset developed by the Department of Agriculture, Livestock,
+Fisheries and Water of the Government of the Canary Islands, to understand the reality of the available
+agricultural surface of the Canary Islands. This tool has been developed from 1998 to the present.
 
-    There are several crop maps for each of the islands, which allow us to see the temporal and spatial evolution
-    of the cultivated areas of the islands in recent years. All this means that the Canary Islands Crop Map is a
-    basic tool for decision-making in present and future regional agricultural policy, as well as being a basic
-    source for the preservation of agricultural land in the field of territorial planning.
+There are several crop maps for each of the islands, which allow us to see the temporal and spatial evolution
+of the cultivated areas of the islands in recent years. All this means that the Canary Islands Crop Map is a
+basic tool for decision-making in present and future regional agricultural policy, as well as being a basic
+source for the preservation of agricultural land in the field of territorial planning.
 
-    The data of the Canary Islands Crop Map have been published on the open data portal of
-    the Government of the Canary Islands (https://datos.canarias.es/catalogos/general/dataset/mapa-de-cultivos-de-canarias)
-    and in datos gob (https://datos.gob.es/es/catalogo/a05003638-mapa-de-cultivos-de-canarias1),
-    this work having been addressed within the Strategic Plan for Innovation and Continuous Improvement
-    of the Ministry of Agriculture, Livestock and Fisheries.
+The data of the Canary Islands Crop Map have been published on the open data portal of
+the Government of the Canary Islands (https://datos.canarias.es/catalogos/general/dataset/mapa-de-cultivos-de-canarias)
+and in datos gob (https://datos.gob.es/es/catalogo/a05003638-mapa-de-cultivos-de-canarias1),
+this work having been addressed within the Strategic Plan for Innovation and Continuous Improvement
+of the Ministry of Agriculture, Livestock and Fisheries.
     """
     provider = "Gobierno de Canarias - Consejería de Agricultura, Ganadería, Pesca y Soberanía Alimentaria <https://www.gobiernodecanarias.org/agpsa/>"
     license = "CC-BY-4.0"  # as stated in https://datos.canarias.es/portal/aviso-legal-y-condiciones-de-uso

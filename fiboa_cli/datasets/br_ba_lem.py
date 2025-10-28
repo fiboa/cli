@@ -15,11 +15,11 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "West Bahia, Brazil"
     title = "Field boundaries for the west of Bahia state, Brazil"
     description = """
-    This dataset is the supplementary data of a paper published in the Data in Brief Journal.
+This dataset is the supplementary data of a paper published in the Data in Brief Journal.
 
-    The dataset, in ESRI shapefile format (spatial reference system: WGS 84, EPSG: 4326), provides monthly land use
-    information about 1854 fields from October 2019 to September 2020 from Luís Eduardo Magalhães (LEM) and other
-    municipalities in the west of Bahia state, Brazil. The majority of the 16 land uses classes are related to crops.
+The dataset, in ESRI shapefile format (spatial reference system: WGS 84, EPSG: 4326), provides monthly land use
+information about 1854 fields from October 2019 to September 2020 from Luís Eduardo Magalhães (LEM) and other
+municipalities in the west of Bahia state, Brazil. The majority of the 16 land uses classes are related to crops.
     """
     provider = "Mendeley Data <https://data.mendeley.com/datasets/vz6d7tw87f/1#file-5ac1542b-12ef-4dce-8258-113b5c5d87c9>"
     attribution = "Copyright © 2024 Elsevier inc, its licensors, and contributors."

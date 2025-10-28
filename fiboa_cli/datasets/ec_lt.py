@@ -12,9 +12,9 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     short_name = "Lithuania"
     title = "Field boundaries for Lithuania"
     description = """
-    Collection of data on agricultural land and crop areas, cultivated crops in the territory of the Republic of Lithuania.
+Collection of data on agricultural land and crop areas, cultivated crops in the territory of the Republic of Lithuania.
 
-    The download service is a set of personalized spatial data of agricultural land and crop areas, cultivated crops. The service provides object geometry with descriptive (attributive) data.
+The download service is a set of personalized spatial data of agricultural land and crop areas, cultivated crops. The service provides object geometry with descriptive (attributive) data.
     """
     provider = "Construction Sector Development Agency <https://www.geoportal.lt/geoportal/nacionaline-mokejimo-agentura-prie-zemes-ukio-ministerijos#savedSearchId={56542726-DC0B-461E-A32C-3E9A4A693E27}&collapsed=true>"
     # license = "Non-commercial use only <https://www.geoportal.lt/metadata-catalog/catalog/search/resource/details.page?uuid=%7B7AF3F5B2-DC58-4EC5-916C-813E994B2DCF%7D>"

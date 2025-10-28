@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - EuroCropsConverterMixin is a BaseClass for EuroCrops-provided datasets
   - EuroLandBaseConverter is a BaseClass for Euroland-provided datasets
 - Avoid base property schema override
+- Remove unintended CommonMark formatting (indentation) from descriptions in converters
 
 ## [v0.20.3] - 2025-09-13
 

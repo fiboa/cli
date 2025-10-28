@@ -17,9 +17,9 @@ class ARConverter(ESBaseConverter):
     short_name = "Spain Aragon"
     title = "Spain Aragon Crop fields"
     description = """
-    SIGPAC - Sistema de Información Geográfica de la Política Agrícola común (ejercicio actual)
+SIGPAC - Sistema de Información Geográfica de la Política Agrícola común (ejercicio actual)
 
-    Crop Fields of Spain province Aragon
+Crop Fields of Spain province Aragon
     """
     provider = "Gobierno de Aragon <https://www.aragon.es>"
 

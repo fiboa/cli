@@ -7,9 +7,8 @@ class ESGAConverter(EsriRESTConverterMixin, ESBaseConverter):
     short_name = "Spain "
     title = "Spain Galicia Crop fields"
     description = """
-    Galician Crop Fields
-    The Geographic Information System for Agricultural Plots (SIXPAC) is an official reference database for the identification of agricultural plots, which is mandatory in Spain for making applications for direct CAP aid that require declaring surface areas.
-    SIXPAC information is relevant to farmers applying for these aid schemes, so that they can indicate the location of the farm surfaces that may be eligible for subsidies, as well as to facilitate the submission of requests for changes to data relating to land uses contained in the system.
+**Galician Crop Fields**: The Geographic Information System for Agricultural Plots (SIXPAC) is an official reference database for the identification of agricultural plots, which is mandatory in Spain for making applications for direct CAP aid that require declaring surface areas.
+SIXPAC information is relevant to farmers applying for these aid schemes, so that they can indicate the location of the farm surfaces that may be eligible for subsidies, as well as to facilitate the submission of requests for changes to data relating to land uses contained in the system.
     """
     license = "CC-BY-4.0"  # https://mapas.xunta.gal/gl/aviso-legal
     attribution = "Información procedente do FOGGA"

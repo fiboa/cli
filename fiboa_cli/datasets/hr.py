@@ -11,12 +11,12 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "Croatia"
     title = "Croatian Field Boundaries"
     description = """
-    Field boundary data for Croatia, provided as part of national agricultural datasets.
+Field boundary data for Croatia, provided as part of national agricultural datasets.
 
-    This dataset contains spatial data related to agricultural land use in Croatia, including ARKOD parcel information,
-    environmentally sensitive areas, High Nature Value Grasslands, protective buffer strips around watercourses, and vineyard
-    classifications. The data is crucial for managing agricultural activities, ensuring compliance with environmental regulations,
-    and supporting sustainable land use practices.
+This dataset contains spatial data related to agricultural land use in Croatia, including ARKOD parcel information,
+environmentally sensitive areas, High Nature Value Grasslands, protective buffer strips around watercourses, and vineyard
+classifications. The data is crucial for managing agricultural activities, ensuring compliance with environmental regulations,
+and supporting sustainable land use practices.
     """
 
     provider = "Agencija za plaćanja u poljoprivredi, ribarstvu i ruralnom razvoju <https://www.apprrr.hr/prostorni-podaci-servisi/>"

@@ -10,11 +10,11 @@ class Convert(EuroCropsConverterMixin, FiboaBaseConverter):
     short_name = "Romania"
     title = "Field boundaries for Romania"
     description = """
-        The dataset includes the land cover layer from the Romanian side of the Romania-Bulgaria cross-border area (Mehedinți, Dolj, Olt, Teleorman, Giurgiu, Călărași, Constanța counties), developed within the project "Common strategy for territorial development of the cross-border area Romania-Bulgaria", code MIS-ETC 171, funded by the Romania-Bulgaria Cross-Border Cooperation Programme 2007-2013.
+The dataset includes the land cover layer from the Romanian side of the Romania-Bulgaria cross-border area (Mehedinți, Dolj, Olt, Teleorman, Giurgiu, Călărași, Constanța counties), developed within the project "Common strategy for territorial development of the cross-border area Romania-Bulgaria", code MIS-ETC 171, funded by the Romania-Bulgaria Cross-Border Cooperation Programme 2007-2013.
 
-        The dataset is published in the WGS 84 / UTM zone 35N coordinate system (to be compatible with the similar dataset on the Bulgarian side).
+The dataset is published in the WGS 84 / UTM zone 35N coordinate system (to be compatible with the similar dataset on the Bulgarian side).
 
-        The dataset is in line with the conceptual framework described in the Land Cover Data Specifications for the Implementation of the INSPIRE Directive (version 3.0). The information layer was developed based on a methodology developed within the project, which was carried out as follows: - analysis and harmonisation of the land cover classification system; - acquisition and processing of the reference data, listed below; - verification and validation of the quality of the spatial data produced;
+The dataset is in line with the conceptual framework described in the Land Cover Data Specifications for the Implementation of the INSPIRE Directive (version 3.0). The information layer was developed based on a methodology developed within the project, which was carried out as follows: - analysis and harmonisation of the land cover classification system; - acquisition and processing of the reference data, listed below; - verification and validation of the quality of the spatial data produced;
     """
     provider = (
         "Ministry of Regional Development and Public Administration <http://spatial.mdrap.ro>"
