@@ -144,11 +144,13 @@ Check `fiboa validate-schema --help` for more details.
 Various "improvements" can be applied to a fiboa GeoParquet file.
 The commands allows to
 
+- detect fiboa-0.2 files and convert them to fiboa-0.3
 - change the CRS (`--crs`)
 - change the GeoParquet version (`-gp1`) and compression (`-pc`)
 - add/fill missing perimeter/area values (`-sz`)
 - fix invalid geometries (`-g`)
 - rename columns (`-r`)
+- add HCAT columns (`--hcat=mapping.csv`) based on the input crop:code (from crop-extension) and a hcat-mapping csv file
 
 Example:
 
