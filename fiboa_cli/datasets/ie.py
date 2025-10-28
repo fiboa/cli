@@ -15,10 +15,7 @@ class IEConverter(AdminConverterMixin, FiboaBaseConverter):
     id = "ie"
     short_name = "Ireland"
     title = "Ireland INSPIRE Geospatial aid application (GSAA) dataset"
-    description = """
-    This data represents the outline shape of LPIS parcels as claimed under area based schemes. The dataset includes the crops claimed as part of the annual GSAA.
-    Yearly information provided through the beneficiary declaration.
-    """
+    description = "This data represents the outline shape of LPIS parcels as claimed under area based schemes. The dataset includes the crops claimed as part of the annual GSAA. Yearly information provided through the beneficiary declaration."
 
     provider = "Department of Agriculture, Food and the Marine <https://www.gov.ie/en/organisation/department-of-agriculture-food-and-the-marine/>"
     attribution = "Ireland Department of Agriculture, Food and the Marine"

@@ -47,8 +47,14 @@ class Converter(FiboaBaseConverter):
     short_name = "Country, Region, etc."
     # Title of the collection
     title = "Field boundaries for Country, Region, etc."
-    # Description of the collection. Can be multiline and include CommonMark.
-    description = """Describe the dataset here."""
+    # Description of the collection.
+    description = """
+Describe the dataset here.
+
+Can be formatted with [CommonMark](https://commonmark.org/) (a Markdown variant).
+The description can be multiple lines long,
+but ensure it is _not_ indented within the triple quotes.
+    """
 
     # The provider of the data.
     # A string that contains the provider name and optionally a URL.

@@ -15,10 +15,10 @@ class JPConverter(FiboaBaseConverter):
     short_name = "Japan"
     title = "Japan Fude Parcels"
     description = """
-    Japanese Farmland Parcel Polygons (Fude Polygons in Japanese) represent parcel information of farmland.
-    The polygons are manually digitized data derived from aerial imagery, such as satellite images. Since no
-    on-site verification or similar procedures have been conducted, the data may not necessarily match the actual
-    current conditions. Fude Polygons are created for the purpose of roughly indicating the locations of farmland.
+Japanese Farmland Parcel Polygons (Fude Polygons in Japanese) represent parcel information of farmland.
+The polygons are manually digitized data derived from aerial imagery, such as satellite images. Since no
+on-site verification or similar procedures have been conducted, the data may not necessarily match the actual
+current conditions. Fude Polygons are created for the purpose of roughly indicating the locations of farmland.
     """
 
     provider = "Japanese Ministry of Agriculture, Forestry and Fisheries (MAFF, 農林水産省) <https://www.maff.go.jp/>"

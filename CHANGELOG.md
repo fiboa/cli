@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - EuroCropsConverterMixin is a BaseClass for EuroCrops-provided datasets
   - EuroLandBaseConverter is a BaseClass for Euroland-provided datasets
 - Avoid base property schema override
+- Remove unintended CommonMark formatting (indentation) from descriptions in converters
 - Fibo Improve command 
   - Upgrades from fiboa-0.2 if required
   - Adds HCAT if specified
