@@ -15,9 +15,9 @@ class BGConverter(AdminConverterMixin, FiboaBaseConverter):
     title = "Bulgaria"
     license = "CC-BY-4.0"
     provider = "Ministry of Health"
-    description = """\
-    Bulgarian Agriculture areas. Dataset has been produced from field checks and orthophotos mapping.
-    Categorized in Arable Land, Greenhouses, Mixed Land Use and Rice fields.
+    description = """
+Bulgarian Agriculture areas. Dataset has been produced from field checks and orthophotos mapping.
+Categorized in Arable Land, Greenhouses, Mixed Land Use and Rice fields.
     """
 
     area_is_in_ha = False
