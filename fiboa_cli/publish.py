@@ -184,6 +184,8 @@ class Publish(BaseCommand):
         converted_by = kwargs.get("converted_by")
         if converted_by:
             data["submitter"] = converted_by
+
+        assert data["provider"], "Cannot determine data provider from converter or data survey."
         return data, properties
 
     def readme_attribute_table(self, stac_data, properties):
