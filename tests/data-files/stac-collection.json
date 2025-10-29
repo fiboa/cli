@@ -1,7 +1,7 @@
 {
   "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://stac-extensions.github.io/processing/v1.2.0/schema.json"
+    "https://stac-extensions.github.io/processing/v1.1.0/schema.json"
   ],
   "type": "Collection",
   "id": "de_nrw",
@@ -18,9 +18,23 @@
     "data": {
       "roles": ["data"],
       "href": "file://C:/Dev/fiboa-cli/tests/data-files/fiboa-example.json",
-      "processing:software": { "fiboa-cli": "0.20.3" },
+      "processing:software": {
+        "fiboa-cli": "0.20.1",
+        "vecorel-cli": "0.2.3"
+      },
       "type": "application/geo+json"
     }
   },
-  "links": []
+  "links": [],
+  "fiboa_version": "0.3.0",
+  "vecorel_version": "0.1.0",
+  "vecorel_extensions": {
+    "de_nrw": [
+      "https://fiboa.org/crop-extension/v0.2.0/schema.yaml",
+      "https://fiboa.org/flik-extension/v0.2.0/schema.yaml",
+      "https://vecorel.org/specification/v0.1.0/schema.yaml",
+      "https://vecorel.org/administrative-division-extension/v0.1.0/schema.yaml",
+      "https://fiboa.org/specification/v0.3.0/schema.yaml"
+    ]
+  }
 }

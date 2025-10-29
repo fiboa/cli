@@ -18,30 +18,28 @@ def test_create_stac_collection(tmp_folder: Path):
 
     created_file = load_file(out_file)
     expected = load_file(expected_file)
-
     assert isinstance(created_file, dict), "Created file is not a valid JSON dict"
 
+    def pop_path(*args, value=None):
+        c, e = created_file, expected
+        for index, arg in enumerate(args):
+            assert arg in c, f"{arg} not in created stac {c}"
+            assert arg in e, f"{arg} not in expected {e}"
+            method = dict.pop if index == len(args) - 1 else dict.get
+            c, e = method(c, arg), method(e, arg)
+        if value is not None:
+            assert c == value, f"{c} != {value}"
+
     # Cater for environment differences in paths
-    assert "assets" in created_file
-    assert "data" in created_file["assets"]
-    assert "href" in created_file["assets"]["data"]
-    del created_file["assets"]["data"]["href"]
-    del expected["assets"]["data"]["href"]
+    pop_path("assets", "data", "href")
+
     # Cater for floating point differences
-    assert "extent" in created_file
-    assert "spatial" in created_file["extent"]
-    assert "bbox" in created_file["extent"]["spatial"]
-    del created_file["extent"]["spatial"]["bbox"]
-    del expected["extent"]["spatial"]["bbox"]
+    pop_path("extent", "spatial", "bbox")
+
     # Cater for differences in version numbers
-    assert "assets" in created_file
-    assert "data" in created_file["assets"]
-    assert "processing:software" in created_file["assets"]["data"]
-    assert "fiboa-cli" in created_file["assets"]["data"]["processing:software"]
-    assert (
-        created_file["assets"]["data"]["processing:software"]["fiboa-cli"] == Registry.get_version()
-    )
-    del created_file["assets"]["data"]["processing:software"]["fiboa-cli"]
-    del expected["assets"]["data"]["processing:software"]["fiboa-cli"]
+    pop_path("assets", "data", "processing:software", "fiboa-cli", value=Registry.get_version())
+
+    created_file["vecorel_extensions"]["de_nrw"].sort()
+    expected["vecorel_extensions"]["de_nrw"].sort()
 
     assert created_file == expected
