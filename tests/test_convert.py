@@ -19,6 +19,7 @@ tests = [
     "at_crop",
     "be_vlg",
     "br_ba_lem",
+    "bg",
     "de_sh",
     "ec_lv",
     "ec_si",
