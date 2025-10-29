@@ -15,9 +15,9 @@ class Convert(EuroCropsConverterMixin, FiboaBaseConverter):
     short_name = "Estonia"
     title = "Field boundaries for Estonia"
     description = """
-    Geospatial Aid Application Estonia Agricultural parcels.
-    The original dataset is provided by ARIB and obtained from the INSPIRE theme GSAA (specifically Geospaial Aid Application Estonia Agricultural parcels) through which the data layer Fields and Eco Areas (GSAA) is made available.
-    The data comes from ARIB's database of agricultural parcels.
+Geospatial Aid Application Estonia Agricultural parcels.
+The original dataset is provided by ARIB and obtained from the INSPIRE theme GSAA (specifically Geospaial Aid Application Estonia Agricultural parcels) through which the data layer Fields and Eco Areas (GSAA) is made available.
+The data comes from ARIB's database of agricultural parcels.
     """
     provider = "Põllumajanduse Registrite ja Informatsiooni Amet <http://data.europa.eu/88u/dataset/pria-pollud>"
     attribution = "© Põllumajanduse Registrite ja Informatsiooni Amet"

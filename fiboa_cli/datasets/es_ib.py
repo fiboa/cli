@@ -10,9 +10,7 @@ class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
     id = "es_ib"
     short_name = "Spain Balearic Islands"
     title = "Spain Balearic Islands Crop fields"
-    description = """
-    SIGPAC Crop fields of Spain - Balearic Islands
-    """
+    description = "SIGPAC Crop fields of Spain - Balearic Islands"
     # https://www.caib.es/sites/M170613081930629/f/463418
     # see https://intranet.caib.es/opendatacataleg/dataset/sigpac-2024/resource/3a0bc2e0-3f37-45b7-a7d4-1e8c7cf09bc8
     license = "CC-BY-4.0"  # http://www.opendefinition.org/licenses/cc-by

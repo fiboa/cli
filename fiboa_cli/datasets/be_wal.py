@@ -17,16 +17,16 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     short_name = "Belgium, Wallonia"
     title = "Belgium Wallonia: Parcellaire Agricole Anonyme"
     description = """
-    The Crop Fields (PAA) covers land use in agricultural and forestry areas managed as part of the implementation of the
-    Common Agricultural Policy by the Paying Agency of Wallonia.
+The Crop Fields (PAA) covers land use in agricultural and forestry areas managed as part of the implementation of the
+Common Agricultural Policy by the Paying Agency of Wallonia.
 
-    The PAA represents the public version of the agricultural plot. It therefore does not include personal information
-    allowing the operator to be identified. It is provided on an annual basis. Data from a year of cultivation are made
-    available to the public during the following year.
+The PAA represents the public version of the agricultural plot. It therefore does not include personal information
+allowing the operator to be identified. It is provided on an annual basis. Data from a year of cultivation are made
+available to the public during the following year.
 
-    The data is distributed in two ways: either at the source of the paying agency (more attributes
-    but no public distribution) or at the European Commission data portal (no limitations). We use the
-    free-licensed version for this converter.
+The data is distributed in two ways: either at the source of the paying agency (more attributes
+but no public distribution) or at the European Commission data portal (no limitations). We use the
+free-licensed version for this converter.
     """
     provider = "Inspire Geoportal of the European Commission <https://inspire-geoportal.ec.europa.eu/srv/eng/catalog.search#/metadata/2a0d9be0-ac3d-443e-9db0-a7cfb0f128e2>"
     license = "No conditions apply to access and use. Distributed through Inspire guidelines <https://inspire-geoportal.ec.europa.eu/srv/eng/catalog.search#/metadata/2a0d9be0-ac3d-443e-9db0-a7cfb0f128e2>"

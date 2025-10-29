@@ -20,14 +20,14 @@ class ANConverter(ESBaseConverter):
     short_name = "Spain Andalusia"
     title = "Spain Andalusia Crop fields"
     description = """
-    SIGPAC is the Geographic Information System for the Identification of Agricultural Plots ,
-    created through collaboration between the Spanish Agricultural Guarantee Fund (FEGA) and
-    the different Autonomous Communities, within the scope of their territories, as an element
-    of the Integrated Management and Control System of the direct aid regimes. It has the character
-    of a public register of administrative profile, and contains updated information on the
-    plots that may benefit from community aid related to the surface area, providing graphic
-    support for these and their subdivisions (ENCLOSURES) with defined agricultural uses or
-    developments.
+SIGPAC is the Geographic Information System for the Identification of Agricultural Plots ,
+created through collaboration between the Spanish Agricultural Guarantee Fund (FEGA) and
+the different Autonomous Communities, within the scope of their territories, as an element
+of the Integrated Management and Control System of the direct aid regimes. It has the character
+of a public register of administrative profile, and contains updated information on the
+plots that may benefit from community aid related to the surface area, providing graphic
+support for these and their subdivisions (ENCLOSURES) with defined agricultural uses or
+developments.
     """
     provider = "Junta de Andalucía <https://www.juntadeandalucia.es>"
     attribution = "©Junta de Andalucía"
