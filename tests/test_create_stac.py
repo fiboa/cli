@@ -38,6 +38,7 @@ def test_create_stac_collection(tmp_folder: Path):
 
     # Cater for differences in version numbers
     pop_path("assets", "data", "processing:software", "fiboa-cli", value=Registry.get_version())
+    pop_path("assets", "data", "processing:software", "vecorel-cli")
 
     created_file["vecorel_extensions"]["de_nrw"].sort()
     expected["vecorel_extensions"]["de_nrw"].sort()
