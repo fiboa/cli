@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Split Germany BB and NDS in block dataset and crop fields
 - Add HCAT to datasets where possible
 - Updated years & variants for at_crop, be_vlg, es_an, es_cl, es_pv, ie, pt, se
+- Extend create_stac, include include fiboa data
 - Publish command; skip hidden files, generate better texts
 - Fix to vecorel: converter.license and provider should be string
 - Added a Dockerfile to simplify working with fiboa
