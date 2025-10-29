@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Split Germany BB and NDS in block dataset and crop fields
 - Add HCAT to datasets where possible
 - Updated years & variants for at_crop, be_vlg, es_an, es_cl, es_pv, ie, pt, se
+- Publish command; skip hidden files, generate better texts
 - Fix to vecorel: converter.license and provider should be string
 - Added a Dockerfile to simplify working with fiboa
 - Command `fiboa publish` to automate source coop publication process
@@ -27,6 +28,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - EuroCropsConverterMixin is a BaseClass for EuroCrops-provided datasets
   - EuroLandBaseConverter is a BaseClass for Euroland-provided datasets
 - Avoid base property schema override
+- Add Converter for Bulgaria
+- Remove unintended CommonMark formatting (indentation) from descriptions in converters
+- Fibo Improve command 
+  - Upgrades from fiboa-0.2 if required
+  - Adds HCAT if specified
 
 ## [v0.20.3] - 2025-09-13
 

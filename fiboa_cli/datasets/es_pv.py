@@ -16,11 +16,11 @@ class ESPVConverter(ESBaseConverter):
     short_name = "Spain Basque Country"
     title = "Spain Basque Country Crop fields"
     description = """
-    SIGPAC, the geographic information system for the identification of agricultural plots, is the system
-    that farmers and ranchers must use to apply for community aid related to the area. The reason for
-    putting this system into effect was the result of a requirement imposed by the European Union on
-    all Member States. Sigpac began to be used from February 1, 2005, together with the beginning of
-    the 2005 community aid application period.
+SIGPAC, the geographic information system for the identification of agricultural plots, is the system
+that farmers and ranchers must use to apply for community aid related to the area. The reason for
+putting this system into effect was the result of a requirement imposed by the European Union on
+all Member States. Sigpac began to be used from February 1, 2005, together with the beginning of
+the 2005 community aid application period.
     """
     provider = "Gobierno Vasco <https://www.euskadi.eus/web01-tramite/es/contenidos/tramite_servicio/datos_geograficos_sigpac/es_def/index.shtml>"
     attribution = "Basque Government / Gobierno Vasco"

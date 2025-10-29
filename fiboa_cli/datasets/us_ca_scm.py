@@ -17,12 +17,12 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "US, California (SCM)"
     title = "California (US) Statewide Crop Mapping"
     description = """
-    For many years, the California Department of Water Resources (DWR) has collected land use data throughout the state
-    and used this information to develop water use estimates for statewide and regional planning efforts, including water
-    use projections, water use efficiency evaluation, groundwater model development, and water transfers. These data are
-    essential for regional analysis and decision making, which has become increasingly important as DWR and other state agencies
-    seek to address resource management issues, regulatory compliance issues, environmental impacts, ecosystem services,
-    urban and economic development, and other issues.
+For many years, the California Department of Water Resources (DWR) has collected land use data throughout the state
+and used this information to develop water use estimates for statewide and regional planning efforts, including water
+use projections, water use efficiency evaluation, groundwater model development, and water transfers. These data are
+essential for regional analysis and decision making, which has become increasingly important as DWR and other state agencies
+seek to address resource management issues, regulatory compliance issues, environmental impacts, ecosystem services,
+urban and economic development, and other issues.
     """
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     provider = "County of Santa Clara <https://www.sccgov.org/sites/dpd/DocsForms/Documents/Ag_Preserves_Laminated_map.pdf>"

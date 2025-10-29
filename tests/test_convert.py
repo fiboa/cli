@@ -19,6 +19,7 @@ tests = [
     "at_block",
     "be_vlg",
     "br_ba_lem",
+    "bg",
     "de_sh",
     "de_bb",
     "ec_lv",

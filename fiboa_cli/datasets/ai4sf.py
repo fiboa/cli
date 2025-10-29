@@ -76,12 +76,12 @@ class Converter(FiboaBaseConverter):
     title = "Field boundaries for Cambodia and Vietnam (AI4SmallFarms)"
     # from https://research.tudelft.nl/en/publications/ai4smallfarms-a-dataset-for-crop-field-delineation-in-southeast-a
     description = """
-    Agricultural field polygons within smallholder farming systems are essential to facilitate the collection of geo-spatial data useful for farmers, managers, and policymakers.
-    However, the limited availability of training labels poses a challenge in developing supervised methods to accurately delineate field boundaries using Earth Observation (EO) data.
-    This data set allows researchers to test and benchmark machine learning methods to delineate agricultural field boundaries in polygon format.
-    The large-scale data set consists of 439,001 field polygons divided into 62 tiles of approximately 5×5 km distributed across Vietnam and Cambodia, covering a range of fields and diverse landscape types.
-    The field polygons have been meticulously digitized from satellite images, following a rigorous multi-step quality control process and topological consistency checks.
-    Multi-temporal composites of Sentinel-2 (S2) images are provided to ensure cloud-free data.
+Agricultural field polygons within smallholder farming systems are essential to facilitate the collection of geo-spatial data useful for farmers, managers, and policymakers.
+However, the limited availability of training labels poses a challenge in developing supervised methods to accurately delineate field boundaries using Earth Observation (EO) data.
+This data set allows researchers to test and benchmark machine learning methods to delineate agricultural field boundaries in polygon format.
+The large-scale data set consists of 439,001 field polygons divided into 62 tiles of approximately 5×5 km distributed across Vietnam and Cambodia, covering a range of fields and diverse landscape types.
+The field polygons have been meticulously digitized from satellite images, following a rigorous multi-step quality control process and topological consistency checks.
+Multi-temporal composites of Sentinel-2 (S2) images are provided to ensure cloud-free data.
     """
 
     provider = "DATA Archiving and Networked Services (DANS) <https://research.tudelft.nl/en/publications/ai4smallfarms-a-dataset-for-crop-field-delineation-in-southeast-a>"

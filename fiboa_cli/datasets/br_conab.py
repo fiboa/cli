@@ -48,14 +48,14 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "Conab"
     title = "Brazil Crop Fields (CONAB)"
     description = """
-    CONAB, Brazil's National Supply Company, is the government agency responsible for providing information on the country's agricultural harvest.
+CONAB, Brazil's National Supply Company, is the government agency responsible for providing information on the country's agricultural harvest.
 
-    This subset of 27, after inspecting all boundaries in the CONAB public database, appear to be hand-drawn field boundaries.
+This subset of 27, after inspecting all boundaries in the CONAB public database, appear to be hand-drawn field boundaries.
 
-    The content of the Mappings comes from Conab, total or partial reproduction without profit motives is authorized,
-    as long as the source is cited and the integrity of the information is maintained.
+The content of the Mappings comes from Conab, total or partial reproduction without profit motives is authorized,
+as long as the source is cited and the integrity of the information is maintained.
 
-    Further information or suggestions can be sent to the email address conab.geote@conab.gov.br
+Further information or suggestions can be sent to the email address conab.geote@conab.gov.br
     """
     provider = (
         "Conab <https://portaldeinformacoes.conab.gov.br/mapeamentos-agricolas-downloads.html>"

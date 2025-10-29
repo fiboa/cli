@@ -18,10 +18,10 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     short_name = "Sweden"
     title = "Swedish Crop Fields (Jordbruksskiften)"
     description = """
-    A crop field (Jordbruksskift) is a contiguous area of land within a block where a farmer grows a crop or otherwise manages the land.
-    To receive compensation for agricultural support (EU support), farmers apply for support from the
-    Swedish Agency for Agriculture via a SAM application. The data set contains parcels where the area
-    applied for and the area decided on are the same. The data is published at the end of a year.
+A crop field (Jordbruksskift) is a contiguous area of land within a block where a farmer grows a crop or otherwise manages the land.
+To receive compensation for agricultural support (EU support), farmers apply for support from the
+Swedish Agency for Agriculture via a SAM application. The data set contains parcels where the area
+applied for and the area decided on are the same. The data is published at the end of a year.
     """
     provider = "Jordbruksverket (The Swedish Board of Agriculture) <https://jordbruksverket.se>"
     attribution = "Jordbruksverket"

@@ -11,9 +11,9 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     short_name = "Finland"
     title = "Finnish Crop Fields (Maatalousmaa)"
     description = """
-    The Finnish Food Authority (FFA) since 2020 produces spatial data sets,
-    more specifically in this context the "Field parcel register" and "Agricultural parcel containing spatial data".
-    A set called "Agricultural land: arable land, permanent grassland or permanent crop (land use)".
+The Finnish Food Authority (FFA) since 2020 produces spatial data sets,
+more specifically in this context the "Field parcel register" and "Agricultural parcel containing spatial data".
+A set called "Agricultural land: arable land, permanent grassland or permanent crop (land use)".
     """
     provider = "Finnish Food Authority <https://www.ruokavirasto.fi/en/about-us/open-information/spatial-data-sets/>"
     attribution = "Finnish Food Authority"

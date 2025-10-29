@@ -10,9 +10,7 @@ class ESCLConverter(ESBaseConverter):
     id = "es_md"
     short_name = "Spain Comunidad de Madrid"
     title = "Spain Madrid Crop fields"
-    description = """
-    SIGPAC is the Agricultural Parcel Identification System implemented throughout the European Union for the application of CAP (Common Agricultural Policy) aid to farmers and ranchers.
-    """
+    description = "SIGPAC is the Agricultural Parcel Identification System implemented throughout the European Union for the application of CAP (Common Agricultural Policy) aid to farmers and ranchers."
     provider = "Comunidad de Madrid <https://www.comunidad.madrid>"
     license = "CC0-1.0"  # No-limits
 

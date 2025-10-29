@@ -21,14 +21,14 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     short_name = "Austria"
     title = "Field boundaries for Austria"
     description = """
-    **Crop Field boundaries for Austria - INVEKOS Schläge Österreich 2025.**
+**Crop Field boundaries for Austria - INVEKOS Schläge Österreich 2025.**
 
-    This layer includes all field uses recorded by the applicants, which serve as the basis for the funding process. A field
-    is a contiguous area of a piece of land that is cultivated for a growing season with only one crop (field use type) and
-    uniform management requirements or as a landscape element type in accordance with Annex 1 of the regulation of the responsible
-    Federal Ministry with horizontal rules for the area of the Common Agricultural Policy (Horizontal CAP Regulation)
-    StF: BGBl. II No. 100/2015 or is simply maintained in good agricultural and ecological condition in accordance with
-    Art. 94 of Regulation (EU) No. 1306/2013 and is digitized in the GIS as a polygon or as a point.
+This layer includes all field uses recorded by the applicants, which serve as the basis for the funding process. A field
+is a contiguous area of a piece of land that is cultivated for a growing season with only one crop (field use type) and
+uniform management requirements or as a landscape element type in accordance with Annex 1 of the regulation of the responsible
+Federal Ministry with horizontal rules for the area of the Common Agricultural Policy (Horizontal CAP Regulation)
+StF: BGBl. II No. 100/2015 or is simply maintained in good agricultural and ecological condition in accordance with
+Art. 94 of Regulation (EU) No. 1306/2013 and is digitized in the GIS as a polygon or as a point.
     """
     provider = "Agrarmarkt Austria <https://geometadatensuche.inspire.gv.at/metadatensuche/inspire/api/records/9db8a0c3-e92a-4df4-9d55-8210e326a7ed>"
     license = "CC-BY-4.0"

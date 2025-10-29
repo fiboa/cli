@@ -19,13 +19,13 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     short_name = "Latvia"
     title = "Latvia Lauki Parcels"
     description = """
-    Latvia offers parcel data on a [public map, available to any user](https://www.lad.gov.lv/lv/lauku-registra-dati).
+Latvia offers parcel data on a [public map, available to any user](https://www.lad.gov.lv/lv/lauku-registra-dati).
 
-    The land register is a geographic information system (GIS) that gathers information about agricultural land eligible for state and European Union support from direct support scheme payments or environmental, climate, and rural landscape improvement payments.
+The land register is a geographic information system (GIS) that gathers information about agricultural land eligible for state and European Union support from direct support scheme payments or environmental, climate, and rural landscape improvement payments.
 
-    The GIS of the field register contains a database of field blocks with interconnected spatial cartographic data and information of attributes subordinate to them: geographic attachment, identification numbers, and area information.
+The GIS of the field register contains a database of field blocks with interconnected spatial cartographic data and information of attributes subordinate to them: geographic attachment, identification numbers, and area information.
 
-    Relevant datasets are: Country blocks (Lauku Bloki), Fields (Lauki), and Landscape elements.
+Relevant datasets are: Country blocks (Lauku Bloki), Fields (Lauki), and Landscape elements.
     """
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     provider = "Rural Support Service Republic of Latvia (Lauku atbalsta dienests) <https://www.lad.gov.lv/lv/lauku-registra-dati>"

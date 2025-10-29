@@ -20,17 +20,17 @@ class NLCropConverter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "Netherlands (Crops)"
     title = "BRP Crop Field Boundaries for The Netherlands (CAP-based)"
     description = """
-    BasisRegistratie Percelen (BRP) combines the location of
-    agricultural plots with the crop grown. The data set
-    is published by RVO (Netherlands Enterprise Agency). The boundaries of the agricultural plots
-    are based within the reference parcels (formerly known as AAN). A user an agricultural plot
-    annually has to register his crop fields with crops (for the Common Agricultural Policy scheme).
-    A dataset is generated for each year with reference date May 15.
-    A view service and a download service are available for the most recent BRP crop plots.
+BasisRegistratie Percelen (BRP) combines the location of
+agricultural plots with the crop grown. The data set
+is published by RVO (Netherlands Enterprise Agency). The boundaries of the agricultural plots
+are based within the reference parcels (formerly known as AAN). A user an agricultural plot
+annually has to register his crop fields with crops (for the Common Agricultural Policy scheme).
+A dataset is generated for each year with reference date May 15.
+A view service and a download service are available for the most recent BRP crop plots.
 
-    <https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/index.xml>
+<https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/index.xml>
 
-    Data is currently available for the years 2009 to 2024.
+Data is currently available for the years 2009 to 2024.
     """
 
     provider = (

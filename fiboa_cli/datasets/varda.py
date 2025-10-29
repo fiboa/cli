@@ -16,7 +16,7 @@ class Converter(FiboaBaseConverter):
     id = "varda"
     short_name = "Varda"
     title = "Varda Global FieldID"
-    description = """Field Boundaries from the Global FieldID system from Varda."""
+    description = "Field Boundaries from the Global FieldID system from Varda."
 
     provider = "Varda <https://www.varda.ag>"
     attribution = "© 2024 Varda"

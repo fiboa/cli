@@ -14,14 +14,14 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     short_name = "Slovakia"
     title = "Slovakia Agricultural Land Identification System"
     description = """
-    Systém identifikácie poľnohospodárskych pozemkov (LPIS)
+Systém identifikácie poľnohospodárskych pozemkov (LPIS)
 
-    LPIS is an agricultural land identification system. It represents the vector boundaries of agricultural land
-    and carries information about the unique code, acreage, culture/land use, etc., which is used as a reference
-    for farmers' applications, for administrative and cross-checks, on-site checks and also checks using remote
-    sensing methods.
+LPIS is an agricultural land identification system. It represents the vector boundaries of agricultural land
+and carries information about the unique code, acreage, culture/land use, etc., which is used as a reference
+for farmers' applications, for administrative and cross-checks, on-site checks and also checks using remote
+sensing methods.
 
-    Dataset Hranice užívania contains the use declared by applicants for direct support.
+Dataset Hranice užívania contains the use declared by applicants for direct support.
     """
     provider = "Pôdohospodárska platobná agentúra <https://www.apa.sk>"
     license = "CC0-1.0"  # "Open Data"
