@@ -8,9 +8,7 @@ class ESCBConverter(EsriRESTConverterMixin, ESBaseConverter):
     id = "es_cb"
     short_name = "Spain Cantabria"
     title = "Spain Cantabria Crop fields"
-    description = """
-    SIGPAC Crop fields of Spain - Cantabria
-    """
+    description = "SIGPAC Crop fields of Spain - Cantabria"
     # https://www.caib.es/sites/M170613081930629/f/463418
     # see https://intranet.caib.es/opendatacataleg/dataset/sigpac-2024/resource/3a0bc2e0-3f37-45b7-a7d4-1e8c7cf09bc8
     # "Our licenses allow the reproduction or redistribution of the licensed digital information to third parties. In such cases, it is essential that when redistributing or transferring the data to said third parties, they clearly and explicitly accept the conditions of our non-commercial use license."

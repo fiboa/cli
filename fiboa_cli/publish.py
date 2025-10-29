@@ -34,7 +34,11 @@ DESCRIPTIONS = {
     "hcat:name": "The machine-readable HCAT name of the crop",
     "hcat:code": "The 10-digit HCAT code indicating the hierarchy of the crop",
     "hcat:name_en": "The HCAT crop name translated into English",
+    "admin:country_code": "ISO 3166-1 alpha-2 country code.",
+    "admin:subdivision_code": "ISO 3166-2 principal subdivision code (e.g. province or state)",
 }
+
+is_windows = os.name == "nt"
 
 
 class Publish(BaseCommand):
@@ -55,14 +59,6 @@ class Publish(BaseCommand):
                 help="Generate README.txt and LICENSE.txt for the dataset if not present.",
                 default=False,
             ),
-            "yes": click.option(
-                "--yes",
-                "-y",
-                is_flag=True,
-                type=click.BOOL,
-                help="Answer yes to all questions.",
-                default=False,
-            ),
             "data_url": click.option(
                 "--data-url",
                 type=click.STRING,
@@ -72,6 +68,36 @@ class Publish(BaseCommand):
                 "--s3-upload-path",
                 type=click.STRING,
                 help="Upload to this path on S3. By default it's the source coop fiboa data repository.",
+            ),
+            "yes": click.option(
+                "--yes",
+                "-y",
+                is_flag=True,
+                type=click.BOOL,
+                help="Answer yes to all questions.",
+                default=False,
+                show_default=True,
+            ),
+            "data_survey_url": click.option(
+                "--data-survey-url",
+                type=click.STRING,
+                help="URL to the data survey markdown file.",
+                default=os.getenv("FIBOA_DATA_SURVEY"),
+                show_default=True,
+            ),
+            "editor": click.option(
+                "--editor",
+                type=click.STRING,
+                help="Editor to use when editing generated files.",
+                default=os.getenv("EDITOR", "edit" if is_windows else "nano"),
+                show_default=True,
+            ),
+            "converted_by": click.option(
+                "--converted-by",
+                type=click.STRING,
+                help="Name of the person or organization that converted the data.",
+                default=os.getenv("FIBOA_CONVERTED_BY"),
+                show_default=True,
             ),
         }
 
@@ -84,7 +110,7 @@ class Publish(BaseCommand):
 
     def __init__(self, dataset: str, data_url=None, s3_upload_path=None):
         super().__init__()
-        self.cmd_title = f"Convert {dataset}"
+        self.cmd_title = f"Publish {dataset}"
         self.dataset = dataset
         self.data_url = data_url or f"{self.url_base}/{self.dataset}"
         self.s3_upload_path = (
@@ -104,9 +130,9 @@ class Publish(BaseCommand):
             self.error(f"Missing command {cmd}. Please install {name or cmd}")
             sys.exit(1)
 
-    def download_data_survey(self, base):
+    def download_data_survey(self, base, **kwargs):
         data_survey = (
-            os.getenv("FIBOA_DATA_SURVEY")
+            kwargs.get("data_survey_url")
             or f"https://raw.githubusercontent.com/fiboa/data-survey/refs/heads/main/data/{base}.md"
         )
         response = requests.get(data_survey)
@@ -118,7 +144,7 @@ class Publish(BaseCommand):
             return response.text
 
     @cache
-    def collect_meta_data(self, parquet_file):
+    def collect_meta_data(self, parquet_file, **kwargs):
         base = self.dataset.replace("_", "-").upper()
         data = {
             "provider": self.converter.provider,
@@ -128,7 +154,7 @@ class Publish(BaseCommand):
             "submitter": "Fiboa project",
             "header": "",
         }
-        text = self.download_data_survey(base)
+        text = self.download_data_survey(base, **kwargs)
         mapping = {
             "data provider (legal entity)": "provider",
             "submitter (affiliation)": "submitter",
@@ -155,6 +181,11 @@ class Publish(BaseCommand):
             data["projection"] = f"{crs['id']['authority']}:{crs['id']['code']} ({crs['name']})"
         except Exception:
             pass
+        converted_by = kwargs.get("converted_by")
+        if converted_by:
+            data["submitter"] = converted_by
+
+        assert data["provider"], "Cannot determine data provider from converter or data survey."
         return data, properties
 
     def readme_attribute_table(self, stac_data, properties):
@@ -181,10 +212,10 @@ class Publish(BaseCommand):
         aligned_cols.insert(1, ["-" * (w + 2) for w in widths])
         return "\n".join(["|" + "|".join(cols) + "|" for cols in aligned_cols])
 
-    def make_license(self, parquet_file):
+    def make_license(self, parquet_file, **kwargs):
         text = ""
         try:
-            data, properties = self.collect_meta_data(parquet_file)
+            data, properties = self.collect_meta_data(parquet_file, **kwargs)
             text = data["license"]
             if getattr(self.converter, "license") not in (None, "", data["license"]):
                 text += "\n" + self.converter.license + "\n"
@@ -211,13 +242,13 @@ class Publish(BaseCommand):
             self.exception(e)
         return text
 
-    def make_readme(self, parquet_file, file_name, stac):
+    def make_readme(self, parquet_file, file_name, stac, **kwargs):
         version = Registry.get_version()
         converter = self.converter
         with open(stac) as f:
             stac_data = json.load(f)
         count = stac_data["assets"]["data"]["table:row_count"]
-        data, properties = self.collect_meta_data(parquet_file)
+        data, properties = self.collect_meta_data(parquet_file, **kwargs)
         columns = self.readme_attribute_table(stac_data, properties)
         urls = converter.get_urls() or "manually downloaded file"
         urls = urls.keys() if isinstance(urls, dict) else [urls]
@@ -257,6 +288,9 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         target,
         generate_meta=False,
         yes=False,
+        data_survey_url=None,
+        editor=None,
+        converted_by=None,
         **kwargs,
     ):
         """
@@ -275,7 +309,7 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         parquet_file = Path(target) / f"{file_name}.parquet"
 
         has_write_access = bool(
-            os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY")
+            os.getenv("AWS_ACCESS_KEY_ID") and os.getenv("AWS_SECRET_ACCESS_KEY")
         )
 
         stac_file = Path(target) / "stac" / "collection.json"
@@ -297,7 +331,15 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         self.create_stac_collection(target, file_name, parquet_file, stac_file)
 
         if generate_meta:
-            self.generate_meta(target, file_name, stac_file, yes=yes)
+            self.generate_meta(
+                target,
+                file_name,
+                stac_file,
+                data_survey_url=data_survey_url,
+                converted_by=converted_by,
+                yes=yes,
+                editor=editor,
+            )
 
         self.generate_pmtiles(target, file_name, parquet_file)
         if not has_write_access:
@@ -308,10 +350,10 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
             )
             self.info("  - Go to 'Access keys' and press 'Create access key'")
             self.info(
-                "  - Run export WS_ACCESS_KEY_ID=<> AWS_SECRET_ACCESS_KEY=<>\n"
-                "    where you copy-past the access key and secret",
+                "  - Run `export AWS_ACCESS_KEY_ID=<> AWS_SECRET_ACCESS_KEY=<>`\n"
+                "    (Linux/Mac only) where you copy-paste the access key and secret to <>.",
             )
-            self.error("Please set AWS_ env vars for uploading")
+            self.error("Please set AWS_ environment variables for uploading")
             return
         self.upload_to_aws(target)
 
@@ -347,7 +389,7 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         with open(stac_file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
 
-    def generate_meta(self, target, file_name, stac_file, yes=False):
+    def generate_meta(self, target, file_name, stac_file, **kwargs):
         parquet_file = Path(target) / f"{file_name}.parquet"
         for required in ("README.md", "LICENSE.txt"):
             path = Path(target) / required
@@ -358,27 +400,34 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
                         parquet_file,
                         file_name=file_name,
                         stac=stac_file,
+                        **kwargs,
                     )
                 else:
-                    text = self.make_license(parquet_file)
+                    text = self.make_license(parquet_file, **kwargs)
                 self.info(
                     f"\nGenerated the following file {required}:\n{'-' * 80}\n\n{text}\n{'-' * 80}\n"
                 )
                 action = (
-                    "C" if yes else input("Do you want to Continue (C), Edit (E) or Abort (A)?")
+                    "C"
+                    if kwargs.get("yes")
+                    else input("Do you want to Continue (C), Edit (E) or Abort (A)?")
                 )
                 if action.lower() not in "ce":
                     self.warning("Bailing out")
                     sys.exit(1)
                 with open(path, "w") as f:
                     f.write(text)
-                if action.lower() == "e":
-                    with open(path, "w") as f:
-                        f.write(text)
-                    editor = os.getenv("EDITOR") or "nano"
+                editor = kwargs.get("editor")
+                if action.lower() == "e" and editor:
                     os.system(f"{editor} {path}")
 
     def generate_pmtiles(self, target, file_name, parquet_file):
+        if is_windows:
+            self.warning(
+                "PMTiles generation through tippecanoe is not supported on Windows, skipping."
+            )
+            return
+
         pm_file = Path(target) / f"{file_name}.pmtiles"
         if not pm_file.exists():
             self.info("Running ogr2ogr | tippecanoe")
@@ -392,4 +441,4 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         self.info("Uploading to aws")
 
         self.check_command("aws")
-        self.exc(f"aws s3 sync {target} {self.s3_upload_path}")
+        self.exc(f"aws s3 sync --exclude '.*' {target} {self.s3_upload_path}")

@@ -10,9 +10,9 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     short_name = "Slovenia"
     title = "Slovenia Crop Fields"
     description = """
-    The Slovenian government provides slightly different, relevant open data sets called GERK, KMRS, RABA and EKRZ.
-    This converter uses the KRMS dataset, which includes CAP applications of the last year and discerns
-    around 150 different crop categories.
+The Slovenian government provides slightly different, relevant open data sets called GERK, KMRS, RABA and EKRZ.
+This converter uses the KRMS dataset, which includes CAP applications of the last year and discerns
+around 150 different crop categories.
     """
     provider = "Ministry of Agriculture, Forestry and Food (Ministrstvo za kmetijstvo, gozdarstvo in prehrano) <https://www.gov.si/drzavni-organi/ministrstva/ministrstvo-za-kmetijstvo-gozdarstvo-in-prehrano/>"
 

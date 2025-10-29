@@ -14,13 +14,13 @@ class ESCLConverter(ESBaseConverter):
     short_name = "Spain Castilla y León"
     title = "Spain Castile and León Crop fields"
     description = """
-    Official SIGPAC land plan for the year 2024. (reference date 02-01-2024)
+Official SIGPAC land plan for the year 2024. (reference date 02-01-2024)
 
-    Source: SIGPAC (FEGA) database. The Land Consolidation Replacement Farms are included,
-    not updated in the SIGPAC published in the Viewer.
-    Data manager: Ministry of Agriculture, Fisheries and Food.
-    Data provided by: Department of Agriculture, Livestock and Rural Development. Regional Government of Castile and Leon.
-    Free use of the data is permitted, but commercial exploitation is prohibited.
+Source: SIGPAC (FEGA) database. The Land Consolidation Replacement Farms are included,
+not updated in the SIGPAC published in the Viewer.
+Data manager: Ministry of Agriculture, Fisheries and Food.
+Data provided by: Department of Agriculture, Livestock and Rural Development. Regional Government of Castile and Leon.
+Free use of the data is permitted, but commercial exploitation is prohibited.
     """
     provider = "Junta de Castilla y León <https://datos.jcyl.es/web/jcyl/set/es/sector-publico/sigpac/1284212629849>"
     license = "CC-NC: Free use of the data is permitted, but commercial exploitation is prohibited <http://ftp.itacyl.es/cartografia/LICENCIA-IGCYL-NC-2012.pdf>"
