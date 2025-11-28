@@ -1,3 +1,4 @@
+import geopandas as gpd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
@@ -59,6 +60,10 @@ and supporting sustainable land use practices.
 
     ec_mapping_csv = "hr_2020.csv"
 
+    def migrate(self, gdf) -> gpd.GeoDataFrame:
+        gdf["land_use_id"] = gdf["land_use_id"].astype(int)
+        return super().migrate(gdf)
+
     missing_schemas = {
         "required": [
             "mines_status",
@@ -69,7 +74,7 @@ and supporting sustainable land use practices.
             "jpaid",
         ],
         "properties": {
-            "land_use_id": {"type": "double"},
+            "land_use_id": {"type": "integer"},
             "home_name": {"type": "string"},
             "slope": {"type": "double"},
             "z_avg": {"type": "double"},

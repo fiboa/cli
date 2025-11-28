@@ -3,6 +3,7 @@ from io import StringIO
 from typing import Optional
 
 import geopandas as gpd
+import numpy as np
 from vecorel_cli.vecorel.util import load_file
 
 HCAT_EXTENSION = "https://fiboa.org/hcat-extension/v0.3.0/schema.yaml"
@@ -68,11 +69,21 @@ class AddHCATMixin:
             def map_to(attribute):
                 return {e[from_code]: e[attribute] for e in self.ec_mapping}
 
+            col = None
             for k, v in zip(
                 self.hcat_columns.keys(), ("translated_name", "HCAT3_name", "HCAT3_code")
             ):
                 if v in self.ec_mapping[0]:
-                    gdf[k] = crop_code_col.map(map_to(v))
+                    col = crop_code_col.map(map_to(v))
+                    gdf[k] = col
+                    assert np.unique(col[~col.isna()]).size > 1, "No HCAT crops mapped"
+
+            if col is not None and col.isna().any():
+                index = [
+                    k for k, v in self.columns.items() if v.startswith("crop:") and k in gdf.columns
+                ]
+                missing = gdf[col.isna()][index].drop_duplicates()
+                self.info(f"Missing codes in HCAT mapping:\n{missing}")
 
         if "crop:code_list" not in gdf.columns:
             gdf["crop:code_list"] = (
@@ -86,6 +97,8 @@ class AddHCATMixin:
 
 
 def ec_url(csv_file):
+    if csv_file.startswith("https://"):
+        return csv_file
     return f"https://raw.githubusercontent.com/maja601/EuroCrops/refs/heads/main/csvs/country_mappings/{csv_file}"
 
 

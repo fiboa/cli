@@ -41,10 +41,6 @@ free-licensed version for this converter.
     column_additions = {
         "determination:datetime": "2022-01-01T00:00:00Z",
     }
-    column_migrations = {
-        "crop_code": lambda col: col.str.extract(r"\.(\d+)$", expand=False),
-        "crop_name": lambda col: col.str.strip(),
-    }
     index_as_id = True
 
     def layer_filter(self, layer: str, uri: str) -> bool:
@@ -53,7 +49,7 @@ free-licensed version for this converter.
     def file_migration(
         self, gdf: gpd.GeoDataFrame, path: str, uri: str, layer: str = None
     ) -> gpd.GeoDataFrame:
-        return gml_assure_columns(
+        gdf = gml_assure_columns(
             gdf,
             path,
             uri,
@@ -61,3 +57,6 @@ free-licensed version for this converter.
             crop_name={"ElementPath": "specificLandUse@title", "Type": "String", "Width": 255},
             crop_code={"ElementPath": "specificLandUse@href", "Type": "String", "Width": 255},
         )
+        gdf["crop_code"] = gdf["crop_code"].str.extract(r"\.(\d+)$", expand=False)
+        gdf["crop_name"] = gdf["crop_name"].str.strip()
+        return gdf

@@ -31,7 +31,7 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
         # Make year (1st January) from column "VUOSI"
         "VUOSI": lambda col: pd.to_datetime(col, format="%Y"),
     }
-    ec_mapping_csv = "fi_2020.csv"
+    ec_mapping_csv = "https://fiboa.org/code/fi/fi_2023.csv"
 
     area_is_in_ha = False
     area_calculate_missing = True

@@ -1,10 +1,10 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin
+from .commons.hcat import CROP_EXTENSION
 
 
-class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, FiboaBaseConverter):
     sources = {
         "https://www.geodaten-mv.de/dienste/gdimv_feldblock_wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&TYPENAME=mv:feldbloecke&OUTPUTFORMAT=shape-zip": "gdimv_feldblock_wfs.zip"
     }
@@ -16,8 +16,10 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
 
     provider = "Ministerium für Landwirtschaft und Umwelt M-V <https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34>"
     license = "No restrictions apply <https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34>"
-    extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
-    ec_mapping_csv = "de.csv"
+    extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml", CROP_EXTENSION}
+    column_additions = {"crop:code_list": "https://fiboa.org/code/de/de_mv.csv"}
+
+    # ec_mapping_csv = "de.csv"
 
     columns = {
         "geometry": "geometry",
@@ -53,33 +55,21 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     missing_schemas = {
         "properties": {
             "dgl_jahr": {"type": "int16"},
-            "bodennutzu": {
-                "type": "string",
-                "enum": [
-                    "AAF",  # Aufforstung auf Ackerfläche
-                    "AF",  # Ackerfläche
-                    "AGL",  # Aufforstung auf Grünland
-                    "AÖD",  # Aufforstung auf Ödland
-                    "DK",  # Dauerkultur
-                    "FO",  # Forst
-                    "GL",  # Grünland
-                ],
-            },
             "bez_kreis": {"type": "string"},
             "erwind": {
                 "type": "string",
                 "enum": [
-                    "CC0",  # nicht relevant für Cross Compliance
-                    "CC1",  # Erosionsgefährdung nach Direktzahlungen-Verpflichtungenverordnung
+                    "0",  # nicht relevant für Cross Compliance
+                    "1",  # Erosionsgefährdung nach Direktzahlungen-Verpflichtungenverordnung
                     "-",  # keine Angabe
                 ],
             },
             "erwater": {
                 "type": "string",
                 "enum": [
-                    "CC0",  # nicht relevant für Cross Compliance
-                    "CC1",  # Erosionsgefährdung nach Direktzahlungen-Verpflichtungenverordnung (15-27,5 t/ha/a Bodenabtrag durch Wasser)
-                    "CC2",  # hohe Erosionsgefährdung nach Direktzahlungen-Verpflichtungenverordnung (>27,5 t/ha/a Bodenabtrag durch Wasser)
+                    "0",  # nicht relevant für Cross Compliance
+                    "1",  # Erosionsgefährdung nach Direktzahlungen-Verpflichtungenverordnung (15-27,5 t/ha/a Bodenabtrag durch Wasser)
+                    "2",  # hohe Erosionsgefährdung nach Direktzahlungen-Verpflichtungenverordnung (>27,5 t/ha/a Bodenabtrag durch Wasser)
                     "-",  # keine Angabe
                 ],
             },
