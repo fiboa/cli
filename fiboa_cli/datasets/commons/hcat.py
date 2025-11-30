@@ -4,6 +4,7 @@ from typing import Optional
 
 import geopandas as gpd
 import numpy as np
+import pandas as pd
 from vecorel_cli.vecorel.util import load_file
 
 HCAT_EXTENSION = "https://fiboa.org/hcat-extension/v0.3.0/schema.yaml"
@@ -83,7 +84,16 @@ class AddHCATMixin:
                     k for k, v in self.columns.items() if v.startswith("crop:") and k in gdf.columns
                 ]
                 missing = gdf[col.isna()][index].drop_duplicates()
-                self.info(f"Missing codes in HCAT mapping:\n{missing}")
+                missing.reset_index(drop=True, inplace=True)
+                with pd.option_context(
+                    "display.max_colwidth",
+                    None,
+                    "display.max_columns",
+                    None,
+                    "display.max_rows",
+                    None,
+                ):
+                    self.info(f"Missing codes in HCAT mapping:\n{missing}")
 
         if "crop:code_list" not in gdf.columns:
             gdf["crop:code_list"] = (

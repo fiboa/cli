@@ -10,6 +10,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             "HU2024_20240917shp/HU2024_20240917.shp"
         ]
     }
+    # https://data.slovensko.sk/download?id=626c1181-bc53-40b6-9715-3c10164760ec
     id = "sk"
     short_name = "Slovakia"
     title = "Slovakia Agricultural Land Identification System"
@@ -25,7 +26,7 @@ Dataset Hranice užívania contains the use declared by applicants for direct su
     """
     provider = "Pôdohospodárska platobná agentúra <https://www.apa.sk>"
     license = "CC0-1.0"  # "Open Data"
-    ec_mapping_csv = "sk_2021.csv"
+    ec_mapping_csv = "https://fiboa.org/code/sk/sk.csv"
     columns = {
         "geometry": "geometry",
         "KODKD": "id",
