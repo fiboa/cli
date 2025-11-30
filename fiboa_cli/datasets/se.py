@@ -22,6 +22,8 @@ A crop field (Jordbruksskift) is a contiguous area of land within a block where 
 To receive compensation for agricultural support (EU support), farmers apply for support from the
 Swedish Agency for Agriculture via a SAM application. The data set contains parcels where the area
 applied for and the area decided on are the same. The data is published at the end of a year.
+
+    Codes found at https://jordbruksverket.se/stod/jordbruk-tradgard-och-rennaring/sam-ansokan-och-allmant-om-jordbrukarstoden/grodkoder
     """
     provider = "Jordbruksverket (The Swedish Board of Agriculture) <https://jordbruksverket.se>"
     attribution = "Jordbruksverket"
@@ -34,7 +36,7 @@ applied for and the area decided on are the same. The data is published at the e
         "arslager": "determination:datetime",
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    ec_mapping_csv = "se_2021.csv"
+    ec_mapping_csv = "https://fiboa.org/code/se/se.csv"
     column_migrations = {
         # Make year (1st January) from column "arslager"
         "arslager": lambda col: pd.to_datetime(col, format="%Y")

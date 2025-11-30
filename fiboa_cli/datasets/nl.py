@@ -2,13 +2,13 @@ import pandas as pd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import ec_url
+from .commons.hcat import AddHCATMixin
 
 # see https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/basisregistratie_gewaspercelen_brp.xml
 base = "https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/downloads"
 
 
-class NLCropConverter(AdminConverterMixin, FiboaBaseConverter):
+class NLCropConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     area_calculate_missing = True
     variants = {
         "2025": f"{base}/brpgewaspercelen_concept_2025.gpkg",
@@ -59,7 +59,7 @@ Data is currently available for the years 2009 to 2024.
         "jaar": lambda col: pd.to_datetime(col, format="%Y") + pd.DateOffset(months=4, days=14)
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    column_additions = {"crop:code_list": ec_url("nl_2020.csv")}
+    ec_mapping_csv = "https://fiboa.org/code/nl/nl.csv"
     index_as_id = True
 
     missing_schemas = {

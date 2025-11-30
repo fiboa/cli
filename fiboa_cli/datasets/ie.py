@@ -32,7 +32,7 @@ class IEConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "localId": "id",
         "determination:datetime": "determination:datetime",
     }
-    ec_mapping_csv = "ie_2023.csv"
+    ec_mapping_csv = "https://fiboa.org/code/ie/ie.csv"
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         # crop_name can be multiple: "crop1, crop2, crop3". We only read the main crop (first).
