@@ -27,7 +27,6 @@ The GIS of the field register contains a database of field blocks with interconn
 
 Relevant datasets are: Country blocks (Lauku Bloki), Fields (Lauki), and Landscape elements.
     """
-    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     provider = "Rural Support Service Republic of Latvia (Lauku atbalsta dienests) <https://www.lad.gov.lv/lv/lauku-registra-dati>"
     attribution = "Lauku atbalsta dienests"
     license = "CC-BY-SA-4.0"  # Not sure, taken from Eurocrops. It is "public" and free and "available to any user"
@@ -38,6 +37,7 @@ Relevant datasets are: Country blocks (Lauku Bloki), Fields (Lauki), and Landsca
         "DATA_CHANGED_DATE": "determination:datetime",
         "area": "metrics:area",
         "PRODUCT_CODE": "crop:code",
+        "PRODUCT_DESCRIPTION": "crop:name",
     }
     missing_schemas = {
         "properties": {
@@ -47,5 +47,7 @@ Relevant datasets are: Country blocks (Lauku Bloki), Fields (Lauki), and Landsca
         }
     }
     ec_mapping_csv = "lv_2021.csv"
-
+    column_migrations = {
+        "PRODUCT_CODE": lambda col: col.fillna(0).astype(int).astype(str),
+    }
     area_calculate_missing = True

@@ -101,8 +101,8 @@ class AddHCATMixin:
             )
         return gdf
 
-    def migrate(self, gdf) -> gpd.GeoDataFrame:
-        gdf = super().migrate(gdf)
+    def post_migrate(self, gdf) -> gpd.GeoDataFrame:
+        gdf = super().post_migrate(gdf)
         return self.add_hcat(gdf)
 
 

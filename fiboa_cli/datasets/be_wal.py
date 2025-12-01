@@ -46,6 +46,11 @@ free-licensed version for this converter.
     def layer_filter(self, layer: str, uri: str) -> bool:
         return layer == "ExistingLandUseObject"
 
+    column_migrations = {
+        "crop_code": lambda col: col.str.extract(r"\.(\d+)$", expand=False),
+        "crop_name": lambda col: col.str.strip(),
+    }
+
     def file_migration(
         self, gdf: gpd.GeoDataFrame, path: str, uri: str, layer: str = None
     ) -> gpd.GeoDataFrame:
@@ -57,6 +62,4 @@ free-licensed version for this converter.
             crop_name={"ElementPath": "specificLandUse@title", "Type": "String", "Width": 255},
             crop_code={"ElementPath": "specificLandUse@href", "Type": "String", "Width": 255},
         )
-        gdf["crop_code"] = gdf["crop_code"].str.extract(r"\.(\d+)$", expand=False)
-        gdf["crop_name"] = gdf["crop_name"].str.strip()
         return gdf
