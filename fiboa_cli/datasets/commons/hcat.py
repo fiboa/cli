@@ -68,7 +68,7 @@ class AddHCATMixin:
                 crop_code_col = self.get_code_column(gdf)
 
             def map_to(attribute):
-                return {e[from_code]: e[attribute] for e in self.ec_mapping}
+                return {e[from_code]: e[attribute] or None for e in self.ec_mapping}
 
             col = None
             for k, v in zip(
