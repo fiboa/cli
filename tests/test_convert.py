@@ -37,6 +37,7 @@ tests = [
     "ch",
     "cz",
     "us_usda_cropland",
+    "us_ca_scm",
     "jp",
     "lv",
     "ie",
@@ -77,7 +78,7 @@ def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
     from fiboa_cli import Registry  # noqa
 
     def load_ec(csv_file=None, url=None):
-        if "://" in csv_file:
+        if csv_file and "://" in csv_file:
             csv_file = csv_file.split("/")[-1]
         path = url if url and "://" not in url else f"{test_path}/{converter}/{csv_file}"
         return list(DictReader(open(path, "r", encoding="utf-8")))
