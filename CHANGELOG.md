@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Add DuckDB BaseConverter for efficiently transforming large datasets
 - Extend create_stac, include include fiboa data
 - Publish command; skip hidden files, generate better texts
 - Fix to vecorel: converter.license and provider should be string
