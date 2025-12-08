@@ -2,7 +2,9 @@ import json
 import os
 
 import duckdb
+import pyarrow as pa
 from vecorel_cli.encoding.geojson import VecorelJSONEncoder
+from vecorel_cli.parquet.types import get_pyarrow_field
 
 from .fiboa_converter import FiboaBaseConverter
 
@@ -68,24 +70,23 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
         _collection.update(self.column_additions)
         collection = json.dumps(_collection, cls=VecorelJSONEncoder).encode("utf-8")
 
-        # TODO how to get metadata ARROW:schema ?
-        # from vecorel_cli.parquet.types import get_pyarrow_field
-        # schemas = _collection.merge_schemas({})
-        # props = schemas.get("properties", {})
-        # pq_fields = []
-        # for column in self.columns.values():
-        #     schema = props.get(column, {})
-        #     dtype = schema.get("type")
-        #     if dtype is None:
-        #         self.warning(f"{column}: No mapping")
-        #         continue
-        #     try:
-        #         field = get_pyarrow_field(column, schema=schema)
-        #         pq_fields.append(field)
-        #     except Exception as e:
-        #         self.warning(f"{column}: Skipped - {e}")
-        #
-        # pq_schema = pa.schema(pq_fields)
+        schemas = _collection.merge_schemas({})
+        props = schemas.get("properties", {})
+        pq_fields = []
+        for column in self.columns.values():
+            schema = props.get(column, {})
+            dtype = schema.get("type")
+            if dtype is None:
+                self.warning(f"{column}: No mapping")
+                continue
+            try:
+                field = get_pyarrow_field(column, schema=schema)
+                pq_fields.append(field)
+            except Exception as e:
+                self.warning(f"{column}: Skipped - {e}")
+
+        pq_schema = pa.schema(pq_fields)
+        schema_bytes = pq_schema.serialize().to_pybytes()
         # pq_schema = pq_schema.with_metadata({"collection": collection})
 
         con = duckdb.connect()
@@ -102,10 +103,11 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
                 compression 'brotli',
                 KV_METADATA {{
                     collection: ?,
+                    "PYARROW:schema": ?
                 }}
             )
         """,
-            [output_file, collection],
+            [output_file, collection, schema_bytes],
         )
 
         return output_file
