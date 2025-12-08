@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import duckdb
 import pyarrow as pa
@@ -84,6 +85,9 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
                 pq_fields.append(field)
             except Exception as e:
                 self.warning(f"{column}: Skipped - {e}")
+
+        if isinstance(output_file, Path):
+            output_file = str(output_file)
 
         pq_schema = pa.schema(pq_fields)
         schema_bytes = pq_schema.serialize().to_pybytes()
