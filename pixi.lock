@@ -177,7 +177,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       osx-64:
@@ -342,7 +342,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       osx-arm64:
@@ -508,7 +508,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       win-64:
@@ -672,7 +672,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e1/07/c6fe3ad3e685340704d314d765b7912993bcb8dc198f0e7a89382d37974b/win32_setctime-1.2.0-py3-none-any.whl
       - pypi: ./
@@ -828,7 +828,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       osx-64:
@@ -968,7 +968,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       osx-arm64:
@@ -1109,7 +1109,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       win-64:
@@ -1249,7 +1249,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e1/07/c6fe3ad3e685340704d314d765b7912993bcb8dc198f0e7a89382d37974b/win32_setctime-1.2.0-py3-none-any.whl
       - pypi: ./
@@ -1368,7 +1368,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       osx-64:
@@ -1471,7 +1471,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       osx-arm64:
@@ -1575,7 +1575,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       win-64:
@@ -1676,7 +1676,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e1/07/c6fe3ad3e685340704d314d765b7912993bcb8dc198f0e7a89382d37974b/win32_setctime-1.2.0-py3-none-any.whl
       - pypi: ./
@@ -1820,7 +1820,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       osx-64:
@@ -1948,7 +1948,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       osx-arm64:
@@ -2077,7 +2077,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: ./
       win-64:
@@ -2202,7 +2202,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/da/af/5d24b8d49ef358468ecfdff5c556adf37f4fd28e336b96f923661a808329/types_python_dateutil-2.9.0.20251008-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/00/3fca040d7cf8a32776d3d81a00c8ee7457e00f80c649f1e4a863c8321ae9/uri_template-1.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/e8/c0e05e4684d13459f93d312077a9a2efbe04d59c393bc2b8802248c908d4/webcolors-24.11.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e1/07/c6fe3ad3e685340704d314d765b7912993bcb8dc198f0e7a89382d37974b/win32_setctime-1.2.0-py3-none-any.whl
       - pypi: ./
@@ -2917,9 +2917,9 @@ packages:
 - pypi: ./
   name: fiboa-cli
   version: 0.20.3
-  sha256: 0b3743a9a5f590df1aa36c60901b73456e1f2f7dbc25163ba4597134928c1132
+  sha256: 37684f32135ca252711dae982a7f5f80dbc23a622225cf0c6118a9632584059f
   requires_dist:
-  - vecorel-cli==0.2.11
+  - vecorel-cli==0.2.12
   - spdx-license-list==3.27.0
   requires_python: '>=3.10,<3.14'
   editable: true
@@ -7322,10 +7322,10 @@ packages:
   purls: []
   size: 113963
   timestamp: 1753739198723
-- pypi: https://files.pythonhosted.org/packages/04/ed/c3c3cee45ca60be5f4766bc8dcf6ff904b70b5ca80c603d14297a830d1f0/vecorel_cli-0.2.11-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/95/f1/7b40045bfb8de925f0f510b36e269b474766711a5d4b78b47d97c9695e8d/vecorel_cli-0.2.12-py3-none-any.whl
   name: vecorel-cli
-  version: 0.2.11
-  sha256: 405e04bac3f4818787d3a17e57d13985dcfc9a8f3704454cfa45ca7702243951
+  version: 0.2.12
+  sha256: c984d5522e84f5b374d9778a617006afa06e549fdde423a2f8170cbc399731a1
   requires_dist:
   - pyyaml>=6.0,<7.0
   - click>=8.1,<9.0
