@@ -49,6 +49,7 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
                 selections.append(f'"{k}" as "{v}"')
             if v == "geometry":
                 geom_column = k
+        selection = ", ".join(selections)
 
         filters = []
         where = ""
@@ -61,7 +62,6 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
         if len(filters) > 0:
             where = f"WHERE {' AND '.join(filters)}"
 
-        selection = ", ".join(selections)
         if isinstance(urls, str):
             sources = f'"{urls}"'
         else:
@@ -74,6 +74,7 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
 
         schemas = _collection.merge_schemas({})
         props = schemas.get("properties", {})
+        required = schemas.get("required", [])
         pq_fields = []
         for column in self.columns.values():
             schema = props.get(column, {})
@@ -82,7 +83,7 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
                 self.warning(f"{column}: No mapping")
                 continue
             try:
-                field = get_pyarrow_field(column, schema=schema)
+                field = get_pyarrow_field(column, schema=schema, required=column in required)
                 pq_fields.append(field)
             except Exception as e:
                 self.warning(f"{column}: Skipped - {e}")
