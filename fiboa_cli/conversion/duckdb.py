@@ -69,6 +69,7 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
 
         _collection = self.create_collection(cid)
         _collection.update(self.column_additions)
+        _collection["collection"] = self.id
         collection = json.dumps(_collection, cls=VecorelJSONEncoder).encode("utf-8")
 
         schemas = _collection.merge_schemas({})
