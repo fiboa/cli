@@ -1,8 +1,14 @@
 import json
 import os
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 import duckdb
+import numpy as np
+import pyarrow as pa
+import pyarrow.parquet as pq
+from geopandas.array import from_wkb
+from pyarrow.lib import StructArray
 from vecorel_cli.encoding.geojson import VecorelJSONEncoder
 
 from .fiboa_converter import FiboaBaseConverter
@@ -20,10 +26,13 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
         original_geometries=False,
         **kwargs,
     ) -> str:
-        if geoparquet_version is not None:
-            self.warning("geoparquet_version is not supported for DuckDB-based converters and will always write GeoParquet v1.0")
         if not original_geometries:
-            self.warning("original_geometries is not supported for DuckDB-based converters and will always write original geometries")
+            self.warning(
+                "original_geometries is not supported for DuckDB-based converters and will always write original geometries"
+            )
+
+        geoparquet_version = geoparquet_version or "1.1.0"
+        compression = compression or "brotli"
 
         self.variant = variant
         cid = self.id.strip()
@@ -50,7 +59,9 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
                 request_args["block_size"] = 0
             urls = self.download_files(urls, cache, **request_args)
         elif self.avoid_range_request:
-            self.warning("avoid_range_request is set, but cache is not used, so this setting has no effect")
+            self.warning(
+                "avoid_range_request is set, but cache is not used, so this setting has no effect"
+            )
 
         selections = []
         geom_column = None
@@ -112,13 +123,96 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
                 }}
             )
         """,
-            [output_file, compression or 'brotli', collection_json],
+            [output_file, compression, collection_json],
         )
 
-        # todo: write the file again to do the following:
-        # - update geoparquet version to 1.1
-        # - add bounding box + metadata
-        # - add the non-nullability to the respective columns
-        # Ideally do this in improve...
+        # Post-process the written Parquet to proper GeoParquet v1.1 with bbox and nullability
+        try:
+            pq_file = pq.ParquetFile(output_file)
+
+            existing_schema = pq_file.schema_arrow
+            col_names = existing_schema.names
+            assert "geometry" in col_names, "Missing geometry column in output parquet file"
+
+            schemas = collection.merge_schemas({})
+            collection_only = {k for k, v in schemas.get("collection", {}).items() if v}
+            required_columns = {"geometry"} | {
+                r
+                for r in schemas.get("required", [])
+                if r in col_names and r not in collection_only
+            }
+            if "id" in col_names:
+                required_columns.add("id")
+
+            # Update for version 1.1.0
+            metadata = existing_schema.metadata
+            if geoparquet_version > "1.0.0":
+                geo_meta = json.loads(existing_schema.metadata[b"geo"])
+                geo_meta["version"] = geoparquet_version
+                metadata[b"geo"] = json.dumps(geo_meta).encode("utf-8")
+
+            # Build a new Arrow schema with adjusted nullability
+            new_fields = []
+            for field in existing_schema:
+                if field.name in required_columns and field.nullable:
+                    new_fields.append(
+                        pa.field(field.name, field.type, nullable=False, metadata=field.metadata)
+                    )
+                else:
+                    new_fields.append(field)
+
+            add_bbox = geoparquet_version > "1.0.0" and "bbox" not in col_names
+            if add_bbox:
+                new_fields.append(
+                    pa.field(
+                        "bbox",
+                        pa.struct(
+                            [
+                                ("xmin", pa.float64()),
+                                ("ymin", pa.float64()),
+                                ("xmax", pa.float64()),
+                                ("ymax", pa.float64()),
+                            ]
+                        ),
+                    )
+                )
+            new_schema = pa.schema(new_fields, metadata=metadata)
+
+            # 7) Streamingly rewrite the file to a temp file and replace atomically
+            with NamedTemporaryFile(
+                "wb", delete=False, dir=os.path.dirname(output_file), suffix=".parquet"
+            ) as tmp:
+                tmp_path = tmp.name
+
+            writer = pq.ParquetWriter(
+                tmp_path,
+                new_schema,
+                compression=compression,
+                use_dictionary=True,
+                write_statistics=True,
+            )
+            try:
+                bbox_names = ["ymax", "xmax", "ymin", "xmin"]
+                for rg in range(pq_file.num_row_groups):
+                    tbl = pq_file.read_row_group(rg)
+                    if add_bbox:
+                        # determine bounds, change to StructArray type
+                        bounds = from_wkb(tbl["geometry"]).bounds
+                        bbox_array = StructArray.from_arrays(
+                            np.rot90(bounds),
+                            names=bbox_names,
+                        )
+                        tbl = tbl.append_column("bbox", bbox_array)
+                    # Ensure table adheres to the new schema (mainly nullability); cast if needed
+                    if tbl.schema != new_schema:
+                        # Align field order/types; this does not materialize data beyond the batch
+                        tbl = tbl.cast(new_schema, safe=False)
+                    writer.write_table(tbl)
+            finally:
+                writer.close()
+
+            os.replace(tmp_path, output_file)
+        except Exception as e:
+            self.warning(f"GeoParquet 1.1 post-processing failed: {e}")
 
         return output_file
