@@ -101,7 +101,7 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
         con.execute(
             f"""
             COPY (
-              SELECT {selection} FROM read_parquet({sources})
+              SELECT {selection} FROM read_parquet({sources}, union_by_name=true)
               {where}
               ORDER BY ST_Hilbert({geom_column})
             ) TO ? (
