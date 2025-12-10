@@ -67,33 +67,14 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
         else:
             sources = "[" + ",".join([f'"{url}"' for url in urls]) + "]"
 
-        _collection = self.create_collection(cid)
-        _collection.update(self.column_additions)
-        _collection["collection"] = self.id
-        collection = json.dumps(_collection, cls=VecorelJSONEncoder).encode("utf-8")
-
-        schemas = _collection.merge_schemas({})
-        props = schemas.get("properties", {})
-        required = schemas.get("required", [])
-        pq_fields = []
-        for column in self.columns.values():
-            schema = props.get(column, {})
-            dtype = schema.get("type")
-            if dtype is None:
-                self.warning(f"{column}: No mapping")
-                continue
-            try:
-                field = get_pyarrow_field(column, schema=schema, required=column in required)
-                pq_fields.append(field)
-            except Exception as e:
-                self.warning(f"{column}: Skipped - {e}")
+        collection = self.create_collection(cid)
+        collection.update(self.column_additions)
+        collection["collection"] = self.id
 
         if isinstance(output_file, Path):
             output_file = str(output_file)
 
-        pq_schema = pa.schema(pq_fields)
-        schema_bytes = pq_schema.serialize().to_pybytes()
-        # pq_schema = pq_schema.with_metadata({"collection": collection})
+        collection_json = json.dumps(collection, cls=VecorelJSONEncoder).encode("utf-8")
 
         con = duckdb.connect()
         con.install_extension("spatial")
@@ -101,19 +82,19 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
         con.execute(
             f"""
             COPY (
-              SELECT {selection} FROM read_parquet({sources}, union_by_name=true)
+              SELECT {selection}
+              FROM read_parquet({sources}, union_by_name=true)
               {where}
               ORDER BY ST_Hilbert({geom_column})
             ) TO ? (
                 FORMAT parquet,
-                compression 'brotli',
+                compression '{compression}',
                 KV_METADATA {{
                     collection: ?,
-                    "PYARROW:schema": ?
                 }}
             )
         """,
-            [output_file, collection, schema_bytes],
+            [output_file, collection_json],
         )
 
         return output_file
