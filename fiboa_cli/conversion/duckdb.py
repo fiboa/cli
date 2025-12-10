@@ -77,7 +77,13 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
         if isinstance(urls, str):
             sources = f'"{urls}"'
         else:
-            sources = "[" + ",".join([f'"{url}"' for url in urls]) + "]"
+            paths = []
+            for url in urls:
+                if isinstance(url, tuple):
+                    paths.append(f'"{url[0]}"')
+                else:
+                    paths.append(f'"{url}"')
+            sources = "[" + ",".join(paths) + "]"
 
         collection = self.create_collection(cid)
         collection.update(self.column_additions)
@@ -100,13 +106,13 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
               ORDER BY ST_Hilbert({geom_column})
             ) TO ? (
                 FORMAT parquet,
-                compression '{compression}',
+                compression ?,
                 KV_METADATA {{
                     collection: ?,
                 }}
             )
         """,
-            [output_file, collection_json],
+            [output_file, compression or 'brotli', collection_json],
         )
 
         # todo: write the file again to do the following:
