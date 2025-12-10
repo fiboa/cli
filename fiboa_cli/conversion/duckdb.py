@@ -3,9 +3,7 @@ import os
 from pathlib import Path
 
 import duckdb
-import pyarrow as pa
 from vecorel_cli.encoding.geojson import VecorelJSONEncoder
-from vecorel_cli.parquet.types import get_pyarrow_field
 
 from .fiboa_converter import FiboaBaseConverter
 
@@ -22,6 +20,11 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
         original_geometries=False,
         **kwargs,
     ) -> str:
+        if geoparquet_version is not None:
+            self.warning("geoparquet_version is not supported for DuckDB-based converters and will always write GeoParquet v1.0")
+        if not original_geometries:
+            self.warning("original_geometries is not supported for DuckDB-based converters and will always write original geometries")
+
         self.variant = variant
         cid = self.id.strip()
         if self.bbox is not None and len(self.bbox) != 4:
@@ -39,6 +42,15 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
             urls = self.get_urls()
             if urls is None:
                 raise ValueError("No input files provided")
+
+        self.info("Getting file(s) if not cached yet")
+        if cache:
+            request_args = {}
+            if self.avoid_range_request:
+                request_args["block_size"] = 0
+            urls = self.download_files(urls, cache, **request_args)
+        elif self.avoid_range_request:
+            self.warning("avoid_range_request is set, but cache is not used, so this setting has no effect")
 
         selections = []
         geom_column = None
