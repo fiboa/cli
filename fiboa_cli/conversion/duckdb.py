@@ -109,4 +109,10 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
             [output_file, collection_json],
         )
 
+        # todo: write the file again to do the following:
+        # - update geoparquet version to 1.1
+        # - add bounding box + metadata
+        # - add the non-nullability to the respective columns
+        # Ideally do this in improve...
+
         return output_file
