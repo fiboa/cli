@@ -66,7 +66,7 @@ https://doi.org/10.18167/DVN1/P7OLAP, CIRAD Dataverse, V4
 
         rows = read_data_csv("jecam_crop.csv")
         mapping = {row["crop_name"]: index + 1 for index, row in enumerate(rows)}
-        gdf["crop:code"] = gdf["CropType1"].map(mapping)
+        gdf["crop:code"] = gdf["CropType1"].map(mapping).fillna("").astype(str)
 
         gdf.loc[gdf["Area_ha"] == 0, "Area_ha"] = None
         gdf["Irrigated"] = gdf["Irrigated"].astype(bool)

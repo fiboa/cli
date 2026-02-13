@@ -28,3 +28,4 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             "farmer_id": {"type": "string"},
         }
     }
+    column_migrations = {"code": lambda col: col.fillna("").astype(str)}

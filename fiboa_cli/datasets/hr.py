@@ -27,9 +27,7 @@ and supporting sustainable land use practices.
     license = "Prostorni podaci i servisi <https://www.apprrr.hr/prostorni-podaci-servisi/>"
     index_as_id = True
 
-    column_migrations = {
-        "land_use_id": lambda col: col.astype(int)
-    }
+    column_migrations = {"land_use_id": lambda col: col.astype(int)}
 
     columns = {
         "id": "id",
