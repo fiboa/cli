@@ -23,7 +23,7 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "vecorel-cli==0.2.13",
+    "vecorel-cli==0.2.14",
     "spdx-license-list==3.27.0",
 ]
 
