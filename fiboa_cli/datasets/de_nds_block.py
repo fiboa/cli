@@ -7,7 +7,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     sources = "https://sla.niedersachsen.de/mapbender_sla/download/FB_NDS.zip"
     id = "de_nds_block"
     admin_subdivision_code = "NI"
-    short_name = "Germany, Lower Saxony/Bremen/Hamburg"
+    short_name = "Germany, Lower Saxony/Bremen/Hamburg (parcels)"
     title = "Field boundaries for Lower Saxony / Bremen / Hamburg, Germany"
     description = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
     provider = "ML/SLA Niedersachsen <https://sla.niedersachsen.de/landentwicklung/LEA/>"

@@ -9,7 +9,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     )
 
     id = "nl_block"
-    short_name = "Netherlands"
+    short_name = "Netherlands (parcels)"
     title = "Field blocks for The Netherlands"
     description = """
 A field block (Dutch: "Referentieperceel"), formerly known as "AAN" (Agrarisch Areaal Nederland),

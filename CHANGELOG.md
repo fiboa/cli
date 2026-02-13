@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fibo improve command:
   - Upgrades from fiboa-0.2 if required
   - Adds HCAT if specified
+- Various minor bug fixes
 
 ## [v0.20.3] - 2025-09-13
 
