@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add support for Python 3.14, remove support for Python 3.10
 - Support HCAT mapping CSV files without crop_code
 - Split Germany BB and NDS in block dataset and crop fields
+- Fix the column additions of the determination fields in the AI4SF converter
 - Add HCAT to datasets where possible
 - Updated years & variants for at_crop, be_vlg, es_an, es_cl, es_pv, ie, pt, se
 - Extend create_stac, include include fiboa data
