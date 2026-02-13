@@ -77,4 +77,4 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
         assert len(missing) == 0, f"Can not map crops {missing}"
         gdf["crop:code"] = gdf["cultiu"].map(mapping)
         gdf["crop:name_en"] = gdf["cultiu"].map(mapping_en)
-        return gdf
+        return super().migrate(gdf)

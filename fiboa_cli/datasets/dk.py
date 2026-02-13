@@ -2,10 +2,10 @@ import geopandas as gpd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import ec_url
+from .commons.hcat import AddHCATMixin
 
 
-class DKConverter(AdminConverterMixin, FiboaBaseConverter):
+class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
         str(variant): f"https://landbrugsgeodata.fvm.dk/Download/Marker/Marker_{variant}.zip"
         for variant in range(2024, 2008 - 1, -1)
@@ -15,11 +15,8 @@ class DKConverter(AdminConverterMixin, FiboaBaseConverter):
     title = "Denmark Crop Fields (Marker)"
     description = "The Danish Ministry of Food, Agriculture and Fisheries publishes Crop Fields (Marker) for each year."
 
-    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    column_additions = {"crop:code_list": ec_url("nl_2020.csv")}
-
     provider = "Danish Agricultural Agency <https://lbst.dk/>"
-
+    ec_mapping_csv = "dk_2019.csv"
     license = "CC0-1.0"
     columns = {
         "geometry": "geometry",
@@ -30,5 +27,6 @@ class DKConverter(AdminConverterMixin, FiboaBaseConverter):
     }
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
+        gdf["Afgkode"] = gdf["Afgkode"].astype(float).fillna(value=0).astype(int).astype(str)
         gdf["determination:datetime"] = f"{self.variant}-01-01T00:00:00Z"
-        return gdf
+        return super().migrate(gdf)

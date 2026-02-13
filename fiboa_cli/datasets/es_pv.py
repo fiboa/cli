@@ -10,7 +10,7 @@ class ESPVConverter(ESBaseConverter):
         str(
             year
         ): f"https://www.geo.euskadi.eus/cartografia/DatosDescarga/Agricultura/SIGPAC/SIGPAC_CAMPA%C3%91A_{year}_V1/"
-        for year in range(2024, 2015, -1)
+        for year in range(2025, 2015, -1)
     }
     id = "es_pv"
     short_name = "Spain Basque Country"

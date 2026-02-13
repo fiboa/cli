@@ -3,6 +3,9 @@ from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 from fiboa_cli.datasets.commons.data import read_data_csv
+from fiboa_cli.datasets.commons.hcat import CROP_EXTENSION
+
+CODE_LIST = "https://fiboa.org/code/jecam/crop.csv"
 
 
 class JecamConvert(FiboaBaseConverter):
@@ -38,13 +41,14 @@ https://doi.org/10.18167/DVN1/P7OLAP, CIRAD Dataverse, V4
         "AcquiDate": "determination:datetime",
         "admin:country_code": "admin:country_code",
         "SiteName": "site_name",
+        "crop:code": "crop:code",
         "CropType1": "crop:name",
         "Irrigated": "irrigated",
     }
     column_additions = {
-        "crop:code_list": "https://fiboa.org/code/jecam/crop.csv",
+        "crop:code_list": CODE_LIST,
     }
-    extensions = {ADMIN_DIVISION}
+    extensions = {ADMIN_DIVISION, CROP_EXTENSION}
     missing_schemas = {
         "properties": {
             "site_name": {"type": "string"},
@@ -59,6 +63,14 @@ https://doi.org/10.18167/DVN1/P7OLAP, CIRAD Dataverse, V4
         rows = read_data_csv("country_codes.csv")
         mapping = {row["name"]: row["alpha-2"] for row in rows}
         gdf["admin:country_code"] = gdf["Country"].map(mapping)
+
+        rows = read_data_csv("jecam_crop.csv")
+        mapping = {row["crop_name"]: index + 1 for index, row in enumerate(rows)}
+        # todo: The dataset has null values for crop code, but the crop extension
+        # requires a string. We set them to empty strings for now,
+        # but it should be reconsidered in the future
+        # (i.e. the removal of .fillna("").astype(str) )
+        gdf["crop:code"] = gdf["CropType1"].map(mapping).fillna("").astype(str)
 
         gdf.loc[gdf["Area_ha"] == 0, "Area_ha"] = None
         gdf["Irrigated"] = gdf["Irrigated"].astype(bool)

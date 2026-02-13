@@ -10,7 +10,8 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
         str(k): {PREFIX + v: [v.replace("_GPKG.zip", ".gpkg")]}
         for k, v in (
-            (2024, "Landbouwgebruikspercelen_2024_-_Voorlopig_(extractie_15-10-2024)_GPKG.zip"),
+            (2025, "Landbouwgebruikspercelen_2025_-_Voorlopig_(extractie_02-06-2025)_GPKG.zip"),
+            (2024, "Landbouwgebruikspercelen_2024_-_Definitief_(extractie_27-03-2025)_GPKG.zip"),
             (2023, "Landbouwgebruikspercelen_2023_-_Definitief_(extractie_28-03-2024)_GPKG.zip"),
             (2022, "Landbouwgebruikspercelen_2022_-_Definitief_(extractie_26-06-2023)_GPKG.zip"),
             (2021, "Landbouwgebruikspercelen_2021_-_Definitief_(extractie_15-03-2022)_GPKG.zip"),
@@ -35,7 +36,6 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
 
     columns = {
         "geometry": "geometry",
-        "BT_BRON": "source",
         "BT_OMSCH": "typology",
         "GRAF_OPP": "metrics:area",
         "REF_ID": "id",
@@ -47,4 +47,4 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
     }
     ec_mapping_csv = "be_vlg_2021.csv"
 
-    missing_schemas = {"properties": {"source": {"type": "string"}, "typology": {"type": "string"}}}
+    missing_schemas = {"properties": {"typology": {"type": "string"}}}

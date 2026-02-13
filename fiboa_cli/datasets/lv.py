@@ -1,7 +1,7 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import AddHCATMixin, ec_url
+from .commons.ec import AddHCATMixin
 
 count = 3000
 
@@ -27,7 +27,6 @@ The GIS of the field register contains a database of field blocks with interconn
 
 Relevant datasets are: Country blocks (Lauku Bloki), Fields (Lauki), and Landscape elements.
     """
-    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     provider = "Rural Support Service Republic of Latvia (Lauku atbalsta dienests) <https://www.lad.gov.lv/lv/lauku-registra-dati>"
     attribution = "Lauku atbalsta dienests"
     license = "CC-BY-SA-4.0"  # Not sure, taken from Eurocrops. It is "public" and free and "available to any user"
@@ -37,10 +36,8 @@ Relevant datasets are: Country blocks (Lauku Bloki), Fields (Lauki), and Landsca
         "geometry": "geometry",
         "DATA_CHANGED_DATE": "determination:datetime",
         "area": "metrics:area",
-        "crop:code_list": "crop:code_list",
         "PRODUCT_CODE": "crop:code",
-        "crop:name": "crop:name",
-        "crop:name_en": "crop:name_en",
+        "PRODUCT_DESCRIPTION": "crop:name",
     }
     missing_schemas = {
         "properties": {
@@ -50,17 +47,7 @@ Relevant datasets are: Country blocks (Lauku Bloki), Fields (Lauki), and Landsca
         }
     }
     ec_mapping_csv = "lv_2021.csv"
-
+    column_migrations = {
+        "PRODUCT_CODE": lambda col: col.fillna(0).astype(int).astype(str),
+    }
     area_calculate_missing = True
-
-    def migrate(self, gdf):
-        gdf = super().migrate(gdf)
-
-        original_name_mapping = {
-            int(e["original_code"]): e["original_name"] for e in self.ec_mapping
-        }
-        name_mapping = {int(e["original_code"]): e["translated_name"] for e in self.ec_mapping}
-        gdf["crop:code_list"] = ec_url("lv_2021.csv")
-        gdf["crop:name"] = gdf["PRODUCT_CODE"].map(original_name_mapping)
-        gdf["crop:name_en"] = gdf["PRODUCT_CODE"].map(name_mapping)
-        return gdf

@@ -1,0 +1,256 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+0,Background,Background,,
+1,Corn,Corn,grain_maize_corn_popcorn,3301010600
+2,Cotton,Cotton,cotton,3301060300
+3,Rice,Rice,rice,3301010700
+4,Sorghum,Sorghum,millet_sorghum,3301010900
+5,Soybeans,Soybeans,soy_soybeans,3301160000
+6,Sunflower,Sunflower,sunflower,3301060500
+7,,,
+8,,,
+9,,,
+10,Peanuts,Peanuts,nuts,3303030000
+11,Tobacco,Tobacco,tobacco,3301060100
+12,Sweet Corn,Sweet Corn,grain_maize_corn_popcorn,3301010600
+13,Pop or Orn Corn,Pop or Orn Corn,grain_maize_corn_popcorn,3301010600
+14,Mint,Mint,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+15,,,
+16,,,
+17,,,
+18,,,
+19,,,
+20,,,
+21,Barley,Barley,barley,3301010400
+22,Durum Wheat,Durum Wheat,unspecified_season_durum_hard_wheat,3301010299
+23,Spring Wheat,Spring Wheat,spring_common_soft_wheat,3301010102
+24,Winter Wheat,Winter Wheat,winter_common_soft_wheat,3301010101
+25,Other Small Grains,Other Small Grains,cereal,3301010000
+26,Dbl Crop WinWht/Soybeans,Dbl Crop WinWht/Soybeans,soy_soybeans,3301160000
+27,Rye,Rye,rye,3301010300
+28,Oats,Oats,oats,3301010500
+29,Millet,Millet,millet_sorghum,3301010900
+30,Speltz,Speltz,spelt,3301011000
+31,Canola,Canola,unspecified_season_rapeseed_rape,3301060499
+32,Flaxseed,Flaxseed,flax_linseed_oil,3301060702
+33,Safflower,Safflower,safflower,3301083900
+34,Rape Seed,Rape Seed,unspecified_season_rapeseed_rape,3301060499
+35,Mustard,Mustard,mustard,3301210100
+36,Alfalfa,Alfalfa,alfalfa_lucerne,3301090301
+37,Other Hay/Non Alfalfa,Other Hay/Non Alfalfa,alfalfa_lucerne,3301090301
+38,Camelina,Camelina,camelina,3301061500
+39,Buckwheat,Buckwheat,buckwheat,3301150200
+40,,,
+41,Sugarbeets,Sugarbeets,sugar_beet,3301290700
+42,Dry Beans,Dry Beans,beans,3301020100
+43,Potatoes,Potatoes,potatoes,3301030000
+44,Other Crops,Other Crops,,
+45,Sugarcane,Sugarcane,,
+46,Sweet Potatoes,Sweet Potatoes,sweet_potatoes,3301040000
+47,Misc Vegs & Fruits,Misc Vegs & Fruits,unspecified_orchards_fruits,3303019800
+48,Watermelons,Watermelons,watermelon,3301140500
+49,Onions,Onions,onions,3301220400
+50,Cucumbers,Cucumbers,cucumber_pickle,3301140100
+51,Chick Peas,Chick Peas,chickpeas,3301020200
+52,Lentils,Lentils,lentils,3301020500
+53,Peas,Peas,peas,3301020600
+54,Tomatoes,Tomatoes,tomato,3301280000
+55,Caneberries,Caneberries,unspecified_berries_berry_species,3303029800
+56,Hops,Hops,hops,3301060200
+57,Herbs,Herbs,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+58,Clover/Wildflowers,Clover/Wildflowers,clover,3301090303
+59,Sod/Grass Seed,Sod/Grass Seed,poaceae_grasses,3301090200
+60,Switchgrass,Switchgrass,switchgrass,3301090208
+61,Fallow/Idle Cropland,Fallow/Idle Cropland,fallow_land_not_crop,3301110000
+62,,,
+63,Forest,Forest,tree_wood_forest,3306000000
+64,Shrubland,Shrubland,unmaintained,3308000000
+65,Barren,Barren,unmaintained,3308000000
+66,Cherries,Cherries,cherry_cherries,3303010400
+67,Peaches,Peaches,peach,3303011100
+68,Apples,Apples,apples,3303010200
+69,Grapes,Grapes,vineyards_wine_vine_rebland_grapes,3303060000
+70,Christmas Trees,Christmas Trees,other_tree_wood_forest,3306990000
+71,Other Tree Crops,Other Tree Crops,unspecified_permanent_crops,3303120000
+72,Citrus,Citrus,citrus_plantations,3303040000
+73,,,
+74,Pecans,Pecans,pecan,3303030300
+75,Almonds,Almonds,almond,3303030100
+76,Walnuts,Walnuts,walnuts,3303030600
+77,Pears,Pears,pears,3303011200
+78,,,
+79,,,
+80,,,
+81,Clouds/No Data,Clouds/No Data,,
+82,Developed,Developed,,
+83,Water,Water,,
+84,,,
+85,,,
+86,,,
+87,Wetlands,Wetlands,,
+88,Nonag/Undefined,Nonag/Undefined,,
+89,,,
+90,,,
+91,,,
+92,Aquaculture,Aquaculture,,
+93,,,
+94,,,
+95,,,
+96,,,
+97,,,
+98,,,
+99,,,
+100,,,
+101,,,
+102,,,
+103,,,
+104,,,
+105,,,
+106,,,
+107,,,
+108,,,
+109,,,
+110,,,
+111,Open Water,Open Water,,
+112,Perennial Ice/Snow,Perennial Ice/Snow,,
+113,,,
+114,,,
+115,,,
+116,,,
+117,,,
+118,,,
+119,,,
+120,,,
+121,Developed/Open Space,Developed/Open Space,,
+122,Developed/Low Intensity,Developed/Low Intensity,,
+123,Developed/Med Intensity,Developed/Med Intensity,,
+124,Developed/High Intensity,Developed/High Intensity,,
+125,,,
+126,,,
+127,,,
+128,,,
+129,,,
+130,,,
+131,Barren,Barren,,
+132,,,
+133,,,
+134,,,
+135,,,
+136,,,
+137,,,
+138,,,
+139,,,
+140,,,
+141,Deciduous Forest,Deciduous Forest,tree_wood_forest,3306000000
+142,Evergreen Forest,Evergreen Forest,tree_wood_forest,3306000000
+143,Mixed Forest,Mixed Forest,tree_wood_forest,3306000000
+144,,,
+145,,,
+146,,,
+147,,,
+148,,,
+149,,,
+150,,,
+151,,,
+152,Shrubland,Shrubland,unmaintained,3308000000
+154,,,
+155,,,
+156,,,
+157,,,
+158,,,
+159,,,
+160,,,
+161,,,
+162,,,
+163,,,
+164,,,
+165,,,
+166,,,
+167,,,
+168,,,
+169,,,
+170,,,
+171,,,
+172,,,
+173,,,
+174,,,
+175,,,
+176,Grass/Pasture,Grass/Pasture,pasture_meadow_grassland_grass,3302000000
+177,,,
+178,,,
+179,,,
+180,,,
+181,,,
+182,,,
+183,,,
+184,,,
+185,,,
+186,,,
+187,,,
+188,,,
+189,,,
+190,Woody Wetlands,Woody Wetlands,,
+191,,,
+192,,,
+193,,,
+194,,,
+195,Herbaceous Wetlands,Herbaceous Wetlands,,
+196,,,
+197,,,
+198,,,
+199,,,
+200,,,
+201,,,
+202,,,
+203,,,
+204,Pistachios,Pistachios,pistachio,3303030400
+205,Triticale,Triticale,triticale,3301010800
+206,Carrots,Carrots,carrots_daucus,3301290300
+207,Asparagus,Asparagus,asparagus,3301200000
+208,Garlic,Garlic,garlic,3301220200
+209,Cantaloupes,Cantaloupes,melon,3301140300
+210,Prunes,Prunes,plums,3303011300
+211,Olives,Olives,olive_plantations,3303050000
+212,Oranges,Oranges,citrus_plantations,3303040000
+213,Honeydew Melons,Honeydew Melons,melon,3301140300
+214,Broccoli,Broccoli,broccoli,3301210202
+215,Avocados,Avocados,avocado,3303100000
+216,Peppers,Peppers,capsicum,3301300000
+217,Pomegranates,Pomegranates,pomegranate,3303011400
+218,Nectarines,Nectarines,nectarine,3303010900
+219,Greens,Greens,salads_lettuce_leaf_vegetables,3301310000
+220,Plums,Plums,plums,3303011300
+221,Strawberries,Strawberries,strawberries,3301130000
+222,Squash,Squash,pumpkin_squash_gourd,3301140400
+223,Apricots,Apricots,apricots,3303010300
+224,Vetch,Vetch,vetches,3301090305
+225,Dbl Crop WinWht/Corn,Dbl Crop WinWht/Corn,winter_common_soft_wheat,3301010101
+226,Dbl Crop Oats/Corn,Dbl Crop Oats/Corn,oats,3301010500
+227,Lettuce,Lettuce,salads_lettuce_leaf_vegetables,3301310000
+228,Dbl Crop Triticale/Corn,Dbl Crop Triticale/Corn,triticale,3301010800
+229,Pumpkins,Pumpkins,pumpkin_squash_gourd,3301140400
+230,Dbl Crop Lettuce/Durum Wht,Dbl Crop Lettuce/Durum Wht,salads_lettuce_leaf_vegetables,3301310000
+231,Dbl Crop Lettuce/Cantaloupe,Dbl Crop Lettuce/Cantaloupe,salads_lettuce_leaf_vegetables,3301310000
+232,Dbl Crop Lettuce/Cotton,Dbl Crop Lettuce/Cotton,salads_lettuce_leaf_vegetables,3301310000
+233,Dbl Crop Lettuce/Barley,Dbl Crop Lettuce/Barley,salads_lettuce_leaf_vegetables,3301310000
+234,Dbl Crop Durum Wht/Sorghum,Dbl Crop Durum Wht/Sorghum,unspecified_season_durum_hard_wheat,3301010299
+235,Dbl Crop Barley/Sorghum,Dbl Crop Barley/Sorghum,barley,3301010400
+236,Dbl Crop WinWht/Sorghum,Dbl Crop WinWht/Sorghum,winter_common_soft_wheat,3301010101
+237,Dbl Crop Barley/Corn,Dbl Crop Barley/Corn,barley,3301010400
+238,Dbl Crop WinWht/Cotton,Dbl Crop WinWht/Cotton,winter_common_soft_wheat,3301010101
+239,Dbl Crop Soybeans/Cotton,Dbl Crop Soybeans/Cotton,cotton,3301060300
+240,Dbl Crop Soybeans/Oats,Dbl Crop Soybeans/Oats,oats,3301010500
+241,Dbl Crop Corn/Soybeans,Dbl Crop Corn/Soybeans,grain_maize_corn_popcorn,3301010600
+242,Blueberries,Blueberries,blueberry,3303020400
+243,Cabbage,Cabbage,brassica_oleracea_cabbage,3301210200
+244,Cauliflower,Cauliflower,cauliflower,3301210204
+245,Celery,Celery,celery,3301250000
+246,Radishes,Radishes,radish,3301290600
+247,Turnips,Turnips,turnips,3301290800
+248,Eggplants,Eggplants,aubergine_eggplant,3301260000
+249,Gourds,Gourds,pumpkin_squash_gourd,3301140400
+250,Cranberries,Cranberries,cranberry,3303020500
+251,,,
+252,,,
+253,,,
+254,Dbl Crop Barley/Soybeans,Dbl Crop Barley/Soybeans,barley,3301010400
+255,,,

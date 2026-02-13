@@ -3,13 +3,18 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.convert_gml import gml_assure_columns
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.data import read_data_csv
+from .commons.hcat import AddHCATMixin
 
 
-class IEConverter(AdminConverterMixin, FiboaBaseConverter):
-    sources = {
-        "https://osi-inspire-atom.s3-eu-west-1.amazonaws.com/IACSdata/IACS_GSAA_2022.zip": [
-            "IACS_GSAA_2022.gml"
-        ]
+class IEConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    variants = {
+        str(year): {
+            f"https://dafm-inspire-atom.s3.eu-west-1.amazonaws.com/files/LU/GSAA_{year}.zip": [
+                f"GSAA_{year}.gml"
+            ]
+        }
+        for year in range(2024, 2021, -1)
     }
 
     id = "ie"
@@ -22,24 +27,27 @@ class IEConverter(AdminConverterMixin, FiboaBaseConverter):
     license = "CC-BY-4.0"
     columns = {
         "geometry": "geometry",
-        "crop_name": "crop_name",
+        "crop_name": "crop:name",
+        "crop_code": "crop:code",
         "localId": "id",
-        "determination:datetime": "determination:datetime",
+        "observationDate": "determination:datetime",
     }
-    # TODO use crop-extension, maybe with reverse mapping
+    ec_mapping_csv = "https://fiboa.org/code/ie/ie.csv"
 
-    missing_schemas = {
-        "properties": {
-            "crop_name": {"type": "string"},
-        }
+    column_migrations = {
+        "observationDate": lambda col: col.str.replace("+01:00", "T00:00:00Z"),
     }
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         # crop_name can be multiple: "crop1, crop2, crop3". We only read the main crop (first).
         gdf["crop_name"] = gdf["crop_name"].str.split(", ").str.get(0)
         gdf = gdf[gdf["crop_name"] != "Void"]  # Exclude non-agriculture fields
-        gdf["determination:datetime"] = gdf["observationDate"].str.replace("+01:00", "T00:00:00Z")
-        return gdf
+
+        rows = read_data_csv("ie_2023.csv")
+        mapping = {row["original_name"]: index + 1 for index, row in enumerate(rows)}
+        gdf["crop_code"] = gdf["crop_name"].map(mapping)
+
+        return super().migrate(gdf)
 
     def file_migration(
         self, gdf: gpd.GeoDataFrame, path: str, uri: str, layer: str = None

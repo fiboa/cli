@@ -21,7 +21,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
     columns = {
         "geometry": "geometry",
-        "FB_FLIK": ["id", "flik"],
+        "FB_FLIK": ("id", "flik"),
         "JAHR": "determination:datetime",
         "FB_A_FLAE": "metrics:area",
         "FB_BN_KAT": "FB_BN_KAT",

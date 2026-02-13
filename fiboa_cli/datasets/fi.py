@@ -2,10 +2,10 @@ import pandas as pd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import ec_url
+from .commons.hcat import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     sources = "https://download.inspire.ruokavirasto-awsa.com/data/2023/LandUse.ExistingLandUse.GSAAAgriculturalParcel.gpkg"
     id = "fi"
     short_name = "Finland"
@@ -31,8 +31,7 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
         # Make year (1st January) from column "VUOSI"
         "VUOSI": lambda col: pd.to_datetime(col, format="%Y"),
     }
-    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    column_additions = {"crop:code_list": ec_url("fi_2020.csv")}
+    ec_mapping_csv = "https://fiboa.org/code/fi/fi_2023.csv"
 
     area_is_in_ha = False
     area_calculate_missing = True
