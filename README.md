@@ -31,7 +31,7 @@ pixi run fiboa
 
 #### Using pip
 
-Alternatively, you can install from PyPI with **Python 3.10** or any later version:
+Alternatively, you can install from PyPI with **Python 3.11** or any later version:
 
 ```bash
 pip install fiboa-cli
@@ -62,8 +62,10 @@ fiboa CLI supports various commands to work with the files:
     - [Improve a fiboa Parquet file](#improve-a-fiboa-parquet-file)
     - [Update an extension template with new names](#update-an-extension-template-with-new-names)
     - [Converter for existing datasets](#converter-for-existing-datasets)
+    - [Publish datasets to source coop or your own s3 repository](#publish-datasets-to-source-coop-or-your-own-s3-repository)
   - [Development](#development)
     - [Implement a converter](#implement-a-converter)
+  - [Run in Docker](#run-in-docker)
 
 ## Commands
 

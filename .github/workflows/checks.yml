@@ -20,9 +20,8 @@ jobs:
           - windows-latest
           - macos-latest
         python-version:
-          - "3.10"
-          - "3.13"
-        # - "3.x"
+          - "3.11"
+          - "3.14"
 
     steps:
     # Pixi should manage Python versions, but it doesn't work on Windows in GitHub Actions
