@@ -101,9 +101,9 @@ Multi-temporal composites of Sentinel-2 (S2) images are provided to ensure cloud
 
     # Add columns with constant values.
     # The key is the column name, the value is a constant value that's used for all rows.
-    add_columns = {
+    column_additions = {
         "determination:datetime": "2021-08-01T00:00:00Z",
-        "determination_method": "auto-imagery",
+        "determination:method": "auto-imagery",
     }
 
     def migrate(self, gdf):
