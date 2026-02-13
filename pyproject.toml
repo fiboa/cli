@@ -16,14 +16,14 @@ authors = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.11"
 dependencies = [
-    "vecorel-cli==0.2.12",
+    "vecorel-cli==0.2.13",
     "spdx-license-list==3.27.0",
 ]
 
@@ -43,7 +43,7 @@ channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tool.pixi.dependencies]
-python = ">=3.10,<3.14"
+python = ">=3.11"
 pyproj = ">=3.6,<4.0"
 # rar is a bit difficult. vecorel-cli needs it for extracting some rar files in converters
 # but needs a rar cmd tool, which we need to install from conda explictly.

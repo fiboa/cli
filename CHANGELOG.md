@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Update vecorel-cli
+- Add support for Python 3.14, remove support for Python 3.10
 - Support HCAT mapping CSV files without crop_code
 - Split Germany BB and NDS in block dataset and crop fields
 - Add HCAT to datasets where possible
@@ -24,14 +26,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Check AWS-environment vars
   - Synchronize parquet + pmtiles + README/LICENSE to source coop repo
 - Check for license validity, either SPDX string or custom with url
-- Seperate concerns for HCAT utility classes; 
+- Seperate concerns for HCAT utility classes:
   - AddHCATMixin assures hcat-extension validity and csv-based data-conversion if required
   - EuroCropsConverterMixin is a BaseClass for EuroCrops-provided datasets
   - EuroLandBaseConverter is a BaseClass for Euroland-provided datasets
 - Avoid base property schema override
 - Add Converter for Bulgaria
 - Remove unintended CommonMark formatting (indentation) from descriptions in converters
-- Fibo Improve command 
+- Fibo improve command:
   - Upgrades from fiboa-0.2 if required
   - Adds HCAT if specified
 
