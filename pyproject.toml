@@ -1,5 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+# upper bound due to https://github.com/pypa/setuptools/issues/5174
+requires = ["setuptools>=61.0,<82.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]

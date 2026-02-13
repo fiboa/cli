@@ -36,7 +36,7 @@ CSB represents non-confidential single crop field boundaries over a set time fra
     columns = {
         "geometry": "geometry",
         "CSBID": "id",
-        # "CDL2023": "crop:code",
+        "CDL2023": "crop:code",
         "crop:name": "crop:name",
         "CNTY": "administrative_area_level_2",
     }

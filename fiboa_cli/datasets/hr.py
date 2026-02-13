@@ -1,4 +1,3 @@
-import geopandas as gpd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
@@ -28,6 +27,10 @@ and supporting sustainable land use practices.
     license = "Prostorni podaci i servisi <https://www.apprrr.hr/prostorni-podaci-servisi/>"
     index_as_id = True
 
+    column_migrations = {
+        "land_use_id": lambda col: col.astype(int)
+    }
+
     columns = {
         "id": "id",
         "land_use_id": "crop:code",
@@ -38,13 +41,13 @@ and supporting sustainable land use practices.
         "slope": "slope",
         "z_avg": "height",
         "eligibility_coef": "eligibility_coef",
-        # "mines_status": "mines_status",
-        # "mines_year_removed": "mines_year_removed",
+        "mines_status": "mines_status",
+        "mines_year_removed": "mines_year_removed",
         "water_protect_zone": "water_protect_zone",
         "natura2000": "natura2000",
-        # "natura2000_ok": "natura2000_ok",
-        # "natura2000_pop": "natura2000_pop",
-        # "natura2000_povs": "natura2000_povs",
+        "natura2000_ok": "natura2000_ok",
+        "natura2000_pop": "natura2000_pop",
+        "natura2000_povs": "natura2000_povs",
         "anc": "anc",
         "anc_area": "anc_area",
         "rp": "rp",
@@ -59,10 +62,6 @@ and supporting sustainable land use practices.
     }
 
     ec_mapping_csv = "hr_2020.csv"
-
-    def migrate(self, gdf) -> gpd.GeoDataFrame:
-        gdf["land_use_id"] = gdf["land_use_id"].astype(int)
-        return super().migrate(gdf)
 
     missing_schemas = {
         "required": [

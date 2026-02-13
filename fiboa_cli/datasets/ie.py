@@ -30,9 +30,13 @@ class IEConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "crop_name": "crop:name",
         "crop_code": "crop:code",
         "localId": "id",
-        "determination:datetime": "determination:datetime",
+        "observationDate": "determination:datetime",
     }
     ec_mapping_csv = "https://fiboa.org/code/ie/ie.csv"
+
+    column_migrations = {
+        "observationDate": lambda col: col.str.replace("+01:00", "T00:00:00Z"),
+    }
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         # crop_name can be multiple: "crop1, crop2, crop3". We only read the main crop (first).
@@ -43,7 +47,6 @@ class IEConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         mapping = {row["original_name"]: index + 1 for index, row in enumerate(rows)}
         gdf["crop_code"] = gdf["crop_name"].map(mapping)
 
-        gdf["determination:datetime"] = gdf["observationDate"].str.replace("+01:00", "T00:00:00Z")
         return super().migrate(gdf)
 
     def file_migration(
