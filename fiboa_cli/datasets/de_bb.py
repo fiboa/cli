@@ -28,4 +28,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             "farmer_id": {"type": "string"},
         }
     }
+    # todo: The dataset has null values for crop code, but the crop extension
+    # requires a string. We set them to empty strings for now,
+    # but it should be reconsidered in the future.
     column_migrations = {"code": lambda col: col.fillna("").astype(str)}
