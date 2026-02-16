@@ -6,10 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- 
+- Add DuckDB BaseConverter for efficiently transforming large datasets
+
+## [v0.21.0] - 2026-02-16
 
 - Update vecorel-cli
+- Make the library better usable as a Python library
 - Add support for Python 3.14, remove support for Python 3.10
-- Add DuckDB BaseConverter for efficiently transforming large datasets
+- Support HCAT mapping CSV files without crop_code
+- Split Germany BB and NDS in block dataset and crop fields
+- Fix the column additions of the determination fields in the AI4SF converter
+- Add HCAT to datasets where possible
+- Updated years & variants for at_crop, be_vlg, es_an, es_cl, es_pv, ie, pt, se
 - Extend create_stac, include include fiboa data
 - Publish command; skip hidden files, generate better texts
 - Fix to vecorel: converter.license and provider should be string
@@ -33,6 +42,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fibo improve command:
   - Upgrades from fiboa-0.2 if required
   - Adds HCAT if specified
+- Various minor bug fixes
 
 ## [v0.20.3] - 2025-09-13
 
@@ -458,7 +468,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - First release
 
-[Unreleased]: <https://github.com/fiboa/cli/compare/v0.20.3...main>
+[Unreleased]: <https://github.com/fiboa/cli/compare/v0.21.0...main>
+[v0.21.0]: <https://github.com/fiboa/cli/compare/v0.20.3...v0.21.0>
 [v0.20.3]: <https://github.com/fiboa/cli/compare/v0.20.2...v0.20.3>
 [v0.20.2]: <https://github.com/fiboa/cli/compare/v0.20.1...v0.20.2>
 [v0.20.1]: <https://github.com/fiboa/cli/compare/v0.20.0...v0.20.1>

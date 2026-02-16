@@ -5,7 +5,7 @@ from .commons.ec import AddHCATMixin
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
-    sources = "https://www.opengeodata.nrw.de/produkte/umwelt_klima/bodennutzung/landwirtschaft/LFK-AKTI_EPSG25832_Shape.zip"
+    sources = "https://www.opengeodata.nrw.de/produkte/umwelt_klima/bodennutzung/landwirtschaft/LWK-TSCHLAG_EPSG25832_Shape.zip"
     id = "de_nrw"
     admin_subdivision_code = "NW"
     short_name = "Germany, North Rhine-Westphalia"
@@ -21,10 +21,9 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     columns = {
         "geometry": "geometry",
         "ID": "id",
-        "INSPIRE_ID": "inspire:id",
         "FLIK": "flik",
-        "GUELT_VON": "determination:datetime",
-        "NUTZ_CODE": "crop:code",
-        "NUTZ_TXT": "crop:name",
+        "BEGINLIFES": "determination:datetime",
+        "CODE": "crop:code",
+        "CODE_TXT": "crop:name",
         "AREA_HA": "metrics:area",
     }

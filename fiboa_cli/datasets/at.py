@@ -1,44 +1,43 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
-from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.ec import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
-    sources = {
-        "https://inspire.lfrz.gv.at/009501/ds/inspire_referenzen_2021_polygon.gpkg.zip": [
-            "INSPIRE_REFERENZEN_2021_POLYGON.gpkg"
-        ]
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    variants = {
+        "2025": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2025-1_polygon.gpkg.zip",
+        "2024": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2024-2_polygon.gpkg.zip",
+        "2023": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2023-2_polygon.gpkg.zip",
+        "2022": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2022_polygon.gpkg.zip",
+        "2021": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2021_polygon.gpkg.zip",
+        "2020": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2020_polygon.gpkg.zip",
+        "2019": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2019_polygon.gpkg.zip",
+        "2018": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2018_polygon.gpkg.zip",
     }
+
     id = "at"
     country = "AT"
     short_name = "Austria"
     title = "Field boundaries for Austria"
     description = """
-**Field boundaries for Austria - INVEKOS Referenzen Österreich 2021.**
+**Crop Field boundaries for Austria - INVEKOS Schläge Österreich 2025.**
 
-The layer includes all reference parcels ("Referenzparzellen") defined by the paying agency Agrarmarkt Austria and recorded landscape elements (landscape element layers) within the meaning of Art. 5 of Regulation (EU) No. 640/2014 and Regulation of the competent federal ministry with horizontal rules for the area of the Common Agricultural Policy (Horizontal CAP Regulation) StF: Federal Law Gazette II No. 100/2015.
-
-Reference parcel: is the physical block that can be clearly delimited from the outside (e.g. forest, roads, water bodies) and is formed by contiguous agricultural areas that are recognizable in nature.
+This layer includes all field uses recorded by the applicants, which serve as the basis for the funding process. A field
+is a contiguous area of a piece of land that is cultivated for a growing season with only one crop (field use type) and
+uniform management requirements or as a landscape element type in accordance with Annex 1 of the regulation of the responsible
+Federal Ministry with horizontal rules for the area of the Common Agricultural Policy (Horizontal CAP Regulation)
+StF: BGBl. II No. 100/2015 or is simply maintained in good agricultural and ecological condition in accordance with
+Art. 94 of Regulation (EU) No. 1306/2013 and is digitized in the GIS as a polygon or as a point.
     """
     provider = "Agrarmarkt Austria <https://geometadatensuche.inspire.gv.at/metadatensuche/inspire/api/records/9db8a0c3-e92a-4df4-9d55-8210e326a7ed>"
     license = "CC-BY-4.0"
     columns = {
+        "GEO_ID": "id",
         "geometry": "geometry",
-        "RFL_ID": "id",
-        "REF_ART": "ref_art",
-        "BRUTTOFLAECHE_HA": "metrics:area",
-        "INSPIRE_ID": "inspire:id",
-        "REF_ART_BEZEICHNUNG": "ref_art_bezeichnung",
-        "REFERENZ_KENNUNG": "referenz_kennung",
-        "FART_ID": "fart_id",
-        "GEO_DATERF": "determination:datetime",
+        "SNAR_CODE": "crop:code",
+        "SNAR_BEZEICHNUNG": "crop:name",
+        "SL_FLAECHE_BRUTTO_HA": "metrics:area",
+        "GEOM_DATE_CREATED": "determination:datetime",
     }
-    extensions = {"https://fiboa.org/inspire-extension/v0.3.0/schema.yaml"}
-    missing_schemas = {
-        "properties": {
-            "ref_art": {"type": "string"},
-            "ref_art_bezeichnung": {"type": "string"},
-            "referenz_kennung": {"type": "uint64"},
-            "fart_id": {"type": "uint32"},
-        }
-    }
+    ec_mapping_csv = "https://fiboa.org/code/at/at.csv"

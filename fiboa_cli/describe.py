@@ -1,18 +1,18 @@
 from pathlib import Path
 from typing import Union
 
-from vecorel_cli.describe import DescribeFile
+from vecorel_cli.describe import DescribeFile as Base
 from vecorel_cli.vecorel.schemas import CollectionSchemas
 from yarl import URL
 
 from .fiboa.version import get_versions
 
 
-class DescribeFiboaFile(DescribeFile):
+class DescribeFile(Base):
     @staticmethod
     def get_cli_callback(cmd):
         def callback(source, num, properties, verbose):
-            return DescribeFiboaFile(source).run(num=num, properties=properties, verbose=verbose)
+            return DescribeFile(source).run(num=num, properties=properties, verbose=verbose)
 
         return callback
 

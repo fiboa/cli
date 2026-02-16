@@ -54,4 +54,4 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     def migrate(self, gdf):
         gdf["flik"] = gdf["description"].apply(parse_flik)
         gdf["area"] = gdf["description"].apply(parse_size)
-        return gdf
+        return super().migrate(gdf)

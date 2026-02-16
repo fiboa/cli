@@ -1,14 +1,16 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.hcat import AddHCATMixin, load_ec_mapping
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     sources = {
         "https://data.slovensko.sk/download?id=e39ad227-1899-4cff-b7c8-734f90aa0b59&blocksize=0": [
             "HU2024_20240917shp/HU2024_20240917.shp"
         ]
     }
+    # https://data.slovensko.sk/download?id=626c1181-bc53-40b6-9715-3c10164760ec
     id = "sk"
     short_name = "Slovakia"
     title = "Slovakia Agricultural Land Identification System"
@@ -24,19 +26,25 @@ Dataset Hranice užívania contains the use declared by applicants for direct su
     """
     provider = "Pôdohospodárska platobná agentúra <https://www.apa.sk>"
     license = "CC0-1.0"  # "Open Data"
-    # TODO look for a way to find codes for crop_name and implement crop-extension
+    ec_mapping_csv = "https://fiboa.org/code/sk/sk.csv"
     columns = {
         "geometry": "geometry",
         "KODKD": "id",
-        "PLODINA": "crop_name",
+        "PLODINA": "crop:name",
         "KULTURA_NA": "crop_group",
         "LOKALITA_N": "municipality",
         "VYMERA": "metrics:area",
     }
     missing_schemas = {
         "properties": {
-            "crop_name": {"type": "string"},
             "crop_group": {"type": "string"},
             "municipality": {"type": "string"},
         }
     }
+
+    def migrate(self, gdf):
+        if self.ec_mapping is None:
+            self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+        mapping = {row["original_name"]: index + 1 for index, row in enumerate(self.ec_mapping)}
+        gdf["crop:code"] = gdf["PLODINA"].map(mapping)
+        return super().migrate(gdf)

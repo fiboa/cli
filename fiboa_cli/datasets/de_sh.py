@@ -16,7 +16,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     columns = {
         "geometry": "geometry",
         "fachguelti": "determination:datetime",
-        "FLIK": ["flik", "id"],
+        "FLIK": ("flik", "id"),
         "Flaeche": "metrics:area",
         "HBN": "hbn",
     }

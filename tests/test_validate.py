@@ -2,7 +2,8 @@ from pathlib import Path
 
 import pytest
 from jsonschema.exceptions import ValidationError
-from vecorel_cli.validate import ValidateData
+
+from fiboa_cli.validate import ValidateData
 
 
 @pytest.mark.parametrize(

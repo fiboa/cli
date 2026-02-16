@@ -4,13 +4,21 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.ec import load_ec_mapping
+from .commons.hcat import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
-    sources = {
-        "https://data.cnra.ca.gov/dataset/6c3d65e3-35bb-49e1-a51e-49d5a2cf09a9/resource/f38d3f6f-dcf1-4553-9f07-4f381d494320/download/i15_crop_mapping_2022_provisional_gdb.zip": [
-            "i15_Crop_Mapping_2022_Provisional_GDB/i15_Crop_Mapping_2022_Provisional.gdb"
-        ]
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    variants = {
+        "2023": {
+            "https://data.cnra.ca.gov/dataset/6c3d65e3-35bb-49e1-a51e-49d5a2cf09a9/resource/4e17ca38-268e-4bf5-bbc5-09636d44ed60/download/i15_crop_mapping_2023_provisional_20241127.gdb.zip": [
+                "i15_Crop_Mapping_2023_Provisional_20241127.gdb"
+            ]
+        },
+        "2022": {
+            "https://data.cnra.ca.gov/dataset/6c3d65e3-35bb-49e1-a51e-49d5a2cf09a9/resource/f38d3f6f-dcf1-4553-9f07-4f381d494320/download/i15_crop_mapping_2022_provisional_gdb.zip": [
+                "i15_Crop_Mapping_2022_Provisional_GDB/i15_Crop_Mapping_2022_Provisional.gdb"
+            ]
+        },
     }
     id = "us_ca_scm"
     admin_subdivision_code = "CA"
@@ -24,7 +32,6 @@ essential for regional analysis and decision making, which has become increasing
 seek to address resource management issues, regulatory compliance issues, environmental impacts, ecosystem services,
 urban and economic development, and other issues.
     """
-    extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     provider = "County of Santa Clara <https://www.sccgov.org/sites/dpd/DocsForms/Documents/Ag_Preserves_Laminated_map.pdf>"
     license = "CC0-1.0"
     columns = {
@@ -36,8 +43,8 @@ urban and economic development, and other issues.
     }
     column_additions = {
         "determination:datetime": "2023-05-01T00:00:00Z",
-        "crop:code_list": "https://fiboa.org/code/us/ca/scm.csv",
     }
+    ec_mapping_csv = "https://fiboa.org/code/us/ca/scm.csv"
     missing_schemas = {
         "properties": {
             "admin_level_2": {"type": "string"},

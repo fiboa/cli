@@ -2,9 +2,9 @@ from pathlib import Path
 
 import geopandas
 from pytest import mark
-from vecorel_cli.validate import ValidateData
 
-from fiboa_cli.improve import Improve
+from fiboa_cli.improve import ImproveData
+from fiboa_cli.validate import ValidateData
 
 files = [
     "fiboa-example.json",
@@ -20,7 +20,7 @@ def test_improve_base(tmp_parquet_file, base):
     # Fiboa-0_2 file is not fiboa or vecorel compliant
     assert ValidateData().validate(source).is_valid() == ("fiboa_0_2" not in base)
 
-    Improve().improve_file(source=source, target=tmp_parquet_file)
+    ImproveData().improve_file(source=source, target=tmp_parquet_file)
     result = ValidateData().validate(tmp_parquet_file)
     assert result.is_valid(), result.errors
 
@@ -30,7 +30,7 @@ def test_improve_hcat(tmp_parquet_file, base, hcat):
     source = Path("tests/data-files") / base
     hcat = "tests/data-files/convert/" + hcat
 
-    Improve().improve_file(source=source, target=tmp_parquet_file, add_hcat=hcat)
+    ImproveData().improve_file(source=source, target=tmp_parquet_file, add_hcat=hcat)
     result = ValidateData().validate(tmp_parquet_file, num=100)
     assert result.is_valid(), result.errors
 

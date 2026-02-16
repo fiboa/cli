@@ -2,9 +2,10 @@ import pandas as pd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.hcat import AddHCATMixin
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     sources = None
     data_access = """
     Data must be obtained from the Swiss open data portal at https://www.geodienste.ch/services/lwb_nutzungsflaechen .
@@ -32,7 +33,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "id": "id",
         "flaeche_m2": "metrics:area",
         "kanton": "admin:subdivision_code",
-        "nutzung": "crop_name",
+        "nutzung": "crop:name",
         "bezugsjahr": "determination:datetime",
     }
     column_filters = {
@@ -43,8 +44,4 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     column_migrations = {
         "bezugsjahr": lambda col: pd.to_datetime(col, format="%Y"),
     }
-    missing_schemas = {
-        "properties": {
-            "crop_name": {"type": "string"},
-        }
-    }
+    ec_mapping_csv = "https://fiboa.org/code/ch/ch.csv"

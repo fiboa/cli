@@ -3,7 +3,7 @@ import responses
 from fiboa_cli.publish import Publish
 
 
-class TestPublish(Publish):
+class PublishTest(Publish):
     def generate_pmtiles(self, target, file_name, parquet_file):
         pass
 
@@ -22,7 +22,7 @@ def test_publish(tmp_folder):
         body=open(f"tests/data-files/publish/{base}-survey.md").read(),
     )
     responses.add(rsp1)
-    TestPublish(converter).run(
+    PublishTest(converter).run(
         variant="2023", target=tmp_folder, cache=path, generate_meta=True, yes=True
     )
     files = [f.name for f in tmp_folder.iterdir() if f.is_file()]

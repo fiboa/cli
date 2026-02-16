@@ -13,4 +13,3 @@ class ECConverter(EuroCropsConverterMixin, BEVLGBaseConverter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         del self.columns["BT_OMSCH"]
-        del self.columns["BT_BRON"]
