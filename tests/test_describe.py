@@ -4,7 +4,7 @@ import sys
 from loguru import logger
 from vecorel_cli.vecorel.version import vecorel_version
 
-from fiboa_cli.describe import DescribeFiboaFile
+from fiboa_cli.describe import DescribeFile
 from fiboa_cli.fiboa.version import fiboa_version, spec_pattern
 
 
@@ -13,7 +13,7 @@ def test_describe(capsys):
     logger.remove()
     logger.add(sys.stdout, format="{message}", level="DEBUG", colorize=False)
 
-    describe = DescribeFiboaFile("tests/data-files/fiboa-example.json")
+    describe = DescribeFile("tests/data-files/fiboa-example.json")
     describe.describe()
 
     out, err = capsys.readouterr()

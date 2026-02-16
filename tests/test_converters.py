@@ -1,8 +1,8 @@
 import spdx_license_list
-from vecorel_cli.converters import Converters
 from vecorel_cli.vecorel.schemas import VecorelSchema
 from vecorel_cli.vecorel.util import load_file
 
+from fiboa_cli.converters import Converters
 from fiboa_cli.fiboa.version import get_fiboa_uri
 
 

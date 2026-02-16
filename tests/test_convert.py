@@ -6,8 +6,9 @@ from unittest.mock import patch
 import pyarrow.parquet as pq
 from loguru import logger
 from pytest import mark
-from vecorel_cli.convert import ConvertData
-from vecorel_cli.validate import ValidateData
+
+from fiboa_cli.convert import ConvertData
+from fiboa_cli.validate import ValidateData
 
 """
 Create input files with: `ogr2ogr output.gpkg -limit 100 input.gpkg`

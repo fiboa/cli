@@ -1,14 +1,14 @@
 import click
 from geopandas import GeoDataFrame
 from vecorel_cli.cli.options import JSON_INDENT, VECOREL_FILE_ARG, VECOREL_TARGET_CONSOLE
-from vecorel_cli.create_stac import CreateStacCollection
+from vecorel_cli.create_stac import CreateStacCollection as Base
 from vecorel_cli.registry import VecorelRegistry
 from vecorel_cli.vecorel.collection import Collection
 
 from fiboa_cli.fiboa.version import get_versions
 
 
-class CreateFiboaStacCollection(CreateStacCollection):
+class CreateStacCollection(Base):
     temporal_property = "determination:datetime"
 
     @staticmethod
@@ -24,7 +24,7 @@ class CreateFiboaStacCollection(CreateStacCollection):
                 type=click.STRING,
                 help="The temporal property to use for the temporal extent.",
                 show_default=True,
-                default=CreateFiboaStacCollection.temporal_property,
+                default=CreateStacCollection.temporal_property,
             ),
             # todo: allow additional parameters for missing data in the collection?
             # https://stackoverflow.com/questions/36513706/python-click-pass-unspecified-number-of-kwargs

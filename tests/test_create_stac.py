@@ -2,7 +2,7 @@ from pathlib import Path
 
 from vecorel_cli.vecorel.util import load_file
 
-from fiboa_cli.create_stac import CreateFiboaStacCollection
+from fiboa_cli.create_stac import CreateStacCollection
 from fiboa_cli.registry import Registry
 
 
@@ -11,7 +11,7 @@ def test_create_stac_collection(tmp_folder: Path):
     expected_file = "tests/data-files/stac-collection.json"
     out_file = tmp_folder / "collection.json"
 
-    gj = CreateFiboaStacCollection()
+    gj = CreateStacCollection()
     gj.create_cli(source, out_file)
 
     assert out_file.exists()

@@ -5,7 +5,7 @@ import spdx_license_list
 from geopandas import GeoDataFrame
 from vecorel_cli.basecommand import runnable
 from vecorel_cli.encoding.auto import create_encoding
-from vecorel_cli.improve import ImproveData
+from vecorel_cli.improve import ImproveData as Base
 from vecorel_cli.vecorel.collection import Collection
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 from vecorel_cli.vecorel.version import sdl_uri
@@ -13,14 +13,14 @@ from vecorel_cli.vecorel.version import sdl_uri
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 from fiboa_cli.datasets.commons.ec import AddHCATMixin
 from fiboa_cli.datasets.commons.hcat import CROP_EXTENSION, HCAT_EXTENSION
-from fiboa_cli.registry import FIBOA_SPECIFICATION
+from fiboa_cli.registry import Registry
 
 
-class Improve(ImproveData):
+class ImproveData(Base):
     @staticmethod
     def get_cli_args():
         return {
-            **ImproveData.get_cli_args(),
+            **Base.get_cli_args(),
             "add-hcat": click.option(
                 "--add-hcat",
                 "-hcat",
@@ -99,7 +99,7 @@ class Improve(ImproveData):
             return geodata, original
 
         self.info(f"Migrating data from fiboa version {original['fiboa_version']}")
-        schemas = {"https://vecorel.org/specification/v0.1.0/schema.yaml", FIBOA_SPECIFICATION}
+        schemas = set()
         for e in original.get("fiboa_extensions", []):
             if e in EXTENSION_MAPPING:
                 schemas.add(EXTENSION_MAPPING[e])
@@ -107,14 +107,13 @@ class Improve(ImproveData):
         base = {k: original[k] for k in ("title", "description", "attribution") if k in original}
         collection_id = original.get("id") or file_name.split(".")[0]
 
-        collection = Collection(
-            {"schemas": {collection_id: list(schemas)}, "collection": collection_id} | base
-        )
+        collection = Collection(Registry.get_default_collection(collection_id, extensions=schemas))
+        collection.update(base)
 
         # Migrate custom schemas
         if "fiboa_custom_schemas" in original:
             collection["schemas:custom"] = {
-                "$schema": "https://vecorel.org/sdl/v0.2.0/schema.json",
+                "$schema": sdl_uri,
                 "required": [],
                 "collection": {},
             } | original["fiboa_custom_schemas"]
