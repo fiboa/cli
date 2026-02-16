@@ -19,8 +19,8 @@
       "roles": ["data"],
       "href": "file://C:/Dev/fiboa-cli/tests/data-files/fiboa-example.json",
       "processing:software": {
-        "fiboa-cli": "0.20.1",
-        "vecorel-cli": "0.2.3"
+        "fiboa-cli": "0.21.0",
+        "vecorel-cli": "0.2.15"
       },
       "type": "application/geo+json"
     }

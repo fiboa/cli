@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v0.21.0] - 2026-02-16
+
 - Update vecorel-cli
+- Make the library better usable as a Python library
 - Add support for Python 3.14, remove support for Python 3.10
 - Support HCAT mapping CSV files without crop_code
 - Split Germany BB and NDS in block dataset and crop fields
@@ -463,7 +466,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - First release
 
-[Unreleased]: <https://github.com/fiboa/cli/compare/v0.20.3...main>
+[Unreleased]: <https://github.com/fiboa/cli/compare/v0.21.0...main>
+[v0.21.0]: <https://github.com/fiboa/cli/compare/v0.20.3...v0.21.0>
 [v0.20.3]: <https://github.com/fiboa/cli/compare/v0.20.2...v0.20.3>
 [v0.20.2]: <https://github.com/fiboa/cli/compare/v0.20.1...v0.20.2>
 [v0.20.1]: <https://github.com/fiboa/cli/compare/v0.20.0...v0.20.1>
