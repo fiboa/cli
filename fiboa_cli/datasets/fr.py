@@ -1,3 +1,4 @@
+from geopandas import GeoDataFrame
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
@@ -9,17 +10,17 @@ class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
         "2022": {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FXX_2022-01-01/RPG_2-0__GPKG_LAMB93_FXX_2022-01-01.7z.001": [
-                "RPG_2-0__GPKG_LAMB93_FXX_2022-01-01/RPG/1_DONNEES_LIVRAISON_2023-08-01/RPG_2-0_GPKG_LAMB93_FXX-2022/PARCELLES_GRAPHIQUES.gpkg"
+                "**/*.gpkg"
             ]
         },
         "2023": {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01.7z": [
-                "RPG_2-2__GPKG_LAMB93_FXX_2023-01-01/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01.gpkg"
+                "**/*.gpkg"
             ]
         },
         "2021": {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FXX_2021-01-01/RPG_2-0__GPKG_LAMB93_FXX_2021-01-01.7z": [
-                "RPG_2-0__GPKG_LAMB93_FXX_2022-01-01/RPG/1_DONNEES_LIVRAISON_2021-08-01/RPG_2-0_GPKG_LAMB93_FXX-2021/PARCELLES_GRAPHIQUES.gpkg"
+                "**/*.gpkg"
             ]
         },
         "2020": {
@@ -44,7 +45,7 @@ The anonymized version is distributed as part of the public service for making r
 
     provider = "Anstitut National de l'Information Géographique et Forestière <https://www.data.gouv.fr/en/datasets/registre-parcellaire-graphique-rpg-contours-des-parcelles-et-ilots-culturaux-et-leur-groupe-de-cultures-majoritaire/>"
     # Attribution example as described in the open license
-    attribution = "IGN — Original data from https://geoservices.ign.fr/rpg"
+    attribution = "IGN - Original data from https://geoservices.ign.fr/rpg"
     license = "Licence Ouverte / Open Licence <https://etalab.gouv.fr/licence-ouverte-open-licence>"
     ec_mapping_csv = "fr_2018.csv"
 
@@ -55,6 +56,12 @@ The anonymized version is distributed as part of the public service for making r
         "code_cultu": "crop:code",
         "code_group": "group_code",
     }
+
+    def migrate(self, gdf) -> GeoDataFrame:
+        if "ID_PARCEL" in gdf.columns:
+            # Make column names lowercase, harmonize for different years
+            gdf.rename(columns={k: k.lower() for k in gdf.columns}, inplace=True)
+        return super().migrate(gdf)
 
     column_filters = {
         "surf_parc": lambda col: col > 0.0  # fiboa validator requires area > 0.0
