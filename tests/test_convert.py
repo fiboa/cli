@@ -48,7 +48,8 @@ tests = [
     "sk",
     "jecam",
     "ec_ro",
-    "india_10k",
+    "india_10k", 
+    "de_fusion_ml",	
 ]
 test_path = "tests/data-files/convert"
 
@@ -69,6 +70,8 @@ extra_convert_parameters = {
     "lv": _input_files("lv", "1_100.xml"),
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
     "jecam": _input_files("jecam", "BD_JECAM_CIRAD_2023_feb.shp"),
+    "de_fusion_ml": _input_files("de_fusion", "de_test_2019.geojson", "de_train_2018.geojson"),
+
 }
 
 
