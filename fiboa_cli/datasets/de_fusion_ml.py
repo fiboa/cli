@@ -16,11 +16,6 @@ class DeFusionMlConverter(MlSplitsMixin, DeFusionConverter):
     def migrate(self, gdf):
         # Assign split from temp marker
         gdf["split"] = gdf["_source_split"].astype(object)
-
-        # Build unique IDs from split + fid before dropping the temp marker.
-        # Using split as prefix avoids collisions between train/test files
-        # since both files contain overlapping fid values.
+        # Build unique IDs from split + fid to avoid collisions between files
         gdf["id"] = gdf["_source_split"] + "_" + gdf["fid"].astype(str)
-
-        gdf = gdf.drop(columns=["_source_split"])
         return super().migrate(gdf)

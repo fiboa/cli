@@ -1,6 +1,9 @@
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 
 
+CROP_EXTENSION = "https://fiboa.org/crop-extension/v0.2.0/schema.yaml"
+
+
 class ZaFusionConverter(FiboaBaseConverter):
     sources = {
         "https://data.source.coop/esa/fusion-competition/sa-19E-258N-crop-labels-train-2017.geojson": "za_train_258N.geojson",
@@ -18,6 +21,8 @@ covering three tiles in the Western Cape region of South Africa.
     provider = "ESA Fusion Competition via Source Cooperative <https://source.coop/esa/fusion-competition>"
     attribution = "https://data.source.coop/esa/fusion-competition"
     license = "CC-BY-4.0"
+    extensions = {CROP_EXTENSION}
+    area_is_in_ha = False
     columns = {
         "geometry": "geometry",
         "id": "id",
@@ -28,25 +33,11 @@ covering three tiles in the Western Cape region of South Africa.
     column_additions = {
         "determination:datetime": "2017-01-01T00:00:00Z",
     }
-    missing_schemas = {
-        "properties": {
-            "crop:code": {"type": "uint16"},
-            "crop:name": {"type": "string"},
-        }
-    }
 
     def _normalize_geojson_properties(self, feature):
-        # These GeoJSON files have no top-level feature id, only fid inside properties.
         if "id" not in feature["properties"]:
             feature["properties"]["id"] = feature["properties"].get("fid", None)
         return feature
 
     def migrate(self, gdf):
-        # Reproject from EPSG:32734 to WGS84 as required by fiboa spec
-        if gdf.crs is not None and gdf.crs.to_epsg() != 4326:
-            gdf = gdf.to_crs("EPSG:4326")
-
-        # Convert area from m² to hectares
-        gdf["SHAPE_AREA"] = gdf["SHAPE_AREA"] / 10000
-
         return super().migrate(gdf)
