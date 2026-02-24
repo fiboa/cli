@@ -3,7 +3,7 @@ from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 from ..conversion.fiboa_converter import FiboaBaseConverter
 
 
-class Converter(FiboaBaseConverter):
+class Ai4SfConverter(FiboaBaseConverter):
     sources = {
         # Cambodia
         "https://phys-techsciences.datastations.nl/api/access/datafile/100634?gbrecs=true": "2_cambodia_areas.gpkg",
@@ -72,7 +72,7 @@ class Converter(FiboaBaseConverter):
     }
 
     id = "ai4sf"
-    short_name = "Cambodia/Vietnam (AI4SmallFarms)"
+    short_name = "Cambodia/Vietnam (AI4SF)"
     title = "Field boundaries for Cambodia and Vietnam (AI4SmallFarms)"
     # from https://research.tudelft.nl/en/publications/ai4smallfarms-a-dataset-for-crop-field-delineation-in-southeast-a
     description = """
