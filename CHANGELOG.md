@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - AddHCATMixin assures hcat-extension validity and csv-based data-conversion if required
   - EuroCropsConverterMixin is a BaseClass for EuroCrops-provided datasets
   - EuroLandBaseConverter is a BaseClass for Euroland-provided datasets
-- Addes some converters that contain splits for ML usecases
+- Added ML-split variants of converters (ai4sf_ml, india_10k_ml, de_fusion_ml, za_fusion_ml, rw_rwanda_ml) that include train/val/test split information for machine learning use cases
 - Avoid base property schema override
 - Add Converter for Bulgaria
 - Remove unintended CommonMark formatting (indentation) from descriptions in converters
