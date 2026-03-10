@@ -35,8 +35,10 @@ covering three tiles in the Western Cape region of South Africa.
     }
 
     def _normalize_geojson_properties(self, feature):
-        if "id" not in feature["properties"]:
-            feature["properties"]["id"] = feature["properties"].get("fid", None)
+        fid = feature["properties"].get("fid")
+        if fid is None:
+            raise ValueError(f"Feature has no 'fid' property: {feature}")
+        feature["properties"]["id"] = fid
         return feature
 
     def migrate(self, gdf):

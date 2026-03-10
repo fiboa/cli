@@ -28,17 +28,23 @@ covering two tiles in the Brandenburg region of Germany.
         "SHAPE_AREA": "metrics:area",
         "crop_id": "crop:code",
         "crop_name": "crop:name",
-    }
-    column_additions = {
-        "determination:datetime": "2019-01-01T00:00:00Z",
+        "determination:datetime": "determination:datetime",
     }
 
     def _normalize_geojson_properties(self, feature):
         # These GeoJSON files have no top-level feature id, only fid inside properties.
         # Override to use fid so vecorel does not crash looking for feature["id"].
-        if "id" not in feature["properties"]:
-            feature["properties"]["id"] = feature["properties"].get("fid", None)
+        fid = feature["properties"].get("fid")
+        if fid is None:
+            raise ValueError(f"Feature has no 'fid' property: {feature}")
+        feature["properties"]["id"] = fid
         return feature
+
+    def file_migration(self, gdf, path, uri, layer=None):
+        # Train file covers 2018, test file covers 2019.
+        year = "2018" if "2018" in path else "2019"
+        gdf["determination:datetime"] = f"{year}-01-01T00:00:00Z"
+        return super().file_migration(gdf, path, uri, layer)
 
     def migrate(self, gdf):
         # Source GeoJSON uses EPSG:25833 (ETRS89/UTM zone 33N) but the CRS tag
