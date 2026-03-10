@@ -40,4 +40,7 @@ covering three tiles in the Western Cape region of South Africa.
         return feature
 
     def migrate(self, gdf):
+        # Source GeoJSON uses EPSG:32734 (WGS84/UTM zone 34S) but the CRS tag
+        # is not picked up by the reader, so coordinates arrive labeled as 4326.
+        gdf = gdf.set_crs("EPSG:32734", allow_override=True).to_crs("EPSG:4326")
         return super().migrate(gdf)

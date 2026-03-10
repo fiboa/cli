@@ -41,4 +41,7 @@ covering two tiles in the Brandenburg region of Germany.
         return feature
 
     def migrate(self, gdf):
+        # Source GeoJSON uses EPSG:25833 (ETRS89/UTM zone 33N) but the CRS tag
+        # is not picked up by the reader, so coordinates arrive labeled as 4326.
+        gdf = gdf.set_crs("EPSG:25833", allow_override=True).to_crs("EPSG:4326")
         return super().migrate(gdf)
