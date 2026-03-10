@@ -34,6 +34,6 @@ the 2021 growing season.
         "determination_datetime": "determination:datetime",
     }
 
-    def migrate(self, gdf):
-        gdf["id"] = gdf["id"].astype(str)
-        return super().migrate(gdf)
+    column_migrations = {
+        "id": lambda col: col.astype(str),
+    }

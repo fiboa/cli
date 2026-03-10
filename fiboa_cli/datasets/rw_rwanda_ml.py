@@ -88,11 +88,5 @@ class RwRwandaMlConverter(MlSplitsMixin, RwRwandaConverter):
         )
         # Drop duplicate rows created when a field overlaps multiple tiles
         joined = joined[~joined.index.duplicated(keep="first")]
-        gdf["_source_split"] = (
-            joined["index_right"].notna().map({True: "train", False: "test"})
-        )
+        gdf["split"] = joined["index_right"].notna().map({True: "train", False: "test"}).values
         return super().file_migration(gdf, path, uri, layer)
-
-    def migrate(self, gdf):
-        gdf["split"] = gdf["_source_split"].astype(object)
-        return super().migrate(gdf)
