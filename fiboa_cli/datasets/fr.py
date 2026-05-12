@@ -13,6 +13,13 @@ class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
                 "**/*.gpkg"
             ]
         },
+        "2024": {
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.001": [],
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.002": [],
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.003": [],
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.004": [],
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.005": [],
+        },
         "2023": {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01.7z": [
                 "**/*.gpkg"
@@ -20,7 +27,7 @@ class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         },
         "2021": {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FXX_2021-01-01/RPG_2-0__GPKG_LAMB93_FXX_2021-01-01.7z": [
-                "**/*.gpkg"
+                "**/PARCELLES_GRAPHIQUES.gpkg"
             ]
         },
         "2020": {
@@ -60,7 +67,7 @@ The anonymized version is distributed as part of the public service for making r
     def migrate(self, gdf) -> GeoDataFrame:
         if "ID_PARCEL" in gdf.columns:
             # Make column names lowercase, harmonize for different years
-            gdf.rename(columns={k: k.lower() for k in gdf.columns}, inplace=True)
+            gdf = gdf.rename(columns={k: k.lower() for k in gdf.columns}, inplace=True)
         return super().migrate(gdf)
 
     column_filters = {
