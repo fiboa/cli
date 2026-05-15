@@ -11,8 +11,7 @@ base = "https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/downloads"
 class NLCropConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     area_calculate_missing = True
     variants = {
-        "2025": f"{base}/brpgewaspercelen_concept_2025.gpkg",
-        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.gpkg" for y in range(2024, 2020, -1)},
+        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.gpkg" for y in range(2025, 2020, -1)},
         **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.zip" for y in range(2020, 2009, -1)},
     }
 
