@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Update fr-converter to support 2021/2022 files
+
 ## [v0.21.0] - 2026-02-16
 
 - Update vecorel-cli
