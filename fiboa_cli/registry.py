@@ -22,7 +22,7 @@ class FiboaRegistry(VecorelRegistry):
         "determination:details",
     ]
     required_extensions = [re.compile(spec_pattern)]
-    ignored_datasets = VecorelRegistry.ignored_datasets + ["es.py"]
+    ignored_datasets = VecorelRegistry.ignored_datasets + ["es_base.py"]
 
     def register_commands(self):
         from .convert import ConvertData

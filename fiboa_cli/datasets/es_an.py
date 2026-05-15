@@ -1,7 +1,7 @@
 from loguru import logger
 
 from .commons.data import read_data_csv
-from .es import ESBaseConverter
+from .es_base import ESBaseConverter
 
 
 class ANConverter(ESBaseConverter):

@@ -1,5 +1,5 @@
 from fiboa_cli.conversion.converter_rest import EsriRESTConverterMixin
-from fiboa_cli.datasets.es import ESBaseConverter
+from fiboa_cli.datasets.es_base import ESBaseConverter
 
 
 class ESGAConverter(EsriRESTConverterMixin, ESBaseConverter):
