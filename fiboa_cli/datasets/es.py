@@ -3,10 +3,10 @@ import re
 import requests
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
-from ..conversion.fiboa_converter import FiboaBaseConverter
+from ..conversion.per_file import PerFileBaseConverter
 
 
-class Converter(FiboaBaseConverter):
+class Converter(PerFileBaseConverter):
     id = "es"
     short_name = "Spain"
     title = "Spain Declared Crops (Cultivos Declarados SIGPAC)"
