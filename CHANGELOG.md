@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 - Converter for Spain (whole), based on the FEGA 2025+ data
+- Update fr-converter to support 2021/2022 files
 
 ## [v0.21.0] - 2026-02-16
 
