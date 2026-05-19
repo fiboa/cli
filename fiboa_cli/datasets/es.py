@@ -1,50 +1,121 @@
+import re
+
+import requests
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
-from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
-from fiboa_cli.datasets.commons.data import read_data_csv
+from ..conversion.fiboa_converter import FiboaBaseConverter
 
 
-class ESBaseConverter(FiboaBaseConverter):
+class Converter(FiboaBaseConverter):
+    id = "es"
+    short_name = "Spain"
+    title = "Spain Declared Crops (Cultivos Declarados SIGPAC)"
+    description = """
+National declared-crop dataset (Cultivos Declarados SIGPAC) published by the Spanish Agricultural Guarantee Fund
+(FEGA) via the unified SIGPAC Hub Cloud portal (sigpac-hubcloud.es). Each record is a declaration line within a
+farmer's Single Application (Solicitud Única) for Common Agricultural Policy (CAP) direct payments, mapped onto
+SIGPAC cadastral divisions. Data is distributed as one GeoPackage per Spanish province, harmonised across the
+country since the 2025 campaign year.
+
+This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
     """
-    Base Converter for Spain
-    Asssumes a source column with the SIGPAC-Land Use code
-    The Land Use code is filtered for agricultural use and transformed into a high-level crop type
+    provider = "Fondo Español de Garantía Agraria (FEGA) <https://www.fega.gob.es>"
+    attribution = "©FEGA / Ministerio de Agricultura, Pesca y Alimentación"
+    license = "CC-BY-4.0"
 
-    "Cultivo Declarado" is what we would prefer, but the "Recinto" is the best to be found so far
+    variants = {"2025": "2025"}
 
-    For Spanish Sources, see https://www.cartodruid.es/en/-/descargar-sigpac-comunidad-autonoma
-    There seems to be a National Layer; https://inspire-geoportal.ec.europa.eu/srv/api/records/87ce5171-d713-4eec-a1f3-2b9dd94cad91
-    """
+    columns = {
+        "geometry": "geometry",
+        "id": "id",
+        "provincia": "admin_province_code",
+        "municipio": "admin_municipality_code",
+        "dn_surface": "metrics:area",
+        "parc_producto": "crop:code",
+        "parc_sistexp": "irrigation_system",
+        "parc_supcult": "cultivation_surface",
+    }
 
-    use_code_attribute = "uso_sigpac"
+    area_is_in_ha = False
 
     extensions = {
         "https://fiboa.org/crop-extension/v0.2.0/schema.yaml",
         ADMIN_DIVISION,
     }
+
     column_additions = {
-        # https://www.euskadi.eus/contenidos/informacion/pac2015_pagosdirectos/es_def/adjuntos/Anexos_PAC_marzo2015.pdf
-        # https://www.fega.gob.es/sites/default/files/files/document/AD-CIRCULAR_2-2021_EE98293_SIGC2021.PDF
-        # Very generic list
         "admin:country_code": "ES",
-        "crop:code_list": "https://fiboa.org/code/es/sigpac/land_use.csv",
+        # FEGA declared-crop codelist (PARC_PRODUCTO) — separate from the SIGPAC land-use list.
+        # Reference list shipped inside each provincial GPKG as the `cod_producto` layer.
+        "crop:code_list": "https://fiboa.org/code/es/cultivos_declarados/parc_producto.csv",
+    }
+
+    column_migrations = {
+        # crop:code must be a string per the crop extension; parc_producto is an integer.
+        "parc_producto": lambda col: col.astype("Int64").astype(str),
+        # admin_*_code are strings; zero-pad province to 2 digits (INE convention).
+        "provincia": lambda col: col.astype("Int64").astype(str).str.zfill(2),
+        "municipio": lambda col: col.astype("Int64").astype(str),
+    }
+
+    missing_schemas = {
+        "properties": {
+            "admin_province_code": {"type": "string"},
+            "admin_municipality_code": {"type": "string"},
+            "irrigation_system": {"type": "string"},
+            "cultivation_surface": {"type": "int32"},
+        }
     }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        assert self.id.startswith("es_"), "Assuming Spanish subclass"
+        if not self.variant:
+            self.variant = next(iter(self.variants))
+        self.column_additions = {
+            **self.column_additions,
+            "determination:datetime": f"{self.variant}-01-01T00:00:00Z",
+        }
 
-        def code_filter(col):
-            return ~col.isin("AG/CA/ED/FO/IM/IS/IV/TH/ZC/ZU/ZV/MT".split("/") + [None])
-
-        self.column_filters = {self.use_code_attribute: code_filter}
-        self.column_additions["admin:subdivision_code"] = self.id[len("es_") :].upper()
+    def layer_filter(self, layer: str, uri: str) -> bool:
+        # GPKG contains the data layer plus several codelist tables (cod_*) — only read the data.
+        return layer == "cultivo_declarado"
 
     def migrate(self, gdf):
-        # This actually is a land use code. Not sure if we should put this in crop:code
-        rows = read_data_csv("es_coda_uso.csv")
-        mapping = {row["original_code"]: row["original_name"] for row in rows}
-        mapping_en = {row["original_code"]: row["name_en"] for row in rows}
-        gdf["crop:name"] = gdf[self.use_code_attribute].map(mapping)
-        gdf["crop:name_en"] = gdf[self.use_code_attribute].map(mapping_en)
+        # The source has no globally unique row identifier. Build one from the SIGPAC cadastral key
+        # plus the declaration-line index, which is unique per record.
+        def part(col):
+            return gdf[col].astype("Int64").astype(str)
+
+        gdf["id"] = (
+            part("provincia").str.zfill(2)
+            + "-"
+            + part("municipio")
+            + "-"
+            + part("agregado")
+            + "-"
+            + part("zona")
+            + "-"
+            + part("poligono")
+            + "-"
+            + part("parcela")
+            + "-"
+            + part("recinto")
+            + "-"
+            + part("ld_recinto")
+        )
         return super().migrate(gdf)
+
+    def get_urls(self):
+        if self.variant not in self.variants:
+            opts = ", ".join(self.variants.keys())
+            raise ValueError(f"Unknown variant '{self.variant}', choose from {opts}")
+
+        year = self.variant
+        base = f"https://sigpac-hubcloud.es/geopackages/{year}/cultivo_declarado/"
+        response = requests.get(base, timeout=60)
+        response.raise_for_status()
+        # The directory listing is a classic Apache-style HTML index; parse out the .zip hrefs.
+        zip_paths = re.findall(r'HREF="(/geopackages/[^"]+\.zip)"', response.text)
+        if not zip_paths:
+            raise RuntimeError(f"No GeoPackage archives found at {base}")
+        return {f"https://sigpac-hubcloud.es{p}": ["*.gpkg"] for p in zip_paths}

@@ -3,7 +3,7 @@ from datetime import datetime
 
 import requests
 
-from .es import ESBaseConverter
+from .es_base import ESBaseConverter
 
 
 class ESVCConverter(ESBaseConverter):

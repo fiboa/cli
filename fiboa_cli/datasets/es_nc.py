@@ -6,7 +6,7 @@ import requests
 from loguru import logger
 from vecorel_cli.vecorel.util import name_from_uri
 
-from .es import ESBaseConverter
+from .es_base import ESBaseConverter
 
 
 class NCConverter(ESBaseConverter):

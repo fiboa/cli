@@ -1,6 +1,6 @@
 import pandas as pd
 
-from .es import ESBaseConverter
+from .es_base import ESBaseConverter
 
 
 class ARConverter(ESBaseConverter):

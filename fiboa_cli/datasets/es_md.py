@@ -1,4 +1,4 @@
-from .es import ESBaseConverter
+from .es_base import ESBaseConverter
 
 
 class ESCLConverter(ESBaseConverter):
