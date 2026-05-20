@@ -73,7 +73,13 @@ class PerFileBaseConverter(FiboaBaseConverter):
                 original_geometries=original_geometries,
                 **kwargs,
             )
-        self.merge_files(output_file, part_files, compression=compression or "zstd")
+        self.merge_files(
+            output_file,
+            part_files,
+            compression=compression or "zstd",
+            compression_level=compression_level,
+            geoparquet_version=geoparquet_version,
+        )
         return output_file
 
     def merge_files(
@@ -83,6 +89,7 @@ class PerFileBaseConverter(FiboaBaseConverter):
         batch_size: int = DEFAULT_BATCH_SIZE,
         compression: str = "zstd",
         compression_level: Optional[int] = None,
+        geoparquet_version: Optional[str] = None,
         cleanup_parts: bool = False,
     ) -> str:
         """
@@ -97,7 +104,19 @@ class PerFileBaseConverter(FiboaBaseConverter):
         were produced by an older vecorel-cli (which sorted by WKB lex order
         instead of Hilbert) and would otherwise silently drop rows in the
         streaming merge (``np.searchsorted`` requires a sorted input).
+
+        ``geoparquet_version`` (``"1.0.0"`` / ``"1.1.0"`` / ``None``) sets the
+        ``version`` field of the merged file's ``geo`` metadata. When ``None``
+        (default), the value declared by the input files is preserved unchanged.
         """
+        if geoparquet_version is not None:
+            from vecorel_cli.const import GEOPARQUET_VERSIONS
+
+            if geoparquet_version not in GEOPARQUET_VERSIONS:
+                raise ValueError(
+                    f"Invalid geoparquet_version {geoparquet_version!r}; "
+                    f"expected one of {GEOPARQUET_VERSIONS}"
+                )
         if not paths:
             raise ValueError("No paths to merge")
         paths = [str(p) for p in paths]
@@ -180,6 +199,7 @@ class PerFileBaseConverter(FiboaBaseConverter):
             batch_size,
             compression,
             compression_level,
+            geoparquet_version,
         )
         actual_rows = pq.ParquetFile(output_file).metadata.num_rows
         if actual_rows != expected_rows:
@@ -264,9 +284,15 @@ def _ensure_hilbert_sorted(
     return True
 
 
-def _build_output_schema(input_schema: pa.Schema, merged_bbox, geom_types) -> pa.Schema:
-    """Patch the geo metadata: merged bbox + union of geometry_types. Other
-    schema metadata and field metadata are preserved unchanged."""
+def _build_output_schema(
+    input_schema: pa.Schema,
+    merged_bbox,
+    geom_types,
+    geoparquet_version: Optional[str] = None,
+) -> pa.Schema:
+    """Patch the geo metadata: merged bbox + union of geometry_types, and
+    optionally overwrite the GeoParquet ``version`` field. Other schema
+    metadata and field metadata are preserved unchanged."""
     meta = dict(input_schema.metadata or {})
     geo = json.loads(meta[GEO_META_KEY])
     primary_col = geo["primary_column"]
@@ -274,6 +300,8 @@ def _build_output_schema(input_schema: pa.Schema, merged_bbox, geom_types) -> pa
         geo["columns"][primary_col]["bbox"] = [float(v) for v in merged_bbox]
     if geom_types:
         geo["columns"][primary_col]["geometry_types"] = list(geom_types)
+    if geoparquet_version is not None:
+        geo["version"] = geoparquet_version
     meta[GEO_META_KEY] = json.dumps(geo).encode("utf-8")
     return input_schema.with_metadata(meta)
 
@@ -288,10 +316,11 @@ def _streaming_merge(
     batch_size: int,
     compression: str,
     compression_level: Optional[int],
+    geoparquet_version: Optional[str] = None,
 ) -> None:
     pq_files = [pq.ParquetFile(p) for p in paths]
     in_schema = pq_files[0].schema_arrow
-    out_schema = _build_output_schema(in_schema, merged_bbox, geom_types)
+    out_schema = _build_output_schema(in_schema, merged_bbox, geom_types, geoparquet_version)
 
     iters = [pf.iter_batches(batch_size=batch_size) for pf in pq_files]
     heads: list = [None] * len(paths)
