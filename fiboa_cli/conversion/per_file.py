@@ -12,6 +12,17 @@ GEO_META_KEY = b"geo"
 DEFAULT_BATCH_SIZE = 64_000
 
 
+def _major_version(schema_version: Optional[str]) -> int:
+    """Return the major part of a ``MAJOR.MINOR.PATCH`` version, or 0."""
+    if not schema_version:
+        return 0
+    head = schema_version.split(".", 1)[0]
+    try:
+        return int(head)
+    except ValueError:
+        return 0
+
+
 # This converter is experimental, use with caution.
 # Use this primarily for datasets that are too large to be processed by the default converter
 class PerFileBaseConverter(FiboaBaseConverter):
@@ -187,11 +198,20 @@ class PerFileBaseConverter(FiboaBaseConverter):
         if n_resorted:
             self.warning(f"Re-sorted {n_resorted}/{len(paths)} part file(s) before merging.")
 
-        self.info(f"Streaming merge -> {output_file} (Hilbert ref bounds = {total_bounds})")
         expected_rows = sum(pq.ParquetFile(p).metadata.num_rows for p in paths)
+
+        # GeoParquet 2.0+ uses native Parquet GEOMETRY logical types, which the
+        # pyarrow streaming writer can't emit. Stream-merge to a 1.1.0
+        # intermediate, then convert to 2.x via DuckDB. This preserves the
+        # bounded peak-memory profile (one batch * k) for the heavy merge step.
+        write_as_v2 = _major_version(geoparquet_version) >= 2
+        intermediate = output_file + ".v11.tmp" if write_as_v2 else output_file
+        intermediate_version = None if write_as_v2 else geoparquet_version
+
+        self.info(f"Streaming merge -> {intermediate} (Hilbert ref bounds = {total_bounds})")
         _streaming_merge(
             paths,
-            output_file,
+            intermediate,
             primary_col,
             total_bounds,
             merged_bbox,
@@ -199,15 +219,33 @@ class PerFileBaseConverter(FiboaBaseConverter):
             batch_size,
             compression,
             compression_level,
-            geoparquet_version,
+            intermediate_version,
         )
-        actual_rows = pq.ParquetFile(output_file).metadata.num_rows
+        actual_rows = pq.ParquetFile(intermediate).metadata.num_rows
         if actual_rows != expected_rows:
             raise RuntimeError(
                 f"Streaming merge dropped rows: expected {expected_rows:,} "
-                f"(sum of inputs), wrote {actual_rows:,} to {output_file}. "
+                f"(sum of inputs), wrote {actual_rows:,} to {intermediate}. "
                 "This is a bug — inputs were verified Hilbert-sorted before merge."
             )
+        if write_as_v2:
+            self.info(
+                f"Converting intermediate -> {output_file} as "
+                f"GeoParquet {geoparquet_version} (via DuckDB)"
+            )
+            from vecorel_cli.parquet.duckdb import copy_to_geoparquet2
+
+            copy_to_geoparquet2(
+                intermediate,
+                output_file,
+                schema_version=geoparquet_version,
+                compression=compression,
+                compression_level=compression_level,
+            )
+            try:
+                os.remove(intermediate)
+            except OSError:
+                self.warning(f"Could not remove intermediate file {intermediate}")
         self.info(f"Merged {actual_rows:,} rows into {output_file}")
 
         if cleanup_parts:
