@@ -1,10 +1,51 @@
 code,province,filename
+01,Álava,ALAVA
+02,Albacete,ALBACETE
+03,Alicante,ALICANTE
+04,Almería,ALMERIA
 05,Ávila,AVILA
-34,Palencia,PALENCIA
-37,Salamanca,SALAMANCA
-40,Segovia,SEGOVIA
-42,Soria,SORIA,
-47,Valladolid,VALLADOLID
-49,Zamora,ZAMORA
-24,León,LEON
+06,Badajoz,BADAJOZ
+07,Illes Balears,ILLES BALEARS
+08,Barcelona,BARCELONA
 09,Burgos,BURGOS
+10,Cáceres,CACERES
+11,Cádiz,CADIZ
+12,Castellón,CASTELLON
+13,Ciudad Real,CIUDAD REAL
+14,Córdoba,CORDOBA
+15,A Coruña,A CORUÑA
+16,Cuenca,CUENCA
+17,Girona,GIRONA
+18,Granada,GRANADA
+19,Guadalajara,GUADALAJARA
+20,Guipúzcoa,GUIPUZCOA
+21,Huelva,HUELVA
+22,Huesca,HUESCA
+23,Jaén,JAEN
+24,León,LEON
+25,Lleida,LLEIDA
+26,La Rioja,LA RIOJA
+27,Lugo,LUGO
+28,Madrid,MADRID
+29,Málaga,MALAGA
+30,Murcia,MURCIA
+31,Navarra,NAVARRA
+32,Ourense,OURENSE
+33,Asturias,ASTURIAS
+34,Palencia,PALENCIA
+35,Las Palmas,LAS PALMAS
+36,Pontevedra,PONTEVEDRA
+37,Salamanca,SALAMANCA
+38,Santa Cruz de Tenerife,SANTA CRUZ DE TENERIFE
+39,Cantabria,CANTABRIA
+40,Segovia,SEGOVIA
+41,Sevilla,SEVILLA
+42,Soria,SORIA
+43,Tarragona,TARRAGONA
+44,Teruel,TERUEL
+45,Toledo,TOLEDO
+46,Valencia,VALENCIA
+47,Valladolid,VALLADOLID
+48,Vizcaya,VIZCAYA
+49,Zamora,ZAMORA
+50,Zaragoza,ZARAGOZA

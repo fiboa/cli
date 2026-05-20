@@ -35,8 +35,8 @@ class AddHCATMixin:
     def convert(self, *args, **kwargs):
         self.mapping_file = kwargs.get("mapping_file")
         if not self.mapping_file:
-            assert self.ec_mapping_csv is not None, (
-                "Specify ec_mapping_csv in Converter, e.g. find them at https://github.com/maja601/EuroCrops/tree/main/csvs/country_mappings"
+            assert isinstance(self.ec_mapping_csv, str), (
+                "Specify proper ec_mapping_csv in Converter, e.g. find them at https://github.com/maja601/EuroCrops/tree/main/csvs/country_mappings"
             )
         return super().convert(*args, **kwargs)
 
