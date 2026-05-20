@@ -54,7 +54,13 @@ class PerFileBaseConverter(FiboaBaseConverter):
         # Multi-source: convert each URI to its own GeoParquet part, then merge.
         part_files = []
         for index, (uri, target) in enumerate(urls.items()):
-            part = os.path.join(dirname, f"{filename}_{index}{ext}")
+            part = os.path.join(dirname, f"{filename}_{index}_part{ext}")
+            part_files.append(part)
+            if os.path.exists(part):
+                self.info(
+                    f"Skipping existing file {part}: {uri} -> {output_file} (part {index + 1}/{len(urls)})"
+                )
+                continue
             self.info(f"Converting source {index + 1}/{len(urls)}: {uri}")
             super().convert(
                 output_file=part,
@@ -67,7 +73,6 @@ class PerFileBaseConverter(FiboaBaseConverter):
                 original_geometries=original_geometries,
                 **kwargs,
             )
-            part_files.append(part)
         self.merge_files(output_file, part_files, compression=compression or "zstd")
         return output_file
 
@@ -85,12 +90,13 @@ class PerFileBaseConverter(FiboaBaseConverter):
         sorted by Hilbert distance. Streams via pyarrow row groups so peak
         memory is roughly O(batch_size * k).
 
-        Assumes each input file was produced by the standard convert pipeline,
-        which already sorts rows by Hilbert distance against the CRS's total
-        bounds (see ``vecorel_cli.vecorel.hilbert.hilbert_sort_geodataframe``).
-        Because every input shares the same Hilbert reference grid (derived
-        from the CRS, not from per-file extents), no pre-sort is required —
-        we just merge the already-sorted runs.
+        Each input file is expected to be sorted by Hilbert distance against
+        the CRS's total bounds (see ``vecorel_cli.vecorel.hilbert``). If a
+        part file is *not* in Hilbert order it is sorted in place before the
+        streaming merge — this guards against pre-existing part files that
+        were produced by an older vecorel-cli (which sorted by WKB lex order
+        instead of Hilbert) and would otherwise silently drop rows in the
+        streaming merge (``np.searchsorted`` requires a sorted input).
         """
         if not paths:
             raise ValueError("No paths to merge")
@@ -146,7 +152,24 @@ class PerFileBaseConverter(FiboaBaseConverter):
 
         total_bounds = crs_total_bounds(crs)
 
+        # Verify each part is Hilbert-sorted; sort in place if not. With a
+        # vecorel-cli that already Hilbert-sorts, this is a fast no-op read.
+        self.info(f"Verifying Hilbert order of {len(paths)} part file(s)")
+        n_resorted = 0
+        for path in paths:
+            if _ensure_hilbert_sorted(
+                path, primary_col, total_bounds, compression, compression_level
+            ):
+                n_resorted += 1
+                self.warning(
+                    f"  {path}: was not Hilbert-sorted, re-sorted in place. "
+                    "(Bump vecorel-cli to skip this rewrite next time.)"
+                )
+        if n_resorted:
+            self.warning(f"Re-sorted {n_resorted}/{len(paths)} part file(s) before merging.")
+
         self.info(f"Streaming merge -> {output_file} (Hilbert ref bounds = {total_bounds})")
+        expected_rows = sum(pq.ParquetFile(p).metadata.num_rows for p in paths)
         _streaming_merge(
             paths,
             output_file,
@@ -158,6 +181,14 @@ class PerFileBaseConverter(FiboaBaseConverter):
             compression,
             compression_level,
         )
+        actual_rows = pq.ParquetFile(output_file).metadata.num_rows
+        if actual_rows != expected_rows:
+            raise RuntimeError(
+                f"Streaming merge dropped rows: expected {expected_rows:,} "
+                f"(sum of inputs), wrote {actual_rows:,} to {output_file}. "
+                "This is a bug — inputs were verified Hilbert-sorted before merge."
+            )
+        self.info(f"Merged {actual_rows:,} rows into {output_file}")
 
         if cleanup_parts:
             for path in paths:
@@ -200,6 +231,37 @@ def _hilbert_keys_for_table(table: pa.Table, primary_col: str, total_bounds) -> 
 
     bounds = _bounds_array_for_table(table, primary_col)
     return hilbert_distances_from_bounds(bounds, total_bounds)
+
+
+def _ensure_hilbert_sorted(
+    path: str,
+    primary_col: str,
+    total_bounds,
+    compression: str,
+    compression_level: Optional[int],
+) -> bool:
+    """If ``path`` is already Hilbert-sorted against ``total_bounds``, leave it
+    untouched and return False. Otherwise sort it in place and return True.
+
+    The whole file is loaded into memory once; for the per-file converter this
+    is bounded by a single source partition (much smaller than the merged
+    dataset). Schema metadata (``geo``, collection JSON, etc.) is preserved.
+    """
+    pf = pq.ParquetFile(path)
+    table = pf.read()
+    hilberts = _hilbert_keys_for_table(table, primary_col, total_bounds)
+    # NB: hilberts is uint64; never use np.diff for monotonicity here — uint
+    # underflow makes any descent wrap to a huge positive and fool the check.
+    if hilberts.size <= 1 or bool(np.all(hilberts[1:] >= hilberts[:-1])):
+        return False
+    order = np.argsort(hilberts, kind="stable")
+    sorted_table = table.take(pa.array(order))
+    sorted_table = sorted_table.replace_schema_metadata(pf.schema_arrow.metadata)
+    write_kwargs = {"compression": compression}
+    if compression_level is not None:
+        write_kwargs["compression_level"] = compression_level
+    pq.write_table(sorted_table, path, **write_kwargs)
+    return True
 
 
 def _build_output_schema(input_schema: pa.Schema, merged_bbox, geom_types) -> pa.Schema:
