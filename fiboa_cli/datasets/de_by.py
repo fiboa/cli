@@ -16,13 +16,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     description = """A field block (German: "Feldblock") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated by one or more farmers with one or more crops, is fully or partially set aside or is fully or partially taken out of production."""
     license = "CC-BY-4.0"
     attribution = "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de"
-    providers = [
-        {
-            "name": "Bayerische Vermessungsverwaltung",
-            "url": "https://www.ldbv.bayern.de",
-            "roles": ["producer", "licensor"],
-        }
-    ]
+    provider = "Bayerische Vermessungsverwaltung <https://www.ldbv.bayern.de>"
     mapping_file = "https://fiboa.org/code/de/de_by.csv"
     ec_mapping_csv = "https://fiboa.org/code/de/de_by.csv"
 
