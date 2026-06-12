@@ -10,6 +10,11 @@ from vecorel_cli.vecorel.util import load_file
 HCAT_EXTENSION = "https://fiboa.org/hcat-extension/v0.3.0/schema.yaml"
 CROP_EXTENSION = "https://fiboa.org/crop-extension/v0.2.0/schema.yaml"
 
+ECV2_MAPPING_URL = (
+    "https://raw.githubusercontent.com/Martincccc/EuroCropsV2/main/"
+    "data/cropcodemapping/eurocrops.csv"
+)
+
 
 class AddHCATMixin:
     """
@@ -17,6 +22,9 @@ class AddHCATMixin:
     Automatically adds crop:code_list to the columns, and adds HCAT and CROP extensions.
     """
 
+    HCAT_PREFIXES = {3: "HCAT3", 4: "hcat4"}
+
+    hcat_version = 4
     ec_mapping_csv: Optional[str] = None  # TODO rename to hcat_mapping_csv
     mapping_file = None
     ec_mapping: Optional[list[dict]] = None  # TODO rename to hcat_mapping
@@ -31,6 +39,9 @@ class AddHCATMixin:
         super().__init__(*args, **kwargs)
         self.columns |= self.hcat_columns | {"crop:code_list": "crop:code_list"}
         self.extensions = getattr(self, "extensions", set()) | {CROP_EXTENSION, HCAT_EXTENSION}
+        assert self.hcat_version in self.HCAT_PREFIXES, (
+            f"Unsupported HCAT version {self.hcat_version}"
+        )
 
     def convert(self, *args, **kwargs):
         self.mapping_file = kwargs.get("mapping_file")
@@ -71,8 +82,9 @@ class AddHCATMixin:
                 return {e[from_code]: e[attribute] or None for e in self.ec_mapping}
 
             col = None
+            prefix = self.HCAT_PREFIXES[self.hcat_version]
             for k, v in zip(
-                self.hcat_columns.keys(), ("translated_name", "HCAT3_name", "HCAT3_code")
+                self.hcat_columns.keys(), ("translated_name", f"{prefix}_name", f"{prefix}_code")
             ):
                 if v in self.ec_mapping[0]:
                     col = crop_code_col.map(map_to(v))
