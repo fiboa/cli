@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-- Suuport multiple years for CZ
+- Update years for DK (2025, 2026)
+- Support multiple years for CZ
 - Converter for Bavaria, Germany
 - Update fr-converter to support 2021/2022 files
 
