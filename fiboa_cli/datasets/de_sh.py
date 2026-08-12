@@ -4,7 +4,12 @@ from ..conversion.fiboa_converter import FiboaBaseConverter
 
 
 class Converter(AdminConverterMixin, FiboaBaseConverter):
-    sources = "https://service.gdi-sh.de/SH_OpenGBD/feeds/Atom_SH_Feldblockfinder_OpenGBD/data/Feldbloecke_2024_GPKG.zip"
+    variants = {
+        str(
+            y
+        ): f"https://service.gdi-sh.de/SH_OpenGBD/feeds/Atom_SH_Feldblockfinder_OpenGBD/data/Feldbloecke_{y}_GPKG.zip"
+        for y in range(2026, 2024 - 1, -1)
+    }
     id = "de_sh"
     admin_subdivision_code = "SH"
     short_name = "Germany, Schleswig-Holstein"
