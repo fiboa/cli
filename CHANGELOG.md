@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Add Italy Tuscany (IT-1) basd on EuroCrops v2
 - Suuport multiple years for CZ
+- Update years for DK (2025, 2026)
 - Converter for Bavaria, Germany
 - Update fr-converter to support 2021/2022 files
 

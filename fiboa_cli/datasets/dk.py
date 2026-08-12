@@ -8,7 +8,7 @@ from .commons.hcat import AddHCATMixin
 class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
         str(variant): f"https://landbrugsgeodata.fvm.dk/Download/Marker/Marker_{variant}.zip"
-        for variant in range(2024, 2008 - 1, -1)
+        for variant in range(2026, 2008 - 1, -1)
     }
     id = "dk"
     short_name = "Denmark"
