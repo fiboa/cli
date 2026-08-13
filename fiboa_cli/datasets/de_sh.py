@@ -8,7 +8,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         str(
             y
         ): f"https://service.gdi-sh.de/SH_OpenGBD/feeds/Atom_SH_Feldblockfinder_OpenGBD/data/Feldbloecke_{y}_GPKG.zip"
-        for y in range(2026, 2024 - 1, -1)
+        for y in range(2026, 2023 - 1, -1)
     }
     id = "de_sh"
     admin_subdivision_code = "SH"
