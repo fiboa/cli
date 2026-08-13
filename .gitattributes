@@ -1,0 +1,4 @@
+# Combine concurrent changes to CHANGELOG.md instead of conflicting. When two PRs both append
+# entries under "## [Unreleased]", git's built-in "union" driver keeps both
+# sets of added lines rather than reporting a merge conflict.
+CHANGELOG.md merge=union

@@ -8,7 +8,7 @@ from .commons.hcat import AddHCATMixin
 class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
         str(variant): f"https://landbrugsgeodata.fvm.dk/Download/Marker/Marker_{variant}.zip"
-        for variant in range(2024, 2008 - 1, -1)
+        for variant in range(2026, 2008 - 1, -1)
     }
     id = "dk"
     short_name = "Denmark"
@@ -25,8 +25,8 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "Afgkode": "crop:code",
         "Afgroede": "crop:name",
     }
+    use_variant_as_determination = True
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         gdf["Afgkode"] = gdf["Afgkode"].astype(float).fillna(value=0).astype(int).astype(str)
-        gdf["determination:datetime"] = f"{self.variant}-01-01T00:00:00Z"
         return super().migrate(gdf)

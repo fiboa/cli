@@ -3,9 +3,15 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
+base = "https://www.apprrr.hr/wp-content/uploads/nipp"
+
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     sources = "https://www.apprrr.hr/wp-content/uploads/nipp/land_parcels.gpkg"
+    variants = {
+        "2024": f"{base}/land_parcels.gpkg",
+        **{str(y): f"{base}/arkod_31_12_{y}.gpkg" for y in range(2023, 2010, -1)},
+    }
     id = "hr"
     short_name = "Croatia"
     title = "Croatian Field Boundaries"
@@ -99,3 +105,4 @@ and supporting sustainable land use practices.
 
     area_is_in_ha = False
     area_calculate_missing = True
+    use_variant_as_determination = True

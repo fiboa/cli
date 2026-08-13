@@ -9,6 +9,7 @@ AREA_KEY = "metrics:area"
 class FiboaBaseConverter(BaseConverter):
     area_is_in_ha = True
     area_calculate_missing = False
+    use_variant_as_determination = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,4 +36,7 @@ class FiboaBaseConverter(BaseConverter):
         elif self.area_is_in_ha and gdf_area_key in gdf.columns:
             # convert area in ha to meters
             gdf[gdf_area_key] = gdf[gdf_area_key].astype(float) * 10_000
+
+        if self.use_variant_as_determination:
+            gdf["determination:datetime"] = f"{self.variant}-01-01T00:00:00Z"
         return gdf
