@@ -25,8 +25,8 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "Afgkode": "crop:code",
         "Afgroede": "crop:name",
     }
+    use_variant_as_determination = True
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         gdf["Afgkode"] = gdf["Afgkode"].astype(float).fillna(value=0).astype(int).astype(str)
-        gdf["determination:datetime"] = f"{self.variant}-01-01T00:00:00Z"
         return super().migrate(gdf)
