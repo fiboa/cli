@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 from loguru import logger
 
-from .es import ESBaseConverter
+from .es_base import ESBaseConverter
 
 
 class ESPVConverter(ESBaseConverter):
