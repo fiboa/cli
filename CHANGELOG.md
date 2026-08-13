@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Add Italy Tuscany (IT-1) basd on EuroCrops v2
 - Suuport multiple years for CZ
+- Multiple year support for HR
+- Introduce FiboaBaseConverter.use_variant_as_determination for setting proper determination_date
 - Update years for DK (2025, 2026)
 - Converter for Bavaria, Germany
 - Update fr-converter to support 2021/2022 files
