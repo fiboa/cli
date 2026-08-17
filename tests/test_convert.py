@@ -50,6 +50,7 @@ tests = [
     "jecam",
     "ec_ro",
     "india_10k",
+    "it_1",
 ]
 test_path = "tests/data-files/convert"
 
