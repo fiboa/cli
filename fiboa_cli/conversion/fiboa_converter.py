@@ -14,6 +14,10 @@ class FiboaBaseConverter(BaseConverter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.extensions.add(get_fiboa_uri())
+        if self.use_variant_as_determination:
+            # The column is added in post_migrate; list it so it survives the
+            # "remove unlisted columns" step of the base converter.
+            self.columns = {**self.columns, "determination:datetime": "determination:datetime"}
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)

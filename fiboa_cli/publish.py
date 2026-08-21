@@ -1,17 +1,14 @@
+import hashlib
 import json
 import os
-import re
+import shutil
+import subprocess
 import sys
-from datetime import date
-from functools import cache
 from pathlib import Path
 
 import click
-import requests
-import spdx_license_list
 from vecorel_cli.basecommand import BaseCommand, runnable
 from vecorel_cli.cli.options import VECOREL_TARGET
-from vecorel_cli.encoding.auto import create_encoding
 
 from .convert import ConvertData
 from .converters import Converters
@@ -19,84 +16,50 @@ from .create_stac import CreateStacCollection
 from .registry import Registry
 from .validate import ValidateData
 
-STAC_EXTENSION = "https://stac-extensions.github.io/web-map-links/v1.2.0/schema.json"
-DESCRIPTIONS = {
-    "id": "Unique identifier",
-    "collection": "The collection identifier",
-    "inspire:id": "The INSPIRE identifier",
-    "determination:datetime": "Timestamp of the determination of the field boundary",
-    "metrics:area": "Field area in square meters",
-    "metrics:perimeter": "Field perimeter in square meters",
-    "crop:code_list": "A link to the code list",
-    "crop:code": "The crop code",
-    "crop:name": "Crop name in the original language",
-    "crop:name_en": "Crop name in English",
-    "hcat:name": "The machine-readable HCAT name of the crop",
-    "hcat:code": "The 10-digit HCAT code indicating the hierarchy of the crop",
-    "hcat:name_en": "The HCAT crop name translated into English",
-    "admin:country_code": "ISO 3166-1 alpha-2 country code.",
-    "admin:subdivision_code": "ISO 3166-2 principal subdivision code (e.g. province or state)",
-}
+FILE_EXTENSION = "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+WEB_MAP_LINKS_EXTENSION = "https://stac-extensions.github.io/web-map-links/v1.3.0/schema.json"
+PMTILES_MEDIA_TYPE = "application/vnd.pmtiles"
+TIPPECANOE_DEFAULT_OPTS = "-zg --drop-densest-as-needed --extend-zooms-if-still-dropping"
 
 is_windows = os.name == "nt"
 
 
+def multihash_sha256(path: Path, chunk_size: int = 1024 * 1024) -> str:
+    """
+    sha2-256 multihash of a file, hex encoded: 0x12 (sha2-256), 0x20 (32 bytes), digest.
+    This is the encoding the STAC file extension expects for ``file:checksum``.
+    """
+    digest = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(chunk_size), b""):
+            digest.update(chunk)
+    return "1220" + digest.hexdigest()
+
+
 class Publish(BaseCommand):
     cmd_name = "publish"
-    cmd_help = f"Convert and publish a {Registry.project} dataset to source coop."
-    url_base = "https://data.source.coop/fiboa/data"
+    cmd_help = (
+        f"Convert a {Registry.project} dataset and prepare it for publication: "
+        "GeoParquet, PMTiles and a STAC Collection with relative links."
+    )
 
     @staticmethod
     def get_cli_args():
         return {
             **ConvertData.get_cli_args(),
             "target": VECOREL_TARGET(folder=True),
-            "generate_meta": click.option(
-                "--generate-meta",
-                "-gm",
+            "pmtiles": click.option(
+                "--pmtiles/--no-pmtiles",
                 is_flag=True,
-                type=click.BOOL,
-                help="Generate README.txt and LICENSE.txt for the dataset if not present.",
-                default=False,
-            ),
-            "data_url": click.option(
-                "--data-url",
-                type=click.STRING,
-                help="When generating documentation, this is the link to the data.",
-            ),
-            "s3_upload_path": click.option(
-                "--s3-upload-path",
-                type=click.STRING,
-                help="Upload to this path on S3. By default it's the source coop fiboa data repository.",
-            ),
-            "yes": click.option(
-                "--yes",
-                "-y",
-                is_flag=True,
-                type=click.BOOL,
-                help="Answer yes to all questions.",
-                default=False,
+                help="Generate PMTiles with ogr2ogr and tippecanoe.",
+                default=True,
                 show_default=True,
             ),
-            "data_survey_url": click.option(
-                "--data-survey-url",
+            "tippecanoe_opts": click.option(
+                "--tippecanoe-opts",
                 type=click.STRING,
-                help="URL to the data survey markdown file.",
-                default=os.getenv("FIBOA_DATA_SURVEY"),
-                show_default=True,
-            ),
-            "editor": click.option(
-                "--editor",
-                type=click.STRING,
-                help="Editor to use when editing generated files.",
-                default=os.getenv("EDITOR", "edit" if is_windows else "nano"),
-                show_default=True,
-            ),
-            "converted_by": click.option(
-                "--converted-by",
-                type=click.STRING,
-                help="Name of the person or organization that converted the data.",
-                default=os.getenv("FIBOA_CONVERTED_BY"),
+                help="Additional options passed to tippecanoe.",
+                default=TIPPECANOE_DEFAULT_OPTS,
                 show_default=True,
             ),
         }
@@ -108,337 +71,174 @@ class Publish(BaseCommand):
 
         return callback
 
-    def __init__(self, dataset: str, data_url=None, s3_upload_path=None):
+    def __init__(self, dataset: str):
         super().__init__()
         self.cmd_title = f"Publish {dataset}"
         self.dataset = dataset
-        self.data_url = data_url or f"{self.url_base}/{self.dataset}"
-        self.s3_upload_path = (
-            s3_upload_path or f"s3://us-west-2.opendata.source.coop/fiboa/data/{self.dataset}/"
-        )
 
         try:
             self.converter = Converters().load(self.dataset)
         except (ImportError, NameError, OSError, RuntimeError, SyntaxError) as e:
             raise Exception(f"Converter for '{self.dataset}' not available or faulty: {e}") from e
 
-    def exc(self, cmd):
-        assert os.system(cmd) == 0
-
     def check_command(self, cmd, name=None):
-        if os.system(f"{cmd} --version") != 0:
+        if shutil.which(cmd) is None:
             self.error(f"Missing command {cmd}. Please install {name or cmd}")
             sys.exit(1)
-
-    def download_data_survey(self, base, **kwargs):
-        data_survey = (
-            kwargs.get("data_survey_url")
-            or f"https://raw.githubusercontent.com/fiboa/data-survey/refs/heads/main/data/{base}.md"
-        )
-        response = requests.get(data_survey)
-        if not response.ok:
-            self.warning(
-                f"Missing data survey {base}.md at {data_survey}. Falling back to converter declared properties."
-            )
-        else:
-            return response.text
-
-    @cache
-    def collect_meta_data(self, parquet_file, **kwargs):
-        base = self.dataset.replace("_", "-").upper()
-        data = {
-            "provider": self.converter.provider,
-            "license": self.converter.license,
-            "projection": "",
-            "homepage": "",
-            "submitter": "Fiboa project",
-            "header": "",
-        }
-        text = self.download_data_survey(base, **kwargs)
-        mapping = {
-            "data provider (legal entity)": "provider",
-            "submitter (affiliation)": "submitter",
-        }
-        properties = {}
-        if text:
-            data["header"] = (
-                f"\n- **Data Survey:** https://github.com/fiboa/data-survey/blob/main/data/{base}.md"
-            )
-            data.update(
-                {
-                    mapping.get(a.lower(), a.lower()): b
-                    for a, b in re.findall(r"- \*\*(.+?):\*\* (.+?)\n", text)
-                }
-            )
-            properties = {
-                a.lower(): b.strip()
-                for a, b in re.findall(r"\n\|\s*(\w+)[^|]*\|[^|]*\|[^|]*\|([^|]*)\|", text)
-            }
-        try:
-            # Try read projection from parquet metadata
-            meta = create_encoding(parquet_file).get_geoparquet_metadata()
-            crs = meta["columns"]["geometry"]["crs"]
-            data["projection"] = f"{crs['id']['authority']}:{crs['id']['code']} ({crs['name']})"
-        except Exception:
-            pass
-        converted_by = kwargs.get("converted_by")
-        if converted_by:
-            data["submitter"] = converted_by
-
-        assert data["provider"], "Cannot determine data provider from converter or data survey."
-        return data, properties
-
-    def readme_attribute_table(self, stac_data, properties):
-        def description(name):
-            m = self.converter.columns
-            reverse = dict(zip(m.values(), m.keys()))
-            return (
-                properties.get(reverse.get(name))
-                or properties.get(name)
-                or DESCRIPTIONS.get(name, "")
-            )
-
-        cols = [["Property", "**Data Type**", "Description"]] + [
-            [
-                s["name"],
-                re.search(r"\w+", s["type"])[0],
-                description(s["name"]),
-            ]
-            for s in stac_data["assets"]["data"]["table:columns"]
-            if s["name"] not in ("geometry", "bbox", "collection")
-        ]
-        widths = [max(len(c[i]) for c in cols) for i in range(3)]
-        aligned_cols = [[f" {c:<{w}} " for c, w in zip(row, widths)] for row in cols]
-        aligned_cols.insert(1, ["-" * (w + 2) for w in widths])
-        return "\n".join(["|" + "|".join(cols) + "|" for cols in aligned_cols])
-
-    def make_license(self, parquet_file, **kwargs):
-        text = ""
-        try:
-            data, properties = self.collect_meta_data(parquet_file, **kwargs)
-            text = data["license"]
-            if getattr(self.converter, "license") not in (None, "", data["license"]):
-                text += "\n" + self.converter.license + "\n"
-
-            found = False
-            for _license in (data["license"], self.converter.license):
-                if not _license or "<(https://" in _license:
-                    continue
-
-                # Include full-license text
-                _license = _license.upper()
-                if _license in spdx_license_list.LICENSES:
-                    response = requests.get(
-                        f"https://raw.githubusercontent.com/spdx/license-list-data/refs/heads/main/text/{_license}.txt"
-                    )
-                    if response.ok:
-                        found = True
-                        text += f"\n\n{response.text}\n"
-                        break
-            if not found:
-                self.warning(f"License {text} could not be found in SPDX license list")
-
-        except Exception as e:
-            self.exception(e)
-        return text
-
-    def make_readme(self, parquet_file, file_name, stac, **kwargs):
-        version = Registry.get_version()
-        converter = self.converter
-        with open(stac) as f:
-            stac_data = json.load(f)
-        count = stac_data["assets"]["data"]["table:row_count"]
-        data, properties = self.collect_meta_data(parquet_file, **kwargs)
-        columns = self.readme_attribute_table(stac_data, properties)
-        urls = converter.get_urls() or "manually downloaded file"
-        urls = urls.keys() if isinstance(urls, dict) else [urls]
-        downloaded_urls = "\n".join([("  - " + url) for url in urls])
-
-        return f"""# Field boundaries for {converter.short_name}
-
-Provides {count} official field boundaries from {converter.short_name}.
-It has been converted to a fiboa GeoParquet file from data obtained from {data["provider"]}.
-
-- **Source Data Provider:** [{data["provider"]}]({data["homepage"]})
-- **Converted by:** {data["submitter"]}
-- **License:** {data["license"]}
-- **Projection:** {data["projection"]}{data["header"]}
-
----
-
-- [Download the data as fiboa GeoParquet]({self.data_url}/{file_name}.parquet)
-- [STAC Browser](https://radiantearth.github.io/stac-browser/#/external/data.source.coop/fiboa/data/{self.dataset}/stac/collection.json)
-- [STAC Collection]({self.data_url}/stac/collection.json)
-- [PMTiles]({self.data_url}/{file_name}.pmtiles)
-
-## Columns
-
-{columns}
-
-## Lineage
-
-- Data downloaded on {date.today()} from:
-{downloaded_urls}
-- Converted to GeoParquet using [fiboa-cli](https://github.com/fiboa/cli), version {version}
-"""
 
     @runnable
     def publish(
         self,
         target,
-        generate_meta=False,
-        yes=False,
-        data_survey_url=None,
-        editor=None,
-        converted_by=None,
+        pmtiles=True,
+        tippecanoe_opts=TIPPECANOE_DEFAULT_OPTS,
         **kwargs,
     ):
         """
-        You need GDAL 3.8 or later (for ogr2ogr) with libgdal-arrow-parquet, tippecanoe, and AWS CLI
+        Creates the following files in the target folder:
+
+        - <dataset>[-<variant>].parquet: the converted and validated fiboa GeoParquet file
+        - <dataset>[-<variant>].pmtiles: vector tiles for visualization (ogr2ogr + tippecanoe)
+        - collection.json: a STAC Collection with relative links to the files above
+
+        Existing files are reused, delete them to regenerate.
+        PMTiles generation needs GDAL 3.8 or later (for ogr2ogr) and tippecanoe:
         - https://gdal.org/
         - https://github.com/felt/tippecanoe
-        - https://aws.amazon.com/cli/
         """
-        Path(target).mkdir(parents=True, exist_ok=True)
+        target = Path(target)
+        target.mkdir(parents=True, exist_ok=True)
 
         file_name = self.dataset
-        if not kwargs["variant"] and self.converter.variants:
+        if not kwargs.get("variant") and self.converter.variants:
             kwargs["variant"] = next(iter(self.converter.variants))
-        if kwargs["variant"]:
+        if kwargs.get("variant"):
             file_name += f"-{kwargs['variant']}"
-        parquet_file = Path(target) / f"{file_name}.parquet"
+        parquet_file = target / f"{file_name}.parquet"
+        pmtiles_file = target / f"{file_name}.pmtiles"
+        stac_file = target / "collection.json"
 
-        has_write_access = bool(
-            os.getenv("AWS_ACCESS_KEY_ID") and os.getenv("AWS_SECRET_ACCESS_KEY")
-        )
-
-        stac_file = Path(target) / "stac" / "collection.json"
-
-        ## Create parquet file
+        # Create parquet file
         if not parquet_file.exists():
-            self.info(f"Converting file for {self.dataset} to {parquet_file}")
+            self.info(f"Converting {self.dataset} to {parquet_file}")
             ConvertData(self.dataset).run(parquet_file, **kwargs)
-            self.success(f"Converted file for {self.dataset} to {parquet_file}")
+            self.success(f"Converted {self.dataset} to {parquet_file}")
         else:
-            self.success(f"Using existing file {parquet_file} for {self.dataset}")
+            self.success(f"Using existing file {parquet_file}")
 
-        ## Validate parquet file, we only want to publish valid files
+        # Validate parquet file, we only want to publish valid files
         self.info(f"Validating {parquet_file}")
         ValidateData().validate(parquet_file, num=-1)
         self.log("\n  => VALID\n", "success")
 
-        ## Create STAC collection.json
-        self.create_stac_collection(target, file_name, parquet_file, stac_file)
+        # Create PMTiles
+        if pmtiles:
+            self.generate_pmtiles(parquet_file, pmtiles_file, tippecanoe_opts)
+        has_pmtiles = pmtiles_file.exists()
 
-        if generate_meta:
-            self.generate_meta(
-                target,
-                file_name,
-                stac_file,
-                data_survey_url=data_survey_url,
-                converted_by=converted_by,
-                yes=yes,
-                editor=editor,
-            )
+        # Create STAC collection.json
+        self.create_stac_collection(parquet_file, pmtiles_file if has_pmtiles else None, stac_file)
+        self.success(f"Created {stac_file}")
+        return stac_file
 
-        self.generate_pmtiles(target, file_name, parquet_file)
-        if not has_write_access:
-            self.info("Get your credentials through the source coop organization.")
-            self.info("Login to AWS Console and generate an access key:")
-            self.info(
-                "  - In AWS console, click on account (right top) press 'Security credentials',"
-            )
-            self.info("  - Go to 'Access keys' and press 'Create access key'")
-            self.info(
-                "  - Run `export AWS_ACCESS_KEY_ID=<> AWS_SECRET_ACCESS_KEY=<>`\n"
-                "    (Linux/Mac only) where you copy-paste the access key and secret to <>.",
-            )
-            self.error("Please set AWS_ environment variables for uploading")
-            return
-        self.upload_to_aws(target)
-
-    def create_stac_collection(self, target, file_name, parquet_file, stac_file):
-        p_stac = Path(stac_file)
-        if p_stac.exists() and p_stac.stat().st_mtime >= Path(parquet_file).stat().st_mtime:
-            return
-
-        self.success(f"Creating STAC collection.json for {parquet_file}")
-        p_stac.parent.mkdir(exist_ok=True)
-        CreateStacCollection().create_cli(parquet_file, stac_file)
-
-        Path(target, "stac").mkdir(parents=True, exist_ok=True)
-        data = json.load(open(stac_file, "r"))
-        assert data["id"] == self.dataset, (
-            f"Wrong collection dataset id: {data['id']} != {self.dataset}, for {stac_file}"
+    def create_stac_collection(self, parquet_file: Path, pmtiles_file, stac_file: Path):
+        is_current = (
+            stac_file.exists()
+            and stac_file.stat().st_mtime >= parquet_file.stat().st_mtime
+            and (pmtiles_file is None or stac_file.stat().st_mtime >= pmtiles_file.stat().st_mtime)
         )
+        if is_current:
+            self.info(f"Reusing existing {stac_file}")
+            return
 
-        data["assets"]["data"]["href"] = f"{self.data_url}/{file_name}.parquet"
+        self.info(f"Creating STAC collection for {parquet_file}")
+        data = CreateStacCollection().create_from_file(
+            parquet_file, data_url=f"./{parquet_file.name}"
+        )
+        if data["id"] != self.dataset:
+            raise Exception(
+                f"Wrong collection id: {data['id']} != {self.dataset}, for {parquet_file}"
+            )
 
-        if STAC_EXTENSION not in data["stac_extensions"]:
-            data["stac_extensions"].append(STAC_EXTENSION)
+        extensions = data.setdefault("stac_extensions", [])
+        if FILE_EXTENSION not in extensions:
+            extensions.append(FILE_EXTENSION)
 
-        if not any(d.get("rel") == "pmtiles" for d in data["links"]):
+        asset = data["assets"]["data"]
+        asset["title"] = f"{data.get('title') or self.dataset} (GeoParquet)"
+        asset.update(self.file_metadata(parquet_file))
+
+        if pmtiles_file is not None:
+            if WEB_MAP_LINKS_EXTENSION not in extensions:
+                extensions.append(WEB_MAP_LINKS_EXTENSION)
+            data["links"] = [link for link in data.get("links", []) if link.get("rel") != "pmtiles"]
             data["links"].append(
                 {
-                    "href": f"{self.data_url}/{file_name}.pmtiles",
-                    "type": "application/vnd.pmtiles",
                     "rel": "pmtiles",
+                    "href": f"./{pmtiles_file.name}",
+                    "type": PMTILES_MEDIA_TYPE,
+                    "title": "Web map tiles",
+                    "pmtiles:layers": [self.dataset],
                 }
             )
+            data["assets"]["visual"] = {
+                "href": f"./{pmtiles_file.name}",
+                "type": PMTILES_MEDIA_TYPE,
+                "title": f"{data.get('title') or self.dataset} (PMTiles)",
+                "roles": ["visual"],
+                **self.file_metadata(pmtiles_file),
+            }
 
-        with open(stac_file, "w", encoding="utf-8") as f:
+        with stac_file.open("w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
 
-    def generate_meta(self, target, file_name, stac_file, **kwargs):
-        parquet_file = Path(target) / f"{file_name}.parquet"
-        for required in ("README.md", "LICENSE.txt"):
-            path = Path(target) / required
-            if not path.exists():
-                self.warning(f"Missing {required}. Generating at {path}")
-                if required == "README.md":
-                    text = self.make_readme(
-                        parquet_file,
-                        file_name=file_name,
-                        stac=stac_file,
-                        **kwargs,
-                    )
-                else:
-                    text = self.make_license(parquet_file, **kwargs)
-                self.info(
-                    f"\nGenerated the following file {required}:\n{'-' * 80}\n\n{text}\n{'-' * 80}\n"
-                )
-                action = (
-                    "C"
-                    if kwargs.get("yes")
-                    else input("Do you want to Continue (C), Edit (E) or Abort (A)?")
-                )
-                if action.lower() not in "ce":
-                    self.warning("Bailing out")
-                    sys.exit(1)
-                with open(path, "w") as f:
-                    f.write(text)
-                editor = kwargs.get("editor")
-                if action.lower() == "e" and editor:
-                    os.system(f"{editor} {path}")
+    @staticmethod
+    def file_metadata(path: Path) -> dict:
+        return {
+            "file:size": path.stat().st_size,
+            "file:checksum": multihash_sha256(path),
+        }
 
-    def generate_pmtiles(self, target, file_name, parquet_file):
+    def generate_pmtiles(self, parquet_file: Path, pmtiles_file: Path, tippecanoe_opts: str):
         if is_windows:
             self.warning(
                 "PMTiles generation through tippecanoe is not supported on Windows, skipping."
             )
             return
+        if pmtiles_file.exists():
+            self.success(f"Using existing file {pmtiles_file}")
+            return
 
-        pm_file = Path(target) / f"{file_name}.pmtiles"
-        if not pm_file.exists():
-            self.info("Running ogr2ogr | tippecanoe")
-            self.check_command("tippecanoe")
-            self.check_command("ogr2ogr", name="GDAL")
-            self.exc(
-                f"ogr2ogr -t_srs EPSG:4326 -f geojson /vsistdout/ {str(parquet_file)} | tippecanoe -zg --projection=EPSG:4326 -o {str(pm_file)} -l {self.dataset} --drop-densest-as-needed"
-            )
-
-    def upload_to_aws(self, target):
-        self.info("Uploading to aws")
-
-        self.check_command("aws")
-        self.exc(f"aws s3 sync --exclude '.*' {target} {self.s3_upload_path}")
+        self.check_command("tippecanoe")
+        self.check_command("ogr2ogr", name="GDAL")
+        self.info("Running ogr2ogr | tippecanoe")
+        ogr = subprocess.Popen(
+            [
+                "ogr2ogr",
+                "-t_srs",
+                "EPSG:4326",
+                "-f",
+                "GeoJSONSeq",
+                "/vsistdout/",
+                str(parquet_file),
+            ],
+            stdout=subprocess.PIPE,
+        )
+        tippecanoe = subprocess.run(
+            [
+                "tippecanoe",
+                *tippecanoe_opts.split(),
+                "--projection=EPSG:4326",
+                "-o",
+                str(pmtiles_file),
+                "-l",
+                self.dataset,
+            ],
+            stdin=ogr.stdout,
+        )
+        ogr.stdout.close()
+        ogr.wait()
+        if ogr.returncode != 0 or tippecanoe.returncode != 0:
+            pmtiles_file.unlink(missing_ok=True)
+            raise Exception("PMTiles generation failed, see output above.")
+        self.success(f"Created {pmtiles_file}")
