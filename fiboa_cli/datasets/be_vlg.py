@@ -10,6 +10,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
         str(k): {PREFIX + v: [v.replace("_GPKG.zip", ".gpkg")]}
         for k, v in (
+            (2026, "agpa_2026_2026-06-02_public.zip"),
             (2025, "Landbouwgebruikspercelen_2025_-_Voorlopig_(extractie_02-06-2025)_GPKG.zip"),
             (2024, "Landbouwgebruikspercelen_2024_-_Definitief_(extractie_27-03-2025)_GPKG.zip"),
             (2023, "Landbouwgebruikspercelen_2023_-_Definitief_(extractie_28-03-2024)_GPKG.zip"),
@@ -42,8 +43,13 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
         "GWSCOD_H": "crop:code",
         "GWSNAM_H": "crop:name",
     }
-    column_additions = {
-        "determination:datetime": "2024-03-28T00:00:00Z",
+    # Each edition is the campaign year of its variant; the old constant
+    # "2024-03-28" was the extraction date of one edition applied to all of them.
+    use_variant_as_determination = True
+    column_filters = {
+        # A handful of plots (e.g. one in 2023, typology "Niet-geclassificeerd") carry no
+        # crop code; crop:code is required by the crop extension, so drop them.
+        "GWSCOD_H": lambda col: col.notna(),
     }
     ec_mapping_csv = "be_vlg_2021.csv"
 
