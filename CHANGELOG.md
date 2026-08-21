@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update years for DK (2025, 2026)
 - Converter for Bavaria, Germany
 - Update fr-converter to support 2021/2022 files
+- Converter for Lithuania KŽS reference parcels (lt_kzs), reading the geoportal.lt ArcGIS REST service
+- Support Esri JSON and server-side filters in EsriRESTConverterMixin (rest_format, rest_params["where"])
 
 ## [v0.21.0] - 2026-02-16
 
