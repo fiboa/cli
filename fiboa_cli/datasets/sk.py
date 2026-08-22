@@ -27,9 +27,12 @@ Dataset Hranice užívania contains the use declared by applicants for direct su
     provider = "Pôdohospodárska platobná agentúra <https://www.apa.sk>"
     license = "CC0-1.0"  # "Open Data"
     ec_mapping_csv = "https://fiboa.org/code/sk/sk.csv"
+    # KODKD is the LPIS block code, shared by several fields and sometimes empty;
+    # the row index is the field id and the code is kept as block_id.
+    index_as_id = True
     columns = {
         "geometry": "geometry",
-        "KODKD": "id",
+        "KODKD": "block_id",
         "PLODINA": "crop:name",
         "KULTURA_NA": "crop_group",
         "LOKALITA_N": "municipality",
@@ -37,6 +40,7 @@ Dataset Hranice užívania contains the use declared by applicants for direct su
     }
     missing_schemas = {
         "properties": {
+            "block_id": {"type": "string"},
             "crop_group": {"type": "string"},
             "municipality": {"type": "string"},
         }
