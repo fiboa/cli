@@ -13,6 +13,8 @@ class FiboaBaseConverter(BaseConverter):
     area_is_in_ha = True
     area_calculate_missing = False
     use_variant_as_determination = False
+    # rows lacking a REQUIRED_NON_NULL value are dropped up to this share, else it's an error
+    max_dropped_share = 0.01
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -32,6 +34,12 @@ class FiboaBaseConverter(BaseConverter):
                 if key in targets and src in gdf.columns:
                     nulls = gdf[src].isna()
                     if nulls.any():
+                        share = nulls.mean()
+                        if share > self.max_dropped_share:
+                            raise ValueError(
+                                f"{int(nulls.sum())} of {len(gdf)} rows ({share:.1%}) have no "
+                                f"{key} ({src}); fix the converter instead of dropping them"
+                            )
                         self.warning(
                             f"Dropping {int(nulls.sum())} rows without a value for {key} ({src})"
                         )

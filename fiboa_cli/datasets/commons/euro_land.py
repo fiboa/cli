@@ -47,3 +47,11 @@ class EuroLandBaseConverter(AddHCATMixin, FiboaBaseConverter):
         super().__init__(*args, **kwargs)
         provider = "Europe-LAND HE Project <https://doi.org/10.5281/zenodo.14230620>"
         self.provider = (f"{self.provider}, {provider}") if self.provider else provider
+
+    def migrate(self, gdf):
+        # Some Europe-LAND files (e.g. LT 2024) ship an empty crop_code column next to
+        # a populated crop_name; the name is then the best available crop code.
+        if "crop_code" in gdf.columns and gdf["crop_code"].isna().all():
+            self.warning("crop_code is empty, using crop_name as crop:code")
+            gdf["crop_code"] = gdf["crop_name"]
+        return super().migrate(gdf)
