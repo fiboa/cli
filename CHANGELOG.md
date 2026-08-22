@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
 - Declare the beautifulsoup4 dependency that the ES-PV and ES-VC converters import
 - SK: KODKD is the (non-unique, sometimes empty) LPIS block code, keep it as block_id and use the row index as id
-- ES-CAT: the 2024 download is a shapefile package, not a GeoPackage
+- ES-CAT: the 2024 download is a shapefile package, not a GeoPackage; 34 crop names new in 2024 added to the mapping
 - CZ: find the shapefile in nested archive folders (2026)
 - DE-BB: read the shapefile as cp1252 (its .cpg wrongly says UTF-8)
 - NL: new PDOK download location (rvo/gewaspercelen/atom), add the 2026 concept edition
