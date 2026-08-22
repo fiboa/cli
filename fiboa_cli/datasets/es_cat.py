@@ -9,7 +9,7 @@ class ESCatConverter(FiboaBaseConverter):
     variants = {
         "2024": {
             "https://analisi.transparenciacatalunya.cat/api/views/yh94-j2n9/files/d90f5fca-ddd8-405d-a0d5-90609985e98e?download=true&filename=Cultius_DUN2024_SHP.zip": [
-                "Cultius_DUN2024_GPKG/CULTIUS_DUN2024.gpkg"
+                "Cultius_DUN2024_SHP/Cultius_DUN2024_SHP.shp"
             ]
         },
         "2023": {
@@ -66,7 +66,7 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
 
     def migrate(self, gdf):
         # In 2023 gpkg, names are lowercase. But in 2022 shapefile, case is mixed
-        to_lower = {k: k.lower() for k in gdf.columns if k != k.lower}
+        to_lower = {k: k.lower() for k in gdf.columns if k != k.lower()}
         if to_lower:
             gdf.rename(columns=to_lower, inplace=True)
 
