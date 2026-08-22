@@ -20,7 +20,8 @@ ITEMS = {
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # see https://mze.gov.cz/public/app/eagriapp/lpisdata/
-    variants = {str(k): {BASE.format(v): ["*.shp"]} for k, v in ITEMS.items()}
+    # the 2026 archive nests the shapefile in a folder, older ones are flat
+    variants = {str(k): {BASE.format(v): ["**/*.shp"]} for k, v in ITEMS.items()}
     id = "cz"
     short_name = "Czech"
     title = "Field boundaries for Czech"
