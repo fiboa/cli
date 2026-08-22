@@ -25,12 +25,17 @@ class FiboaBaseConverter(BaseConverter):
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
 
+        # post_migrate runs before columns are renamed, so look up the source column
         for key in REQUIRED_NON_NULL:
-            if key in gdf.columns:
-                nulls = gdf[key].isna()
-                if nulls.any():
-                    self.warning(f"Dropping {int(nulls.sum())} rows without a value for {key}")
-                    gdf = gdf[~nulls]
+            for src, dst in self.columns.items():
+                targets = dst if isinstance(dst, (list, tuple)) else [dst]
+                if key in targets and src in gdf.columns:
+                    nulls = gdf[src].isna()
+                    if nulls.any():
+                        self.warning(
+                            f"Dropping {int(nulls.sum())} rows without a value for {key} ({src})"
+                        )
+                        gdf = gdf[~nulls]
 
         gdf_area_key = next((k for k, v in self.columns.items() if v == AREA_KEY), None)
         if self.area_calculate_missing:
