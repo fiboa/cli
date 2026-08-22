@@ -4,13 +4,15 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
-# see https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/basisregistratie_gewaspercelen_brp.xml
-base = "https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/downloads"
+# see https://service.pdok.nl/rvo/gewaspercelen/atom/basisregistratie_gewaspercelen_brp.xml
+# (the old feed rvo/brpgewaspercelen/atom/v1_0/ redirects here since 2026)
+base = "https://service.pdok.nl/rvo/gewaspercelen/atom/downloads"
 
 
 class NLCropConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     area_calculate_missing = True
     variants = {
+        "2026": f"{base}/gewaspercelen_concept_2026.gpkg",
         **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.gpkg" for y in range(2025, 2020, -1)},
         **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.zip" for y in range(2020, 2009, -1)},
     }
@@ -27,9 +29,9 @@ annually has to register his crop fields with crops (for the Common Agricultural
 A dataset is generated for each year with reference date May 15.
 A view service and a download service are available for the most recent BRP crop plots.
 
-<https://service.pdok.nl/rvo/brpgewaspercelen/atom/v1_0/index.xml>
+<https://service.pdok.nl/rvo/gewaspercelen/atom/index.xml>
 
-Data is currently available for the years 2009 to 2024.
+Data is currently available for the years 2009 to 2025 (final) and 2026 (concept).
     """
 
     provider = (

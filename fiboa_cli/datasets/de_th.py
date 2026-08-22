@@ -8,6 +8,8 @@ from ..conversion.fiboa_converter import FiboaBaseConverter
 
 class Converter(AdminConverterMixin, FiboaBaseConverter):
     sources = "https://www.geoproxy.geoportal-th.de/download-service/opendata/agrar/DGK_Thue.zip"
+    # https://www.geoproxy.geoportal-th.de/inspire-dl/
+    # http://www.geoproxy.geoportal-th.de/inspire-dl/atom/DataSet/DataSet_06cd3e2f-ed4a-4507-b5e7-14973d4d6968.xml
 
     id = "de_th"
     admin_subdivision_code = "TH"

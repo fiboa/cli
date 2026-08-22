@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 - Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
+- NL: new PDOK download location (rvo/gewaspercelen/atom), add the 2026 concept edition
+- DE-TH: note the INSPIRE download service
 - BE-VLG: drop plots without a crop code (one such plot in the 2023 edition made validation fail); derive determination:datetime from the variant year instead of a constant date
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It creates GeoParquet, PMTiles and a STAC Collection with relative links, `file:size`/`file:checksum` and a web-map-links v1.3.0 `pmtiles` link. Publishing is done by catalogs such as the [harmonized field data catalog](https://github.com/fieldsoftheworld/harmonized-field-data-catalog).
 - Add Italy Tuscany (IT-1) basd on EuroCrops v2
