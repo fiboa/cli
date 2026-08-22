@@ -46,11 +46,6 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
     # Each edition is the campaign year of its variant; the old constant
     # "2024-03-28" was the extraction date of one edition applied to all of them.
     use_variant_as_determination = True
-    column_filters = {
-        # A handful of plots (e.g. one in 2023, typology "Niet-geclassificeerd") carry no
-        # crop code; crop:code is required by the crop extension, so drop them.
-        "GWSCOD_H": lambda col: col.notna(),
-    }
     ec_mapping_csv = "be_vlg_2021.csv"
 
     missing_schemas = {"properties": {"typology": {"type": "string"}}}

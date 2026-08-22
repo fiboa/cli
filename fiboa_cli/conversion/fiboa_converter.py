@@ -4,6 +4,9 @@ from vecorel_cli.conversion.base import BaseConverter
 from ..fiboa.version import get_fiboa_uri
 
 AREA_KEY = "metrics:area"
+# Properties that a schema requires to be non-null; rows lacking them cannot
+# validate, so they are dropped (with a warning) rather than failing the run.
+REQUIRED_NON_NULL = ("crop:code",)
 
 
 class FiboaBaseConverter(BaseConverter):
@@ -21,6 +24,13 @@ class FiboaBaseConverter(BaseConverter):
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
+
+        for key in REQUIRED_NON_NULL:
+            if key in gdf.columns:
+                nulls = gdf[key].isna()
+                if nulls.any():
+                    self.warning(f"Dropping {int(nulls.sum())} rows without a value for {key}")
+                    gdf = gdf[~nulls]
 
         gdf_area_key = next((k for k, v in self.columns.items() if v == AREA_KEY), None)
         if self.area_calculate_missing:

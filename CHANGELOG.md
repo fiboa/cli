@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Declare the beautifulsoup4 dependency that the ES-PV and ES-VC converters import
 - NL: new PDOK download location (rvo/gewaspercelen/atom), add the 2026 concept edition
 - DE-TH: note the INSPIRE download service
-- BE-VLG: drop plots without a crop code (one such plot in the 2023 edition made validation fail); derive determination:datetime from the variant year instead of a constant date
+- Drop rows without a crop:code (required by the crop extension) with a warning instead of failing the conversion (BE-VLG 2023, ES-CN had one such row each)
+- BE-VLG: derive determination:datetime from the variant year instead of a constant date
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It creates GeoParquet, PMTiles and a STAC Collection with relative links, `file:size`/`file:checksum` and a web-map-links v1.3.0 `pmtiles` link. Publishing is done by catalogs such as the [harmonized field data catalog](https://github.com/fieldsoftheworld/harmonized-field-data-catalog).
 - Add Italy Tuscany (IT-1) basd on EuroCrops v2
 - Suuport multiple years for CZ
