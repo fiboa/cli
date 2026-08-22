@@ -4,7 +4,7 @@ from .es import ESBaseConverter
 class ESCLConverter(ESBaseConverter):
     sources = {
         "https://idem.comunidad.madrid/recursos_cat_geo/Catalogo/recursos/UsoDelSuelo/spacm_sigpac.cm.zip": [
-            "2024_SIGPAC_shape_toda_la_com/RECINTO.shp"
+            "**/RECINTO.shp"
         ]
     }
     id = "es_md"
