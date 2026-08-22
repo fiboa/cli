@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
 - Declare the beautifulsoup4 dependency that the ES-PV and ES-VC converters import
+- EE: name the cached WFS responses (ee_gsaa_<year>.gml)
 - ES-MD: the archive no longer nests RECINTO.shp in a folder
 - SK: KODKD is the (non-unique, sometimes empty) LPIS block code, keep it as block_id and use the row index as id
 - ES-CAT: the 2024 download is a shapefile package, not a GeoPackage; 34 crop names new in 2024 added to the mapping
