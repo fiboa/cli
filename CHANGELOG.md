@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 - Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
+- Declare the beautifulsoup4 dependency that the ES-PV and ES-VC converters import
 - NL: new PDOK download location (rvo/gewaspercelen/atom), add the 2026 concept edition
 - DE-TH: note the INSPIRE download service
 - BE-VLG: drop plots without a crop code (one such plot in the 2023 edition made validation fail); derive determination:datetime from the variant year instead of a constant date

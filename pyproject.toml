@@ -24,6 +24,7 @@ classifiers = [
 requires-python = ">=3.11"
 dependencies = [
     "vecorel-cli==0.2.15",
+    "beautifulsoup4>=4.12",
 ]
 
 [project.scripts]
