@@ -83,7 +83,16 @@ class EsriRESTConverterMixin:
             print(
                 f"Read {len(data)} features, page {len(gdfs)} from [{data.iloc[0, 0]} ... {data.iloc[-1, 0]}]"
             )
-            last_id = data[self.rest_attribute].values[-1]
+            # joined layers return the field as <table>.<name>
+            id_column = next(
+                (
+                    c
+                    for c in data.columns
+                    if c == self.rest_attribute or c.endswith("." + self.rest_attribute)
+                ),
+                self.rest_attribute,
+            )
+            last_id = data[id_column].values[-1]
 
             yield data, base_url, base_url, layer["id"]
 

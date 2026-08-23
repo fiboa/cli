@@ -1,9 +1,20 @@
-import re
-
 import pandas as pd
 
 from fiboa_cli.conversion.converter_rest import EsriRESTConverterMixin
 from fiboa_cli.datasets.es import ESBaseConverter
+
+CATALAN_MONTHS = (
+    "gener febrer març abril maig juny juliol agost setembre octubre novembre desembre".split()
+)
+
+
+def snapshot_date(catxe):
+    """'maig 2026' -> 2026-05-01"""
+    try:
+        month, year = str(catxe).strip().lower().split()
+        return pd.Timestamp(year=int(year), month=CATALAN_MONTHS.index(month) + 1, day=1, tz="UTC")
+    except (ValueError, AttributeError):
+        return pd.NaT
 
 
 class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
@@ -19,17 +30,14 @@ class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
     columns = {
         "DN_OID": "id",
         "geometry": "geometry",
-        "PROVINCIA": "admin_province_code",
         "MUNICIPIO": "admin_municipality_code",
         "DN_SURFACE": "metrics:area",
         "USO_SIGPAC": "crop:code",
         "crop:name": "crop:name",
         "crop:name_en": "crop:name_en",
-        "ANYS": "determination:datetime",
+        "determination:datetime": "determination:datetime",
     }
-    column_migrations = {
-        "ANYS": lambda col: pd.to_datetime(col, format="%Y"),
-    }
+    column_additions = ESBaseConverter.column_additions | {"admin_province_code": "07"}
     area_is_in_ha = False
     missing_schemas = {
         "properties": {
@@ -37,18 +45,21 @@ class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
             "admin_municipality_code": {"type": "string"},
         }
     }
-
-    # See https://ideib.caib.es/geoserveis/rest/services/public/GOIB_SIGPAC_IB/MapServer/ for current years
-    variants = {str(year): str(year) for year in range(2024, 2010 - 1, -1)}
     use_code_attribute = "USO_SIGPAC"
 
+    # Since 2026 the service publishes a single layer with the current state
+    # ("Recintes SIGPAC màxima actualitat"); the Catxe field names the month of
+    # the snapshot, e.g. "maig 2026". The layer is a join, so the fields come
+    # prefixed (SIGPAC_FOGAIBA.DN_OID, COD_Municipis.NOM, ...).
     rest_base_url = "https://ideib.caib.es/geoserveis/rest/services/public/GOIB_SIGPAC_IB/MapServer"
     rest_params = {
         "where": "USO_SIGPAC NOT IN ('AG','CA','ED','FO','IM','IS','IV','TH','ZC','ZU','ZV','MT')"
     }
 
     def rest_layer_filter(self, layers):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
-        regex = re.compile("SIGPAC .* " + self.variant)
-        return next(layer for layer in layers if regex.match(layer["name"]))
+        return next(layer for layer in layers if "SIGPAC" in layer["name"].upper())
+
+    def file_migration(self, gdf, path, uri, layer):
+        gdf = gdf.rename(columns={c: c.rsplit(".", 1)[-1] for c in gdf.columns if "." in c})
+        gdf["determination:datetime"] = gdf["Catxe"].map(snapshot_date)
+        return gdf
