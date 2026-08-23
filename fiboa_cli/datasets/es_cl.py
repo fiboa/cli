@@ -55,7 +55,7 @@ Free use of the data is permitted, but commercial exploitation is prohibited.
             logger.warning(f"Choosing first year {self.variant}")
         else:
             assert 2019 <= int(self.variant) <= 2025, f"Wrong year {self.variant}"
-        base = f"http://ftp.itacyl.es/cartografia/05_SIGPAC/{self.variant}_ETRS89/Parcelario_SIGPAC_CyL_Provincias/"
+        base = f"https://ftp.itacyl.es/cartografia/05_SIGPAC/{self.variant}_ETRS89/Parcelario_SIGPAC_CyL_Provincias/"
         response = requests.get(base)
         assert response.status_code == 200, f"Error getting urls {response}\n{response.content}"
         uris = {
