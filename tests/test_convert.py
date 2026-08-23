@@ -52,6 +52,7 @@ tests = [
     "india_10k",
     "it_1",
     "es_ar",
+    "es_an",
 ]
 test_path = "tests/data-files/convert"
 
@@ -69,6 +70,10 @@ extra_convert_parameters = {
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
     "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
     "es_ar": {"variant": "2026", **_input_files("es_ar", "es_ar_44216.shp.zip")},
+    "es_an": {
+        "variant": "2025",
+        "input_files": {f"{test_path}/es_an/SP25_REC_PROV_04.zip": ["SP25_REC_04.shp"]},
+    },
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "lv": _input_files("lv", "1_100.xml"),
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
