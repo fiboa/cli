@@ -53,6 +53,7 @@ tests = [
     "it_1",
     "es_ar",
     "es_an",
+    "es_cm",
 ]
 test_path = "tests/data-files/convert"
 
@@ -70,6 +71,7 @@ extra_convert_parameters = {
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
     "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
     "es_ar": {"variant": "2026", **_input_files("es_ar", "es_ar_44216.shp.zip")},
+    "es_cm": {"variant": "2024", **_input_files("es_cm", "es_cm_0.gpkg")},
     "es_an": {
         "variant": "2025",
         "input_files": {f"{test_path}/es_an/SP25_REC_PROV_04.zip": ["SP25_REC_04.shp"]},

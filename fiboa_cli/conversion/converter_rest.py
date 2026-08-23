@@ -33,9 +33,10 @@ class EsriRESTConverterMixin:
         return super().download_files(uris, cache_folder)
 
     def get_data(self, paths, **kwargs):
-        if not paths[0].startswith("http"):
-            # This happens when input_file param is used
-            return super().get_data(paths, **kwargs)
+        if isinstance(paths[0], tuple):
+            # (path, uri) pairs from the base downloader: input_file param was used
+            yield from super().get_data(paths, **kwargs)
+            return
 
         base_url = paths[0]  # loop over paths to support more than 1 source
         source_fs = get_fs(base_url)

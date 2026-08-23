@@ -19,16 +19,18 @@ the identification basis for any type of aid related to the surface area.
     attribution = "Unidad de Cartografía. Secretaría General. Consejería de Agricultura, Ganadería y Desarrollo Rural."
     provider = "Unidad de Cartografía. Secretaría General. Consejería de Agricultura, Ganadería y Desarrollo Rural. <https://datosabiertos.castillalamancha.es>"
     columns = {
-        "dn_oid": "id",
+        "DN_OID": "id",
         "geometry": "geometry",
-        "provincia": "admin_province_code",
-        "municipio": "admin_municipality_code",
-        "dn_surface": "metrics:area",
-        "uso_sigpac": "crop:code",
+        "PROVINCIA": "admin_province_code",
+        "MUNICIPIO": "admin_municipality_code",
+        "DN_SURFACE": "metrics:area",
+        "USO_SIGPAC": "crop:code",
         "crop:name": "crop:name",
         "crop:name_en": "crop:name_en",
     }
+    use_code_attribute = "USO_SIGPAC"
     area_is_in_ha = False
+    use_variant_as_determination = True
     missing_schemas = {
         "properties": {
             "admin_province_code": {"type": "string"},
