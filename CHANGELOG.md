@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - EE: name the cached WFS responses (ee_gsaa_<year>.gml)
 - ES-MD: the archive no longer nests RECINTO.shp in a folder
 - SK: KODKD is the (non-unique, sometimes empty) LPIS block code, keep it as block_id and use the row index as id
+- ES-CB: determination date from the variant year (was an empty string, which broke the STAC temporal extent)
 - ES-CAT: the 2024 download is a shapefile package, not a GeoPackage; 34 crop names new in 2024 added to the mapping
 - CZ: find the shapefile in nested archive folders (2026)
 - DE-BB: read the shapefile as cp1252 (its .cpg wrongly says UTF-8)
