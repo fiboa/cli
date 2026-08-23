@@ -62,8 +62,14 @@ class EsriRESTConverterMixin:
                     cache_folder, f"{self.id}_{layer['id']}_{last_id}.geojson"
                 )
                 if not cache_fs.exists(cache_file):
-                    with cache_fs.open(cache_file, mode="wb") as file:
-                        stream_file(source_fs, url, file)
+                    try:
+                        with cache_fs.open(cache_file, mode="wb") as file:
+                            stream_file(source_fs, url, file)
+                    except Exception:
+                        # A download that broke off must not survive as a cached page
+                        if cache_fs.exists(cache_file):
+                            cache_fs.rm(cache_file)
+                        raise
                 url = cache_file
 
             try:
