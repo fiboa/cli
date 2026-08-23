@@ -66,7 +66,13 @@ class EsriRESTConverterMixin:
                         stream_file(source_fs, url, file)
                 url = cache_file
 
-            data = gpd.read_file(url)
+            try:
+                data = gpd.read_file(url)
+            except Exception as e:
+                # An error response from the server must not survive as a cached page
+                if cache_fs is not None and cache_fs.exists(url):
+                    cache_fs.rm(url)
+                raise RuntimeError(f"Could not read page {len(gdfs)} of {layer_url}: {e}") from e
             print(
                 f"Read {len(data)} features, page {len(gdfs)} from [{data.iloc[0, 0]} ... {data.iloc[-1, 0]}]"
             )

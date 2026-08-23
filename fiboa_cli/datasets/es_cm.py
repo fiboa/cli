@@ -41,16 +41,14 @@ the identification basis for any type of aid related to the surface area.
     rest_attribute = "objectid_1"
 
     def get_urls(self):
-        latest_year = next(iter(self.variants))
         if not self.variant:
-            self.variant = latest_year
-        if self.variant == latest_year:
-            layer = "Vector/Recintos_sigpac"
-        else:
-            services = requests.get(self.rest_base_url, {"f": "pjson"}).json()["services"]
-            layer = next(
-                s["name"]
-                for s in services
-                if re.search(f"Recintos_sigpac_{self.variant}", s["name"], re.IGNORECASE)
-            )
+            self.variant = next(iter(self.variants))
+        # Always use the year-named service: the unnamed "Recintos_sigpac" service is
+        # whatever year is current (2025 in August 2026) and keys on OBJECTID instead.
+        services = requests.get(self.rest_base_url, {"f": "pjson"}).json()["services"]
+        layer = next(
+            s["name"]
+            for s in services
+            if re.search(f"Recintos_sigpac_{self.variant}$", s["name"], re.IGNORECASE)
+        )
         return {"REST": self.rest_base_url.replace("Vector", layer + "/MapServer")}
