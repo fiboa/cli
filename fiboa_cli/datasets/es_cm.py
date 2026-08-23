@@ -38,7 +38,7 @@ the identification basis for any type of aid related to the surface area.
     variants = {str(year): str(year) for year in range(2024, 2018 - 1, -1)}
 
     rest_base_url = "https://geoservicios.castillalamancha.es/arcgis/rest/services/Vector"
-    rest_attribute = "objectid_1"
+    rest_attribute = "OBJECTID_1"
 
     def get_urls(self):
         if not self.variant:
