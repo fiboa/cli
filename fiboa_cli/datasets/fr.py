@@ -20,7 +20,9 @@ class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             ]
         },
         "2024": {
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.001": [],
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.001": [
+                "**/RPG_Parcelles.gpkg"  # RPG 3.0 renamed PARCELLES_GRAPHIQUES.gpkg
+            ],
             "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.002": [],
             "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.003": [],
             "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.004": [],
@@ -100,7 +102,7 @@ The anonymized version is distributed as part of the public service for making r
     def migrate(self, gdf) -> GeoDataFrame:
         if "ID_PARCEL" in gdf.columns:
             # Make column names lowercase, harmonize for different years
-            gdf = gdf.rename(columns={k: k.lower() for k in gdf.columns}, inplace=True)
+            gdf = gdf.rename(columns={k: k.lower() for k in gdf.columns})
         return super().migrate(gdf)
 
     column_filters = {
