@@ -91,17 +91,31 @@ extra_convert_parameters = {
 
 
 @mark.parametrize("converter", tests)
+@patch("fiboa_cli.datasets.commons.hcat.load_ec_mapping")
 @patch("fiboa_cli.datasets.commons.ec.load_ec_mapping")
-def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
+def test_converter(load_ec_mock, load_hcat_mock, capsys, tmp_parquet_file, converter):
     from fiboa_cli import Registry  # noqa
 
     def load_ec(csv_file=None, url=None):
+        original = (csv_file, url)
         if csv_file and "://" in csv_file:
             csv_file = csv_file.split("/")[-1]
         path = url if url and "://" not in url else f"{test_path}/{converter}/{csv_file}"
-        return list(DictReader(open(path, "r", encoding="utf-8")))
+        try:
+            return list(DictReader(open(path, "r", encoding="utf-8")))
+        except FileNotFoundError:
+            # no local fixture for this mapping: fetch the real one (old behavior)
+            from io import StringIO
+
+            from vecorel_cli.vecorel.util import load_file
+
+            from fiboa_cli.datasets.commons.hcat import ec_url
+
+            real = original[1] or ec_url(original[0])
+            return list(DictReader(StringIO(load_file(real).decode("utf-8"))))
 
     load_ec_mock.side_effect = load_ec
+    load_hcat_mock.side_effect = load_ec
     logger.remove()
     logger.add(sys.stdout, format="{message}", level="DEBUG", colorize=False)
 

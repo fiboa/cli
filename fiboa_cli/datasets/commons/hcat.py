@@ -77,7 +77,7 @@ class AddHCATMixin:
                 if v in self.ec_mapping[0]:
                     col = crop_code_col.map(map_to(v))
                     gdf[k] = col
-                    assert np.unique(col[~col.isna()]).size > 1, "No HCAT crops mapped"
+                    assert np.unique(col[~col.isna()]).size > 0, "No HCAT crops mapped"
 
             if col is not None and col.isna().any():
                 index = [
