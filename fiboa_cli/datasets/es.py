@@ -1,12 +1,15 @@
 import re
 
 import requests
+from vecorel_cli.conversion.admin import AdminConverterMixin
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
-from ..conversion.fiboa_converter import FiboaBaseConverter
+from fiboa_cli.datasets.commons.hcat import AddHCATMixin
+
+from ..conversion.per_file import PerFileBaseConverter
 
 
-class Converter(FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, PerFileBaseConverter):
     id = "es"
     short_name = "Spain"
     title = "Spain Declared Crops (Cultivos Declarados SIGPAC)"
@@ -25,15 +28,17 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
 
     variants = {"2025": "2025"}
 
+    # FEGA declared-crop codelist (PARC_PRODUCTO) — separate from the SIGPAC land-use list.
+    # Reference list shipped inside each provincial GPKG as the `cod_producto` layer.
+    ec_mapping_csv = "https://fiboa.org/code/es/es.csv"
+
     columns = {
         "geometry": "geometry",
         "id": "id",
-        "provincia": "admin_province_code",
-        "municipio": "admin_municipality_code",
+        "provincia": "admin:subdivision_code",
         "dn_surface": "metrics:area",
         "parc_producto": "crop:code",
         "parc_sistexp": "irrigation_system",
-        "parc_supcult": "cultivation_surface",
     }
 
     area_is_in_ha = False
@@ -43,27 +48,15 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
         ADMIN_DIVISION,
     }
 
-    column_additions = {
-        "admin:country_code": "ES",
-        # FEGA declared-crop codelist (PARC_PRODUCTO) — separate from the SIGPAC land-use list.
-        # Reference list shipped inside each provincial GPKG as the `cod_producto` layer.
-        "crop:code_list": "https://fiboa.org/code/es/cultivos_declarados/parc_producto.csv",
-    }
-
     column_migrations = {
-        # crop:code must be a string per the crop extension; parc_producto is an integer.
-        "parc_producto": lambda col: col.astype("Int64").astype(str),
-        # admin_*_code are strings; zero-pad province to 2 digits (INE convention).
+        "parc_producto": lambda col: col.astype("Int64").fillna(0).astype(str),
         "provincia": lambda col: col.astype("Int64").astype(str).str.zfill(2),
-        "municipio": lambda col: col.astype("Int64").astype(str),
     }
 
     missing_schemas = {
         "properties": {
-            "admin_province_code": {"type": "string"},
             "admin_municipality_code": {"type": "string"},
             "irrigation_system": {"type": "string"},
-            "cultivation_surface": {"type": "int32"},
         }
     }
 

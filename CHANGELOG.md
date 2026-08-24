@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support multiple years for CZ
 - Converter for Bavaria, Germany
 - Update fr-converter to support 2021/2022 files
+- PerFileBaseConverter: per-file migration and merging the result, decreasing memory requirements for large data sets
 
 ## [v0.21.0] - 2026-02-16
 
@@ -25,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix the column additions of the determination fields in the AI4SF converter
 - Add HCAT to datasets where possible
 - Updated years & variants for at_crop, be_vlg, es_an, es_cl, es_pv, ie, pt, se
-- Extend create_stac, include include fiboa data
+- Extend create_stac, include fiboa data
 - Publish command; skip hidden files, generate better texts
 - Fix to vecorel: converter.license and provider should be string
 - Added a Dockerfile to simplify working with fiboa
