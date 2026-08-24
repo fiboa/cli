@@ -224,9 +224,13 @@ class Publish(BaseCommand):
             ],
             stdout=subprocess.PIPE,
         )
+        # tippecanoe ignores $TMPDIR and spills into /tmp, which is often a small partition
+        tmpdir = os.environ.get("TMPDIR")
+        tmp_opts = ["-t", tmpdir] if tmpdir else []
         tippecanoe = subprocess.run(
             [
                 "tippecanoe",
+                *tmp_opts,
                 *tippecanoe_opts.split(),
                 "--projection=EPSG:4326",
                 "-o",
