@@ -168,7 +168,10 @@ class PerFileBaseConverter(FiboaBaseConverter):
             )
 
         # Same Hilbert reference grid that the upstream sort used.
-        from vecorel_cli.vecorel.hilbert import crs_total_bounds
+        try:
+            from vecorel_cli.vecorel.hilbert import crs_total_bounds
+        except ImportError:
+            from .hilbert import crs_total_bounds
 
         total_bounds = crs_total_bounds(crs)
 
@@ -248,7 +251,10 @@ def _bounds_array_for_table(table: pa.Table, primary_col: str) -> np.ndarray:
 
 
 def _hilbert_keys_for_table(table: pa.Table, primary_col: str, total_bounds) -> np.ndarray:
-    from vecorel_cli.vecorel.hilbert import hilbert_distances_from_bounds
+    try:
+        from vecorel_cli.vecorel.hilbert import hilbert_distances_from_bounds
+    except ImportError:
+        from fiboa_cli.conversion.hilbert import hilbert_distances_from_bounds
 
     bounds = _bounds_array_for_table(table, primary_col)
     return hilbert_distances_from_bounds(bounds, total_bounds)
