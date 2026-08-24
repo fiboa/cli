@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from .es import ESBaseConverter
+from .es_base import ESBaseConverter
 
 # IDEAragon lists every product of a collection that intersects a province
 # (https://idearagon.aragon.es/descargas, collection "SIGPAC"). The per-province
