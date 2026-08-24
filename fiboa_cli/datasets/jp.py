@@ -3,11 +3,11 @@ from fiboa_cli.conversion.duckdb import FiboaDuckDBBaseConverter
 
 class JPConverter(FiboaDuckDBBaseConverter):
     variants = {
-        "test": "./tests/data-files/convert/jp/jp_field_polygons_2024.parquet",
         "2024": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2024.parquet",
         "2023": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2023.parquet",
         "2022": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2022.parquet",
         "2021": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2021.parquet",
+        "test": "./tests/data-files/convert/jp/jp_field_polygons_2024.parquet",
     }
 
     id = "jp"
@@ -29,8 +29,12 @@ current conditions. Fude Polygons are created for the purpose of roughly indicat
         "polygon_uuid": "id",
         "land_type_en": "land_type_en",
         "local_government_cd": "admin_local_code",
+        "issue_year": "determination:datetime",
     }
-    column_additions = {"determination:datetime": "2024-01-01T00:00:00Z"}
+    # SQL migrations (DuckDB converter): per-feature determination date from the issue year
+    column_migrations = {
+        "issue_year": "make_timestamp(CAST(issue_year AS INTEGER), 1, 1, 0, 0, 0) AT TIME ZONE 'UTC'",
+    }
     missing_schemas = {
         "properties": {
             "land_type_en": {"type": "string"},
