@@ -79,6 +79,7 @@ class PerFileBaseConverter(FiboaBaseConverter):
             compression=compression or "zstd",
             compression_level=compression_level,
             geoparquet_version=geoparquet_version,
+            cleanup_parts=True,
         )
         return output_file
 
