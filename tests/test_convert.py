@@ -51,6 +51,8 @@ tests = [
     "ec_ro",
     "india_10k",
     "it_1",
+    "de_bw",
+
 ]
 test_path = "tests/data-files/convert"
 
@@ -71,6 +73,7 @@ extra_convert_parameters = {
     "lv": _input_files("lv", "1_100.xml"),
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
     "jecam": _input_files("jecam", "BD_JECAM_CIRAD_2023_feb.shp"),
+    "de_bw": _input_files("de_bw", "de_bw.json"),
 }
 
 
