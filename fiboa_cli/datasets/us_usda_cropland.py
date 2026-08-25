@@ -8,17 +8,15 @@ from .commons.hcat import AddHCATMixin
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    # One archive carries the whole sequence: CSB1724.gdb has a CDL<year> crop
+    # column for every year 2017-2024, so every variant reads the same source.
     variants = {
-        "2024": {
+        str(y): {
             "https://www.nass.usda.gov/Research_and_Science/Crop-Sequence-Boundaries/datasets/NationalCSB_2017-2024_rev23.zip": [
                 "NationalCSB_2017-2024_rev23/CSB1724.gdb"
             ]
-        },
-        "2023": {
-            "https://www.nass.usda.gov/Research_and_Science/Crop-Sequence-Boundaries/datasets/NationalCSB_2016-2023_rev23.zip": [
-                "NationalCSB_2016-2023_rev23/CSB1623.gdb"
-            ]
-        },
+        }
+        for y in range(2024, 2016, -1)
     }
     id = "us_usda_cropland"
     short_name = "US (USDA CSB)"
@@ -40,9 +38,7 @@ CSB represents non-confidential single crop field boundaries over a set time fra
         "crop:name": "crop:name",
         "CNTY": "administrative_area_level_2",
     }
-    column_additions = {
-        "determination:datetime": "2023-05-01T00:00:00Z",
-    }
+    use_variant_as_determination = True
     missing_schemas = {
         "properties": {
             "administrative_area_level_2": {"type": "string"},
