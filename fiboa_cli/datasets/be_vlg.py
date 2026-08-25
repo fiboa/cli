@@ -8,7 +8,9 @@ PREFIX = "https://www.landbouwvlaanderen.be/bestanden/gis/"
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
-        str(k): {PREFIX + v: [v.replace("_GPKG.zip", ".gpkg")]}
+        str(k): {
+            PREFIX + v: [v.replace("_GPKG.zip", ".gpkg") if v.endswith("_GPKG.zip") else "*.gpkg"]
+        }
         for k, v in (
             (2026, "agpa_2026_2026-06-02_public.zip"),
             (2025, "Landbouwgebruikspercelen_2025_-_Voorlopig_(extractie_02-06-2025)_GPKG.zip"),
