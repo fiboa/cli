@@ -37,6 +37,21 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
     attribution = "Bron: Dept. LV"
     license = "Licentie modellicentie-gratis-hergebruik/v1.0 <https://data.vlaanderen.be/id/licentie/modellicentie-gratis-hergebruik/v1.0>"
 
+    # the 2026 "agpa" edition renamed every column to English
+    RENAMES_2026 = {
+        "reference_id": "REF_ID",
+        "maincrop_code": "GWSCOD_H",
+        "maincrop_title": "GWSNAM_H",
+        "area_ha": "GRAF_OPP",
+    }
+
+    def migrate(self, gdf):
+        if "maincrop_code" in gdf.columns:
+            gdf = gdf.rename(columns=self.RENAMES_2026)
+            if "BT_OMSCH" not in gdf.columns:  # no farm-typology column any more
+                gdf["BT_OMSCH"] = None
+        return super().migrate(gdf)
+
     columns = {
         "geometry": "geometry",
         "BT_OMSCH": "typology",
