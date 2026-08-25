@@ -14,11 +14,6 @@ from .commons.ec import AddHCATMixin
 class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # TODO, 2022 works, check (or discover) paths for other years
     variants = {
-        "2022": {
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FXX_2022-01-01/RPG_2-0__GPKG_LAMB93_FXX_2022-01-01.7z.001": [
-                "**/*.gpkg"
-            ]
-        },
         "2024": {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.001": [
                 "**/RPG_Parcelles.gpkg"  # RPG 3.0 renamed PARCELLES_GRAPHIQUES.gpkg
@@ -30,7 +25,12 @@ class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         },
         "2023": {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01.7z": [
-                "**/*.gpkg"
+                "**/PARCELLES_GRAPHIQUES.gpkg"
+            ]
+        },
+        "2022": {
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FXX_2022-01-01/RPG_2-0__GPKG_LAMB93_FXX_2022-01-01.7z.001": [
+                "**/PARCELLES_GRAPHIQUES.gpkg"
             ]
         },
         "2021": {
@@ -43,10 +43,15 @@ class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FR_2020-01-01/RPG_2-0__GPKG_LAMB93_FR_2020-01-01.7z.002": [],
         },
         "2019": {
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0_GPKG_LAMB93_FR-2019/RPG_2-0_GPKG_LAMB93_FR-2019.7z": []
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0_GPKG_LAMB93_FR-2019/RPG_2-0_GPKG_LAMB93_FR-2019.7z": [
+                "**/PARCELLES_GRAPHIQUES.gpkg"
+            ]
         },
-        "2018": {
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__SHP_LAMB93_FR-2017_2017-01-01/RPG_2-0__SHP_LAMB93_FR-2017_2017-01-01.7z": []
+        # the newest SHP edition on the download server is 2017; there is no 2018 archive
+        "2017": {
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__SHP_LAMB93_FR-2017_2017-01-01/RPG_2-0__SHP_LAMB93_FR-2017_2017-01-01.7z": [
+                "**/PARCELLES_GRAPHIQUES.shp"
+            ]
         },
     }
 
@@ -90,6 +95,7 @@ The anonymized version is distributed as part of the public service for making r
     attribution = "IGN - Original data from https://geoservices.ign.fr/rpg"
     license = "Licence Ouverte / Open Licence <https://etalab.gouv.fr/licence-ouverte-open-licence>"
     ec_mapping_csv = "fr_2018.csv"
+    use_variant_as_determination = True
 
     columns = {
         "geometry": "geometry",
