@@ -67,14 +67,11 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
             )
 
         selections = []
-        geom_column = None
         for k, v in self.columns.items():
             if k in self.column_migrations:
                 selections.append(f'{self.column_migrations.get(k)} as "{v}"')
             else:
                 selections.append(f'"{k}" as "{v}"')
-            if v == "geometry":
-                geom_column = k
         selection = ", ".join(selections)
 
         filters = []
@@ -111,15 +108,19 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
         con = duckdb.connect()
         con.install_extension("spatial")
         con.load_extension("spatial")
+        # No ORDER BY here: ST_Hilbert without bounds is meaningless (whole
+        # countries collapse into a handful of cells), and with bounds it uses
+        # a different reference grid than the rest of the pipeline. The
+        # canonical in-place Hilbert sort below runs after post-processing.
         con.execute(
             f"""
             COPY (
               SELECT {selection}
               FROM read_parquet({sources}, union_by_name=true)
               {where}
-              ORDER BY ST_Hilbert({geom_column})
             ) TO ? (
                 FORMAT parquet,
+                ROW_GROUP_SIZE 50_000,
                 compression ?,
                 KV_METADATA {{
                     collection: ?,
@@ -218,5 +219,28 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
             os.replace(tmp_path, output_file)
         except Exception as e:
             self.warning(f"GeoParquet 1.1 post-processing failed: {e}")
+
+        # canonical spatial ordering, same grid as the per-file merge
+        try:
+            from vecorel_cli.vecorel.hilbert import crs_total_bounds
+        except ImportError:
+            from .hilbert import crs_total_bounds
+        from .per_file import _ensure_hilbert_sorted
+
+        with pq.ParquetFile(output_file) as pf:
+            meta = pf.schema_arrow.metadata or {}
+        if b"geo" in meta:
+            geo = json.loads(meta[b"geo"])
+            primary = geo["primary_column"]
+            crs = geo["columns"][primary].get("crs") or "EPSG:4326"
+            if _ensure_hilbert_sorted(
+                output_file,
+                primary,
+                crs_total_bounds(crs),
+                compression,
+                None,
+                row_group_size=50_000,
+            ):
+                self.info("Sorted output into Hilbert order")
 
         return output_file

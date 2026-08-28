@@ -271,6 +271,7 @@ def _ensure_hilbert_sorted(
     total_bounds,
     compression: str,
     compression_level: Optional[int],
+    row_group_size: Optional[int] = None,
 ) -> bool:
     """If ``path`` is already Hilbert-sorted against ``total_bounds``, leave it
     untouched and return False. Otherwise sort it in place and return True.
@@ -279,20 +280,26 @@ def _ensure_hilbert_sorted(
     is bounded by a single source partition (much smaller than the merged
     dataset). Schema metadata (``geo``, collection JSON, etc.) is preserved.
     """
+    # cheap check first: the keys only need the bbox covering column
     with pq.ParquetFile(path) as pf:
-        table = pf.read()
-        metadata = pf.schema_arrow.metadata
-    hilberts = _hilbert_keys_for_table(table, primary_col, total_bounds)
+        has_bbox = "bbox" in pf.schema_arrow.names
+        probe = pf.read(columns=["bbox"]) if has_bbox else pf.read()
+    hilberts = _hilbert_keys_for_table(probe, primary_col, total_bounds)
     # NB: hilberts is uint64; never use np.diff for monotonicity here — uint
     # underflow makes any descent wrap to a huge positive and fool the check.
     if hilberts.size <= 1 or bool(np.all(hilberts[1:] >= hilberts[:-1])):
         return False
+    with pq.ParquetFile(path) as pf:
+        table = pf.read()
+        metadata = pf.schema_arrow.metadata
     order = np.argsort(hilberts, kind="stable")
     sorted_table = table.take(pa.array(order))
     sorted_table = sorted_table.replace_schema_metadata(metadata)
     write_kwargs = {"compression": compression}
     if compression_level is not None:
         write_kwargs["compression_level"] = compression_level
+    if row_group_size is not None:
+        write_kwargs["row_group_size"] = row_group_size
     pq.write_table(sorted_table, path, **write_kwargs)
     return True
 

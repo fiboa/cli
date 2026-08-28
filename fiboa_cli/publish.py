@@ -126,6 +126,8 @@ class Publish(BaseCommand):
         else:
             self.success(f"Using existing file {parquet_file}")
 
+        self.ensure_spatial_order(parquet_file)
+
         # Validate parquet file, we only want to publish valid files
         self.info(f"Validating {parquet_file}")
         ValidateData().validate(parquet_file, num=-1)
@@ -198,6 +200,45 @@ class Publish(BaseCommand):
             "file:size": path.stat().st_size,
             "file:checksum": multihash_sha256(path),
         }
+
+    # ~50k rows per group: inside gpio's spatial-query sweet spot, and with a
+    # Hilbert order every small group is finer bbox-skipping granularity
+    ROW_GROUP_SIZE = 50_000
+
+    def ensure_spatial_order(self, parquet_file: Path):
+        """Hilbert-sort the file in place unless it already is sorted.
+
+        Every write path ends up spatially ordered regardless of converter
+        (plain pandas, per-file merge, DuckDB), and re-running publish over an
+        existing parquet doubles as the repair tool for published data."""
+        import json as _json
+
+        import pyarrow.parquet as _pq
+
+        from .conversion.per_file import _ensure_hilbert_sorted
+
+        try:
+            from vecorel_cli.vecorel.hilbert import crs_total_bounds
+        except ImportError:
+            from .conversion.hilbert import crs_total_bounds
+
+        with _pq.ParquetFile(parquet_file) as pf:
+            meta = pf.schema_arrow.metadata or {}
+        if b"geo" not in meta:
+            self.warning(f"{parquet_file} has no geo metadata; skipping spatial ordering")
+            return
+        geo = _json.loads(meta[b"geo"])
+        primary = geo["primary_column"]
+        crs = geo["columns"][primary].get("crs") or "EPSG:4326"
+        if _ensure_hilbert_sorted(
+            str(parquet_file),
+            primary,
+            crs_total_bounds(crs),
+            "zstd",
+            None,
+            row_group_size=self.ROW_GROUP_SIZE,
+        ):
+            self.success(f"Re-sorted {parquet_file} into Hilbert order")
 
     def generate_pmtiles(self, parquet_file: Path, pmtiles_file: Path, tippecanoe_opts: str):
         if is_windows:
