@@ -14,7 +14,11 @@ class NLCropConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
         "2026": f"{base}/gewaspercelen_concept_2026.gpkg",
         **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.gpkg" for y in range(2025, 2019, -1)},
-        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.zip" for y in range(2019, 2008, -1)},
+        # the zip editions each contain one FileGDB (naming varies per year)
+        **{
+            str(y): {f"{base}/brpgewaspercelen_definitief_{y}.zip": ["*.gdb"]}
+            for y in range(2019, 2008, -1)
+        },
     }
 
     id = "nl"
