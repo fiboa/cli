@@ -292,6 +292,22 @@ def _ensure_hilbert_sorted(
     with pq.ParquetFile(path) as pf:
         table = pf.read()
         metadata = pf.schema_arrow.metadata
+    # int32 offsets of plain binary/string columns overflow when a take()
+    # concatenates >2 GB of chunks (large WKB columns); widen them first.
+    # Parquet's physical BYTE_ARRAY is identical either way.
+    fields = []
+    widened = False
+    for f in table.schema:
+        if pa.types.is_binary(f.type):
+            fields.append(f.with_type(pa.large_binary()))
+            widened = True
+        elif pa.types.is_string(f.type):
+            fields.append(f.with_type(pa.large_string()))
+            widened = True
+        else:
+            fields.append(f)
+    if widened:
+        table = table.cast(pa.schema(fields, metadata=table.schema.metadata))
     order = np.argsort(hilberts, kind="stable")
     sorted_table = table.take(pa.array(order))
     sorted_table = sorted_table.replace_schema_metadata(metadata)
