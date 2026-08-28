@@ -7,6 +7,7 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.convert_gml import gml_assure_columns
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.de_iacs import DEIACSMixin
 
 BASE_URL = "https://gdiserv.bayern.de/srv66381/services/invekos_lpis-wfs"
 PARAMS = {
@@ -19,7 +20,7 @@ PARAMS = {
 PAGE_SIZE = 10_000
 
 
-class DEBYBlockConverter(AdminConverterMixin, FiboaBaseConverter):
+class DEBYBlockConverter(AdminConverterMixin, DEIACSMixin, FiboaBaseConverter):
     id = "de_by_block"
     admin_subdivision_code = "BY"
     short_name = "Germany, Bavaria (LPIS)"
@@ -48,20 +49,11 @@ year for the application procedure.
     columns = {
         "geometry": "geometry",
         "flik": ("flik", "id"),  # derived in migrate(); unique, unlike in Baden-Württemberg
-        "agricultural_area_type": "agricultural_area_type",  # added in file_migration()
+        "agricultural_area_type": "crop:code",  # added in file_migration(), trimmed in migrate()
         "validFrom": "determination:datetime",
         "area": "metrics:area",  # not in the source; created by area_calculate_missing
     }
     column_migrations = {"validFrom": lambda col: pd.to_datetime(col)}
-
-    missing_schemas = {
-        "properties": {
-            "agricultural_area_type": {
-                "type": "string",
-                "enum": ["Arable land", "Permanent grassland", "Permanent crop", "Other"],
-            }
-        }
-    }
 
     def get_urls(self):
         # numberReturned is always reported as 0 by this server, so the page count has to come
@@ -78,14 +70,16 @@ year for the application procedure.
 
     def file_migration(self, gdf, path, uri, layer=None):
         # The land cover class is carried as an xlink attribute, which the GML driver does not
-        # guess into its generated schema, so ask for it explicitly.
+        # guess into its generated schema, so ask for it explicitly. The href points into the
+        # national de.iacs codelist; the xlink:title next to it only repeats the English label,
+        # which the shared code list already supplies.
         return gml_assure_columns(
             gdf,
             path,
             uri,
             layer,
             agricultural_area_type={
-                "ElementPath": "agriculturalAreaType@title",
+                "ElementPath": "agriculturalAreaType@href",
                 "Type": "String",
                 "Width": 255,
             },
@@ -95,4 +89,6 @@ year for the application procedure.
         # The FLIK is the last dot-separated segment of the identifier URI, e.g.
         # https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI9412000570
         gdf["flik"] = gdf["id"].str.rsplit(".", n=1).str[-1]
+        # …/codelist/de.iacs/AgriculturalAreaTypeValue/AL -> AL
+        gdf["agricultural_area_type"] = gdf["agricultural_area_type"].str.rsplit("/", n=1).str[-1]
         return super().migrate(gdf)
