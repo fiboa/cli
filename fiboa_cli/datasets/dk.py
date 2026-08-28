@@ -28,5 +28,7 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     use_variant_as_determination = True
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
-        gdf["Afgkode"] = gdf["Afgkode"].astype(float).fillna(value=0).astype(int).astype(str)
+        if "Afgkode" in gdf.columns:
+            gdf["Afgkode"] = gdf["Afgkode"].astype(float).fillna(value=0).astype(int).astype(str)
+        # the 2008 and 2009 editions carry no crop columns (boundaries only)
         return super().migrate(gdf)
