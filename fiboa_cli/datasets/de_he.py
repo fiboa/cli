@@ -6,12 +6,13 @@ import requests
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.de_iacs import DEIACSMixin
 
 BASE_URL = "https://inspire-geo.ibykus.net/geoserver/lawi/wfs"
 PAGE_SIZE = 25_000
 
 
-class DEHEConverter(AdminConverterMixin, FiboaBaseConverter):
+class DEHEConverter(AdminConverterMixin, DEIACSMixin, FiboaBaseConverter):
     id = "de_he"
     admin_subdivision_code = "HE"
     short_name = "Germany, Hesse"
@@ -35,21 +36,12 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
     columns = {
         "geometry": "geometry",
         "flik": ("flik", "id"),  # derived in migrate()
-        "agriculturalAreaType": "agricultural_area_type",
+        "agriculturalAreaType": "crop:code",  # de.iacs codes; agriculturalAreaType_txt is the label
         "declaredArea": "metrics:area",  # in hectares, hence the area_is_in_ha default
         "validFrom": "determination:datetime",
     }
     column_migrations = {
         "validFrom": lambda col: pd.to_datetime(col, format="%d.%m.%Y"),
-    }
-
-    missing_schemas = {
-        "properties": {
-            "agricultural_area_type": {
-                "type": "string",
-                "enum": ["AL", "GL", "DK", "S"],
-            }
-        }
     }
 
     def get_urls(self):
