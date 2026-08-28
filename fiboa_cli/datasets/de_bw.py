@@ -1,17 +1,23 @@
 import re
+from urllib.parse import urlencode
 
 import pandas as pd
 import requests
-from urllib.parse import urlencode
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.de_iacs import DEIACSMixin
 
 BASE_URL = "https://owsproxy.lgl-bw.de/owsproxy/wfs/WFS_LW-BW_GISELA_landw_Parzellen"
 FARMLAND = "Bodenbedeckung IN ('Ackerland','Grünland','Dauerkultur')"
 
+# GISELa publishes the German label only, without the code. These are the values of the national
+# de.iacs codelist that the labels correspond to. Ackerland and Dauerkultur are exact; the codelist
+# defines GL as *permanent* grassland, which BW's documentation does not confirm either way.
+AREA_TYPES = {"Ackerland": "AL", "Grünland": "GL", "Dauerkultur": "DK"}
 
-class DEBWConverter(AdminConverterMixin, FiboaBaseConverter):
+
+class DEBWConverter(AdminConverterMixin, DEIACSMixin, FiboaBaseConverter):
     id = "de_bw"
     admin_subdivision_code = "BW"
     short_name = "Germany, Baden-Württemberg"
@@ -40,21 +46,12 @@ geometric area of the polygon.
     columns = {
         "geometry": "geometry",
         "Geo-ID": "id",
-        "FLIK": "flik",              # NOT the id: several rows share one FLIK
-        "Bodenbedeckung": "bodenbedeckung",
+        "FLIK": "flik",  # NOT the id: several rows share one FLIK
+        "area_type": "crop:code",  # derived from Bodenbedeckung in migrate()
         "FlaecheInHa": "metrics:area",
         "Antragsjahr": "determination:datetime",
     }
     column_migrations = {"Antragsjahr": lambda col: pd.to_datetime(col, format="%Y")}
-
-    missing_schemas = {
-        "properties": {
-            "bodenbedeckung": {
-                "type": "string",
-                "enum": ["Ackerland", "Grünland", "Dauerkultur"],
-            }
-        }
-    }
 
     def get_urls(self):
         latest = next(iter(self.variants))
@@ -74,6 +71,7 @@ geometric area of the polygon.
 
         # One cheap request so the page list is derived from the server, not hardcoded.
         hits = requests.get(BASE_URL, params={**params, "resultType": "hits"})
+        hits.raise_for_status()
         total = int(re.search(r'numberMatched="(\d+)"', hits.text).group(1))
 
         query = urlencode({**params, "count": self.page_size})
@@ -82,13 +80,13 @@ geometric area of the polygon.
             for start in range(0, total, self.page_size)
         }
 
-
     def file_migration(self, gdf, path, uri, layer=None):
         # read_geojson hardcodes crs="EPSG:4326"; the payload is really EPSG:25832.
         # allow_override is required because a CRS is already set.
         return gdf.set_crs("EPSG:25832", allow_override=True)
 
     def migrate(self, gdf):
+        gdf["area_type"] = gdf["Bodenbedeckung"].map(AREA_TYPES)
         # read_geojson injects its own "id" column from the GML feature id.
         # Drop it so renaming Geo-ID -> id does not create two columns called "id".
         return super().migrate(gdf.drop(columns=["id"]))

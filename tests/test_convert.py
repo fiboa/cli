@@ -52,7 +52,6 @@ tests = [
     "india_10k",
     "it_1",
     "de_bw",
-
 ]
 test_path = "tests/data-files/convert"
 
