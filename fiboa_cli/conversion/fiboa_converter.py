@@ -6,7 +6,7 @@ from ..fiboa.version import get_fiboa_uri
 AREA_KEY = "metrics:area"
 # Properties that a schema requires to be non-null; rows lacking them cannot
 # validate, so they are dropped (with a warning) rather than failing the run.
-REQUIRED_NON_NULL = ("crop:code",)
+REQUIRED_NON_NULL = ("id", "crop:code")
 
 
 class FiboaBaseConverter(BaseConverter):
