@@ -13,8 +13,8 @@ class NLCropConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     area_calculate_missing = True
     variants = {
         "2026": f"{base}/gewaspercelen_concept_2026.gpkg",
-        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.gpkg" for y in range(2025, 2020, -1)},
-        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.zip" for y in range(2020, 2009, -1)},
+        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.gpkg" for y in range(2025, 2019, -1)},
+        **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.zip" for y in range(2019, 2008, -1)},
     }
 
     id = "nl"
