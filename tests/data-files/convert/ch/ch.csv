@@ -1,0 +1,158 @@
+original_name,translated_name,HCAT3_name,HCAT3_code
+Heuwiesen mit Zufütterung während der Sömmerung,Hay meadows with supplementary feeding during summering,pasture_meadow_grassland_grass,3302000000
+Buntbrache,Colourful fallow,fallow_land_not_crop,3301110000
+Triticale,Triticale,triticale,3301010800
+Gärtnerische Kulturen in Gewächshäusern mit festem Fundament,Horticultural crops in greenhouses with fixed foundation,fresh_vegetables,3301070000
+Winterraps zur Speiseölgewinnung,Winter rapeseed for edible oil,rapeseed_rape,3301060400
+Hanf zur Nutzung der Samen,Hemp for seed use,hemp_cannabis,3301061000
+Mohn,Poppy,poppy,3301060600
+Anderer Hanf,Other hemp,hemp_cannabis,3301061000
+Nassreis,Wet rice,rice,3301010700
+Mischel Brotgetreide,Mixed bread cereals,other_cereals,3301019900
+Beerenkulturen in geschütztem Anbau ohne festes Fundament; auf Pflanztischen oder -gestellen,Berry crops protected without fixed foundation on tables,berries_berry_species,3303020000
+"Übrige Grünfläche (Dauergrünfläche), beitragsberechtigt",Other grassland (permanent grassland) eligible,pasture_meadow_grassland_grass,3302000000
+"Übrige offene Ackerfläche, nicht beitragsberechtigt",Other open arable land not eligible,other_arable_land_crops,3301990000
+Hartweizen,Durum wheat,durum_hard_wheat,3301010200
+"Mehrjährige nachwachsende Rohstoffe (Chinaschilf, usw.)",Perennial renewable resources (miscanthus etc.),miscanthus_silvergrass,3301083000
+Hafer,Oats,oats,3301010500
+Rebflächen mit natürlicher Artenvielfalt,Vineyards with natural biodiversity,vineyards_wine_vine_rebland_grapes,3303060000
+"Übrige Flächen mit Dauerkulturen, nicht beitragsberechtigt",Other perennial crop areas not eligible,orchards_fruits,3303010000
+"Übrige offene Ackerfläche, nicht beitragsberechtigt (regionsspezifische Biodiversitätsförderfläche)",Other open arable land not eligible (region-specific biodiversity area),not_known_and_other,3399000000
+Mehrjährige Gewürz- und Medizinalpflanzen,Perennial spice and medicinal plants,other_flowers_ornamental_plants,3301089900
+"Ziersträucher, Ziergehölze und Zierstauden",Ornamental shrubs trees and perennials,flowers_ornamental_plants,3301080000
+Hopfen,Hops,hops,3301060200
+Hirse zur Nutzung ganze Pflanze,Millet/sorghum for whole plant use,millet_sorghum,3301010900
+Saatmais (Vertragsanbau),Seed/grain maize (contract),grain_maize_corn_popcorn,3301010600
+Extensiv genutzte Weiden,Extensively used pastures,pasture_meadow_grassland_grass,3302000000
+Mehrjährige Beeren,Perennial berries,berries_berry_species,3303020000
+Trüffelanlagen,Truffle plantations,other_arable_land_crops,3301990000
+"Ruderalflächen, Steinhaufen und -wälle",Ruderal areas stone piles and walls,not_known_and_other,3399000000
+Trockenmauern,Dry stone walls,not_known_and_other,3399000000
+Wintergerste,Winter barley,winter_barley,3301010401
+Kunstwiesen (ohne Weiden),Artificial meadows (without pastures),temporary_grass,3301090100
+Tabak,Tobacco,tobacco,3301060100
+Getreide siliert,Cereals for silage,plants_harvested_green,3301090000
+Silo- und Grünmais,Silage and green maize,green_silo_maize,3301090400
+Zuckerrüben,Sugar beet,sugar_beet,3301290700
+Dinkel,Spelt,spelt,3301011000
+"Übrige Flächen innerhalb der LN, beitragsberechtigt",Other areas within utilized agri area eligible,not_known_and_other,3399000000
+Übrige Spezialkulturen in Gewächshäusern mit festem Fundament,Other specialty crops in greenhouses with foundation,other_flowers_ornamental_plants,3301089900
+Soja,Soy,soy_soybeans,3301160000
+"Mischungen von Linsen mit Getreide oder Leindotter, mindestens 30 % Anteil Linsen bei der Ernte (zur Körnergewinnung)",Mixtures of lentils with cereals or camelina (>=30% lentils at harvest) grain use,legumes_dried_pulses_protein_crops,3301020000
+Gepflegte Selven (Edelkastanienbäume),Managed chestnut groves,orchards_fruits,3303010000
+"Wassergräben, Tümpel, Teiche",Ditches ponds pools,not_known_and_other,3399000000
+Waldweiden (ohne bewaldete Fläche),Forest pastures (without forested area),pasture_meadow_grassland_grass,3302000000
+"Übrige Flächen innerhalb der LN, nicht beitragsberechtigt",Other areas within utilized agri area not eligible,not_known_and_other,3399000000
+Lupinen,Lupins,sweet_lupins,3301020700
+Winterweizen (ohne Futterweizen der Sortenliste swiss granum),Winter wheat (excluding feed list),winter_common_soft_wheat,3301010101
+Sorghum zur Nutzung ganze Pflanze,Sorghum for whole plant use,millet_sorghum,3301010900
+"Übrige offene Ackerfläche, beitragsberechtigt",Other open arable land eligible,other_arable_land_crops,3301990000
+Mischel Futtergetreide,Mixed feed cereals,other_cereals,3301019900
+"Übrige Kulturen in geschütztem Anbau ohne festes Fundament, beitragsberechtigt",Other protected crops without foundation eligible,other_flowers_ornamental_plants,3301089900
+Obstanlagen (Steinobst),Orchards (stone fruit),orchards_fruits,3303010000
+Christbäume,Christmas trees,other_tree_wood_forest,3306990000
+"Unbefestigte, natürliche Wege",Unpaved natural tracks,not_known_and_other,3399000000
+Bohnen und Wicken zur Körnergewinnung (z.B. Ackerbohnen),Beans and vetches for grain (e.g. field beans),beans,3301020100
+Sommerweizen (ohne Futterweizen der Sortenliste swiss granum),Spring wheat (excluding feed list),spring_common_soft_wheat,3301010102
+Futterrüben,Fodder beets,mangelwurzel_fodder_beet,3301290400
+Übrige Spezialkulturen in geschütztem Anbau ohne festes Fundament,Other specialty crops protected without foundation,other_flowers_ornamental_plants,3301089900
+Rotationsbrache,Rotational fallow,fallow_land_not_crop,3301110000
+"Übrige Baumschulen (Rosen, Zierstauden, usw.)",Other nurseries (roses ornamentals etc.),flowers_ornamental_plants,3301080000
+Gemüsekulturen in geschütztem Anbau ohne festes Fundament; auf Pflanztischen oder -gestellen,Vegetable crops protected without foundation on benches,fresh_vegetables,3301070000
+Sommerraps als nachwachsender Rohstoff,Spring rapeseed as renewable resource,rapeseed_rape,3301060400
+Trockenreis,Dryland rice,rice,3301010700
+"Weiden (Heimweiden, übrige Weiden ohne Sömmerungsweiden)",Pastures (home pastures others without summering pastures),pasture_meadow_grassland_grass,3302000000
+Uferwiesen (ohne Weiden),Riverside meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+Spargel,Asparagus,asparagus,3301200000
+Übrige Flächen ausserhalb der LN und SF,Other areas outside utilized land and special areas,not_known_and_other,3399000000
+"Übrige Grünfläche (Dauergrünflächen), nicht beitragsberechtigt",Other grassland (permanent) not eligible,pasture_meadow_grassland_grass,3302000000
+Einjährige Beeren (z.B. Erdbeeren),Annual berries (e.g. strawberries),strawberries,3301130000
+"Mischungen von Bohnen, Wicken, Erbsen, Kichererbsen und Lupinen mit Getreide oder Leindotter, mindestens 30 % Anteil Leguminosen bei der Ernte (zur Körnergewinnung)",Mixtures of beans vetches peas chickpeas lupins with cereals or camelina (>=30% legumes) grain use,legumes_dried_pulses_protein_crops,3301020000
+Sonnenblumen als nachwachsender Rohstoff,Sunflowers as renewable resource,sunflower,3301060500
+"Andere Obstanlagen (Kiwis, Holunder usw.)",Other orchards (kiwi elder etc.),orchards_fruits,3303010000
+"Hecken-, Feld- und Ufergehölze (mit Pufferstreifen)",Hedges field and riparian shrubs (with buffer strips),shrubberries_shrubs,3303080000
+Regionsspezifische Biodiversitätsförderflächen,Region-specific biodiversity areas,not_known_and_other,3399000000
+Hausgärten,Home gardens,not_known_and_other,3399000000
+Streueflächen im Sömmerungsgebiet,Litter meadows in summering area,pasture_meadow_grassland_grass,3302000000
+Gemüsekulturen in geschütztem Anbau ohne festes Fundament; im gewachsenen Boden,Vegetables protected without foundation in soil,fresh_vegetables,3301070000
+Übrige Kulturen in geschütztem Anbau mit festem Fundament,Other crops in protected cultivation with foundation,other_flowers_ornamental_plants,3301089900
+Sonnenblumen zur Speiseölgewinnung,Sunflowers for edible oil,sunflower,3301060500
+Lein,Linseed (oil flax),flax_linseed_oil,3301060702
+"Übrige Kunstwiese, beitragsberechtigt (z.B. Schweineweide, Geflügelweide)",Other artificial meadow eligible (e.g. pig poultry pasture),temporary_grass,3301090100
+Roggen,Rye,rye,3301010300
+Futterweizen gemäss Sortenliste swiss granum,Feed wheat according to swiss granum list,common_soft_wheat,3301010100
+Maulbeerbaumanlagen (Fütterung Seidenraupen),Mulberry tree plantations (silkworm feeding),orchards_fruits,3303010000
+Gemüsekulturen in Gewächshäusern mit festem Fundament,Vegetable crops in greenhouses with fixed foundation,fresh_vegetables,3301070000
+Gärtnerische Kulturen in geschütztem Anbau ohne festes Fundament,Horticultural crops protected without fixed foundation,flowers_ornamental_plants,3301080000
+Sommerraps zur Speiseölgewinnung,Spring rapeseed for edible oil,rapeseed_rape,3301060400
+"Offene Ackerfläche, beitragsberechtigt (regionsspezifische Biodiversitätsförderfläche)",Open arable land eligible (region-specific biodiversity area),not_known_and_other,3399000000
+"Einjährige nachwachsende Rohstoffe (Kenaf, usw.)",Annual renewable resources (kenaf etc.),other_arable_land_crops,3301990000
+"Einjährige Freilandgemüse, ohne Konservengemüse",Annual open-field vegetables (excl. canning),fresh_vegetables,3301070000
+"Heuwiesen im Sömmerungsgebiet, Typ wenig intensiv genutzte Wiese",Hay meadows in summering area type low intensity,pasture_meadow_grassland_grass,3302000000
+Baumschulen von Obst und Beeren,Nurseries of fruit and berries,orchards_fruits,3303010000
+"Kulturen in ganzjährig geschütztem Anbau, beitragsberechtigt aggregiert",Crops in year-round protected cultivation eligible aggregated,other_flowers_ornamental_plants,3301089900
+"Übrige Kulturen in geschütztem Anbau ohne festes Fundament, nicht beitragsberechtigt",Other protected crops without foundation not eligible,other_flowers_ornamental_plants,3301089900
+Wenig intensiv genutzte Wiesen (ohne Weiden),Low-intensity meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+"Heuwiesen im Sömmerungsgebiet, Typ extensiv genutzte Wiese",Hay meadows in summering area type extensively used,pasture_meadow_grassland_grass,3302000000
+Futterleguminosen für die Samenproduktion (Vertragsanbau),Forage legumes for seed production (contract),legumes_dried_pulses_protein_crops,3301020000
+Permakultur,Permaculture,not_known_and_other,3399000000
+"Hecken-, Feld- und Ufergehölze (mit Pufferstreifen) (regionsspezifische Biodiversitätsförderfläche)",Hedges field and riparian shrubs (with buffers) region-specific biodiversity,shrubberries_shrubs,3303080000
+Leindotter,Camelina,camelina,3301061500
+Übrige Dauerwiesen (ohne Weiden),Other permanent meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+"Übrige Dauerweiden, beitragsberechtigt aggregiert",Other permanent pastures eligible aggregated,pasture_meadow_grassland_grass,3302000000
+Regionsspezifische Biodiversitätsförderfläche (Grünflächen ohne Weiden),Region-specific biodiversity area (grasslands without pastures),not_known_and_other,3399000000
+Erbsen zur Körnergewinnung (z.B. Eiweisserbsen),Peas for grain (e.g. protein peas),peas,3301020600
+Kichererbsen,Chickpeas,chickpeas,3301020200
+Senf,Mustard,mustard,3301210100
+Körnermais,Grain maize,grain_maize_corn_popcorn,3301010600
+Freiland-Konservengemüse,Open-field processing vegetables,fresh_vegetables,3301070000
+"Landwirtschaftliche Produktion in Gebäuden (z. B. Champignon, Brüsseler)",Agricultural production in buildings (e.g. mushrooms Belgian endive),not_known_and_other,3399000000
+Pflanzkartoffeln (Vertragsanbau),Seed potatoes (contract),potatoes,3301030000
+Saum auf Ackerflächen,Field margin on arable land,not_known_and_other,3399000000
+Linsen,Lentils,lentils,3301020500
+Saflor,Safflower,safflower,3301083900
+Obstanlagen (Birnen),Orchards (pears),orchards_fruits,3303010000
+Streueflächen in der LN,Litter meadows in utilized agri area,pasture_meadow_grassland_grass,3302000000
+Rhabarber,Rhubarb,rhubarb,3301230000
+"Übrige unproduktive Flächen (z.B. gemulchte Flächen, stark verunkrautete Flächen, Hecken ohne Pufferstreifen)","Other unproductive areas (e.g. mulched, weedy, hedges without buffers)",not_known_and_other,3399000000
+"Flächen ohne landwirtschaftliche Hauptzweckbestimmung (erschlossenes Bauland, Spiel-, Reit-, Camping-, Golf-, Flug- und Militärplätze oder ausgemarchte Bereiche von Eisenbahnen, öffentlichen Strassen und Gewässern)",Areas without agricultural main purpose (built land etc.),not_known_and_other,3399000000
+Buchweizen,Buckwheat,buckwheat,3301150200
+"Einjährige gärtnerische Freilandkulturen (Blumen, Rollrasen usw.)",Annual horticultural open-field crops (flowers turf etc.),flowers_ornamental_plants,3301080000
+Sorghum zur Körnergewinnung,Sorghum for grain,millet_sorghum,3301010900
+Mehrjährige gärtnerische Freilandkulturen (nicht im Gewächshaus),Perennial horticultural open-field crops (not greenhouse),other_flowers_ornamental_plants,3301089900
+Pilze in geschütztem Anbau mit festem Fundament,Mushrooms in protected cultivation with foundation,not_known_and_other,3399000000
+Beerenkulturen in Gewächshäusern mit festem Fundament,Berry crops in greenhouses with fixed foundation,berries_berry_species,3303020000
+Obstanlagen (Äpfel),Orchards (apples),orchards_fruits,3303010000
+Sömmerungsweiden,Summer pastures,pasture_meadow_grassland_grass,3302000000
+"Emmer, Einkorn",Emmer einkorn,other_cereals,3301019900
+Regionsspezifische Biodiversitätsförderflächen (Weiden),Region-specific biodiversity areas (pastures),not_known_and_other,3399000000
+Pilze (Freiland),Mushrooms (open field),not_known_and_other,3399000000
+Reben,Vines/vineyards,vineyards_wine_vine_rebland_grapes,3303060000
+Quinoa,Quinoa,quinoa,3301150300
+Hirse zur Körnergewinnung,Millet/sorghum for grain,millet_sorghum,3301010900
+"Heuwiesen im Sömmerungsgebiet, Übrige Wiesen",Hay meadows in summering area other meadows,pasture_meadow_grassland_grass,3302000000
+Futtergräser für die Samenproduktion (Vertragsanbau),Forage grasses for seed production (contract),temporary_grass,3301090100
+Wurzeln der Treibzichorie,Roots of forcing chicory,chicory_chicories,3301310200
+Kartoffeln,Potatoes,potatoes,3301030000
+Baumschule von Forstpflanzen ausserhalb der Forstzone,Nursery of forest plants outside forest zone,tree_wood_forest,3306000000
+Obstanlagen aggregiert,Orchards aggregated,orchards_fruits,3303010000
+"Übrige Flächen mit Dauerkulturen, beitragsberechtigt",Other perennial crop areas eligible,orchards_fruits,3303010000
+Baumschulen von Reben,Vine nurseries,vineyards_wine_vine_rebland_grapes,3303070000
+Wald,Forest,tree_wood_forest,3306000000
+"Hecken-, Feld- und Ufergehölze (mit Krautsaum)",Hedges field and riparian shrubs (with herb strip),shrubberries_shrubs,3303080000
+Sommergerste,Spring barley,spring_barley,3301010402
+Extensiv genutzte Wiesen (ohne Weiden),Extensively used meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+Ölkürbisse,Oil pumpkins,pumpkin_squash_gourd,3301140400
+Nützlingsstreifen auf offener Ackerfläche,Beneficial insect strips on arable land,not_known_and_other,3399000000
+Einjährige Gewürz- und Medizinalpflanzen,Annual spice and medicinal plants,other_arable_land_crops,3301990000
+Beerenkulturen in geschütztem Anbau ohne festes Fundament; im gewachsenen Boden,Berry crops protected without foundation in soil,berries_berry_species,3303020000
+Winterraps als nachwachsender Rohstoff,Winter rapeseed as renewable resource,rapeseed_rape,3301060400
+Hochstamm-Feldobstbäume (Punkte oder Flächen),High-stem field fruit trees (points or areas),orchards_fruits,3303010000
+Nussbäume (Punkte oder Flächen),Nut trees (points or areas),orchards_fruits,3303010000
+Edelkastanienbäume,Sweet chestnut trees,orchards_fruits,3303010000
+Einheimische standortgerechte Einzelbäume und Alleen (Punkte oder Flächen),Native site-appropriate single trees and avenues (points or areas),shrubberries_shrubs,3303080000
+Andere Bäume,Other trees,not_known_and_other,3399000000
+Andere Bäume (regionsspezifische Biodiversitätsförderfläche),Other trees (region-specific biodiversity area),not_known_and_other,3399000000
+Andere Elemente (regionsspezifische Biodiversitätsförderfläche),Other elements (region-specific biodiversity area),not_known_and_other,3399000000
+Ackerschonstreifen,Conservation strips on arable land,not_known_and_other,3399000000
+Getreide in weiter Reihen,Cereals in wide rows,other_cereals,3301019900

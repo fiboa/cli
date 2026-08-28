@@ -213,6 +213,7 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
                     writer.write_table(tbl)
             finally:
                 writer.close()
+                pq_file.close()  # Windows cannot replace a file that is still open
 
             os.replace(tmp_path, output_file)
         except Exception as e:

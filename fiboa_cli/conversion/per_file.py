@@ -122,8 +122,8 @@ class PerFileBaseConverter(FiboaBaseConverter):
             raise ValueError("No paths to merge")
         paths = [str(p) for p in paths]
 
-        base_pf = pq.ParquetFile(paths[0])
-        base_schema = base_pf.schema_arrow
+        with pq.ParquetFile(paths[0]) as base_pf:
+            base_schema = base_pf.schema_arrow
         base_meta = base_schema.metadata or {}
         if GEO_META_KEY not in base_meta:
             raise ValueError(f"{paths[0]} has no 'geo' metadata; not a GeoParquet?")
@@ -140,8 +140,8 @@ class PerFileBaseConverter(FiboaBaseConverter):
             bboxes.append(primary_col_meta["bbox"])
         geom_types.update(primary_col_meta.get("geometry_types") or [])
         for path in paths[1:]:
-            pf = pq.ParquetFile(path)
-            sch = pf.schema_arrow
+            with pq.ParquetFile(path) as pf:
+                sch = pf.schema_arrow
             if not sch.equals(base_schema, check_metadata=False):
                 raise ValueError(
                     f"Schema mismatch: {path} differs from {paths[0]}.\n"
@@ -192,7 +192,7 @@ class PerFileBaseConverter(FiboaBaseConverter):
             self.warning(f"Re-sorted {n_resorted}/{len(paths)} part file(s) before merging.")
 
         self.info(f"Streaming merge -> {output_file} (Hilbert ref bounds = {total_bounds})")
-        expected_rows = sum(pq.ParquetFile(p).metadata.num_rows for p in paths)
+        expected_rows = sum(_num_rows(p) for p in paths)
         _streaming_merge(
             paths,
             output_file,
@@ -205,7 +205,7 @@ class PerFileBaseConverter(FiboaBaseConverter):
             compression_level,
             geoparquet_version,
         )
-        actual_rows = pq.ParquetFile(output_file).metadata.num_rows
+        actual_rows = _num_rows(output_file)
         if actual_rows != expected_rows:
             raise RuntimeError(
                 f"Streaming merge dropped rows: expected {expected_rows:,} "
@@ -225,6 +225,11 @@ class PerFileBaseConverter(FiboaBaseConverter):
 
 
 # ---------- helpers ----------
+
+
+def _num_rows(path) -> int:
+    with pq.ParquetFile(path) as pf:
+        return pf.metadata.num_rows
 
 
 def _bounds_array_for_table(table: pa.Table, primary_col: str) -> np.ndarray:
@@ -274,8 +279,9 @@ def _ensure_hilbert_sorted(
     is bounded by a single source partition (much smaller than the merged
     dataset). Schema metadata (``geo``, collection JSON, etc.) is preserved.
     """
-    pf = pq.ParquetFile(path)
-    table = pf.read()
+    with pq.ParquetFile(path) as pf:
+        table = pf.read()
+        metadata = pf.schema_arrow.metadata
     hilberts = _hilbert_keys_for_table(table, primary_col, total_bounds)
     # NB: hilberts is uint64; never use np.diff for monotonicity here — uint
     # underflow makes any descent wrap to a huge positive and fool the check.
@@ -283,7 +289,7 @@ def _ensure_hilbert_sorted(
         return False
     order = np.argsort(hilberts, kind="stable")
     sorted_table = table.take(pa.array(order))
-    sorted_table = sorted_table.replace_schema_metadata(pf.schema_arrow.metadata)
+    sorted_table = sorted_table.replace_schema_metadata(metadata)
     write_kwargs = {"compression": compression}
     if compression_level is not None:
         write_kwargs["compression_level"] = compression_level
@@ -326,7 +332,7 @@ def _streaming_merge(
     geoparquet_version: Optional[str] = None,
 ) -> None:
     pq_files = [pq.ParquetFile(p) for p in paths]
-    in_schema = pq_files[0].schema_arrow
+    in_schema = pq_files[0].schema_arrow  # readers closed in the finally below
     out_schema = _build_output_schema(in_schema, merged_bbox, geom_types, geoparquet_version)
 
     iters = [pf.iter_batches(batch_size=batch_size) for pf in pq_files]
@@ -391,3 +397,5 @@ def _streaming_merge(
             writer.write_table(combined.take(pa.array(order)))
     finally:
         writer.close()
+        for pf in pq_files:
+            pf.close()
