@@ -54,6 +54,21 @@ Data is currently available for the years 2009 to 2025 (final) and 2026 (concept
         "jaar": "determination:datetime",
     }
 
+    def migrate(self, gdf):
+        if "GWS_GEWASCODE" in gdf.columns:
+            # 2009-2019 FileGDB editions: prefixed names, no year column, and
+            # only a m2 shape area (left unmapped; area_calculate_missing
+            # derives metrics:area from the geometry instead)
+            gdf = gdf.rename(
+                columns={
+                    "GWS_GEWASCODE": "gewascode",
+                    "GWS_GEWAS": "gewas",
+                    "CAT_GEWASCATEGORIE": "category",
+                }
+            )
+            gdf["jaar"] = int(self.variant)
+        return super().migrate(gdf)
+
     column_filters = {
         # category = "Grasland" | "Bouwland" | "Sloot" | "Landschapselement"
         "category": lambda col: col.isin(["Grasland", "Bouwland"])
