@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update fr-converter to support 2021/2022 files
 - Converter for Bavaria, Germany LPIS field blocks (de_by_block)
 - Converter for Hesse, Germany LPIS reference parcels
+- Update vecorel-cli to v0.2.16:
+  - Converter output is sorted by Hilbert distance
+  - Commands exit with a non-zero exit code when they report a failure
+  - Collection-only properties are kept when merging collections
+  - Default GeoParquet compression is now zstd (level 15), configurable via `--compression_level`
 
 ## [v0.21.0] - 2026-02-16
 
