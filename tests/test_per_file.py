@@ -8,9 +8,9 @@ from unittest.mock import patch
 import numpy as np
 import pyarrow.parquet as pq
 import pytest
+from vecorel_cli.vecorel.hilbert import crs_total_bounds, hilbert_distances_from_bounds
 
 from fiboa_cli import Registry  # noqa: F401
-from fiboa_cli.conversion.hilbert import crs_total_bounds, hilbert_distances_from_bounds
 from fiboa_cli.convert import ConvertData
 from fiboa_cli.datasets.es import Converter as ESConverter
 

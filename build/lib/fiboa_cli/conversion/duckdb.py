@@ -233,8 +233,10 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
             self.warning(f"GeoParquet 1.1 post-processing failed: {e}")
 
         # canonical spatial ordering, same grid as the per-file merge
-        from vecorel_cli.vecorel.hilbert import crs_total_bounds
-
+        try:
+            from vecorel_cli.vecorel.hilbert import crs_total_bounds
+        except ImportError:
+            from .hilbert import crs_total_bounds
         from .per_file import _ensure_hilbert_sorted
 
         with pq.ParquetFile(output_file) as pf:

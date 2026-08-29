@@ -168,7 +168,10 @@ class PerFileBaseConverter(FiboaBaseConverter):
             )
 
         # Same Hilbert reference grid that the upstream sort used.
-        from vecorel_cli.vecorel.hilbert import crs_total_bounds
+        try:
+            from vecorel_cli.vecorel.hilbert import crs_total_bounds
+        except ImportError:
+            from .hilbert import crs_total_bounds
 
         total_bounds = crs_total_bounds(crs)
 
@@ -183,7 +186,7 @@ class PerFileBaseConverter(FiboaBaseConverter):
                 n_resorted += 1
                 self.warning(
                     f"  {path}: was not Hilbert-sorted, re-sorted in place. "
-                    "(Files written by vecorel-cli >= 0.2.16 arrive pre-sorted.)"
+                    "(Bump vecorel-cli to skip this rewrite next time.)"
                 )
         if n_resorted:
             self.warning(f"Re-sorted {n_resorted}/{len(paths)} part file(s) before merging.")
@@ -253,7 +256,10 @@ def _bounds_array_for_table(table: pa.Table, primary_col: str) -> np.ndarray:
 
 
 def _hilbert_keys_for_table(table: pa.Table, primary_col: str, total_bounds) -> np.ndarray:
-    from vecorel_cli.vecorel.hilbert import hilbert_distances_from_bounds
+    try:
+        from vecorel_cli.vecorel.hilbert import hilbert_distances_from_bounds
+    except ImportError:
+        from fiboa_cli.conversion.hilbert import hilbert_distances_from_bounds
 
     bounds = _bounds_array_for_table(table, primary_col)
     return hilbert_distances_from_bounds(bounds, total_bounds)
@@ -310,10 +316,7 @@ def _ensure_hilbert_sorted(
         write_kwargs["compression_level"] = compression_level
     if row_group_size is not None:
         write_kwargs["row_group_size"] = row_group_size
-    # store_schema=False: the widened large_* arrow types must not be embedded,
-    # or the rewritten file stops schema-matching untouched siblings on merge
-    # (parquet's physical types are identical either way)
-    pq.write_table(sorted_table, path, store_schema=False, **write_kwargs)
+    pq.write_table(sorted_table, path, **write_kwargs)
     return True
 
 

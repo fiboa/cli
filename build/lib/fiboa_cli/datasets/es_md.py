@@ -1,0 +1,30 @@
+from .es_base import ESBaseConverter
+
+
+class ESCLConverter(ESBaseConverter):
+    sources = {
+        "https://idem.comunidad.madrid/recursos_cat_geo/Catalogo/recursos/UsoDelSuelo/spacm_sigpac.cm.zip": [
+            "**/RECINTO.shp"
+        ]
+    }
+    id = "es_md"
+    short_name = "Spain Comunidad de Madrid"
+    title = "Spain Madrid Crop fields"
+    description = "SIGPAC is the Agricultural Parcel Identification System implemented throughout the European Union for the application of CAP (Common Agricultural Policy) aid to farmers and ranchers."
+    provider = "Comunidad de Madrid <https://www.comunidad.madrid>"
+    license = "CC0-1.0"  # No-limits
+
+    columns = {
+        "DN_OID": "id",
+        "geometry": "geometry",
+        "determination:datetime": "determination:datetime",
+        "USO_SIGPAC": "crop:code",
+        "crop:name": "crop:name",
+        "crop:name_en": "crop:name_en",
+        "DN_SURFACE": "metrics:area",
+    }
+    use_code_attribute = "USO_SIGPAC"
+    column_additions = ESBaseConverter.column_additions | {
+        "determination:datetime": "2024-01-01T00:00:00Z"
+    }
+    area_is_in_ha = False

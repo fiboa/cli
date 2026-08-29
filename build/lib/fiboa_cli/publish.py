@@ -214,9 +214,13 @@ class Publish(BaseCommand):
         import json as _json
 
         import pyarrow.parquet as _pq
-        from vecorel_cli.vecorel.hilbert import crs_total_bounds
 
         from .conversion.per_file import _ensure_hilbert_sorted
+
+        try:
+            from vecorel_cli.vecorel.hilbert import crs_total_bounds
+        except ImportError:
+            from .conversion.hilbert import crs_total_bounds
 
         with _pq.ParquetFile(parquet_file) as pf:
             meta = pf.schema_arrow.metadata or {}
