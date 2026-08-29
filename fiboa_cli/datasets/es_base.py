@@ -7,7 +7,7 @@ from fiboa_cli.datasets.commons.data import read_data_csv
 class ESBaseConverter(FiboaBaseConverter):
     """
     Base Converter for Spain
-    Asssumes a source column with the SIGPAC-Land Use code
+    Assumes a source column with the SIGPAC-Land Use code
     The Land Use code is filtered for agricultural use and transformed into a high-level crop type
 
     "Cultivo Declarado" is what we would prefer, but the "Recinto" is the best to be found so far
