@@ -150,9 +150,21 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
 
             # Update for version 1.1.0
             metadata = existing_schema.metadata
+            add_covering = geoparquet_version > "1.0.0" and "bbox" not in col_names
             if geoparquet_version > "1.0.0":
                 geo_meta = json.loads(existing_schema.metadata[b"geo"])
                 geo_meta["version"] = geoparquet_version
+                if add_covering:
+                    # declare the appended bbox column so engines use it
+                    primary = geo_meta.get("primary_column", "geometry")
+                    geo_meta["columns"][primary]["covering"] = {
+                        "bbox": {
+                            "xmin": ["bbox", "xmin"],
+                            "ymin": ["bbox", "ymin"],
+                            "xmax": ["bbox", "xmax"],
+                            "ymax": ["bbox", "ymax"],
+                        }
+                    }
                 metadata[b"geo"] = json.dumps(geo_meta).encode("utf-8")
 
             # Build a new Arrow schema with adjusted nullability
