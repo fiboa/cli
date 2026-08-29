@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 - 
 - Add DuckDB BaseConverter for efficiently transforming large datasets
-
 - Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
 - Declare the beautifulsoup4 dependency that the ES-PV and ES-VC converters import
 - EE: name the cached WFS responses (ee_gsaa_<year>.gml)
@@ -32,8 +31,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Multiple year support for HR
 - Introduce FiboaBaseConverter.use_variant_as_determination for setting proper determination_date
 - Update years for DK (2025, 2026)
-- Converter for Bavaria, Germany
 - Converter for Spain (whole), based on the FEGA 2025+ data
+- Update fr-converter to support 2021/2022 files
+- Converter for Bavaria, Germany LPIS field blocks (de_by_block)
+- Converter for Hesse, Germany LPIS reference parcels
 - Update fr-converter to support 2021/2022 files
 - PerFileBaseConverter: per-file migration and merging the result, decreasing memory requirements for large data sets
 

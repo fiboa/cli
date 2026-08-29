@@ -1,0 +1,486 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wfs:FeatureCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd http://locationintelligence.epsilon-italia.it/IACS/LPIS https://gdiserv.bayern.de/srv66381/services/invekos_lpis-wfs?SERVICE=WFS&amp;VERSION=2.0.0&amp;REQUEST=DescribeFeatureType&amp;OUTPUTFORMAT=text%2Fxml%3B+subtype%3Dgml%2F3.2.1&amp;TYPENAME=lpis:AgriculturalArea&amp;NAMESPACES=xmlns(lpis,http%3A%2F%2Flocationintelligence.epsilon-italia.it%2FIACS%2FLPIS)" xmlns:wfs="http://www.opengis.net/wfs/2.0" timeStamp="2026-08-25T15:03:42Z" xmlns:gml="http://www.opengis.net/gml/3.2" numberMatched="unknown" numberReturned="0">
+  <!--NOTE: numberReturned attribute should be 'unknown' as well, but this would not validate against the current version of the WFS 2.0 schema (change upcoming). See change request (CR 144): https://portal.opengeospatial.org/files?artifact_id=43925.-->
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_ab9be70c-8bb0-4ea7-9438-ff98e87206fa">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000290</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000290</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_ab9be70c-8bb0-4ea7-9438-ff98e87206fa_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_ab9be70c-8bb0-4ea7-9438-ff98e87206fa_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>769603.6084410000 5413349.9864777000 769696.7825781000 5413404.9835606000 769704.9634533000 5413412.9429164000 769709.5364717000 5413417.3921079000 769726.4226533000 5413432.4319238000 769740.8416751000 5413447.9150530000 769791.6283432000 5413503.5322804000 769802.5818246000 5413513.6400400000 769804.3883341000 5413519.7314593000 769727.2466466000 5413733.1750407000 769722.9216115000 5413735.9445316000 769606.5562477000 5413680.8826797000 769598.0147230000 5413676.8409604000 769598.0152451000 5413676.8395231000 769502.7022963000 5413631.1697863000 769499.3402938000 5413629.5588683000 769499.2039550000 5413629.9294376000 769396.4952436000 5413580.6515015000 769303.9230731000 5413537.1781429000 769301.7289772000 5413531.9112297000 769364.6475627000 5413357.8059116000 769409.6760424000 5413233.3769261000 769414.4367157000 5413231.7324426000 769506.3498455000 5413289.1355833000 769602.4771262000 5413349.2287335000 769602.4499314000 5413349.3026519000 769603.6084410000 5413349.9864777000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2020-01-29T08:43:29.703</lpis:beginLifespanVersion>
+      <lpis:validFrom>2020-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_fbc6a7d6-9f27-463e-873f-b7356b53952b">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000298</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000298</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_fbc6a7d6-9f27-463e-873f-b7356b53952b_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_fbc6a7d6-9f27-463e-873f-b7356b53952b_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>769009.4563195000 5409594.7775345000 769007.9621106000 5409619.5454102000 769006.8207980000 5409638.4636757000 769000.8197816000 5409737.9341758000 768958.2946180000 5409731.4019880000 768869.0923289000 5409717.7122753000 768865.1118665000 5409716.8343986000 768861.8583963000 5409725.0320976000 768861.6163572000 5409725.6419584000 768861.4521163000 5409726.0397195000 768848.1904921000 5409759.4690709000 768842.7610691000 5409762.5789047000 768592.6247808000 5409724.7495947000 768589.6076292000 5409720.2653664000 768597.4816496000 5409687.8386076000 768598.9981578000 5409681.5933143000 768627.4004935000 5409564.7783359000 768628.1123545000 5409562.2345725000 768634.3582297000 5409535.8715013000 768634.2309510000 5409536.4883183000 768653.0274023000 5409459.0559401000 768659.7008107000 5409431.5645957000 768996.0387148000 5409482.4440439000 769016.2925357000 5409481.4603308000 769014.4215765000 5409512.4734841000 769014.3414328000 5409513.8019507000 769009.5062098000 5409593.9505578000 769009.4563195000 5409594.7775345000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2018-04-14T09:07:21.166</lpis:beginLifespanVersion>
+      <lpis:validFrom>2018-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_8c5c9f19-c234-4305-ab4f-6a588fd14dff">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000304</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000304</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_8c5c9f19-c234-4305-ab4f-6a588fd14dff_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_8c5c9f19-c234-4305-ab4f-6a588fd14dff_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>769642.1436536000 5410388.1194474000 769639.9214322000 5410389.9250047000 769636.1416626000 5410393.2750015000 769601.3916626000 5410423.7750015000 769561.1416626000 5410460.2750015000 769555.5829038000 5410461.0981562000 769438.4774145000 5410355.2247984000 769326.5478121000 5410255.8002733000 769332.2229156000 5410240.7562504000 769320.1604156000 5410231.3187504000 769324.1958313000 5410222.3875008000 769330.5708313000 5410203.1375008000 769334.4458313000 5410189.5125008000 769338.6958313000 5410167.3875008000 769341.9311895000 5410143.5361522000 769345.4206526000 5410115.7187750000 769345.5900185000 5410114.3686204000 769346.7730911000 5410106.2982818000 769378.5251324000 5410119.0176823000 769403.3428420000 5410128.9592944000 769426.9195706000 5410139.6243585000 769441.4259900000 5410145.5026662000 769452.3096904000 5410150.0667382000 769470.5826036000 5410168.3922341000 769477.6604766000 5410175.8773240000 769480.2705152000 5410178.1163513000 769480.4363069000 5410178.5162716000 769481.4953846000 5410181.0709641000 769482.6500701000 5410184.4266077000 769485.1791224000 5410189.9568242000 769515.1002495000 5410234.4288986000 769525.6558051000 5410248.0400160000 769539.7618811000 5410261.6261595000 769546.2204605000 5410268.8943115000 769560.9018174000 5410285.4159528000 769597.3224829000 5410318.5955721000 769617.9769905000 5410344.0916724000 769647.9570225000 5410383.1591667000 769646.0820225000 5410384.8258309000 769645.8403250000 5410385.0533113000 769645.7501676000 5410385.1381654000 769645.7501675000 5410385.1381655000 769644.9014652000 5410385.9369454000 769642.2363743000 5410388.1137751000 769642.2363742000 5410388.1137751000 769642.1436536000 5410388.1194474000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2024-02-20T15:02:43.629</lpis:beginLifespanVersion>
+      <lpis:validFrom>2024-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_e0991adf-3870-4431-b7ca-5b44bc97a713">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000321</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000321</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_e0991adf-3870-4431-b7ca-5b44bc97a713_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_e0991adf-3870-4431-b7ca-5b44bc97a713_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>770355.2127149000 5409305.5489366000 770355.1128212000 5409305.8315607000 770355.0373823000 5409306.2444460000 770338.7133615000 5409355.4867399000 770219.9859913000 5409316.1646011000 770085.2975240000 5409271.5474989000 770101.8442840000 5409222.7475339000 770102.9559907000 5409222.7381019000 770103.7973017000 5409222.7312197000 770104.4162476000 5409222.7011132000 770104.3794840000 5409222.6940978000 770162.3055404000 5409220.2075089000 770294.9543829000 5409265.5152068000 770360.7497092000 5409288.7638875000 770355.3370518000 5409305.5911712000 770355.2127149000 5409305.5489366000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2015-01-28T14:43:56.360</lpis:beginLifespanVersion>
+      <lpis:validFrom>2015-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_acda7046-cf36-4509-b715-b23759b340e8">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000327</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000327</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_acda7046-cf36-4509-b715-b23759b340e8_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_acda7046-cf36-4509-b715-b23759b340e8_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>769263.4208550000 5414243.0614865000 769221.2677868000 5414240.6607173000 769078.4485363000 5414159.1532273000 769077.3603196000 5414152.6575960000 769193.6038616000 5413831.2431109000 769198.4073875000 5413829.6764402000 769383.0205451000 5413917.1868789000 769383.1897948000 5413916.7257260000 769404.4565065000 5413927.4145441000 769616.4013310000 5414027.9489719000 769618.6581890000 5414033.4246492000 769563.9682303000 5414184.9366785000 769558.6825489000 5414189.4840155000 769522.1412184000 5414192.7081561000 769498.4087694000 5414197.3687703000 769465.6902498000 5414207.7423378000 769422.1945879000 5414218.2213671000 769392.1588700000 5414223.5343938000 769350.4371280000 5414231.1798109000 769301.1136164000 5414239.9070065000 769263.4208550000 5414243.0614865000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2019-12-16T01:44:22.335</lpis:beginLifespanVersion>
+      <lpis:validFrom>2020-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_6240d1ff-9b00-45f2-997a-c83d05822394">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000329</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000329</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_6240d1ff-9b00-45f2-997a-c83d05822394_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_6240d1ff-9b00-45f2-997a-c83d05822394_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>769587.8651782000 5412698.6029204000 769614.3595806000 5412606.6705176000 769659.2699234000 5412626.2137252000 769704.1411820000 5412646.7566877000 769748.1533065000 5412666.8904728000 769788.9607731000 5412685.7714611000 769795.6966337000 5412664.1352877000 769799.1886583000 5412651.7576751000 769802.9503242000 5412638.8900846000 769810.0790471000 5412613.6399508000 769818.0726475000 5412588.6742412000 769825.1282621000 5412593.8335649000 769831.3682857000 5412597.4588712000 769838.6326585000 5412600.4988177000 769849.3861358000 5412603.9267103000 769859.1842720000 5412606.1905335000 769879.9907435000 5412611.7671498000 769900.5620794000 5412616.9590300000 769921.3044795000 5412624.1601182000 769928.2861649000 5412631.1938330000 769934.8016568000 5412640.4076637000 770000.5280366000 5412747.9335349000 770001.8156436000 5412753.3659392000 770002.0180150000 5412757.7543029000 769962.0530029000 5412913.8866906000 769929.2762265000 5413040.4306801000 769927.5695214000 5413042.7960888000 769925.1409973000 5413044.0769762000 769732.4402670000 5412955.9879175000 769690.3747926000 5412936.8006973000 769669.4136906000 5412928.2083851000 769669.4956927000 5412927.9295366000 769539.1055511000 5412868.3152459000 769538.0412090000 5412863.4194544000 769587.8651782000 5412698.6029204000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2025-12-13T09:20:24.759</lpis:beginLifespanVersion>
+      <lpis:validFrom>2026-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_f00d3059-dc3c-4f95-8391-9f87abcb24af">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000343</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000343</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_f00d3059-dc3c-4f95-8391-9f87abcb24af_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_f00d3059-dc3c-4f95-8391-9f87abcb24af_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>770536.5700000000 5413049.7600000000 770445.2800000000 5413004.6600000000 770421.8820516000 5412993.4436466000 770481.8900000000 5412924.6000000000 770594.8000000000 5412983.3100000000 770655.4200000000 5413001.3800000000 770703.8800000000 5413022.6900000000 770740.4440000000 5413041.0230000000 770768.9400000000 5413055.3110000000 770786.2100000000 5413063.9700000000 770730.1200000000 5413129.5400000000 770728.7600000000 5413131.1300000000 770709.9400000000 5413123.0210000000 770686.4300000000 5413112.8900000000 770680.5640000000 5413110.4190000000 770536.5700000000 5413049.7600000000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2021-04-12T06:07:41.621</lpis:beginLifespanVersion>
+      <lpis:validFrom>2021-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_255d45a3-5094-4d1e-83ae-67bc3c674f67">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000357</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000357</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_255d45a3-5094-4d1e-83ae-67bc3c674f67_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_255d45a3-5094-4d1e-83ae-67bc3c674f67_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>771084.8523372000 5410277.2084988000 771093.8332247000 5410288.2161149000 771118.4463476000 5410319.5779513000 771124.3458209000 5410329.1426527000 771126.7776036000 5410336.5885413000 771126.3156552000 5410342.0208452000 771122.6401166000 5410352.3199134000 771118.2562848000 5410362.1010924000 771112.3634992000 5410372.9804632000 771095.9252722000 5410397.2927491000 771087.5657175000 5410408.9477453000 771083.0160103000 5410415.3964350000 771069.2394530000 5410406.9932753000 771060.5136700000 5410404.0658671000 771051.0183217000 5410402.8802851000 771039.7798877000 5410403.7485581000 771031.7000283000 5410408.3193814000 771023.9317971000 5410412.6376305000 771015.2204650000 5410419.4502827000 771003.0196954000 5410431.7747803000 770985.4157840000 5410453.1475685000 770926.4414694000 5410413.7753870000 770872.2738496000 5410378.9581528000 770825.6174348000 5410351.7161801000 770825.2025376000 5410349.9537457000 770824.6926968000 5410347.7880025000 770824.5793684000 5410347.1581888000 770827.2378810000 5410342.9651718000 770853.1633796000 5410301.5828745000 770858.9551219000 5410292.3483330000 770931.9527725000 5410175.9587524000 770932.8181145000 5410174.5811480000 770962.6617615000 5410127.1340084000 770993.9894974000 5410167.2615027000 771030.6689381000 5410211.9543241000 771060.8045794000 5410248.2638648000 771084.8523372000 5410277.2084988000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2019-01-08T14:07:03.768</lpis:beginLifespanVersion>
+      <lpis:validFrom>2019-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_61ca586c-73da-439c-9d73-62428a621afa">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000368</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000368</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Permanent grassland" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/GL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_61ca586c-73da-439c-9d73-62428a621afa_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_61ca586c-73da-439c-9d73-62428a621afa_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>768573.3102983000 5412848.1425226000 768635.5039371000 5412876.5510440000 768623.2881281000 5412906.2663167000 768598.8497945000 5412892.7769257000 768559.8597721000 5412874.9068461000 768573.3102983000 5412848.1425226000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2025-02-12T14:57:54.965</lpis:beginLifespanVersion>
+      <lpis:validFrom>2025-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_224cb3cf-aec8-4af1-8534-ddb773fa52db">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000372</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000372</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_224cb3cf-aec8-4af1-8534-ddb773fa52db_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_224cb3cf-aec8-4af1-8534-ddb773fa52db_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>770176.6117500000 5409681.9104250000 770167.7514637000 5409678.9155545000 770167.7540767000 5409678.9086002000 770166.8622932000 5409678.6150055000 770166.8622887000 5409678.6150040000 769993.5281209000 5409620.0262219000 769989.6649791000 5409612.5151183000 769978.9349663000 5409594.1604612000 769971.1446670000 5409581.4884160000 769970.6752210000 5409576.3837510000 769972.1604126000 5409571.4762769000 769977.1221304000 5409561.6897620000 770008.4550323000 5409494.8323633000 770042.7091849000 5409506.2047288000 770093.6566677000 5409523.0909749000 770179.1262463000 5409551.4101521000 770264.6342360000 5409579.7708347000 770258.7451960000 5409597.5804865000 770239.4869782000 5409643.6279047000 770196.8125000000 5409630.1562500000 770186.5625000000 5409655.5312500000 770179.5625000000 5409674.0312500000 770176.6117500000 5409681.9104250000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2023-03-26T15:03:42.187</lpis:beginLifespanVersion>
+      <lpis:validFrom>2023-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_5742886e-dfff-4d98-939c-54133502bd81">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000374</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000374</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_5742886e-dfff-4d98-939c-54133502bd81_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_5742886e-dfff-4d98-939c-54133502bd81_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>769109.2433915000 5411171.3453659000 769126.0625000000 5411198.2460938000 769142.1028136000 5411233.7108315000 768940.3440446000 5411260.3695011000 768811.4045278000 5411277.4027296000 768808.5973897000 5411250.5788789000 768804.7870152000 5411213.4676507000 768790.9672965000 5411078.8715492000 768793.0544405000 5411074.4383059000 768793.6268376000 5411073.3795507000 768881.3189821000 5411062.3604443000 768906.6861739000 5411059.1653826000 769022.4424074000 5411044.6155889000 769109.2433915000 5411171.3453659000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2025-01-28T08:47:35.295</lpis:beginLifespanVersion>
+      <lpis:validFrom>2025-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_2b58e682-d33e-4f41-b286-907b6407f410">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000389</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000389</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_2b58e682-d33e-4f41-b286-907b6407f410_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_2b58e682-d33e-4f41-b286-907b6407f410_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>768181.7412427000 5410712.8101700000 768185.7689570000 5410708.4335527000 768191.8887502000 5410695.1960964000 768198.5626863000 5410671.5204032000 768289.9531008000 5410683.9381401000 768374.4342350000 5410697.2797290000 768465.3453973000 5410709.9646954000 768552.8771925000 5410723.9727890000 768555.4092552000 5410728.3178880000 768542.9168979000 5410772.4118616000 768512.4409530000 5410880.5923275000 768344.2354699000 5410855.3941139000 768174.0793158000 5410829.8988483000 768169.6718757000 5410796.9249615000 768164.1433391000 5410751.2414111000 768159.9240634000 5410713.9905716000 768170.3307202000 5410714.6278314000 768176.6974106000 5410714.1986394000 768181.7412427000 5410712.8101700000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2019-12-16T01:44:15.811</lpis:beginLifespanVersion>
+      <lpis:validFrom>2020-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_a059c7cb-224f-4314-9f25-6609a5b18a1e">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000394</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000394</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_a059c7cb-224f-4314-9f25-6609a5b18a1e_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_a059c7cb-224f-4314-9f25-6609a5b18a1e_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>771337.0231389000 5411086.3828637000 771337.8564146000 5411087.1690958000 771342.6787903000 5411119.1498496000 771343.1734754000 5411122.0176317000 771343.5787864000 5411123.4147846000 771344.0774532000 5411128.8768415000 771348.3703915000 5411154.8376974000 771355.9770803000 5411193.5046246000 771357.8899249000 5411199.5874140000 771354.1156681000 5411206.4701843000 771288.6667215000 5411307.1220353000 771215.0333760000 5411429.2408579000 771211.2456410000 5411429.0614347000 771156.9898652000 5411315.4228948000 771156.9658244000 5411315.3725414000 771157.3244830000 5411314.9123691000 771155.6038759000 5411311.1029871000 771112.7190630000 5411222.6977681000 771113.8889145000 5411218.4251315000 771152.7554020000 5411167.4527318000 771228.7567995000 5411069.7997337000 771311.0628900000 5410965.6174640000 771314.5820121000 5410964.7068048000 771324.1836930000 5411015.0257814000 771336.9303514000 5411081.8265058000 771337.0231389000 5411086.3828637000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2024-01-24T08:09:58.718</lpis:beginLifespanVersion>
+      <lpis:validFrom>2024-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_e72ee42b-1fcd-490d-b988-4b2a0b0499bd">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000400</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000400</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_e72ee42b-1fcd-490d-b988-4b2a0b0499bd_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_e72ee42b-1fcd-490d-b988-4b2a0b0499bd_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>768195.9318242000 5411014.4395439000 768194.4962072000 5411001.8332180000 768189.1489172000 5410954.0942174000 768330.9967368000 5410975.3494337000 768479.4140852000 5410997.5848338000 768463.3224839000 5411054.6194224000 768449.6662486000 5411103.0221802000 768446.1374259000 5411108.1775788000 768443.0517040000 5411110.5507730000 768441.3212775000 5411110.5070402000 768414.3893057000 5411109.7398125000 768384.2159191000 5411109.2035616000 768354.4619409000 5411109.7304370000 768353.6334063000 5411108.2242535000 768350.6517745000 5411101.5685992000 768348.5423346000 5411098.5020110000 768345.1493219000 5411096.1250956000 768341.5238513000 5411094.3823869000 768337.5110022000 5411093.9088419000 768329.0904457000 5411095.3413143000 768304.4555135000 5411103.0800180000 768292.8323411000 5411106.0556791000 768281.9252539000 5411107.7178535000 768263.0053718000 5411110.0853647000 768238.5176678000 5411111.2610885000 768229.8255590000 5411111.4192960000 768224.8903857000 5411111.3527221000 768219.7314139000 5411109.9397078000 768212.7114873000 5411107.0924300000 768208.3252240000 5411102.1206702000 768205.2143040000 5411095.9505400000 768195.9318242000 5411014.4395439000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2018-03-11T18:17:51.827</lpis:beginLifespanVersion>
+      <lpis:validFrom>2018-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_50a445a3-d882-48d4-b1b8-85c479d7fdbe">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000511</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000511</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_50a445a3-d882-48d4-b1b8-85c479d7fdbe_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_50a445a3-d882-48d4-b1b8-85c479d7fdbe_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>770190.5900000000 5412811.8000000000 770272.8326098000 5412717.5230923000 770277.1095504000 5412720.1440932000 770280.2992030000 5412723.1202855000 770325.3925234000 5412795.4556465000 770351.9300000000 5412838.0200000000 770361.6200000000 5412853.5600000000 770388.4375000000 5412874.4960938000 770407.7575107000 5412886.8020450000 770412.8900000000 5412890.5000000000 770429.5800000000 5412898.7500000000 770452.5611498000 5412910.1065804000 770481.8900000000 5412924.6000000000 770421.8820516000 5412993.4436466000 770421.8835718000 5412993.4443754000 770415.0800000000 5413001.2500000000 770363.0500000000 5412975.0800000000 770322.3398705000 5412952.4037970000 770307.7259400000 5412940.5974757000 770282.8900000000 5412917.2300000000 770267.9800000000 5412902.7400000000 770190.5900000000 5412811.8000000000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2025-01-28T09:03:46.817</lpis:beginLifespanVersion>
+      <lpis:validFrom>2025-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_b1aee7f0-547a-44fd-bac4-295ccb7825f1">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000403</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000403</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Permanent grassland" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/GL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_b1aee7f0-547a-44fd-bac4-295ccb7825f1_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_b1aee7f0-547a-44fd-bac4-295ccb7825f1_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>768706.9752119000 5411876.9215795000 768707.3941261000 5411875.7455006000 768716.7539755000 5411843.7835518000 768719.4515032000 5411827.8009297000 768719.5187354000 5411826.0958044000 768721.1338348000 5411819.3284254000 768722.1101053000 5411812.8054866000 768722.8785779000 5411806.9934125000 768724.1093149000 5411787.1778217000 768724.3396787000 5411763.0982488000 768759.9543553000 5411791.3766200000 768759.1250000000 5411794.2265625000 768761.7500000000 5411797.9765625000 768762.3750000000 5411804.4765625000 768764.1250000000 5411812.2265625000 768764.5000000000 5411819.2265625000 768764.5000000000 5411823.8515625000 768765.1250000000 5411826.2265625000 768764.5000000000 5411830.6015625000 768764.7769439000 5411837.3350308000 768764.3750000000 5411844.1015625000 768765.1852861000 5411847.2632504000 768763.3913436000 5411888.4542367000 768763.3780531000 5411890.3099642000 768763.1815697000 5411890.2871242000 768762.3727977000 5411897.8356402000 768761.6783569000 5411903.5300790000 768761.4005783000 5411909.2245294000 768760.7061355000 5411915.7523080000 768760.0116852000 5411923.1134148000 768759.4561355000 5411930.0578576000 768758.1250000000 5411940.0507813000 768757.7894675000 5411951.8634173000 768756.6783530000 5411960.6134173000 768755.5672461000 5411966.3078601000 768755.5672461000 5411971.5856387000 768755.8450247000 5411978.2523028000 768757.0950247000 5411984.6411960000 768759.4561316000 5411990.0578601000 768761.2616888000 5411992.8356387000 768762.5000000000 5411994.7265625000 768767.2500000000 5411998.9765625000 768772.8395844000 5412002.4958324000 768770.6800614000 5412005.0558691000 768755.1791687000 5412027.7416649000 768742.9291687000 5412020.2416649000 768727.9291687000 5412009.4916649000 768718.6791687000 5412004.4916649000 768708.1791687000 5411999.7416649000 768698.9005737000 5411998.5300878000 768693.2061325000 5412000.3356434000 768688.0672394000 5412003.9467503000 768678.3903497000 5412000.6437692000 768676.5208447000 5411995.6264320000 768675.9727410000 5411991.2904153000 768675.5944917000 5411982.6467104000 768676.1584131000 5411970.6246223000 768677.4933267000 5411961.1704405000 768680.7500000000 5411947.6015625000 768683.8750000000 5411937.9765625000 768688.3750000000 5411926.1015625000 768704.8727990000 5411883.6689688000 768707.2145844000 5411877.1208324000 768707.0594570000 5411877.2344035000 768706.9752119000 5411876.9215795000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2023-02-27T12:55:06.385</lpis:beginLifespanVersion>
+      <lpis:validFrom>2023-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_87566793-f959-4188-b92d-ef78e67bc98c">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000418</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000418</lpis:id>
+      <lpis:landscapeFeaturesAssociatedWithAgriculturalArea xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.lf.DEBYLI5657000418_33767897"/>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_87566793-f959-4188-b92d-ef78e67bc98c_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_87566793-f959-4188-b92d-ef78e67bc98c_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>769252.1728185000 5410450.8718147000 769251.4119017000 5410458.5064667000 769248.7620865000 5410485.0933150000 769250.0507275000 5410503.6776384000 769250.9585150000 5410528.1148146000 769251.6604439000 5410538.4400648000 769252.2799388000 5410543.3416127000 769252.3029814000 5410551.5871784000 769251.5276169000 5410578.8044026000 769251.0465743000 5410590.9961232000 769251.4350938000 5410597.4381211000 769251.2072311000 5410603.2131466000 769250.2870317000 5410610.2462081000 769248.6392435000 5410616.4166791000 769247.1250000000 5410617.8515625000 769233.0866496000 5410621.3813588000 769223.7500000000 5410623.0527344000 769195.5000000000 5410629.0527344000 769149.5000000000 5410639.1777344000 769113.4128110000 5410647.0576748000 769080.6250000000 5410654.4013672000 769009.0000000000 5410669.9638672000 768980.8750000000 5410676.3388672000 768976.6875000000 5410677.1513672000 768977.0137749000 5410677.9589506000 768976.2582192000 5410678.1303829000 768975.6100319000 5410678.2774538000 768975.5993763000 5410678.5023543000 768961.7343852000 5410679.1250000000 768959.4010417000 5410653.7916718000 768959.0676982000 5410647.1249924000 768948.0875550000 5410646.4595316000 768948.0757989000 5410646.2388108000 768948.0757989000 5410646.2388103000 768950.2388948000 5410587.6223577000 768963.0686734000 5410539.6128714000 769022.4586639000 5410368.2417333000 769031.6365515000 5410341.4006094000 769049.7180946000 5410336.0963176000 769049.9506790000 5410323.8570952000 769051.2184673000 5410308.9598748000 769052.5590250000 5410302.1525328000 769079.4241802000 5410221.1683712000 769114.6544881000 5410225.5709975000 769121.0000000000 5410226.4765625000 769150.7500000000 5410229.4765625000 769200.6313273000 5410232.4249356000 769259.6250000000 5410234.1015625000 769305.5000000000 5410234.7265625000 769311.7450572000 5410235.5575072000 769305.5000000000 5410253.6015625000 769300.8750000000 5410264.1015625000 769293.3750000000 5410281.9765625000 769282.8750000000 5410308.2265625000 769274.7500000000 5410333.3515625000 769271.7500000000 5410344.3515625000 769270.1250000000 5410349.9765625000 769268.5780071000 5410355.4093196000 769260.7032457000 5410388.6073287000 769258.1250000000 5410399.4765625000 769256.3115711000 5410411.2852697000 769256.1193331000 5410411.2744642000 769254.2020244000 5410430.5117952000 769252.1728185000 5410450.8718147000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2026-04-16T06:07:28.934</lpis:beginLifespanVersion>
+      <lpis:validFrom>2026-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_1f49f254-07f4-430d-a8d6-95c2ffd06cda">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000430</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000430</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_1f49f254-07f4-430d-a8d6-95c2ffd06cda_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_1f49f254-07f4-430d-a8d6-95c2ffd06cda_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>768823.6700001000 5413753.2518749000 768961.2950001000 5413781.7518749000 769015.1850822000 5413792.1626259000 769159.0863570000 5413821.7126816000 769182.6389704000 5413826.1963867000 769185.7816762000 5413826.8967836000 769188.3960835000 5413830.5889286000 769187.8317450000 5413832.5037826000 769179.4697042000 5413855.6494512000 769172.0995841000 5413876.0495579000 769148.7395246000 5413940.7091050000 769148.1813902000 5413942.2539971000 769147.7343156000 5413943.4914806000 769146.0253849000 5413948.2217284000 769142.9991467000 5413956.5982301000 769139.3518477000 5413966.6938068000 769130.4095144000 5413991.4458444000 769105.5375408000 5414060.0672515000 769088.2607238000 5414109.5830169000 769073.1022255000 5414149.2389354000 769070.3786486000 5414156.0061621000 768998.9291687000 5414143.2416649000 768836.7950001000 5414117.0018749000 768836.7150002000 5414117.0037498000 768836.7325001000 5414117.0018749000 768802.4300003000 5414112.0074997000 768796.9650002000 5414111.0037498000 768790.3400002000 5414109.2537498000 768778.7150002000 5414106.1287498000 768752.9650002000 5414097.0037498000 768736.5900002000 5414091.0037498000 768713.0450001000 5414081.5018749000 768680.9300003000 5414067.7574997000 768666.9825001000 5414060.1268749000 768647.2950001000 5414046.9393749000 768627.7325001000 5414031.0643749000 768599.7950001000 5414006.8143749000 768620.8575001000 5413962.1268749000 768677.4825001000 5413839.1893749000 768724.7325001000 5413735.1893749000 768823.6700001000 5413753.2518749000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2025-01-01T16:05:50.226</lpis:beginLifespanVersion>
+      <lpis:validFrom>2025-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_0d62d935-da99-4c83-8c0c-8fec7764eae5">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000434</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000434</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_0d62d935-da99-4c83-8c0c-8fec7764eae5_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_0d62d935-da99-4c83-8c0c-8fec7764eae5_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>769669.8653027000 5413287.0624467000 769635.5753504000 5413251.3878103000 769611.0025599000 5413231.4944933000 769577.8491475000 5413203.8311976000 769574.8351624000 5413201.3163196000 769540.1684463000 5413172.7620469000 769523.8822093000 5413159.2107726000 769504.3685417000 5413143.1851256000 769489.6935186000 5413133.4136031000 769477.9338974000 5413125.4394667000 769469.8458842000 5413118.9481570000 769466.8096251000 5413116.5541570000 769463.4295535000 5413114.9702244000 769464.8181715000 5413110.2153084000 769534.2570951000 5412874.5854602000 769540.1688989000 5412875.2700247000 769651.4686443000 5412923.5573901000 769656.0307541000 5412925.5366588000 769755.9206227000 5412970.4743455000 769923.5950480000 5413046.6244441000 769926.2408663000 5413052.1454715000 769825.2060077000 5413442.1935320000 769821.4217498000 5413443.1956564000 769669.8653027000 5413287.0624467000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2019-12-16T01:44:18.879</lpis:beginLifespanVersion>
+      <lpis:validFrom>2020-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_3cb85df4-ac02-43f6-8a31-77e5bd8dc83a">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000442</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000442</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Permanent grassland" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/GL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_3cb85df4-ac02-43f6-8a31-77e5bd8dc83a_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_3cb85df4-ac02-43f6-8a31-77e5bd8dc83a_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>768643.3737581000 5412900.8128369000 768647.2771375000 5412889.2051510000 768650.7492493000 5412885.7158284000 768650.7492801000 5412885.7157975000 768653.3519684000 5412883.1002080000 768689.0537460000 5412913.5455313000 768761.6338198000 5412974.3062726000 768761.6582206000 5412974.3266999000 768760.8229752000 5412975.3496499000 768760.1242014000 5412976.2054593000 768760.0849642000 5412976.2535142000 768753.2405766000 5412976.7227426000 768753.2388737000 5412976.7212201000 768729.9224615000 5412955.8749079000 768643.3737581000 5412900.8128369000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2018-02-26T09:35:06.386</lpis:beginLifespanVersion>
+      <lpis:validFrom>2018-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_48d3e22a-2bc5-46ed-a7ac-8e8af306e73b">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000443</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000443</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Permanent grassland" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/GL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_48d3e22a-2bc5-46ed-a7ac-8e8af306e73b_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_48d3e22a-2bc5-46ed-a7ac-8e8af306e73b_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>768808.9256679000 5413034.6389520000 768848.6014572000 5413080.8787767000 768865.5537379000 5413093.7933222000 768883.7542774000 5413103.8090060000 768925.9798719000 5413125.6575309000 768986.8200652000 5413152.7757583000 768999.5744067000 5413157.1340009000 769011.5570487000 5413158.0601618000 769207.0195043000 5413164.2588666000 769270.3699399000 5413165.9765219000 769317.4682542000 5413176.0820080000 769380.6368017000 5413189.6355413000 769403.9851487000 5413194.6451939000 769416.8886023000 5413198.7685586000 769416.7644397000 5413199.1241040000 769414.6458892000 5413198.2595871000 769402.9309928000 5413199.5396771000 769292.0431327000 5413175.8015385000 769268.5983787000 5413170.7826379000 769205.7285764000 5413169.0639156000 769016.8020187000 5413163.5748568000 768989.9785063000 5413160.0338578000 768979.2655546000 5413155.2059137000 768866.8560002000 5413101.9423384000 768846.4667849000 5413086.8205629000 768763.1122375000 5412991.1994269000 768763.0745740000 5412982.2569471000 768769.9023718000 5412989.1051816000 768808.9256679000 5413034.6389520000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2018-02-19T14:41:12.071</lpis:beginLifespanVersion>
+      <lpis:validFrom>2018-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_3f7dc63c-127c-4ee9-89e0-a66d7a24c807">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000453</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000453</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_3f7dc63c-127c-4ee9-89e0-a66d7a24c807_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_3f7dc63c-127c-4ee9-89e0-a66d7a24c807_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>771826.7137030000 5411361.9584458000 771826.6372919000 5411363.0795175000 771826.8476326000 5411363.0911848000 771826.8394593000 5411363.2060970000 771826.7074247000 5411365.0624270000 771818.5204432000 5411480.1660918000 771814.2075339000 5411483.9107631000 771664.5777487000 5411474.8149847000 771507.3898564000 5411465.1510579000 771437.5752437000 5411353.0840285000 771432.9961753000 5411344.9553368000 771431.0625000000 5411341.6826172000 771431.1552592000 5411341.6873708000 771430.5994288000 5411340.7006692000 771429.8212744000 5411339.3193014000 771410.4123765000 5411305.5659546000 771388.9731249000 5411261.1871685000 771383.0809802000 5411247.0878272000 771638.5133377000 5411262.3486561000 771832.7556117000 5411274.5755124000 771826.7137030000 5411361.9584458000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2026-03-30T06:19:16.486</lpis:beginLifespanVersion>
+      <lpis:validFrom>2026-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_d05f0f78-6f4f-46a5-94c0-b9d9bf19a7e9">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000522</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000522</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_d05f0f78-6f4f-46a5-94c0-b9d9bf19a7e9_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_d05f0f78-6f4f-46a5-94c0-b9d9bf19a7e9_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>770826.4140625000 5411193.3125000000 770826.4527751000 5411193.3856815000 770824.6562500000 5411195.2500000000 770824.6776399000 5411195.2905336000 770826.4140625000 5411193.4375000000 771034.0781250000 5411592.8750000000 771033.3281250000 5411593.6250000000 771030.3281250000 5411596.3750000000 770989.6209596000 5411631.4693994000 770989.2465596000 5411631.8125994000 770988.6574076000 5411632.3397354000 770986.2825596000 5411634.4645994000 770986.2626247000 5411634.4257600000 770940.1792778000 5411674.5009959000 770895.7400000000 5411713.7500000000 770867.8400000000 5411744.5900000000 770863.3600000000 5411743.9800000000 770671.8300000000 5411364.4400000000 770672.7500000000 5411357.9300000000 770701.0900000000 5411327.4800000000 770784.6245938000 5411237.6954331000 770785.1630150000 5411237.4512259000 770783.4513596000 5411239.2853994000 770826.4140625000 5411193.3125000000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2026-04-30T06:16:29.113</lpis:beginLifespanVersion>
+      <lpis:validFrom>2026-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_298243d9-521d-4408-b6a7-2959563a1a15">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000455</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000455</lpis:id>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_298243d9-521d-4408-b6a7-2959563a1a15_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_298243d9-521d-4408-b6a7-2959563a1a15_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>771088.9133885000 5410275.8159040000 771078.7440881000 5410266.1839107000 770966.9439054000 5410129.0976868000 770964.3174186000 5410124.9351540000 770977.7990778000 5410102.8650039000 771040.9107413000 5410002.2577598000 771046.5177155000 5409997.7381339000 771057.5737079000 5409994.4548178000 771086.8630735000 5409988.6363189000 771124.3315111000 5409981.7457139000 771184.3487601000 5409969.0031598000 771188.1174309000 5409968.2485765000 771189.0919964000 5409962.4930416000 771188.8824110000 5409956.4267441000 771186.5539301000 5409928.1559963000 771184.4763205000 5409902.0842729000 771182.8575318000 5409881.4467443000 771183.5238416000 5409881.3587187000 771183.5440646000 5409881.5797907000 771311.8538460000 5409864.4052060000 771352.1274168000 5409859.0157322000 771355.8720004000 5409858.5126855000 771442.7108679000 5409846.8807306000 771570.2962818000 5409829.8081339000 771696.7702484000 5409812.9034116000 771662.6327103000 5409904.4741260000 771643.4715424000 5409954.2476324000 771634.3509959000 5409975.4807468000 771617.9190285000 5409990.7418916000 771588.9798317000 5410020.4647194000 771569.2396833000 5410044.4892857000 771547.4567562000 5410074.3647543000 771523.4566931000 5410110.8654274000 771509.1983239000 5410134.1713169000 771493.4292800000 5410161.7425428000 771492.3863881000 5410163.5659775000 771489.1377750000 5410169.3513343000 771488.9253761000 5410169.7137468000 771487.2875286000 5410172.5083776000 771475.3948670000 5410192.8006260000 771459.7138943000 5410220.8599689000 771436.7673807000 5410264.7878449000 771405.3790719000 5410326.4266080000 771296.1589207000 5410283.9606734000 771255.7546376000 5410268.2510369000 771255.6609276000 5410268.4478787000 771255.3448933000 5410269.1105799000 771255.2102082000 5410269.3930048000 771253.9668081000 5410272.0003255000 771236.2945557000 5410309.0486718000 771236.2944265000 5410309.0489524000 771225.5474433000 5410331.5790776000 771214.0523582000 5410355.7158588000 771213.3865598000 5410357.1113429000 771198.5623980000 5410397.8774338000 771187.0448678000 5410391.0952854000 771178.6196053000 5410385.5292099000 771153.7756143000 5410371.7611461000 771141.0679861000 5410386.5156731000 771123.8858866000 5410372.2002283000 771119.4145626000 5410369.0873075000 771123.8096639000 5410358.3398892000 771129.9392391000 5410341.3731622000 771130.6693901000 5410335.4451652000 771126.8889655000 5410326.1825141000 771111.3279472000 5410304.0565843000 771088.9133885000 5410275.8159040000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2025-05-05T06:44:17.450</lpis:beginLifespanVersion>
+      <lpis:validFrom>2025-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+  <wfs:member>
+    <lpis:AgriculturalArea xmlns:lpis="http://locationintelligence.epsilon-italia.it/IACS/LPIS" gml:id="AgriculturalArea_id_9294d8f9-b5c6-4822-a314-65da885d485c">
+      <gml:identifier>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000459</gml:identifier>
+      <lpis:id>https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI5657000459</lpis:id>
+      <lpis:landscapeFeaturesAssociatedWithAgriculturalArea xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.lf.DEBYLI5657000459_32387424"/>
+      <lpis:agriculturalAreaType xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="Arable land" xlink:href="https://registry.gdi-de.org/codelist/de.iacs/AgriculturalAreaTypeValue/AL"/>
+      <lpis:geometry>
+        <!--Inlined geometry 'AgriculturalArea_id_9294d8f9-b5c6-4822-a314-65da885d485c_LPIS_GEOMETRY'-->
+        <gml:Polygon gml:id="AgriculturalArea_id_9294d8f9-b5c6-4822-a314-65da885d485c_LPIS_GEOMETRY" srsName="urn:ogc:def:crs:EPSG::25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>771091.3619461000 5409136.2196916000 771092.0447444000 5409136.0955470000 771093.5000000000 5409141.1777344000 771099.7500000000 5409162.1777344000 771112.6250000000 5409210.3027344000 771114.7500000000 5409220.8027344000 771116.1250000000 5409232.0527344000 771127.3750000000 5409317.6777344000 771130.1925865000 5409348.4261786000 771130.2500000000 5409349.0527344000 771130.7500000000 5409355.3027344000 771141.3583374000 5409472.9833374000 771146.2223405000 5409523.5433700000 771148.2500000000 5409551.4277344000 771156.2500000000 5409632.0527344000 771160.3583374000 5409670.4833374000 771159.9969235000 5409670.5497655000 771159.9591539000 5409670.2537597000 771119.7277409000 5409677.9512663000 770999.8583374000 5409699.9833374000 770882.8858718000 5409723.2302312000 770841.6926597000 5409731.0989627000 770841.7622638000 5409731.4030618000 770841.3583374000 5409731.4833374000 770815.3583374000 5409603.9833374000 770782.3583374000 5409447.4833374000 770775.4085037000 5409420.9713277000 770775.0981389000 5409419.7873576000 770765.4489046000 5409394.3329805000 770759.6368653000 5409382.2525688000 770754.1139616000 5409368.9742365000 770749.5317542000 5409362.5051571000 770711.2403260000 5409304.9640498000 770705.9296875000 5409295.3398438000 770674.5283726000 5409230.1381816000 770658.2644967000 5409202.8249493000 770621.0698450000 5409136.3776008000 770595.2445785000 5409092.0658285000 770577.2324219000 5409063.3349609000 770576.3574219000 5409061.7099609000 770582.1699219000 5409058.1474609000 770595.5449219000 5409051.0224609000 770597.4425616000 5409050.0538338000 770598.7869033000 5409049.3676310000 770600.2221255000 5409048.6313012000 770658.9756529000 5409018.4882911000 770804.1561737000 5408947.0518088000 770807.1686382000 5408944.6619258000 770812.9100036000 5408940.8892626000 770828.7997871000 5408931.5039626000 770830.8633417000 5408929.4740356000 770847.9922487000 5408915.5873359000 770876.5831554000 5408889.1675967000 770906.6553960000 5408861.4860930000 770938.5159861000 5408832.7268398000 770963.4037412000 5408820.6782499000 770988.8582090000 5408807.9509550000 770996.0445896000 5408820.1175380000 771031.3917806000 5408934.8300119000 771069.6699807000 5409062.6755267000 771090.9416874000 5409134.7948519000 771091.3619461000 5409136.2196916000</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+          <gml:interior>
+            <gml:LinearRing>
+              <gml:posList>770775.0981389000 5409419.7873576000 770775.1033531000 5409419.8011126000 770775.0049873000 5409419.4320059000 770775.0981389000 5409419.7873576000</gml:posList>
+            </gml:LinearRing>
+          </gml:interior>
+        </gml:Polygon>
+      </lpis:geometry>
+      <lpis:beginLifespanVersion>2025-02-04T12:56:38.546</lpis:beginLifespanVersion>
+      <lpis:validFrom>2025-01-01</lpis:validFrom>
+    </lpis:AgriculturalArea>
+  </wfs:member>
+</wfs:FeatureCollection>
