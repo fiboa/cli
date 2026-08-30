@@ -45,6 +45,20 @@ class ESCBConverter(EsriRESTConverterMixin, ESBaseConverter):
     rest_base_url = "https://geoservicios.cantabria.es/inspire/rest/services/SIGPAC/MapServer"
     # rest_params = {"where": "USO_SIGPAC NOT IN ('AG','CA','ED','FO','IM','IS','IV','TH','ZC','ZU','ZV','MT')"}
 
+    def migrate(self, gdf):
+        # 2010-2014 are joined layers: fields arrive table-qualified
+        # (SIGPAC_2014_RECFE_ETRS89.PROVINCIA, SIGPAC_2014_ATRRE.USO_SIGPAC).
+        # Strip the prefixes, first occurrence wins (the geometry table leads).
+        if any("." in c for c in gdf.columns):
+            renames = {}
+            for c in gdf.columns:
+                base = c.rsplit(".", 1)[-1]
+                if base not in renames.values() and base not in gdf.columns:
+                    renames[c] = base
+            gdf = gdf.rename(columns=renames)
+            gdf = gdf.loc[:, ~gdf.columns.duplicated()]
+        return super().migrate(gdf)
+
     def rest_layer_filter(self, layers):
         if not self.variant:
             self.variant = next(iter(self.variants))

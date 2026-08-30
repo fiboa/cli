@@ -46,17 +46,40 @@ class EsriRESTConverterMixin:
         layer = self.rest_layer_filter(service_metadata["layers"])
         page_size = service_metadata["maxRecordCount"]
         layer_url = f"{base_url}/{layer['id']}/query"
+        # Joined layers qualify every field with the table name; discover the
+        # real key field before paging on it ("OBJECTID" alone fails there).
+        probe = requests.get(
+            layer_url,
+            {
+                "f": "json",
+                "where": "1=1",
+                "outFields": "*",
+                "resultRecordCount": 1,
+                "returnGeometry": "false",
+            },
+        ).json()
+        attribute = self.rest_attribute
+        if probe.get("features"):
+            names = list(probe["features"][0]["attributes"].keys())
+            attribute = next(
+                (n for n in names if n == self.rest_attribute),
+                next(
+                    (n for n in names if n.endswith("." + self.rest_attribute)), self.rest_attribute
+                ),
+            )
         get_dict = self.rest_params | {
             "outFields": "*",
             "returnGeometry": "true",
             "f": "geojson",
-            "sortBy": self.rest_attribute,
+            # note: the ArcGIS parameter is orderByFields; "sortBy" was ignored
+            # and only worked on layers whose default order is the key anyway
+            "orderByFields": attribute,
             "resultRecordCount": page_size,
         }
         gdfs = []
         last_id = -1
         while True:
-            get_dict["where"] = f"{self.rest_attribute}>{last_id}"
+            get_dict["where"] = f"{attribute}>{last_id}"
             url = f"{layer_url}?{urlencode(get_dict)}"
             if cache_fs is not None:
                 cache_file = os.path.join(
@@ -88,7 +111,7 @@ class EsriRESTConverterMixin:
                 (
                     c
                     for c in data.columns
-                    if c == self.rest_attribute or c.endswith("." + self.rest_attribute)
+                    if c == attribute or c.endswith("." + self.rest_attribute)
                 ),
                 self.rest_attribute,
             )
