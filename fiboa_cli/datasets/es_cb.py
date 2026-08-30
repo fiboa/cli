@@ -35,7 +35,7 @@ class ESCBConverter(EsriRESTConverterMixin, ESBaseConverter):
         }
     }
 
-    variants = {str(year): str(year) for year in range(2024, 2010 - 1, -1)}
+    variants = {str(year): str(year) for year in range(2025, 2010 - 1, -1)}
     use_code_attribute = "USO_SIGPAC"
     use_variant_as_determination = True
 
