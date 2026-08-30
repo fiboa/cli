@@ -286,9 +286,11 @@ def _ensure_hilbert_sorted(
     with pq.ParquetFile(path) as pf:
         table = pf.read()
         metadata = pf.schema_arrow.metadata
+    narrow_schema = table.schema.with_metadata(metadata)
     # int32 offsets of plain binary/string columns overflow when a take()
-    # concatenates >2 GB of chunks (large WKB columns); widen them first.
-    # Parquet's physical BYTE_ARRAY is identical either way.
+    # concatenates >2 GB of chunks (large WKB columns); widen them for the
+    # take, and cast each written batch back so the file keeps its original
+    # schema (Parquet's physical BYTE_ARRAY is identical either way).
     fields = []
     widened = False
     for f in table.schema:
@@ -308,12 +310,18 @@ def _ensure_hilbert_sorted(
     write_kwargs = {"compression": compression}
     if compression_level is not None:
         write_kwargs["compression_level"] = compression_level
-    if row_group_size is not None:
-        write_kwargs["row_group_size"] = row_group_size
-    # store_schema=False: the widened large_* arrow types must not be embedded,
-    # or the rewritten file stops schema-matching untouched siblings on merge
-    # (parquet's physical types are identical either way)
-    pq.write_table(sorted_table, path, store_schema=False, **write_kwargs)
+    # Write batch-wise against the ORIGINAL narrow schema: each batch is far
+    # below the int32 offset limit, so the down-cast is safe, the geo/collection
+    # metadata is preserved, and the rewritten file schema-matches untouched
+    # pre-sorted siblings during merges.
+    step = row_group_size or 131_072
+    writer = pq.ParquetWriter(path, narrow_schema, **write_kwargs)
+    try:
+        for start in range(0, sorted_table.num_rows, step):
+            batch = sorted_table.slice(start, step)
+            writer.write_table(batch.cast(narrow_schema) if widened else batch)
+    finally:
+        writer.close()
     return True
 
 

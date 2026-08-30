@@ -142,6 +142,21 @@ def test_merge_resorts_unsorted_part(tmp_path, capsys):
     rev = tbl.take(list(reversed(range(tbl.num_rows))))
     pq.write_table(rev.cast(tbl.schema), shuffled)
     conv = ESConverter()
+    # resort the shuffled file directly first: the in-place rewrite must
+    # preserve schema metadata and the narrow (non-large) column types
+    from fiboa_cli.conversion.per_file import _ensure_hilbert_sorted
+
+    resorted = _ensure_hilbert_sorted(
+        str(shuffled), "geometry", crs_total_bounds("EPSG:4258"), "zstd", None
+    )
+    assert resorted is True
+    import json as _json
+
+    with pq.ParquetFile(shuffled) as pf:
+        meta = pf.schema_arrow.metadata or {}
+        assert b"geo" in meta and b"collection" in meta
+        _json.loads(meta[b"geo"])
+        assert pf.schema_arrow.equals(pq.ParquetFile(part).schema_arrow, check_metadata=False)
     merged = tmp_path / "merged.parquet"
     conv.merge_files(str(merged), [str(part), str(shuffled)], cleanup_parts=True)
     assert pq.ParquetFile(merged).metadata.num_rows == 2 * tbl.num_rows
