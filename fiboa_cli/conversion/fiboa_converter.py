@@ -24,6 +24,35 @@ class FiboaBaseConverter(BaseConverter):
             # "remove unlisted columns" step of the base converter.
             self.columns = {**self.columns, "determination:datetime": "determination:datetime"}
 
+    def convert(self, *args, **kwargs):
+        self._prewarm_schemas()
+        return super().convert(*args, **kwargs)
+
+    def _prewarm_schemas(self):
+        """Fetch every schema this conversion will need before doing any real
+        work, with retries. The schema hosts (vecorel.org, fiboa.org) fail
+        intermittently; without this, a transient blip after a long source
+        download kills the conversion at the very last step. load_file caches
+        per process, so a successful pre-warm makes the write network-free."""
+        import time
+
+        from vecorel_cli.vecorel.util import load_file
+        from vecorel_cli.vecorel.version import vecorel_version
+
+        uris = set(self.extensions)
+        uris.add(get_fiboa_uri())
+        uris.add(f"https://vecorel.org/specification/v{vecorel_version}/schema.yaml")
+        for uri in sorted(uris):
+            for attempt in range(5):
+                try:
+                    load_file(uri)
+                    break
+                except Exception as e:
+                    if attempt == 4:
+                        raise RuntimeError(f"Cannot load schema {uri} after 5 attempts: {e}") from e
+                    self.warning(f"Schema fetch failed ({uri}), retrying: {str(e)[:100]}")
+                    time.sleep(2**attempt * 2)
+
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
 
