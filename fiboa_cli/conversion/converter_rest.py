@@ -67,57 +67,107 @@ class EsriRESTConverterMixin:
                     (n for n in names if n.endswith("." + self.rest_attribute)), self.rest_attribute
                 ),
             )
+        base_where = self.rest_params.get("where")
+
+        # Page by half-open id windows instead of orderByFields + "id > last":
+        # server-side sorting costs ~100 s per request on joined layers, while a
+        # range filter on the indexed key answers in about a second. The key is
+        # unique, so a window of page_size ids cannot overflow a page; id gaps
+        # only produce empty windows, which are skipped.
+        min_id = self._rest_id_bound(layer_url, attribute, base_where, "ASC")
+        max_id = self._rest_id_bound(layer_url, attribute, base_where, "DESC")
+
         get_dict = self.rest_params | {
             "outFields": "*",
             "returnGeometry": "true",
             "f": "geojson",
-            # note: the ArcGIS parameter is orderByFields; "sortBy" was ignored
-            # and only worked on layers whose default order is the key anyway
-            "orderByFields": attribute,
-            "resultRecordCount": page_size,
         }
-        gdfs = []
-        last_id = -1
-        while True:
-            get_dict["where"] = f"{attribute}>{last_id}"
-            url = f"{layer_url}?{urlencode(get_dict)}"
+        page = 0
+        lo = min_id - 1
+        while lo < max_id:
+            hi = lo + page_size
+            data = None
             if cache_fs is not None:
-                cache_file = os.path.join(
-                    cache_folder, f"{self.id}_{layer['id']}_{last_id}.geojson"
+                data = self._window_from_legacy_cache(
+                    cache_fs, cache_folder, layer["id"], lo, hi, page_size
                 )
-                if not cache_fs.exists(cache_file):
-                    try:
-                        with cache_fs.open(cache_file, mode="wb") as file:
-                            stream_file(source_fs, url, file)
-                    except Exception:
-                        # A download that broke off must not survive as a cached page
-                        if cache_fs.exists(cache_file):
-                            cache_fs.rm(cache_file)
-                        raise
-                url = cache_file
+            if data is None:
+                clause = f"{attribute}>{lo} AND {attribute}<={hi}"
+                get_dict["where"] = f"({base_where}) AND {clause}" if base_where else clause
+                url = f"{layer_url}?{urlencode(get_dict)}"
+                if cache_fs is not None:
+                    cache_file = os.path.join(
+                        cache_folder, f"{self.id}_{layer['id']}_r{lo}.geojson"
+                    )
+                    if not cache_fs.exists(cache_file):
+                        try:
+                            with cache_fs.open(cache_file, mode="wb") as file:
+                                stream_file(source_fs, url, file)
+                        except Exception:
+                            # A download that broke off must not survive as a cached page
+                            if cache_fs.exists(cache_file):
+                                cache_fs.rm(cache_file)
+                            raise
+                    url = cache_file
 
+                try:
+                    data = gpd.read_file(url)
+                except Exception as e:
+                    # An error response from the server must not survive as a cached page
+                    if cache_fs is not None and cache_fs.exists(url):
+                        cache_fs.rm(url)
+                    raise RuntimeError(
+                        f"Could not read ids ({lo} ... {hi}] of {layer_url}: {e}"
+                    ) from e
+
+            lo = hi
+            if len(data) == 0:
+                continue
+            print(f"Read {len(data)} features, page {page} from ids ({hi - page_size} ... {hi}]")
+            page += 1
+            yield data, base_url, base_url, layer["id"]
+
+    def _rest_id_bound(self, layer_url, attribute, base_where, direction):
+        clause = f"{attribute}>-1"
+        response = requests.get(
+            layer_url,
+            {
+                "f": "json",
+                "where": f"({base_where}) AND {clause}" if base_where else clause,
+                "outFields": attribute,
+                "returnGeometry": "false",
+                "orderByFields": f"{attribute} {direction}",
+                "resultRecordCount": 1,
+            },
+        ).json()
+        return int(next(iter(response["features"][0]["attributes"].values())))
+
+    def _window_from_legacy_cache(self, cache_fs, cache_folder, layer_id, lo, hi, page_size):
+        """Pages cached by the old sorted paging are keyed by the previous page's
+        last id. On dense layers they coincide exactly with an id window, so reuse
+        one when its ids prove it covers (lo, hi] completely."""
+        for key in [-1, lo] if lo == 0 else [lo]:
+            path = os.path.join(cache_folder, f"{self.id}_{layer_id}_{key}.geojson")
+            if not cache_fs.exists(path):
+                continue
             try:
-                data = gpd.read_file(url)
-            except Exception as e:
-                # An error response from the server must not survive as a cached page
-                if cache_fs is not None and cache_fs.exists(url):
-                    cache_fs.rm(url)
-                raise RuntimeError(f"Could not read page {len(gdfs)} of {layer_url}: {e}") from e
-            print(
-                f"Read {len(data)} features, page {len(gdfs)} from [{data.iloc[0, 0]} ... {data.iloc[-1, 0]}]"
-            )
-            # joined layers return the field as <table>.<name>
+                data = gpd.read_file(path)
+            except Exception:
+                continue
             id_column = next(
                 (
                     c
                     for c in data.columns
-                    if c == attribute or c.endswith("." + self.rest_attribute)
+                    if c == self.rest_attribute or c.endswith("." + self.rest_attribute)
                 ),
-                self.rest_attribute,
+                None,
             )
-            last_id = data[id_column].values[-1]
-
-            yield data, base_url, base_url, layer["id"]
-
-            if not len(data) >= page_size:
-                break
+            if id_column is None or len(data) == 0:
+                continue
+            ids = data[id_column]
+            covers = (len(data) == page_size and ids.max() == hi) or (
+                len(data) < page_size and ids.max() <= hi
+            )
+            if ids.min() == lo + 1 and covers:
+                return data
+        return None
