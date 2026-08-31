@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Introduce FiboaBaseConverter.use_variant_as_determination for setting proper determination_date
 - Update years for DK (2025, 2026)
 - Update fr-converter to support 2021/2022 files
+- Converter for Baden-Württemberg, Germany (GISELa LPIS reference parcels, 2018-2022)
 - Converter for Lithuania KŽS reference parcels (lt_kzs), reading the geoportal.lt ArcGIS REST service
 - Support Esri JSON and server-side filters in EsriRESTConverterMixin (rest_format, rest_params["where"])
 - Converter for Bavaria, Germany LPIS field blocks (de_by_block)
