@@ -52,6 +52,8 @@ tests = [
     "india_10k",
     "it_1",
     "de_bw",
+    "de_by_block",
+    "de_he",
 ]
 test_path = "tests/data-files/convert"
 
@@ -66,6 +68,7 @@ extra_convert_parameters = {
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
+    "de_he": _input_files("de_he", "de_he.json"),
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
     "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
@@ -73,6 +76,7 @@ extra_convert_parameters = {
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
     "jecam": _input_files("jecam", "BD_JECAM_CIRAD_2023_feb.shp"),
     "de_bw": _input_files("de_bw", "de_bw.json"),
+    "de_by_block": _input_files("de_by_block", "de_by_block.gml"),
 }
 
 
