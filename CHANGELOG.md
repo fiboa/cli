@@ -6,16 +6,36 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
+- 
+- Add DuckDB BaseConverter for efficiently transforming large datasets
+- Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
+- Declare the beautifulsoup4 dependency that the ES-PV and ES-VC converters import
+- EE: name the cached WFS responses (ee_gsaa_<year>.gml)
+- ES-MD: the archive no longer nests RECINTO.shp in a folder
+- SK: KODKD is the (non-unique, sometimes empty) LPIS block code, keep it as block_id and use the row index as id
+- ES-CM: always read the year-named SIGPAC service (the unnamed one moved on to 2025 with a different id field)
+- REST converters: do not keep an error response as a cached page
+- ES-CB: determination date from the variant year (was an empty string, which broke the STAC temporal extent)
+- ES-CAT: the 2024 download is a shapefile package, not a GeoPackage; 34 crop names new in 2024 added to the mapping
+- CZ: find the shapefile in nested archive folders (2026)
+- DE-BB: read the shapefile as cp1252 (its .cpg wrongly says UTF-8)
+- NL: new PDOK download location (rvo/gewaspercelen/atom), add the 2026 concept edition
+- DE-TH: note the INSPIRE download service
+- Drop rows without a crop:code (required by the crop extension) with a warning instead of failing the conversion (BE-VLG 2023, ES-CN had one such row each); more than 1% missing is an error
+- Europe-LAND converters: use crop_name as crop:code when the file's crop_code column is empty (LT 2024)
+- BE-VLG: derive determination:datetime from the variant year instead of a constant date
+- `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It creates GeoParquet, PMTiles and a STAC Collection with relative links, `file:size`/`file:checksum` and a web-map-links v1.3.0 `pmtiles` link. Publishing is done by catalogs such as the [harmonized field data catalog](https://github.com/fieldsoftheworld/harmonized-field-data-catalog).
 - Add Italy Tuscany (IT-1) basd on EuroCrops v2
 - Suuport multiple years for CZ
 - Multiple years for DE_sh
 - Multiple year support for HR
 - Introduce FiboaBaseConverter.use_variant_as_determination for setting proper determination_date
 - Update years for DK (2025, 2026)
+- Converter for Spain (whole), based on the FEGA 2025+ data
 - Update fr-converter to support 2021/2022 files
 - Converter for Bavaria, Germany LPIS field blocks (de_by_block)
 - Converter for Hesse, Germany LPIS reference parcels
+- PerFileBaseConverter: per-file migration and merging the result, decreasing memory requirements for large data sets
 - Update vecorel-cli to v0.2.16:
   - Converter output is sorted by Hilbert distance
   - Commands exit with a non-zero exit code when they report a failure
@@ -32,7 +52,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix the column additions of the determination fields in the AI4SF converter
 - Add HCAT to datasets where possible
 - Updated years & variants for at_crop, be_vlg, es_an, es_cl, es_pv, ie, pt, se
-- Extend create_stac, include include fiboa data
+- Extend create_stac, include fiboa data
 - Publish command; skip hidden files, generate better texts
 - Fix to vecorel: converter.license and provider should be string
 - Added a Dockerfile to simplify working with fiboa

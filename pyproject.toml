@@ -24,7 +24,9 @@ classifiers = [
 requires-python = ">=3.11"
 dependencies = [
     "vecorel-cli==0.2.16",
+    "beautifulsoup4>=4.12",
     "spdx-license-list==3.27.0",
+    "duckdb==1.4.2",
 ]
 
 [project.scripts]
@@ -62,6 +64,7 @@ ruff = "==0.12.8"
 
 [tool.pixi.feature.dev.pypi-dependencies]
 build = ">=1.0.0,<2.0.0"
+spdx-license-list = "==3.27.0"
 
 [tool.pixi.feature.cloud.dependencies]
 s3fs = ">=2025.7.0"

@@ -33,9 +33,10 @@ class EsriRESTConverterMixin:
         return super().download_files(uris, cache_folder)
 
     def get_data(self, paths, **kwargs):
-        if not paths[0].startswith("http"):
-            # This happens when input_file param is used
-            return super().get_data(paths, **kwargs)
+        if isinstance(paths[0], tuple):
+            # (path, uri) pairs from the base downloader: input_file param was used
+            yield from super().get_data(paths, **kwargs)
+            return
 
         base_url = paths[0]  # loop over paths to support more than 1 source
         source_fs = get_fs(base_url)
@@ -45,32 +46,76 @@ class EsriRESTConverterMixin:
         layer = self.rest_layer_filter(service_metadata["layers"])
         page_size = service_metadata["maxRecordCount"]
         layer_url = f"{base_url}/{layer['id']}/query"
+        # Joined layers qualify every field with the table name; discover the
+        # real key field before paging on it ("OBJECTID" alone fails there).
+        probe = requests.get(
+            layer_url,
+            {
+                "f": "json",
+                "where": "1=1",
+                "outFields": "*",
+                "resultRecordCount": 1,
+                "returnGeometry": "false",
+            },
+        ).json()
+        attribute = self.rest_attribute
+        if probe.get("features"):
+            names = list(probe["features"][0]["attributes"].keys())
+            attribute = next(
+                (n for n in names if n == self.rest_attribute),
+                next(
+                    (n for n in names if n.endswith("." + self.rest_attribute)), self.rest_attribute
+                ),
+            )
         get_dict = self.rest_params | {
             "outFields": "*",
             "returnGeometry": "true",
             "f": "geojson",
-            "sortBy": self.rest_attribute,
+            # note: the ArcGIS parameter is orderByFields; "sortBy" was ignored
+            # and only worked on layers whose default order is the key anyway
+            "orderByFields": attribute,
             "resultRecordCount": page_size,
         }
         gdfs = []
         last_id = -1
         while True:
-            get_dict["where"] = f"{self.rest_attribute}>{last_id}"
+            get_dict["where"] = f"{attribute}>{last_id}"
             url = f"{layer_url}?{urlencode(get_dict)}"
             if cache_fs is not None:
                 cache_file = os.path.join(
                     cache_folder, f"{self.id}_{layer['id']}_{last_id}.geojson"
                 )
                 if not cache_fs.exists(cache_file):
-                    with cache_fs.open(cache_file, mode="wb") as file:
-                        stream_file(source_fs, url, file)
+                    try:
+                        with cache_fs.open(cache_file, mode="wb") as file:
+                            stream_file(source_fs, url, file)
+                    except Exception:
+                        # A download that broke off must not survive as a cached page
+                        if cache_fs.exists(cache_file):
+                            cache_fs.rm(cache_file)
+                        raise
                 url = cache_file
 
-            data = gpd.read_file(url)
+            try:
+                data = gpd.read_file(url)
+            except Exception as e:
+                # An error response from the server must not survive as a cached page
+                if cache_fs is not None and cache_fs.exists(url):
+                    cache_fs.rm(url)
+                raise RuntimeError(f"Could not read page {len(gdfs)} of {layer_url}: {e}") from e
             print(
                 f"Read {len(data)} features, page {len(gdfs)} from [{data.iloc[0, 0]} ... {data.iloc[-1, 0]}]"
             )
-            last_id = data[self.rest_attribute].values[-1]
+            # joined layers return the field as <table>.<name>
+            id_column = next(
+                (
+                    c
+                    for c in data.columns
+                    if c == attribute or c.endswith("." + self.rest_attribute)
+                ),
+                self.rest_attribute,
+            )
+            last_id = data[id_column].values[-1]
 
             yield data, base_url, base_url, layer["id"]
 
