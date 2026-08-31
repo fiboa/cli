@@ -43,6 +43,10 @@ geometric area of the polygon.
 
     page_size = 50_000
 
+    # read_geojson calls open() without an encoding, so it follows the platform locale:
+    # UTF-8 on Linux/macOS, cp1252 on Windows, which would turn "Grünland" into mojibake.
+    open_options = dict(encoding="utf-8")
+
     columns = {
         "geometry": "geometry",
         "Geo-ID": "id",
