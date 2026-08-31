@@ -35,9 +35,12 @@ class EsriRESTConverterMixin:
 
     def get_data(self, paths, **kwargs):
         if not (isinstance(paths[0], str) and paths[0].startswith("http")):
-            # This happens when input_file param is used. The pages are read here because
-            # this method is a generator (so it can't return super().get_data()) and the
-            # base implementation parses every .json file as GeoJSON, which Esri JSON isn't.
+            # This happens when the input_file param is used. Pages are read with the same
+            # gpd.read_file() call as the REST branch below, deliberately rather than through
+            # super().get_data(), for two reasons: Esri JSON carries a .json extension but is
+            # not GeoJSON, and the base implementation's read_geojson() injects the GeoJSON
+            # feature id as an "id" property, which collides with the "id" these converters
+            # map from their own attribute. Reading a fixture must match a real run.
             for path, uri in paths:
                 self.info(f"Reading {path} into GeoDataFrame")
                 yield gpd.read_file(path), path, uri, None
