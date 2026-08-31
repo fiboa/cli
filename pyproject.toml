@@ -67,8 +67,8 @@ build = ">=1.0.0,<2.0.0"
 spdx-license-list = "==3.27.0"
 
 [tool.pixi.feature.cloud.dependencies]
-s3fs = "==2025.7.0"
-gcsfs = "==2025.7.0"
+s3fs = ">=2025.7.0"
+gcsfs = ">=2025.7.0"
 
 [tool.pixi.environments]
 default = {solve-group = "default"}
@@ -110,7 +110,7 @@ exclude = [
 line-length = 100
 indent-width = 4
 
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "W", "I", "NPY201"]  # "C901"
