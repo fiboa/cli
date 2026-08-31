@@ -52,6 +52,7 @@ tests = [
     "india_10k",
     "it_1",
     "de_bw",
+    "lt_kzs",
     "de_by_block",
     "de_he",
 ]
@@ -76,6 +77,7 @@ extra_convert_parameters = {
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
     "jecam": _input_files("jecam", "BD_JECAM_CIRAD_2023_feb.shp"),
     "de_bw": _input_files("de_bw", "de_bw.json"),
+    "lt_kzs": _input_files("lt_kzs", "lt_kzs.json"),
     "de_by_block": _input_files("de_by_block", "de_by_block.gml"),
 }
 

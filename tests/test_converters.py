@@ -1,4 +1,8 @@
+from urllib.parse import parse_qs, urlparse
+
+import geopandas as gpd
 import spdx_license_list
+from shapely.geometry import Point
 from vecorel_cli.vecorel.schemas import VecorelSchema
 from vecorel_cli.vecorel.util import load_file
 
@@ -38,6 +42,50 @@ def test_valid_license():
             )
         assert getattr(converter, "license") is None or isinstance(converter.license, str)
         assert getattr(converter, "provider") is None or isinstance(converter.provider, str)
+
+
+def test_rest_query_params(monkeypatch, tmp_folder):
+    """
+    The paging filter must be combined with rest_params["where"] rather than replace it,
+    and rest_format must drive both the "f" parameter and the cached page extension.
+    """
+    # lt_kzs is the converter that sets rest_format="json" and a rest_params["where"]
+    converter = Converters().load("lt_kzs")
+    converter.cache_folder = str(tmp_folder)
+
+    class Response:
+        def json(self):
+            # maxRecordCount above the page length below, so paging stops after one page
+            return {"layers": [{"id": 0}], "maxRecordCount": 1000}
+
+    monkeypatch.setattr(
+        "fiboa_cli.conversion.converter_rest.requests.get", lambda url, params: Response()
+    )
+
+    requested, read = [], []
+    monkeypatch.setattr(
+        "fiboa_cli.conversion.converter_rest.stream_file",
+        lambda fs, uri, file: (requested.append(uri), file.write(b"{}")),
+    )
+
+    def fake_read_file(path, *args, **kwargs):
+        read.append(path)
+        return gpd.GeoDataFrame({"OBJECTID": [1]}, geometry=[Point(0, 0)], crs="EPSG:4326")
+
+    monkeypatch.setattr(gpd, "read_file", fake_read_file)
+
+    list(converter.get_data([converter.rest_base_url]))
+
+    assert len(requested) == 1, "Expected exactly one page"
+    query = parse_qs(urlparse(requested[0]).query)
+    assert query["f"] == ["json"], "rest_format must drive the output format"
+    assert query["outSR"] == ["4326"], "rest_params must survive into the query"
+    assert query["where"] == ["OBJECTID>-1 AND (GKODAS IN ('bl1','bl1b'))"], (
+        "The paging filter must be combined with rest_params['where'], not replace it"
+    )
+    assert read[0].endswith(".json"), (
+        f"rest_format must drive the cached page extension, got {read[0]}"
+    )
 
 
 def test_overriden_base_properties():

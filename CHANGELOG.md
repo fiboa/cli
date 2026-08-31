@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update years for DK (2025, 2026)
 - Update fr-converter to support 2021/2022 files
 - Converter for Baden-Württemberg, Germany (GISELa LPIS reference parcels, 2018-2022)
+- Converter for Lithuania KŽS reference parcels (lt_kzs), reading the geoportal.lt ArcGIS REST service
+- Support Esri JSON and server-side filters in EsriRESTConverterMixin (rest_format, rest_params["where"])
 - Converter for Bavaria, Germany LPIS field blocks (de_by_block)
 - Converter for Hesse, Germany LPIS reference parcels
 - Update vecorel-cli to v0.2.16:
