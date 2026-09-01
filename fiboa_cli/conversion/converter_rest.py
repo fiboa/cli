@@ -1,4 +1,5 @@
 import os
+import re
 from urllib.parse import urlencode
 
 import geopandas as gpd
@@ -82,6 +83,9 @@ class EsriRESTConverterMixin:
             "returnGeometry": "true",
             "f": "geojson",
         }
+        # Layer ids repeat across services (every SIXPAC_<year> MapServer has its
+        # Recintos layer at id 2), so the service must be part of the cache key.
+        service = re.sub(r"\W+", "_", base_url.rstrip("/").split("/rest/services/")[-1])
         page = 0
         lo = min_id - 1
         while lo < max_id:
@@ -97,7 +101,7 @@ class EsriRESTConverterMixin:
                 url = f"{layer_url}?{urlencode(get_dict)}"
                 if cache_fs is not None:
                     cache_file = os.path.join(
-                        cache_folder, f"{self.id}_{layer['id']}_r{lo}.geojson"
+                        cache_folder, f"{self.id}_{service}_{layer['id']}_r{lo}.geojson"
                     )
                     if not cache_fs.exists(cache_file):
                         try:
