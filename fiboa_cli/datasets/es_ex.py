@@ -3,7 +3,7 @@ from datetime import datetime
 
 import requests
 
-from fiboa_cli.datasets.es import ESBaseConverter
+from fiboa_cli.datasets.es_base import ESBaseConverter
 
 
 class EXConverter(ESBaseConverter):

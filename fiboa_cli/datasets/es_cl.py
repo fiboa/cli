@@ -4,7 +4,7 @@ import re
 import requests
 from loguru import logger
 
-from .es import ESBaseConverter
+from .es_base import ESBaseConverter
 
 regex = re.compile(r"\d+_(RECFE|BURGOS).*\.shp$")
 

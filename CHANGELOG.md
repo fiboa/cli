@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Converter for Spain (whole), based on the FEGA 2025+ data
 - Add Italy Tuscany (IT-1) basd on EuroCrops v2
 - Suuport multiple years for CZ
 - Multiple years for DE_sh
