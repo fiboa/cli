@@ -58,7 +58,9 @@ SIXPAC information is relevant to farmers applying for these aid schemes, so tha
                 # 2014 has no surrogate id at all; the SIGPAC recinto reference is the identifier
                 parts = ["PROVINCIA", "MUNICIPIO", "ZONA", "POLIGONO", "PARCELA", "RECINTO"]
                 gdf["DN_OID"] = gdf[parts].astype(int).astype(str).agg("-".join, axis=1)
-        return gdf
+        # ~16k pages of 1000 features are concatenated per edition; the 20 unmapped
+        # attribute columns would otherwise sit in memory until the very end
+        return gdf[[c for c in self.columns if c in gdf.columns]]
 
     def get_urls(self):
         if not self.variant:
