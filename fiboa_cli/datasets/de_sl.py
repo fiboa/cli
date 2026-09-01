@@ -11,7 +11,9 @@ def parse_flik(x):
 
 
 def parse_size(x):
-    match = re.search(r"Size in ha: (\d+(\.\d+)?)+", x, re.I)
+    # Small parcels are written in scientific notation, e.g. "Size in ha: 1.0999999999999999E-4".
+    # Without the exponent the value is read as 1.1 ha instead of 1.1 m², a factor of 10,000.
+    match = re.search(r"Size in ha: (\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)", x, re.I)
     return float(match.group(1)) if match else None
 
 
