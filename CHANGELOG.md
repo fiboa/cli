@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support Esri JSON and server-side filters in EsriRESTConverterMixin (rest_format, rest_params["where"])
 - Converter for Bavaria, Germany LPIS field blocks (de_by_block)
 - Converter for Hesse, Germany LPIS reference parcels
+- Converter for Saxony-Anhalt, Germany LPIS field blocks (de_st)
 - Update vecorel-cli to v0.2.16:
   - Converter output is sorted by Hilbert distance
   - Commands exit with a non-zero exit code when they report a failure
