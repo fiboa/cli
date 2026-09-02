@@ -56,6 +56,7 @@ tests = [
     "lt_kzs",
     "de_by_block",
     "de_sl_block",
+    "de_sl",
     "de_he",
 ]
 test_path = "tests/data-files/convert"
@@ -83,6 +84,7 @@ extra_convert_parameters = {
     "lt_kzs": _input_files("lt_kzs", "lt_kzs.json"),
     "de_by_block": _input_files("de_by_block", "de_by_block.gml"),
     "de_sl_block": _input_files("de_sl_block", "de_sl_block.gml"),
+    "de_sl": _input_files("de_sl", "de_sl.gml"),
 }
 
 

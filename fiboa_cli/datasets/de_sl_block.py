@@ -7,7 +7,19 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 from ..conversion.convert_gml import gml_assure_columns
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.de_iacs import DEIACSMixin
-from .de_sl import parse_flik, parse_size
+
+
+def parse_flik(x):
+    match = re.search(r"flik:\s*([A-Z]{6}\d{10})", x, re.I)
+    return match.group(1) if match else None
+
+
+def parse_size(x):
+    # Small parcels are written in scientific notation, e.g. "Size in ha: 1.0999999999999999E-4".
+    # Without the exponent the value is read as 1.1 ha instead of 1.1 m², a factor of 10,000.
+    match = re.search(r"Size in ha: (\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)", x, re.I)
+    return float(match.group(1)) if match else None
+
 
 BASE_URL = "https://geoportal.saarland.de/gdi-sl/inspirewfs_Bodenbedeckung_LPIS"
 PARAMS = {
