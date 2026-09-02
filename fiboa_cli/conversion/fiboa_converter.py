@@ -42,16 +42,20 @@ class FiboaBaseConverter(BaseConverter):
         uris = set(self.extensions)
         uris.add(get_fiboa_uri())
         uris.add(f"https://vecorel.org/specification/v{vecorel_version}/schema.yaml")
+        attempts = 8
         for uri in sorted(uris):
-            for attempt in range(5):
+            for attempt in range(attempts):
                 try:
                     load_file(uri)
                     break
                 except Exception as e:
-                    if attempt == 4:
-                        raise RuntimeError(f"Cannot load schema {uri} after 5 attempts: {e}") from e
+                    if attempt == attempts - 1:
+                        raise RuntimeError(
+                            f"Cannot load schema {uri} after {attempts} attempts: {e}"
+                        ) from e
                     self.warning(f"Schema fetch failed ({uri}), retrying: {str(e)[:100]}")
-                    time.sleep(2**attempt * 2)
+                    # ~4 min of tolerance: vecorel.org outages have outlasted a 30 s budget
+                    time.sleep(min(2**attempt * 2, 60))
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
@@ -73,6 +77,23 @@ class FiboaBaseConverter(BaseConverter):
                             f"Dropping {int(nulls.sum())} rows without a value for {key} ({src})"
                         )
                         gdf = gdf[~nulls]
+
+        # A null or empty geometry cannot be validated, tiled or Hilbert-sorted
+        # (geopandas refuses hilbert_distance on such a GeoSeries, which fails the
+        # run at the very last step), so drop those rows under the same bounded
+        # rule as the required properties.
+        if gdf.active_geometry_name is not None:
+            geom = gdf.geometry
+            blank = geom.isna() | geom.is_empty
+            if blank.any():
+                share = blank.mean()
+                if share > self.max_dropped_share:
+                    raise ValueError(
+                        f"{int(blank.sum())} of {len(gdf)} rows ({share:.1%}) have an empty or "
+                        f"missing geometry; fix the converter instead of dropping them"
+                    )
+                self.warning(f"Dropping {int(blank.sum())} rows with an empty or missing geometry")
+                gdf = gdf[~blank]
 
         gdf_area_key = next((k for k, v in self.columns.items() if v == AREA_KEY), None)
         if self.area_calculate_missing:
