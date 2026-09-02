@@ -46,6 +46,23 @@ SIXPAC information is relevant to farmers applying for these aid schemes, so tha
     #   2020: no DN_OID, but IDGEOM (the geometry id, unique and never null)
     file_renames = {"SUP_SIGPAC": "DN_SURFACE", "SUP_SIX": "DN_SURFACE", "USO_SIX": "USO_SIGPAC"}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        base_filter = self.column_filters[self.use_code_attribute]
+
+        def code_filter(col):
+            keep = base_filter(col)
+            # Galicia had no MT (matorral) code before the 2023 campaign: scrub was
+            # coded PR (pasto arbustivo), which the base filter keeps as grazing land.
+            # PR is ~23% of features up to 2022 but only ~1% once MT exists, so
+            # keeping it would leave the pre-2023 editions ~75% larger than 2023+
+            # for no real change on the ground. Drop it for those campaigns.
+            if self.variant and int(self.variant) < 2023:
+                keep &= col != "PR"
+            return keep
+
+        self.column_filters = {self.use_code_attribute: code_filter}
+
     def rest_layer_filter(self, layers):
         return next(layer for layer in layers if "recinto" in layer["name"].lower())
 
