@@ -10,7 +10,11 @@ from .commons.ec import EuroCropsConverterMixin
 class Convert(EuroCropsConverterMixin, FiboaBaseConverter):
     ec_mapping_csv = "ee_2021.csv"
     ec_year = 2021
-    sources = "https://zenodo.org/records/14094196/files/EE_2021.zip?download=1"
+    sources = {
+        "https://zenodo.org/records/14094196/files/EE_2021.zip?download=1": [
+            "EE_2021/EE_2021_EC21.shp"
+        ]
+    }
     id = "ec_ee"
     short_name = "Estonia"
     title = "Field boundaries for Estonia"
