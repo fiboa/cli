@@ -54,6 +54,8 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
         "crop:code": "crop:code",
         "crop:name_en": "crop:name_en",
     }
+    # Tells GDAL how the shapefile variants are encoded, since a shapefile does not have to say.
+    # Unrelated to the GeoJSON encoding that vecorel-cli handles, so it is still needed here.
     open_options = dict(encoding="utf-8")
     column_migrations = {
         "campanya": lambda col: pd.to_datetime(col, format="%Y"),

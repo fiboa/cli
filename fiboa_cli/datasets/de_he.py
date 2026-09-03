@@ -40,7 +40,6 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
         "declaredArea": "metrics:area",  # in hectares, hence the area_is_in_ha default
         "validFrom": "determination:datetime",
     }
-    open_options = dict(encoding="utf-8")
     column_migrations = {
         "validFrom": lambda col: pd.to_datetime(col, format="%d.%m.%Y"),
     }
