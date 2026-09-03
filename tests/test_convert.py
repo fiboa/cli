@@ -31,6 +31,7 @@ tests = [
     "nl",
     "nl_block",
     "pt",
+    "pt#2025",
     "dk",
     "be_wal",
     "se",
@@ -69,6 +70,8 @@ def _input_files(converter, *names):
 extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
+    "pt": {"variant": "2023"},
+    "pt#2025": {"variant": "2025"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
@@ -101,11 +104,14 @@ extra_convert_parameters = {
 def test_converter(load_ec_mock, load_hcat_mock, capsys, tmp_parquet_file, converter):
     from fiboa_cli import Registry  # noqa
 
+    # "<id>#<label>" runs a second edition of <id>, from the same folder of input files
+    converter_id = converter.split("#")[0]
+
     def load_ec(csv_file=None, url=None):
         original = (csv_file, url)
         if csv_file and "://" in csv_file:
             csv_file = csv_file.split("/")[-1]
-        path = url if url and "://" not in url else f"{test_path}/{converter}/{csv_file}"
+        path = url if url and "://" not in url else f"{test_path}/{converter_id}/{csv_file}"
         try:
             return list(DictReader(open(path, "r", encoding="utf-8")))
         except FileNotFoundError:
@@ -124,10 +130,10 @@ def test_converter(load_ec_mock, load_hcat_mock, capsys, tmp_parquet_file, conve
     logger.remove()
     logger.add(sys.stdout, format="{message}", level="DEBUG", colorize=False)
 
-    path = f"tests/data-files/convert/{converter}"
+    path = f"{test_path}/{converter_id}"
     kwargs = extra_convert_parameters.get(converter, {})
 
-    ConvertData(converter).convert(target=tmp_parquet_file, cache=path, **kwargs)
+    ConvertData(converter_id).convert(target=tmp_parquet_file, cache=path, **kwargs)
     out, err = capsys.readouterr()
     output = out + err
 
@@ -138,6 +144,6 @@ def test_converter(load_ec_mock, load_hcat_mock, capsys, tmp_parquet_file, conve
     ValidateData().validate(tmp_parquet_file)
 
     df = pq.read_table(tmp_parquet_file).to_pandas()
-    if "metrics:area" in df.columns and converter not in ("de_bb",):
+    if "metrics:area" in df.columns and converter_id not in ("de_bb",):
         # Check for accidental hectare conversion; fields should be more than 10 square meters
         assert (df["metrics:area"] > 10).all()
