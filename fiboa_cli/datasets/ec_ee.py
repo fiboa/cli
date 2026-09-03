@@ -40,7 +40,9 @@ The data comes from ARIB's database of agricultural parcels.
         "taotleja_n": "taotleja_nimi",  # name of applicant
         "taotleja_r": "taotleja_registrikood",  # applicant's registration code
     }
-    column_migrations = {"JAHR": lambda col: pd.to_datetime(col, format="%Y")}
+    # The shapefile truncates taotlusaasta ("application year") to ten characters;
+    # it holds a bare year, which has to become a datetime for the STAC extent.
+    column_migrations = {"taotlusaas": lambda col: pd.to_datetime(col, format="%Y")}
     missing_schemas = {
         "required": [
             "taotletud_kultuur",
