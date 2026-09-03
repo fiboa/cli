@@ -45,13 +45,11 @@ The data comes from ARIB's database of agricultural parcels.
     column_migrations = {"taotlusaas": lambda col: pd.to_datetime(col, format="%Y")}
     missing_schemas = {
         "required": [
-            "taotletud_kultuur",
             "taotletud_maakasutus",
             "viimase_muutmise_aeg",
             "taotleja_nimi",
         ],
         "properties": {
-            "taotletud_kultuur": {"type": "string"},
             "taotletud_maakasutus": {"type": "string"},
             "niitmise_tuvastamise_staatus": {"type": "string"},
             "niitmise_tuvast_ajavahemik": {"type": "string"},
