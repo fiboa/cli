@@ -5,15 +5,20 @@ from .commons.ec import AddHCATMixin
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    BASE = "https://inspire.lfrz.gv.at/009501/ds/"
+    # Each archive holds a single GeoPackage; naming it makes vecorel extract the
+    # zip once. Handing the archive itself to GDAL instead means re-inflating the
+    # deflate stream on every SQLite seek: the 2018 edition read 85 GB out of a
+    # 1.7 GB archive in 40 minutes and had still not finished reading the layer.
     variants = {
-        "2025": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2025-1_polygon.gpkg.zip",
-        "2024": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2024-2_polygon.gpkg.zip",
-        "2023": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2023-2_polygon.gpkg.zip",
-        "2022": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2022_polygon.gpkg.zip",
-        "2021": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2021_polygon.gpkg.zip",
-        "2020": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2020_polygon.gpkg.zip",
-        "2019": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2019_polygon.gpkg.zip",
-        "2018": "https://inspire.lfrz.gv.at/009501/ds/inspire_schlaege_2018_polygon.gpkg.zip",
+        "2025": {BASE + "inspire_schlaege_2025-1_polygon.gpkg.zip": ["*.gpkg"]},
+        "2024": {BASE + "inspire_schlaege_2024-2_polygon.gpkg.zip": ["*.gpkg"]},
+        "2023": {BASE + "inspire_schlaege_2023-2_polygon.gpkg.zip": ["*.gpkg"]},
+        "2022": {BASE + "inspire_schlaege_2022_polygon.gpkg.zip": ["*.gpkg"]},
+        "2021": {BASE + "inspire_schlaege_2021_polygon.gpkg.zip": ["*.gpkg"]},
+        "2020": {BASE + "inspire_schlaege_2020_polygon.gpkg.zip": ["*.gpkg"]},
+        "2019": {BASE + "inspire_schlaege_2019_polygon.gpkg.zip": ["*.gpkg"]},
+        "2018": {BASE + "inspire_schlaege_2018_polygon.gpkg.zip": ["*.gpkg"]},
     }
 
     id = "at"
