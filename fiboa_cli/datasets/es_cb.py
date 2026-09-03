@@ -16,7 +16,7 @@ class ESCBConverter(EsriRESTConverterMixin, ESBaseConverter):
     attribution = (
         "©Government of Cantabria. Free information available at https://mapas.cantabria.es"
     )
-    provider = ""
+    provider = "Gobierno de Cantabria <https://mapas.cantabria.es>"
     columns = {
         "DN_OID": "id",
         "geometry": "geometry",
