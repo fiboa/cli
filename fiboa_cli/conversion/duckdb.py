@@ -233,9 +233,7 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
             self.warning(f"GeoParquet 1.1 post-processing failed: {e}")
 
         # canonical spatial ordering, same grid as the per-file merge
-        from vecorel_cli.vecorel.hilbert import crs_total_bounds
-
-        from .per_file import _ensure_hilbert_sorted
+        from .per_file import _ensure_hilbert_sorted, hilbert_reference_bounds
 
         with pq.ParquetFile(output_file) as pf:
             meta = pf.schema_arrow.metadata or {}
@@ -243,10 +241,13 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
             geo = json.loads(meta[b"geo"])
             primary = geo["primary_column"]
             crs = geo["columns"][primary].get("crs") or "EPSG:4326"
-            if _ensure_hilbert_sorted(
+            bounds = hilbert_reference_bounds(crs, geo["columns"][primary].get("bbox"))
+            if bounds is None:
+                self.warning("CRS declares no area of use; skipping spatial ordering")
+            elif _ensure_hilbert_sorted(
                 output_file,
                 primary,
-                crs_total_bounds(crs),
+                bounds,
                 compression,
                 None,
                 row_group_size=50_000,

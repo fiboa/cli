@@ -214,9 +214,8 @@ class Publish(BaseCommand):
         import json as _json
 
         import pyarrow.parquet as _pq
-        from vecorel_cli.vecorel.hilbert import crs_total_bounds
 
-        from .conversion.per_file import _ensure_hilbert_sorted
+        from .conversion.per_file import _ensure_hilbert_sorted, hilbert_reference_bounds
 
         with _pq.ParquetFile(parquet_file) as pf:
             meta = pf.schema_arrow.metadata or {}
@@ -226,10 +225,17 @@ class Publish(BaseCommand):
         geo = _json.loads(meta[b"geo"])
         primary = geo["primary_column"]
         crs = geo["columns"][primary].get("crs") or "EPSG:4326"
+        bounds = hilbert_reference_bounds(crs, geo["columns"][primary].get("bbox"))
+        if bounds is None:
+            self.warning(
+                f"{parquet_file}: CRS declares no area of use and the file no bbox; "
+                "skipping spatial ordering"
+            )
+            return
         if _ensure_hilbert_sorted(
             str(parquet_file),
             primary,
-            crs_total_bounds(crs),
+            bounds,
             "zstd",
             None,
             row_group_size=self.ROW_GROUP_SIZE,

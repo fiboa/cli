@@ -168,9 +168,12 @@ class PerFileBaseConverter(FiboaBaseConverter):
             )
 
         # Same Hilbert reference grid that the upstream sort used.
-        from vecorel_cli.vecorel.hilbert import crs_total_bounds
-
-        total_bounds = crs_total_bounds(crs)
+        total_bounds = hilbert_reference_bounds(crs, merged_bbox)
+        if total_bounds is None:
+            raise ValueError(
+                f"Cannot order {output_file}: its CRS declares no area of use and the "
+                "parts carry no bbox to fall back on"
+            )
 
         # Verify each part is Hilbert-sorted; sort in place if not. With a
         # vecorel-cli that already Hilbert-sorts, this is a fast no-op read.
@@ -257,6 +260,26 @@ def _hilbert_keys_for_table(table: pa.Table, primary_col: str, total_bounds) -> 
 
     bounds = _bounds_array_for_table(table, primary_col)
     return hilbert_distances_from_bounds(bounds, total_bounds)
+
+
+def hilbert_reference_bounds(crs, fallback=None):
+    """The CRS's own reference extent for the Hilbert grid, or ``fallback``.
+
+    ``crs_total_bounds`` derives a dataset-independent grid from the CRS's area
+    of use, so parts converted separately sort into the same order. A CRS given
+    as a bare projection definition has no area of use to derive it from —
+    Austria's 2018 edition ships an unnamed "MGI / Austria Lambert" that pyproj
+    cannot match to an EPSG code — and there the data's own extent orders the
+    file just as well; only mergeability with separately converted parts is
+    lost. Returns None when neither is available, leaving the caller to decide
+    whether that is fatal.
+    """
+    from vecorel_cli.vecorel.hilbert import crs_total_bounds
+
+    try:
+        return crs_total_bounds(crs)
+    except ValueError:
+        return tuple(fallback) if fallback else None
 
 
 def _ensure_hilbert_sorted(
