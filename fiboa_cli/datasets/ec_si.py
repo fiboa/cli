@@ -31,7 +31,8 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     }
 
     missing_schemas = {
-        "required": ["gerk_pid", "crop_type_class", "rastlina", "crop_lat_e", "color"],
+        # crop_lat_e is not required: four parcels in the 2021 release have no Latin name.
+        "required": ["gerk_pid", "crop_type_class", "rastlina", "color"],
         "properties": {
             "gerk_pid": {"type": "uint64"},
             "crop_type_class": {"type": "string"},
