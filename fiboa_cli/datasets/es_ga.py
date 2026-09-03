@@ -4,7 +4,7 @@ from fiboa_cli.datasets.es_base import ESBaseConverter
 
 class ESGAConverter(EsriRESTConverterMixin, ESBaseConverter):
     id = "es_ga"
-    short_name = "Spain "
+    short_name = "Spain Galicia"
     title = "Spain Galicia Crop fields"
     description = """
 **Galician Crop Fields**: The Geographic Information System for Agricultural Plots (SIXPAC) is an official reference database for the identification of agricultural plots, which is mandatory in Spain for making applications for direct CAP aid that require declaring surface areas.

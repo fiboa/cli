@@ -8,7 +8,7 @@ from fiboa_cli.datasets.es_base import ESBaseConverter
 
 class ESCMConverter(EsriRESTConverterMixin, ESBaseConverter):
     id = "es_cm"
-    short_name = "Spain "
+    short_name = "Spain Castilla-La Mancha"
     title = "Spain Castilla-La Mancha Crop fields"
     description = """
 SIGPAC is a Geographic Information System dedicated to the control of agricultural aid under
