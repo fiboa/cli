@@ -25,7 +25,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Converter for Bavaria, Germany LPIS field blocks (de_by_block)
 - Converter for Hesse, Germany LPIS reference parcels
 - Converter for Saarland, Germany LPIS field blocks (de_sl_block)
-- Fix parcel sizes written in scientific notation being read 10,000x too large (de_sl parser)
+- Fix parcel sizes written in scientific notation being read 10,000x too large (de_sl_block parser)
+- Repair the Saarland, Germany converter (de_sl), which could no longer read its source at all.
+  It now pages through the whole dataset, where the previous six hardcoded bounding boxes reached
+  only 20,300 of 54,038 parcels, so earlier output was incomplete. `metrics:area` is derived from
+  the geometry, because the service stopped publishing the declared size.
 - Update vecorel-cli to v0.2.16:
   - Converter output is sorted by Hilbert distance
   - Commands exit with a non-zero exit code when they report a failure
