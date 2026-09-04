@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Commands exit with a non-zero exit code when they report a failure
   - Collection-only properties are kept when merging collections
   - Default GeoParquet compression is now zstd (level 15), configurable via `--compression_level`
+- DE-SH: make the 2023, 2025 and 2026 editions convert — glob the GeoPackage inside the archive (2023 was written with user_version = 0, so the archive alone matches no driver), parse fachguelti as DD.MM.YYYY, and map the 2023 and upper-case 2025/2026 column spellings that silently dropped determination:datetime and metrics:area (their area is text with a decimal comma)
 
 ## [v0.21.0] - 2026-02-16
 
