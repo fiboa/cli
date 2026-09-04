@@ -1,3 +1,4 @@
+import json
 import re
 import sys
 from csv import DictReader
@@ -98,6 +99,25 @@ extra_convert_parameters = {
 }
 
 
+# Columns a converter must actually deliver.
+#
+# An optional column goes missing silently: the source spelling drifts between
+# editions, the mapping stops matching, the base converter warns once ("Column
+# 'X' not found in dataset, removing from schema") and validation still passes
+# because the field is optional. That is exactly how de_sh published a 2026
+# edition carrying neither determination:datetime nor metrics:area.
+#
+# A value that is constant across the whole edition is written once into the
+# collection metadata rather than as a column, so both places count as
+# delivered -- de_sh's 2026 fixture is a single campaign date.
+#
+# Keyed like extra_convert_parameters, so "<id>#<label>" can state a different
+# expectation per edition where the editions genuinely differ.
+expected_columns = {
+    "de_sh": ("determination:datetime", "metrics:area", "flik", "hbn", "id"),
+}
+
+
 @mark.parametrize("converter", tests)
 @patch("fiboa_cli.datasets.commons.hcat.load_ec_mapping")
 @patch("fiboa_cli.datasets.commons.ec.load_ec_mapping")
@@ -144,6 +164,17 @@ def test_converter(load_ec_mock, load_hcat_mock, capsys, tmp_parquet_file, conve
     ValidateData().validate(tmp_parquet_file)
 
     df = pq.read_table(tmp_parquet_file).to_pandas()
+
+    required = expected_columns.get(converter)
+    if required:
+        metadata = pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata or {}
+        constants = json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+        missing = [c for c in required if c not in df.columns and constants.get(c) is None]
+        assert not missing, (
+            f"{converter} dropped {missing}: absent from the schema and from the "
+            f"collection metadata. Produced columns: {sorted(df.columns)}"
+        )
+
     if "metrics:area" in df.columns and converter_id not in ("de_bb",):
         # Check for accidental hectare conversion; fields should be more than 10 square meters
         assert (df["metrics:area"] > 10).all()
