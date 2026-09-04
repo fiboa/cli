@@ -59,6 +59,7 @@ tests = [
     "de_sl",
     "de_he",
     "de_st",
+    "it_bz",
 ]
 test_path = "tests/data-files/convert"
 
@@ -87,6 +88,7 @@ extra_convert_parameters = {
     "de_st": _input_files("de_st", "de_st.json"),
     "de_sl_block": _input_files("de_sl_block", "de_sl_block.gml"),
     "de_sl": _input_files("de_sl", "de_sl.gml"),
+    "it_bz": _input_files("it_bz", "it_bz.json"),
 }
 
 

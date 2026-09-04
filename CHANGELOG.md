@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   It now pages through the whole dataset, where the previous six hardcoded bounding boxes reached
   only 20,300 of 54,038 parcels, so earlier output was incomplete. `metrics:area` is derived from
   the geometry, because the service stopped publishing the declared size.
+- Converter for South Tyrol, Italy (it_bz), reading the province's LAFIS utilised agricultural area
 - Update vecorel-cli to v0.2.16:
   - Converter output is sorted by Hilbert distance
   - Commands exit with a non-zero exit code when they report a failure
