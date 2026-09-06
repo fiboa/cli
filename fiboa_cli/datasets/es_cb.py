@@ -9,12 +9,16 @@ class ESCBConverter(EsriRESTConverterMixin, ESBaseConverter):
     short_name = "Spain Cantabria"
     title = "Spain Cantabria Crop fields"
     description = "SIGPAC Crop fields of Spain - Cantabria"
-    # https://www.caib.es/sites/M170613081930629/f/463418
-    # see https://intranet.caib.es/opendatacataleg/dataset/sigpac-2024/resource/3a0bc2e0-3f37-45b7-a7d4-1e8c7cf09bc8
-    # "Our licenses allow the reproduction or redistribution of the licensed digital information to third parties. In such cases, it is essential that when redistributing or transferring the data to said third parties, they clearly and explicitly accept the conditions of our non-commercial use license."
-    license = "CC-BY-NC-4.0"  # http://www.opendefinition.org/licenses/cc-by
+    # Cantabria does not license its cartography under Creative Commons. Decreto
+    # 87/2013 (modified by Decreto 102/2018) defines two licences of its own, both
+    # free of charge: a non-commercial one and a commercial one, the latter needed
+    # only for reselling the data. The Esri service names no licence at all, only
+    # "Gobierno de Cantabria-FEGA" as copyright holder.
+    # https://www.territoriodecantabria.es/cartografia-sig/descargas-y-politica-de-licencias/preguntas-frecuentes
+    license = "Licencia de uso de datos del Gobierno de Cantabria (Decreto 87/2013) <https://www.territoriodecantabria.es/cartografia-sig/datos-abiertos-y-politica-de-licencias>"
+    # The wording the licence requires for original data, verbatim.
     attribution = (
-        "©Government of Cantabria. Free information available at https://mapas.cantabria.es"
+        "© Gobierno de Cantabria. Información gratuita disponible en https://mapas.cantabria.es"
     )
     provider = "Gobierno de Cantabria <https://mapas.cantabria.es>"
     columns = {
