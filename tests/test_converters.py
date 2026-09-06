@@ -56,3 +56,14 @@ def test_overriden_base_properties():
                 assert s == converter_properties[property], (
                     "Converter {converter} overrides schema for base property {property}"
                 )
+
+
+def test_every_converter_maps_an_id():
+    """
+    Nothing downstream enforces `id`: columns without a mapping are dropped, so a
+    converter that never names one writes a valid file without the identifier
+    every collection needs. de_bb and sk were published that way.
+    """
+    c = Converters()
+    for _id in Converters().list_ids():
+        c.load(_id)._require_id_mapping()

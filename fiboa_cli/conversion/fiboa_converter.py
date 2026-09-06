@@ -25,8 +25,32 @@ class FiboaBaseConverter(BaseConverter):
             self.columns = {**self.columns, "determination:datetime": "determination:datetime"}
 
     def convert(self, *args, **kwargs):
+        self._require_id_mapping()
         self._prewarm_schemas()
         return super().convert(*args, **kwargs)
+
+    def _require_id_mapping(self):
+        """Fail before converting when nothing will end up as `id`.
+
+        Every collection needs the identifier, and nothing downstream enforces
+        it: the base converter drops columns no mapping names, so a converter
+        without one simply writes a file without `id` and validates. That is
+        how de_bb and sk reached the catalog without it, and sk shows the
+        subtler half — `index_as_id = True` fills the column and the same drop
+        step removes it again, because `columns` never named it. A converter
+        with no natural key sets both `index_as_id` and `"id": "id"`.
+        """
+        targets = set()
+        for value in list(self.columns.values()) + list(self.column_additions or {}):
+            targets.update(value if isinstance(value, (list, tuple)) else [value])
+        if "id" not in targets:
+            hint = (
+                ' — `index_as_id = True` is set, so add \'"id": "id"\' to columns'
+                if getattr(self, "index_as_id", False)
+                else " — map a unique source column to it, or set index_as_id = True"
+                ' and add \'"id": "id"\' to columns'
+            )
+            raise ValueError(f"{type(self).__name__} maps no column to 'id'{hint}")
 
     def _prewarm_schemas(self):
         """Fetch every schema this conversion will need before doing any real

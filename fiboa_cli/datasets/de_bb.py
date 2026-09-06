@@ -17,7 +17,11 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # The .cpg claims UTF-8 but the DBF is cp1252 (June 2026 download)
     open_options = dict(encoding="cp1252")
 
+    # ref_ident is a field block reference and gp_xx repeats across rows, so
+    # neither identifies a parcel; the row index does, per edition.
+    index_as_id = True
     columns = {
+        "id": "id",
         "geometry": "geometry",
         "ref_ident": "farmer_id",
         "groesse": "metrics:area",

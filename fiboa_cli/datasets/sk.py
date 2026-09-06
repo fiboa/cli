@@ -31,6 +31,7 @@ Dataset Hranice užívania contains the use declared by applicants for direct su
     # the row index is the field id and the code is kept as block_id.
     index_as_id = True
     columns = {
+        "id": "id",
         "geometry": "geometry",
         "KODKD": "block_id",
         "PLODINA": "crop:name",
