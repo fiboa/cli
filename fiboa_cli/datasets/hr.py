@@ -31,8 +31,6 @@ and supporting sustainable land use practices.
     )
 
     license = "Prostorni podaci i servisi <https://www.apprrr.hr/prostorni-podaci-servisi/>"
-    index_as_id = True
-
     column_migrations = {"land_use_id": lambda col: col.astype(int)}
 
     columns = {
@@ -68,14 +66,12 @@ and supporting sustainable land use practices.
     ec_mapping_csv = "hr_2020.csv"
 
     missing_schemas = {
-        "required": [
-            "mines_status",
-            "water_protect_zone",
-            "natura2000",
-            "sanitary_protection_zone",
-            "irrigation",
-            "jpaid",
-        ],
+        # Nothing here is required. The editions carry different subsets — the
+        # 2011 archive has 17 of these columns, 2023 has 25, jpaid appears only
+        # in the current one — and the columns that do exist are often empty:
+        # 2011 leaves mines_status null for 909k of its 1.29M parcels and
+        # water_protect_zone and natura2000 null for 1.00M.
+        "required": [],
         "properties": {
             "land_use_id": {"type": "integer"},
             "home_name": {"type": "string"},
@@ -106,3 +102,12 @@ and supporting sustainable land use practices.
     area_is_in_ha = False
     area_calculate_missing = True
     use_variant_as_determination = True
+
+    def migrate(self, gdf):
+        # The dated archives carry ARKOD's own parcel id, unique per edition and
+        # stable enough to follow a parcel across years — the reason to prefer it
+        # over a row number. The rolling land_parcels.gpkg ships no identifier at
+        # all, so there the row index is all there is.
+        if "id" not in gdf.columns:
+            gdf["id"] = gdf.index
+        return super().migrate(gdf)
