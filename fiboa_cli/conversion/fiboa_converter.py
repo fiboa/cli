@@ -26,8 +26,25 @@ class FiboaBaseConverter(BaseConverter):
 
     def convert(self, *args, **kwargs):
         self._require_id_mapping()
+        self._require_one_source_of_urls()
         self._prewarm_schemas()
         return super().convert(*args, **kwargs)
+
+    def _require_one_source_of_urls(self):
+        """Fail when both `sources` and `variants` are declared.
+
+        The base converter takes `sources` when it is set and ignores the
+        variants entirely, so `--variant 2011` silently converts whatever
+        `sources` points at. hr declared both and would have published thirteen
+        copies of the current file under thirteen different years. A converter
+        that inherits variants it does not want says so with `variants = {}`.
+        """
+        if self.sources and self.variants:
+            raise ValueError(
+                f"{type(self).__name__} declares both sources and variants; sources wins "
+                "and every --variant would convert the same file. Drop sources, or set "
+                "variants = {} when the inherited ones do not apply."
+            )
 
     def _require_id_mapping(self):
         """Fail before converting when nothing will end up as `id`.

@@ -67,3 +67,13 @@ def test_every_converter_maps_an_id():
     c = Converters()
     for _id in Converters().list_ids():
         c.load(_id)._require_id_mapping()
+
+
+def test_no_converter_declares_both_sources_and_variants():
+    """
+    `sources` wins over `variants` in the base converter, so a converter with
+    both converts the same file whatever --variant asks for — silently.
+    """
+    c = Converters()
+    for _id in Converters().list_ids():
+        c.load(_id)._require_one_source_of_urls()
