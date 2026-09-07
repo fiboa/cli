@@ -17,22 +17,21 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # The .cpg claims UTF-8 but the DBF is cp1252 (June 2026 download)
     open_options = dict(encoding="cp1252")
 
-    # ref_ident is a field block reference and gp_xx repeats across rows, so
-    # neither identifies a parcel; the row index does, per edition.
+    # ref_ident holds the FLIK, the field block identifier: 16 characters of
+    # DE + BB + LI (Landwirtschaft/InVeKoS) + capture year + district + sequence,
+    # e.g. DEBBLI0268030574. It is not a farmer, which is what it used to be
+    # mapped to; several fields share one block, and gp_xx repeats across rows
+    # too, so neither identifies a parcel and the row index is the id.
+    extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
     index_as_id = True
     columns = {
         "id": "id",
         "geometry": "geometry",
-        "ref_ident": "farmer_id",
+        "ref_ident": "flik",
         "groesse": "metrics:area",
         "guelt_von": "determination:datetime",
         "code_bez": "crop:name",
         "code": "crop:code",
-    }
-    missing_schemas = {
-        "properties": {
-            "farmer_id": {"type": "string"},
-        }
     }
     # todo: The dataset has null values for crop code, but the crop extension
     # requires a string. We set them to empty strings for now,
