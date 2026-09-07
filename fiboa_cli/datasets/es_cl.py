@@ -26,7 +26,11 @@ Free use of the data is permitted, but commercial exploitation is prohibited.
     license = "CC-NC: Free use of the data is permitted, but commercial exploitation is prohibited <http://ftp.itacyl.es/cartografia/LICENCIA-IGCYL-NC-2012.pdf>"
 
     columns = {
-        "DN_OID": "id",
+        # DN_OID is 0 in every row of every province; C_REFREC is SIGPAC's own
+        # 23-character recinto reference (province, municipality, agregado, zona,
+        # polígono, parcela, recinto), which identifies the field and follows it
+        # across editions.
+        "C_REFREC": "id",
         "geometry": "geometry",
         "USO_SIGPAC": "crop:code",
         "crop:name": "crop:name",

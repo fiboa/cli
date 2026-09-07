@@ -31,19 +31,18 @@ CSB represents non-confidential single crop field boundaries over a set time fra
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     provider = "United States Department of Agriculture <https://www.nass.usda.gov>"
     license = "License and Liability <https://gee-community-catalog.org/projects/csb/#license-and-liability>"
+    # The dissolve below merges every CSB polygon of one crop within a state into
+    # a single geometry and splits it again, so an output field is not a source
+    # CSB. Columns that survived it through `aggfunc="first"` — CSBID, CNTY —
+    # describe an arbitrary member of the group, not the field they end up on, so
+    # neither is published: CSBID gave 3,093 distinct ids to 7.5 million fields.
     columns = {
         "geometry": "geometry",
-        "CSBID": "id",
+        "id": "id",
         # "CDL2023": "crop:code", will be added in migrate
         "crop:name": "crop:name",
-        "CNTY": "administrative_area_level_2",
     }
     use_variant_as_determination = True
-    missing_schemas = {
-        "properties": {
-            "administrative_area_level_2": {"type": "string"},
-        }
-    }
     ec_mapping_csv = "https://fiboa.org/code/us/usda/cropland.csv"
 
     def migrate(self, gdf):
@@ -75,4 +74,8 @@ CSB represents non-confidential single crop field boundaries over a set time fra
             int(e["original_code"]): e["original_name"] for e in self.ec_mapping
         }
         gdf["crop:name"] = gdf[crop_key].map(original_name_mapping)
+
+        # Number the dissolved fields: nothing from the source identifies them.
+        gdf = gdf.reset_index(drop=True)
+        gdf["id"] = gdf.index.astype(str)
         return gdf

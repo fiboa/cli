@@ -18,10 +18,14 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
     provider = "Finnish Food Authority <https://www.ruokavirasto.fi/en/about-us/open-information/spatial-data-sets/>"
     attribution = "Finnish Food Authority"
     license = "CC-BY-4.0"
+    # A peruslohko (basic parcel) is the reference parcel and holds one or more
+    # kasvulohko, the growing parcels this dataset describes: PERUSLOHKOTUNNUS
+    # repeats once per growing parcel (91 distinct over 100 sampled rows), so the
+    # field is identified by the pair, and the basic parcel is the block.
     columns = {
         "geometry": "geometry",
-        "PERUSLOHKOTUNNUS": "id",
-        "LOHKONUMERO": "block_id",
+        "id": "id",
+        "PERUSLOHKOTUNNUS": "block_id",
         "area": "metrics:area",
         "VUOSI": "determination:datetime",
         "KASVIKOODI": "crop:code",
@@ -31,6 +35,11 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
         # Make year (1st January) from column "VUOSI"
         "VUOSI": lambda col: pd.to_datetime(col, format="%Y"),
     }
+
+    def migrate(self, gdf):
+        gdf["id"] = gdf["PERUSLOHKOTUNNUS"].astype(str) + ":" + gdf["LOHKONUMERO"].astype(str)
+        return super().migrate(gdf)
+
     ec_mapping_csv = "https://fiboa.org/code/fi/fi_2023.csv"
 
     area_is_in_ha = False
@@ -38,6 +47,7 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
 
     missing_schemas = {
         "properties": {
-            "block_id": {"type": "int64"},
+            # PERUSLOHKOTUNNUS keeps its leading zeros ("0040000372")
+            "block_id": {"type": "string"},
         }
     }

@@ -20,7 +20,7 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     license = "CC0-1.0"
     columns = {
         "geometry": "geometry",
-        "Marknr": "id",
+        "id": "id",
         "IMK_areal": "metrics:area",
         "Afgkode": "crop:code",
         "Afgroede": "crop:name",
@@ -28,6 +28,13 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     use_variant_as_determination = True
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
+        # Marknr numbers a field within one application, so on its own it repeats
+        # across holdings — 38 of 100 sampled 2026 rows shared one. Journalnr, the
+        # application it belongs to, makes it unique. Neither carries across
+        # editions: a new application number is issued every year, and the source
+        # offers nothing that does.
+        gdf["id"] = gdf["Journalnr"].astype(str) + ":" + gdf["Marknr"].astype(str)
+
         if "Afgkode" in gdf.columns:
             gdf["Afgkode"] = gdf["Afgkode"].astype(float).fillna(value=0).astype(int).astype(str)
         # the 2008 and 2009 editions carry no crop columns (boundaries only)

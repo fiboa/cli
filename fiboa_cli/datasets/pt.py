@@ -42,8 +42,11 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     license = "No conditions apply <https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply>"
     columns = {
         "geometry": "geometry",
-        "OSA_ID": "id",
-        "CUL_ID": "block_id",
+        # CUL_ID identifies the crop parcel and is unique across every layer of
+        # both editions (3,568,852 of 3,568,852 in 2025); OSA_ID is the land
+        # occupation polygon it lies in, which several parcels can share.
+        "CUL_ID": "id",
+        "OSA_ID": "block_id",
         "CUL_CODIGO": "crop:code",
         # The crop name is only published up to 2023; from 2025 the code is all there is.
         "CT_português": "crop:name",

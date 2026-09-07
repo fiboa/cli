@@ -46,6 +46,33 @@ class FiboaBaseConverter(BaseConverter):
                 "variants = {} when the inherited ones do not apply."
             )
 
+    def _require_unique_ids(self, gdf):
+        """Fail when the column that becomes `id` does not identify a field.
+
+        fiboa asks for one identifier per field, and the catalog documents `id`
+        as unique within an edition, but nothing measured it: es_cl published
+        9,109,136 fields whose id was the string "0", us_usda_cropland mapped a
+        group id shared by thousands of fields, and every converter that reads
+        several files and sets `index_as_id` repeated the same index once per
+        file. This runs before geometries are exploded, so it judges what the
+        converter assigned rather than the split parts of one source feature.
+        """
+        source = next((k for k, v in self.columns.items() if v == "id"), None)
+        column = source if source in gdf.columns else ("id" if "id" in gdf.columns else None)
+        if column is None:
+            return
+        ids = gdf[column]
+        if ids.is_unique:
+            return
+        duplicated = int(len(ids) - ids.nunique())
+        worst = ids.value_counts().iloc[0]
+        raise ValueError(
+            f"{type(self).__name__}: '{column}' is not unique — {duplicated:,} of {len(ids):,} "
+            f"rows repeat an id (one appears {worst:,} times), so it cannot be `id`. Map a column "
+            "that identifies a field, build one from the source's key columns, or use the row "
+            "index (index_as_id) only when the conversion reads a single file."
+        )
+
     def _require_id_mapping(self):
         """Fail before converting when nothing will end up as `id`.
 
@@ -100,6 +127,7 @@ class FiboaBaseConverter(BaseConverter):
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
+        self._require_unique_ids(gdf)
 
         # post_migrate runs before columns are renamed, so look up the source column
         for key in REQUIRED_NON_NULL:
