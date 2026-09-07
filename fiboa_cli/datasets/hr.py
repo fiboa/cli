@@ -102,7 +102,19 @@ and supporting sustainable land use practices.
     area_calculate_missing = True
     use_variant_as_determination = True
 
+    # The current edition declares HTRS96 / Croatia TM; the archives leave
+    # gpkg_geometry_columns.srs_id at 0 ("Undefined geographic SRS") although
+    # their coordinates are the same projected metres — 264979..731547 E maps
+    # onto Croatia from EPSG:3765 and nowhere else.
+    ARCHIVE_CRS = "EPSG:3765"
+
     def migrate(self, gdf):
+        if gdf.crs is None or gdf.crs.to_epsg() is None:
+            # Left undeclared, the bogus geographic CRS reaches the STAC extent as
+            # projected metres, and the Hilbert grid spans the whole globe while
+            # the data sits in one cell of it.
+            gdf = gdf.set_crs(self.ARCHIVE_CRS, allow_override=True)
+
         # The dated archives carry ARKOD's own parcel id, unique per edition and
         # stable enough to follow a parcel across years — the reason to prefer it
         # over a row number. The rolling land_parcels.gpkg ships no identifier at
