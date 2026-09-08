@@ -1,3 +1,5 @@
+import pandas as pd
+import pytest
 import spdx_license_list
 from vecorel_cli.vecorel.schemas import VecorelSchema
 from vecorel_cli.vecorel.util import load_file
@@ -77,3 +79,16 @@ def test_no_converter_declares_both_sources_and_variants():
     c = Converters()
     for _id in Converters().list_ids():
         c.load(_id)._require_one_source_of_urls()
+
+
+def test_unique_id_check_ignores_missing_ids():
+    """
+    A row without an id is dropped downstream under a bounded rule, so it is not
+    a repeat: counting nulls as repeats rejected es_cl's C_REFREC, which
+    identifies every one of the 13,022,051 recintos that carries it.
+    """
+    converter = Converters().load("es_cl")
+    converter._require_unique_ids(pd.DataFrame({"C_REFREC": ["a", "b", None, None]}))
+
+    with pytest.raises(ValueError, match="2 of 3 rows repeat an id"):
+        converter._require_unique_ids(pd.DataFrame({"C_REFREC": ["a", "a", "a", None]}))

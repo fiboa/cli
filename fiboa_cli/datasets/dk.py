@@ -29,11 +29,23 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         # Marknr numbers a field within one application, so on its own it repeats
-        # across holdings — 38 of 100 sampled 2026 rows shared one. Journalnr, the
-        # application it belongs to, makes it unique. Neither carries across
-        # editions: a new application number is issued every year, and the source
-        # offers nothing that does.
-        gdf["id"] = gdf["Journalnr"].astype(str) + ":" + gdf["Marknr"].astype(str)
+        # across holdings — 38 of 100 sampled 2026 rows shared one. From 2014 the
+        # source names the application (Journalnr) and the pair identifies a
+        # field; where the application is missing (70 of 599,008 rows in 2015,
+        # the worst edition) the id is left empty and the row is dropped
+        # downstream, rather than every such row sharing an id of "nan".
+        #
+        # The older editions name the applicant instead — Ansoeger until 2011,
+        # KUNDE_LB in 2012 and 2013 — and that pair genuinely repeats: 5,124 keys
+        # cover 11,534 of the 678,347 fields of 2008, mostly distinct polygons of
+        # distinct size. Nothing there identifies a field, so the row index does,
+        # which is safe because an edition is one file. Neither form carries
+        # across editions: a new application number is issued every year.
+        if "Journalnr" in gdf.columns:
+            key = gdf["Journalnr"].astype(str) + ":" + gdf["Marknr"].astype(str)
+            gdf["id"] = key.where(gdf["Journalnr"].notna() & gdf["Marknr"].notna())
+        else:
+            gdf["id"] = gdf.index
 
         if "Afgkode" in gdf.columns:
             gdf["Afgkode"] = gdf["Afgkode"].astype(float).fillna(value=0).astype(int).astype(str)

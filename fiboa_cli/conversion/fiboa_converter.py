@@ -56,16 +56,22 @@ class FiboaBaseConverter(BaseConverter):
         several files and sets `index_as_id` repeated the same index once per
         file. This runs before geometries are exploded, so it judges what the
         converter assigned rather than the split parts of one source feature.
+
+        A missing id is a different failure, dropped under a bounded rule a few
+        lines below, so it is not counted here: es_cl's C_REFREC identifies all
+        13,022,051 recintos except the 20 that carry none, and reading those as
+        repeats rejected a perfectly good identifier.
         """
         source = next((k for k, v in self.columns.items() if v == "id"), None)
         column = source if source in gdf.columns else ("id" if "id" in gdf.columns else None)
         if column is None:
             return
-        ids = gdf[column]
+        ids = gdf[column].dropna()
         if ids.is_unique:
             return
-        duplicated = int(len(ids) - ids.nunique())
-        worst = ids.value_counts().iloc[0]
+        counts = ids.value_counts()
+        duplicated = int(len(ids) - len(counts))
+        worst = int(counts.iloc[0])
         raise ValueError(
             f"{type(self).__name__}: '{column}' is not unique — {duplicated:,} of {len(ids):,} "
             f"rows repeat an id (one appears {worst:,} times), so it cannot be `id`. Map a column "

@@ -33,6 +33,7 @@ tests = [
     "pt",
     "pt#2025",
     "dk",
+    "dk#2008",
     "be_wal",
     "se",
     "ai4sf",
@@ -72,6 +73,9 @@ extra_convert_parameters = {
     "nl": {"variant": "2023"},
     "pt": {"variant": "2023"},
     "pt#2025": {"variant": "2025"},
+    # 2008 stands for the editions before 2014: no crop columns, and no
+    # application number to make Marknr identify a field, so `id` is the row index
+    "dk#2008": {"variant": "2008"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
