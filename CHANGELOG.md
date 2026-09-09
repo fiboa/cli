@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - 
+- PT: add the 2020, 2021 and 2022 editions — the sub-parcel geometry ships as eight or nine regional files in four projections, so each is reprojected to WGS 84 before they are merged; the crop code is C1 on the layer in 2022 and joined in from a separate table (validated one-to-one) in 2020 and 2021; the layer filter is chosen per edition, so 2021's geometry-less `Culturas_2021` table cannot be selected; where no CUL_ID is published the land occupation identifies the field and its parcel is the block; 2020's crop table stops at the mainland, so its island fields carry no crop code
 - Add DuckDB BaseConverter for efficiently transforming large datasets
 - Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
 - Declare the beautifulsoup4 dependency that the ES-PV and ES-VC converters import

@@ -1,3 +1,4 @@
+import json
 import re
 import sys
 from csv import DictReader
@@ -32,6 +33,9 @@ tests = [
     "nl_block",
     "pt",
     "pt#2025",
+    "pt#2022",
+    "pt#2021",
+    "pt#2020",
     "dk",
     "dk#2008",
     "be_wal",
@@ -73,6 +77,9 @@ extra_convert_parameters = {
     "nl": {"variant": "2023"},
     "pt": {"variant": "2023"},
     "pt#2025": {"variant": "2025"},
+    "pt#2022": {"variant": "2022"},
+    "pt#2021": {"variant": "2021"},
+    "pt#2020": {"variant": "2020"},
     # 2008 stands for the editions before 2014: no crop columns, and no
     # application number to make Marknr identify a field, so `id` is the row index
     "dk#2008": {"variant": "2008"},
@@ -99,6 +106,72 @@ extra_convert_parameters = {
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
     "jecam": _input_files("jecam", "BD_JECAM_CIRAD_2023_feb.shp"),
     "de_by_block": _input_files("de_by_block", "de_by_block.gml"),
+}
+
+
+# Columns a converter must actually deliver.
+#
+# An optional column goes missing silently: the source spelling drifts between
+# editions, the mapping stops matching, the base converter warns once ("Column
+# 'X' not found in dataset, removing from schema") and validation still passes
+# because the field is optional. That is exactly how de_sh published a 2026
+# edition carrying neither determination:datetime nor metrics:area.
+#
+# A value that is constant across the whole edition is written once into the
+# collection metadata rather than as a column, so both places count as
+# delivered.
+#
+# Keyed like extra_convert_parameters, so "<id>#<label>" can state a different
+# expectation per edition where the editions genuinely differ.
+expected_columns = {
+    "de_sh": ("determination:datetime", "metrics:area", "flik", "hbn", "id"),
+    # 2023 is the only pt edition that publishes a crop name.
+    "pt": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "crop:name",
+        "block_id",
+        "id",
+    ),
+    "pt#2025": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    # 2020-2022 reach every target by a different route than 2023 and 2025 do: the
+    # crop code is renamed from C1 (2020 and 2021 join it in from a separate table),
+    # the identifiers are copied off the land occupation, and both metrics are
+    # measured rather than read. crop:name is not listed because no edition after
+    # 2023 publishes one -- the published 2025 has none either.
+    "pt#2022": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    "pt#2021": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    "pt#2020": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
 }
 
 
@@ -148,6 +221,31 @@ def test_converter(load_ec_mock, load_hcat_mock, capsys, tmp_parquet_file, conve
     ValidateData().validate(tmp_parquet_file)
 
     df = pq.read_table(tmp_parquet_file).to_pandas()
+
+    required = expected_columns.get(converter)
+    if required:
+        metadata = pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata or {}
+        constants = (
+            json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+        )
+        missing = [c for c in required if c not in df.columns and constants.get(c) is None]
+        assert not missing, (
+            f"{converter} dropped {missing}: absent from the schema and from the "
+            f"collection metadata. Produced columns: {sorted(df.columns)}"
+        )
+    # An identifier that arrives as a float stringifies as "2315738.0": unique,
+    # valid, and silently wrong. pt types its ids as floats from 2025 on, and the
+    # cast that fixes it was removable without any test noticing. Checked for the
+    # converters listed above, opt-in like the rest of that table -- `at` and
+    # `at_block` currently publish ids in this shape and need fixing first.
+    if required and "id" in df.columns:
+        floaty = df["id"].astype("string").str.fullmatch(r"-?\d+\.0*")
+        floaty = floaty.fillna(False)
+        assert not floaty.any(), (
+            f"{converter}: {int(floaty.sum()):,} id(s) are stringified floats, "
+            f"e.g. {df.loc[floaty, 'id'].head(3).tolist()}"
+        )
+
     if "metrics:area" in df.columns and converter_id not in ("de_bb",):
         # Check for accidental hectare conversion; fields should be more than 10 square meters
         assert (df["metrics:area"] > 10).all()
