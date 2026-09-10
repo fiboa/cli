@@ -46,6 +46,13 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
     # cp1252 on them would silently mangle any accented crop name.
     CP1252_EDITIONS = {"2020"}
 
+    def layer_filter(self, layer, uri):
+        # The 2026 GeoPackage carries a QGIS "layer_styles" table beside the
+        # parcels. Its single row was read as a field, kept an index of its own
+        # and so repeated an id; it only stayed out of the published file
+        # because the empty-geometry guard dropped it afterwards.
+        return layer != "layer_styles"
+
     def read_data(self, paths, **kwargs):
         if self.variant in self.CP1252_EDITIONS:
             kwargs["encoding"] = "cp1252"
