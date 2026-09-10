@@ -62,10 +62,25 @@ class FiboaBaseConverter(BaseConverter):
         13,022,051 recintos except the 20 that carry none, and reading those as
         repeats rejected a perfectly good identifier.
         """
-        source = next((k for k, v in self.columns.items() if v == "id"), None)
-        column = source if source in gdf.columns else ("id" if "id" in gdf.columns else None)
+        sources = [
+            k
+            for k, v in self.columns.items()
+            if "id" in (v if isinstance(v, (list, tuple)) else [v])
+        ]
+        column = next(
+            (c for c in sources if c in gdf.columns), "id" if "id" in gdf.columns else None
+        )
         if column is None:
-            return
+            # The mapping exists (convert() checks that) but the data does not
+            # carry it, and the unlisted-column drop then writes a file without
+            # `id` that validates: si published its 2019 edition that way,
+            # because that campaign names the field POLJINA_ID and every later
+            # one names it ID.
+            raise ValueError(
+                f"{type(self).__name__}: none of the columns mapped to 'id' "
+                f"({', '.join(sources) or 'none'}) is in this source; it has "
+                f"{', '.join(sorted(gdf.columns)[:12])}"
+            )
         ids = gdf[column].dropna()
         if ids.is_unique:
             return

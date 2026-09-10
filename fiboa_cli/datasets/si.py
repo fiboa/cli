@@ -38,18 +38,27 @@ around 150 different crop categories.
             gdf = gdf.set_crs(self.SLOVENE_GRID)
         return super().migrate(gdf)
 
+    # The campaigns do not agree on their column names. 2019 carries only
+    # GERK_PID, POLJINA_ID and SIFRA_KMRS — it names the field POLJINA_ID where
+    # every later campaign names it ID, and it has neither an area nor a crop
+    # name. 2020 spells the Latin crop name CROP_LATIN, 2021 onwards CROP_LAT_E.
+    # Each edition carries exactly one of each pair.
     columns = {
         "geometry": "geometry",
         "ID": "id",
+        "POLJINA_ID": "id",
         "GERK_PID": "block_id",
         "AREA": "metrics:area",
         "SIFRA_KMRS": "crop:code",
         "RASTLINA": "crop:name",
         "CROP_LAT_E": "crop:name_en",
+        "CROP_LATIN": "crop:name_en",
     }
     ec_mapping_csv = "https://fiboa.org/code/si/si.csv"
     column_migrations = {"geometry": lambda col: col.make_valid()}
     area_is_in_ha = False
+    # 2019 publishes no area at all, so it is computed from the geometry
+    area_calculate_missing = True
     missing_schemas = {
         "properties": {
             "block_id": {"type": "uint64"},
