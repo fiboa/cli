@@ -98,7 +98,12 @@ The anonymized version is distributed as part of the public service for making r
     # The 2018 code list does not cover the codes RPG added later, and the
     # editions we publish run to 2024: MLC, MLF, HPC and ACP alone account for
     # 37,011 fields of the 2024 edition.
-    ec_mapping_supplements = ["fr_other_years.csv"]
+    ec_mapping_supplements = [
+        "fr_other_years.csv",
+        # Codes neither EuroCrops table carries, mapped from the sibling code
+        # each one has there: JAC (jachère) alone is 604,122 fields of 2024.
+        "https://fiboa.org/code/fr/fr_supplement.csv",
+    ]
     use_variant_as_determination = True
 
     columns = {
