@@ -77,6 +77,8 @@ extra_convert_parameters = {
     # application number to make Marknr identify a field, so `id` is the row index
     "dk#2008": {"variant": "2008"},
     "fi": {"variant": "2023"},
+    # the fixture archive holds the 2024 edition only; the published one holds both
+    "lt": {"variant": "2024"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
