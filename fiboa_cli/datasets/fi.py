@@ -4,9 +4,18 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
+# The Finnish Food Authority publishes one file per year under /data/<year>/, all
+# with the same name, so the cache name has to carry the year. 2020 is the first
+# year served and 2025 the last; 2019 and 2026 answer 403.
+BASE = "https://download.inspire.ruokavirasto-awsa.com/data"
+FILE = "LandUse.ExistingLandUse.GSAAAgriculturalParcel.gpkg"
+
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
-    sources = "https://download.inspire.ruokavirasto-awsa.com/data/2023/LandUse.ExistingLandUse.GSAAAgriculturalParcel.gpkg"
+    variants = {
+        str(year): {f"{BASE}/{year}/{FILE}": f"fi_gsaa_{year}.gpkg"}
+        for year in range(2025, 2019, -1)
+    }
     id = "fi"
     short_name = "Finland"
     title = "Finnish Crop Fields (Maatalousmaa)"

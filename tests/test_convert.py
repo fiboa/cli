@@ -76,6 +76,7 @@ extra_convert_parameters = {
     # 2008 stands for the editions before 2014: no crop columns, and no
     # application number to make Marknr identify a field, so `id` is the row index
     "dk#2008": {"variant": "2008"},
+    "fi": {"variant": "2023"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
