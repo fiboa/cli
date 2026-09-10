@@ -9,7 +9,8 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         str(year): {
             f"https://rkg.gov.si/razno/portal_analysis/KMRS_{year}.rar": [f"KMRS_{year}.shp"]
         }
-        for year in range(2024, 2020, -1)
+        # rkg.gov.si keeps KMRS_<year>.rar for 2019 onwards; 2018 and 2025 are 404
+        for year in range(2024, 2018, -1)
     }
     id = "si"
     short_name = "Slovenia"
