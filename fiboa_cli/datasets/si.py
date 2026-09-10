@@ -26,6 +26,18 @@ around 150 different crop categories.
 
     license = "Javno dostopni podatki: Publicly available data <https://rkg.gov.si/vstop/>"
 
+    # KMRS_2021.rar ships the shapefile without a .prj, so its geometries arrive
+    # naive and the conversion stops at the first transform. Every other campaign
+    # declares EPSG:3794 (Slovenia 1996 / Slovene National Grid), and 2021 covers
+    # the same ground in the same numbers: 377373..622579 easting against 2020's
+    # 377373..622579.
+    SLOVENE_GRID = "EPSG:3794"
+
+    def migrate(self, gdf):
+        if gdf.crs is None:
+            gdf = gdf.set_crs(self.SLOVENE_GRID)
+        return super().migrate(gdf)
+
     columns = {
         "geometry": "geometry",
         "ID": "id",
