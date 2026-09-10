@@ -55,7 +55,15 @@ around 150 different crop categories.
         "CROP_LATIN": "crop:name_en",
     }
     ec_mapping_csv = "https://fiboa.org/code/si/si.csv"
-    column_migrations = {"geometry": lambda col: col.make_valid()}
+    column_migrations = {
+        "geometry": lambda col: col.make_valid(),
+        # The KMRS code list is zero-padded to three digits ("005"), and 2020
+        # stores those codes without their leading zeros: 120,000 of its 819,620
+        # rows (14.66%) matched nothing in the crop table, while every other
+        # campaign matched everything. None of the unpadded codes ("5", "6",
+        # "20", "13", ...) appears in any other edition.
+        "SIFRA_KMRS": lambda col: col.astype(str).str.strip().str.zfill(3),
+    }
     area_is_in_ha = False
     # 2019 publishes no area at all, so it is computed from the geometry
     area_calculate_missing = True
