@@ -39,6 +39,18 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
     attribution = "Bron: Dept. LV"
     license = "Licentie modellicentie-gratis-hergebruik/v1.0 <https://data.vlaanderen.be/id/licentie/modellicentie-gratis-hergebruik/v1.0>"
 
+    # The 2020 GeoPackage holds a byte sequence no UTF-8 decoder accepts (0xEF at
+    # position 6 of a value), so reading it the normal way dies before the first
+    # row arrives; cp1252 reads it, and costs nothing because every other value
+    # in the file is ASCII. The other campaigns decode as UTF-8, and forcing
+    # cp1252 on them would silently mangle any accented crop name.
+    CP1252_EDITIONS = {"2020"}
+
+    def read_data(self, paths, **kwargs):
+        if self.variant in self.CP1252_EDITIONS:
+            kwargs["encoding"] = "cp1252"
+        return super().read_data(paths, **kwargs)
+
     # the 2026 "agpa" edition renamed every column to English
     RENAMES_2026 = {
         "reference_id": "REF_ID",
