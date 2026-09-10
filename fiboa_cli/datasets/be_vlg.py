@@ -66,7 +66,16 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
         "area_ha": "GRAF_OPP",
     }
 
+    # Flanders publishes in Lambert 72. The 2020 snapshot leaves its GeoPackage
+    # SRS at "Undefined geographic SRS" while holding those metres, which puts
+    # projected coordinates in the STAC extent (rashid PTL-BBX-001 caught
+    # 258615.94 as an east longitude) and builds the Hilbert grid from a global
+    # geographic extent, leaving every parcel in one cell of it.
+    LAMBERT_72 = "EPSG:31370"
+
     def migrate(self, gdf):
+        if gdf.crs is None or gdf.crs.to_epsg() is None:
+            gdf = gdf.set_crs(self.LAMBERT_72, allow_override=True)
         if "maincrop_code" in gdf.columns:
             gdf = gdf.rename(columns=self.RENAMES_2026)
             if "BT_OMSCH" not in gdf.columns:  # no farm-typology column any more
