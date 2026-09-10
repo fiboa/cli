@@ -7,10 +7,12 @@ PREFIX = "https://www.landbouwvlaanderen.be/bestanden/gis/"
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    # Every archive holds exactly one GeoPackage, but its name is not the name of
+    # the archive: 2020 ships "Landbouwgebruikspercelen2020_igb15-05_uitgebreid_
+    # (toestand_19-03-2021).gpkg" inside "Landbouwgebruikspercelen_2020_uitgebreid_
+    # toestand_19-03-2021_GPKG.zip". Glob for it instead of deriving it.
     variants = {
-        str(k): {
-            PREFIX + v: [v.replace("_GPKG.zip", ".gpkg") if v.endswith("_GPKG.zip") else "*.gpkg"]
-        }
+        str(k): {PREFIX + v: ["*.gpkg"]}
         for k, v in (
             (2026, "agpa_2026_2026-06-02_public.zip"),
             (2025, "Landbouwgebruikspercelen_2025_-_Voorlopig_(extractie_02-06-2025)_GPKG.zip"),
