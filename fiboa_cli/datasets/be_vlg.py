@@ -52,11 +52,20 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
                 gdf["BT_OMSCH"] = None
         return super().migrate(gdf)
 
+    # REF_ID references the parcel, and a row is one crop declared on it, so it
+    # repeats whenever a parcel carries more than one: 183 references cover 367
+    # of the 515,747 rows of 2018, some with two different crops on the same
+    # geometry (winter barley and winter wheat on 414623668, both 0.6238 ha),
+    # some with the same crop twice. It is published as `block_id`, and the row
+    # index does the identifying — safe here because an edition is one layer of
+    # one file.
+    index_as_id = True
     columns = {
         "geometry": "geometry",
+        "id": "id",
         "BT_OMSCH": "typology",
         "GRAF_OPP": "metrics:area",
-        "REF_ID": "id",
+        "REF_ID": "block_id",
         "GWSCOD_H": "crop:code",
         "GWSNAM_H": "crop:name",
     }
@@ -65,4 +74,9 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
     use_variant_as_determination = True
     ec_mapping_csv = "be_vlg_2021.csv"
 
-    missing_schemas = {"properties": {"typology": {"type": "string"}}}
+    missing_schemas = {
+        "properties": {
+            "typology": {"type": "string"},
+            "block_id": {"type": "string"},
+        }
+    }
