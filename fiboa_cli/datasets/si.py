@@ -7,7 +7,9 @@ from .commons.hcat import AddHCATMixin
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
         str(year): {
-            f"https://rkg.gov.si/razno/portal_analysis/KMRS_{year}.rar": [f"KMRS_{year}.shp"]
+            # 2019 nests the shapefile in a KMRS_2019/ folder, the others keep it
+            # at the root of the archive
+            f"https://rkg.gov.si/razno/portal_analysis/KMRS_{year}.rar": [f"**/KMRS_{year}.shp"]
         }
         # rkg.gov.si keeps KMRS_<year>.rar for 2019 onwards; 2018 and 2025 are 404
         for year in range(2024, 2018, -1)
