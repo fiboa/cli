@@ -18,6 +18,12 @@ class AddHCATMixin:
     """
 
     ec_mapping_csv: Optional[str] = None  # TODO rename to hcat_mapping_csv
+    # Tables that fill gaps in the main one. EuroCrops splits some countries in
+    # two — fr_2018.csv holds the code list of that campaign and
+    # fr_other_years.csv the codes that appeared later — and a converter that
+    # names only the first leaves every later code unmapped. Rows here win over
+    # the main table where both carry a code.
+    ec_mapping_supplements: list[str] = []
     mapping_file = None
     ec_mapping: Optional[list[dict]] = None  # TODO rename to hcat_mapping
 
@@ -62,6 +68,8 @@ class AddHCATMixin:
 
             if self.ec_mapping is None:
                 self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+                for supplement in self.ec_mapping_supplements:
+                    self.ec_mapping = self.ec_mapping + load_ec_mapping(supplement)
 
             from_code = "original_code"
             if from_code not in self.ec_mapping[0]:

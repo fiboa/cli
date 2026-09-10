@@ -95,6 +95,10 @@ The anonymized version is distributed as part of the public service for making r
     attribution = "IGN - Original data from https://geoservices.ign.fr/rpg"
     license = "Licence Ouverte / Open Licence <https://etalab.gouv.fr/licence-ouverte-open-licence>"
     ec_mapping_csv = "fr_2018.csv"
+    # The 2018 code list does not cover the codes RPG added later, and the
+    # editions we publish run to 2024: MLC, MLF, HPC and ACP alone account for
+    # 37,011 fields of the 2024 edition.
+    ec_mapping_supplements = ["fr_other_years.csv"]
     use_variant_as_determination = True
 
     columns = {
