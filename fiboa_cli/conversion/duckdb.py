@@ -14,6 +14,38 @@ from vecorel_cli.encoding.geojson import VecorelJSONEncoder
 from .fiboa_converter import FiboaBaseConverter
 
 
+def normalize_pa_field(field: pa.Field) -> pa.Field:
+    return pa.field(
+        field.name, normalize_pa_type(field.type), nullable=field.nullable, metadata=field.metadata
+    )
+
+
+def normalize_pa_type(dtype: pa.DataType) -> pa.DataType:
+    """
+    Convert Arrow types to the canonical types required by the Vecorel SDL / fiboa,
+    e.g. large_string -> string, large_binary -> binary, timestamps -> timestamp[ms, UTC].
+    """
+    if pa.types.is_large_string(dtype) or pa.types.is_string_view(dtype):
+        return pa.string()
+    if pa.types.is_large_binary(dtype) or pa.types.is_binary_view(dtype):
+        return pa.binary()
+    if pa.types.is_timestamp(dtype):
+        # naive timestamps are assumed to be in UTC
+        return pa.timestamp("ms", tz="UTC")
+    if (
+        pa.types.is_list(dtype)
+        or pa.types.is_large_list(dtype)
+        or pa.types.is_list_view(dtype)
+        or pa.types.is_large_list_view(dtype)
+    ):
+        return pa.list_(normalize_pa_field(dtype.value_field))
+    if pa.types.is_struct(dtype):
+        return pa.struct([normalize_pa_field(dtype.field(i)) for i in range(dtype.num_fields)])
+    if pa.types.is_map(dtype):
+        return pa.map_(normalize_pa_type(dtype.key_type), normalize_pa_type(dtype.item_type))
+    return dtype
+
+
 # This converter is experimental, use with caution.
 # Results may not be fully fiboa compliant yet.
 # Use this primarily for datasets that are too large to be processed by the default converter
@@ -130,92 +162,101 @@ class FiboaDuckDBBaseConverter(FiboaBaseConverter):
         )
 
         # Post-process the written Parquet to proper GeoParquet v1.1 with bbox and nullability
+        tmp_path = None
         try:
-            pq_file = pq.ParquetFile(output_file)
-
-            existing_schema = pq_file.schema_arrow
-            col_names = existing_schema.names
-            assert "geometry" in col_names, "Missing geometry column in output parquet file"
-
-            schemas = collection.merge_schemas({})
-            collection_only = {k for k, v in schemas.get("collection", {}).items() if v}
-            required_columns = {"geometry"} | {
-                r
-                for r in schemas.get("required", [])
-                if r in col_names and r not in collection_only
-            }
-            if "id" in col_names:
-                required_columns.add("id")
-
-            # Update for version 1.1.0
-            metadata = existing_schema.metadata
-            if geoparquet_version > "1.0.0":
-                geo_meta = json.loads(existing_schema.metadata[b"geo"])
-                geo_meta["version"] = geoparquet_version
-                metadata[b"geo"] = json.dumps(geo_meta).encode("utf-8")
-
-            # Build a new Arrow schema with adjusted nullability
-            new_fields = []
-            for field in existing_schema:
-                if field.name in required_columns and field.nullable:
-                    new_fields.append(
-                        pa.field(field.name, field.type, nullable=False, metadata=field.metadata)
-                    )
-                else:
-                    new_fields.append(field)
-
-            add_bbox = geoparquet_version > "1.0.0" and "bbox" not in col_names
-            if add_bbox:
-                new_fields.append(
-                    pa.field(
-                        "bbox",
-                        pa.struct(
-                            [
-                                ("xmin", pa.float64()),
-                                ("ymin", pa.float64()),
-                                ("xmax", pa.float64()),
-                                ("ymax", pa.float64()),
-                            ]
-                        ),
-                    )
-                )
-            new_schema = pa.schema(new_fields, metadata=metadata)
-
-            # 7) Streamingly rewrite the file to a temp file and replace atomically
-            with NamedTemporaryFile(
-                "wb", delete=False, dir=os.path.dirname(output_file), suffix=".parquet"
-            ) as tmp:
-                tmp_path = tmp.name
-
-            writer = pq.ParquetWriter(
-                tmp_path,
-                new_schema,
-                compression=compression,
-                use_dictionary=True,
-                write_statistics=True,
-            )
-            try:
-                bbox_names = ["ymax", "xmax", "ymin", "xmin"]
-                for rg in range(pq_file.num_row_groups):
-                    tbl = pq_file.read_row_group(rg)
-                    if add_bbox:
-                        # determine bounds, change to StructArray type
-                        bounds = from_wkb(tbl["geometry"]).bounds
-                        bbox_array = StructArray.from_arrays(
-                            np.rot90(bounds),
-                            names=bbox_names,
-                        )
-                        tbl = tbl.append_column("bbox", bbox_array)
-                    # Ensure table adheres to the new schema (mainly nullability); cast if needed
-                    if tbl.schema != new_schema:
-                        # Align field order/types; this does not materialize data beyond the batch
-                        tbl = tbl.cast(new_schema, safe=False)
-                    writer.write_table(tbl)
-            finally:
-                writer.close()
-
+            # The reader must be closed before the temp file can replace the output file
+            # (on Windows, replacing a file that is still open fails)
+            with pq.ParquetFile(output_file) as pq_file:
+                tmp_path = self._rewrite(pq_file, output_file, collection, geoparquet_version, compression)
             os.replace(tmp_path, output_file)
         except Exception as e:
+            if tmp_path and os.path.exists(tmp_path):
+                os.unlink(tmp_path)
             self.warning(f"GeoParquet 1.1 post-processing failed: {e}")
 
         return output_file
+
+    # Rewrites the Parquet file to a temp file and returns its path
+    def _rewrite(self, pq_file, output_file, collection, geoparquet_version, compression) -> str:
+        existing_schema = pq_file.schema_arrow
+        col_names = existing_schema.names
+        assert "geometry" in col_names, "Missing geometry column in output parquet file"
+
+        schemas = collection.merge_schemas({})
+        collection_only = {k for k, v in schemas.get("collection", {}).items() if v}
+        required_columns = {"geometry"} | {
+            r for r in schemas.get("required", []) if r in col_names and r not in collection_only
+        }
+        if "id" in col_names:
+            required_columns.add("id")
+
+        # Update for version 1.1.0
+        metadata = existing_schema.metadata
+        if geoparquet_version > "1.0.0":
+            geo_meta = json.loads(existing_schema.metadata[b"geo"])
+            geo_meta["version"] = geoparquet_version
+            metadata[b"geo"] = json.dumps(geo_meta).encode("utf-8")
+
+        # Build a new Arrow schema with normalized data types and adjusted nullability
+        new_fields = []
+        for field in existing_schema:
+            new_fields.append(
+                pa.field(
+                    field.name,
+                    normalize_pa_type(field.type),
+                    nullable=field.nullable and field.name not in required_columns,
+                    metadata=field.metadata,
+                )
+            )
+
+        add_bbox = geoparquet_version > "1.0.0" and "bbox" not in col_names
+        if add_bbox:
+            new_fields.append(
+                pa.field(
+                    "bbox",
+                    pa.struct(
+                        [
+                            ("xmin", pa.float64()),
+                            ("ymin", pa.float64()),
+                            ("xmax", pa.float64()),
+                            ("ymax", pa.float64()),
+                        ]
+                    ),
+                )
+            )
+        new_schema = pa.schema(new_fields, metadata=metadata)
+
+        # Streamingly rewrite the file to a temp file
+        with NamedTemporaryFile(
+            "wb", delete=False, dir=os.path.dirname(output_file), suffix=".parquet"
+        ) as tmp:
+            tmp_path = tmp.name
+
+        writer = pq.ParquetWriter(
+            tmp_path,
+            new_schema,
+            compression=compression,
+            use_dictionary=True,
+            write_statistics=True,
+        )
+        try:
+            bbox_names = ["ymax", "xmax", "ymin", "xmin"]
+            for rg in range(pq_file.num_row_groups):
+                tbl = pq_file.read_row_group(rg)
+                if add_bbox:
+                    # determine bounds, change to StructArray type
+                    bounds = from_wkb(tbl["geometry"]).bounds
+                    bbox_array = StructArray.from_arrays(
+                        np.rot90(bounds),
+                        names=bbox_names,
+                    )
+                    tbl = tbl.append_column("bbox", bbox_array)
+                # Ensure table adheres to the new schema (types, nullability); cast if needed
+                if tbl.schema != new_schema:
+                    # Align field order/types; this does not materialize data beyond the batch
+                    tbl = tbl.cast(new_schema, safe=False)
+                writer.write_table(tbl)
+        finally:
+            writer.close()
+
+        return tmp_path
