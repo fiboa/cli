@@ -1,0 +1,12 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+JAC,Jachère (terre arable),Fallow (arable land),fallow_land_not_crop,3301110000
+FVP,Féverole de printemps,Spring faba bean,beans,3301020100
+AAR,Autre plante aromatique herbacée non pérenne (< 5 ans),Other non-perennial herbaceous aromatic plant,unspecified_aromatic_medicinal_culinary_plants_spices_herbs,3301061298
+ARP,Plante aromatique arbustive ou arborée,Shrub or tree aromatic plant,unspecified_aromatic_medicinal_culinary_plants_spices_herbs,3301061298
+AME,Plante médicinale et à parfum herbacée,Herbaceous medicinal and perfume plant,unspecified_aromatic_medicinal_culinary_plants_spices_herbs,3301061298
+PME,Plante médicinale pérenne,Perennial medicinal plant,unspecified_aromatic_medicinal_culinary_plants_spices_herbs,3301061298
+PRF,Plante à parfum pérenne,Perennial perfume plant,unspecified_aromatic_medicinal_culinary_plants_spices_herbs,3301061298
+PEV,Pépinière (plants laissés en place),Nursery (plants left in place),nurseries_nursery,3303070000
+SAG,Roselière,Reed bed,not_known_and_other,3399000000
+CAH,Autre céréale ou pseudo-céréale d'hiver,Other winter cereal or pseudo-cereal,winter_unspecified_cereals,3301011501
+MCS,Autre céréale ou pseudo-céréale de printemps,Other spring cereal or pseudo-cereal,spring_unspecified_cereals,3301011502
