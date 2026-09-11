@@ -1,9 +1,4 @@
-import csv
-from io import StringIO
-
-from vecorel_cli.vecorel.util import load_file
-
-from fiboa_cli.datasets.commons.hcat import AddHCATMixin
+from fiboa_cli.datasets.commons.hcat import AddHCATMixin, ec_url, load_ec_mapping  # noqa: F401
 
 
 class EuroCropsConverterMixin(AddHCATMixin):
@@ -34,16 +29,3 @@ class EuroCropsConverterMixin(AddHCATMixin):
         provider = "EuroCrops <https://github.com/maja601/EuroCrops>"
         self.provider = (f"{self.provider}, {provider}") if self.provider else provider
         self.license = "CC-BY-SA-4.0"
-
-
-def ec_url(csv_file):
-    return f"https://raw.githubusercontent.com/maja601/EuroCrops/refs/heads/main/csvs/country_mappings/{csv_file}"
-
-
-def load_ec_mapping(csv_file=None, url=None):
-    if not (csv_file or url):
-        raise ValueError("Either csv_file or url must be specified")
-    if not url:
-        url = ec_url(csv_file)
-    content = load_file(url)
-    return list(csv.DictReader(StringIO(content.decode("utf-8"))))
