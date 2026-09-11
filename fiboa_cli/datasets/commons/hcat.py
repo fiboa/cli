@@ -53,6 +53,10 @@ class AddHCATMixin:
         # Lookup column that will be renamed after the migration to hcat:code
         hcat_code_column = next(k for k, v in self.hcat_columns.items() if v == "hcat:code")
         if hcat_code_column not in gdf.columns:
+            code_sources = [k for k, v in self.columns.items() if v in ("crop:code", "crop:name")]
+            if not any(k in gdf.columns for k in code_sources):
+                # this edition carries no crop columns at all: nothing to map
+                return gdf
             # Add HCAT columns based on crop-columns
             # Map to HCAT categories by using the mapping from the csv file
 
