@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- `fiboa publish` does convert, validate, PMTiles and STAC for one edition into one folder; the README, licence, data-survey and S3 upload steps it used to perform belong to the catalog that calls it
 - PerFileBaseConverter: convert a multi-file source one file at a time and merge the parts, so a dataset larger than memory can be converted; used by the Spain-wide converter
 - Update vecorel-cli to v0.2.17:
   - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
