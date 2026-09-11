@@ -84,6 +84,8 @@ extra_convert_parameters = {
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
     },
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
+    # the fixture is the 2022 archive; the converter's default is the newest edition
+    "fr": {"variant": "2022"},
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": _input_files("lv", "1_100.xml"),
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
@@ -150,7 +152,9 @@ def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
     required = expected_columns.get(converter)
     if required:
         metadata = pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata or {}
-        constants = json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+        constants = (
+            json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+        )
         missing = [c for c in required if c not in df.columns and constants.get(c) is None]
         assert not missing, (
             f"{converter} dropped {missing}: absent from the schema and from the "
