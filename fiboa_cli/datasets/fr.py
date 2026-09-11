@@ -108,7 +108,8 @@ The anonymized version is distributed as part of the public service for making r
 
     columns = {
         "geometry": "geometry",
-        "id_parcel": "id",
+        "id": "id",
+        "parcel_id": "parcel_id",
         "surf_parc": "metrics:area",
         "code_cultu": "crop:code",
         "code_group": "group_code",
@@ -118,6 +119,24 @@ The anonymized version is distributed as part of the public service for making r
         if "ID_PARCEL" in gdf.columns:
             # Make column names lowercase, harmonize for different years
             gdf = gdf.rename(columns={k: k.lower() for k in gdf.columns})
+
+        # RPG's own parcel id identifies a field in every edition but 2024,
+        # where 361 ids cover 736 of the 9,679,888 rows: 231 of those rows are
+        # exact duplicates and the rest are two declarations sharing one id
+        # (10308017 is declared both BOR and PTR). It is published as
+        # `parcel_id` throughout, and `id` falls back to the row index in an
+        # edition where it repeats — safe, because an edition is one layer of
+        # one file.
+        gdf["parcel_id"] = gdf["id_parcel"]
+        if gdf["id_parcel"].is_unique:
+            gdf["id"] = gdf["id_parcel"]
+        else:
+            repeats = len(gdf) - gdf["id_parcel"].nunique()
+            self.warning(
+                f"id_parcel repeats for {repeats:,} of {len(gdf):,} rows in this edition; "
+                "numbering the rows and keeping it as parcel_id"
+            )
+            gdf["id"] = gdf.index
         return super().migrate(gdf)
 
     column_filters = {
@@ -127,5 +146,6 @@ The anonymized version is distributed as part of the public service for making r
     missing_schemas = {
         "properties": {
             "group_code": {"type": "string"},
+            "parcel_id": {"type": "string"},
         }
     }
