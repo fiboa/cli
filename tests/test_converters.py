@@ -54,13 +54,24 @@ def test_rest_query_params(monkeypatch, tmp_folder):
     converter.cache_folder = str(tmp_folder)
 
     class Response:
-        def json(self):
-            # maxRecordCount above the page length below, so paging stops after one page
-            return {"layers": [{"id": 0}], "maxRecordCount": 1000}
+        def __init__(self, payload):
+            self._payload = payload
 
-    monkeypatch.setattr(
-        "fiboa_cli.conversion.converter_rest.requests.get", lambda url, params: Response()
-    )
+        def json(self):
+            return self._payload
+
+    def fake_get(url, params=None):
+        params = params or {}
+        if params.get("f") == "pjson":
+            # maxRecordCount above the page length below, so paging stops after one page
+            return Response({"layers": [{"id": 0}], "maxRecordCount": 1000})
+        if params.get("outFields") == "*":  # probe for the real key field
+            return Response({"features": [{"attributes": {"OBJECTID": 1}}]})
+        # the two id bounds the window paging starts from
+        bound = 1000 if params["orderByFields"].endswith("DESC") else 1
+        return Response({"features": [{"attributes": {"OBJECTID": bound}}]})
+
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.requests.get", fake_get)
 
     requested, read = [], []
     monkeypatch.setattr(
@@ -80,7 +91,7 @@ def test_rest_query_params(monkeypatch, tmp_folder):
     query = parse_qs(urlparse(requested[0]).query)
     assert query["f"] == ["json"], "rest_format must drive the output format"
     assert query["outSR"] == ["4326"], "rest_params must survive into the query"
-    assert query["where"] == ["OBJECTID>-1 AND (GKODAS IN ('bl1','bl1b'))"], (
+    assert query["where"] == ["OBJECTID>0 AND OBJECTID<=1000 AND (GKODAS IN ('bl1','bl1b'))"], (
         "The paging filter must be combined with rest_params['where'], not replace it"
     )
     assert read[0].endswith(".json"), (
