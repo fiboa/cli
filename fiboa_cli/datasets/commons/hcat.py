@@ -92,8 +92,10 @@ class AddHCATMixin:
                 name_col = self.get_code_column(gdf, "crop:name")
 
             def map_by_name(attribute):
+                # Three Walloon crops are spelled with a trailing space in the
+                # table ("Luzerne lupuline "), so both sides are stripped.
                 return {
-                    e["original_name"]: e[attribute] or None
+                    (e["original_name"] or "").strip(): e[attribute] or None
                     for e in self.ec_mapping
                     if not (e["original_code"] or "").strip()
                 }
@@ -105,7 +107,7 @@ class AddHCATMixin:
                 if v in self.ec_mapping[0]:
                     col = crop_code_col.map(map_to(v))
                     if name_col is not None:
-                        col = col.fillna(name_col.map(map_by_name(v)))
+                        col = col.fillna(name_col.str.strip().map(map_by_name(v)))
                     gdf[k] = col
                     assert np.unique(col[~col.isna()]).size > 0, "No HCAT crops mapped"
 
