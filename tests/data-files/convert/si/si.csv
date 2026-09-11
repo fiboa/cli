@@ -1,0 +1,180 @@
+original_code,original_name,latin_name,translated_name,HCAT3_name,HCAT3_code
+000,ni v uporabi,Not known,Not known,not_known_and_other,3399000000
+001,pšenica (jara),Triticum aestivum L.,Common wheat spring,spring_common_soft_wheat,3301010102
+002,rž (jara),Secale cereale L.,Rye (spring),spring_rye,3301010302
+003,pira (jara),Triticum spelta L.,Spring Spelt,spring_spelt,3301011002
+004,ajda,Fagopyrum esculentum Moench,Buckwheat,buckwheat,3301150200
+005,koruza za zrnje,Zea mays L.,Grain maize,grain_maize_corn_popcorn,3301010600
+006,koruza za silažo,Zea mays L.,Silo Maize,green_silo_maize,3301090400
+007,tritikala (jara),X Triticosecale Wittmack (Triticum x Secale),Spring Triticale,spring_triticale,3301010802
+008,oves (jari),Avena sativa L.,Oats (spring),spring_oats,3301010502
+009,ječmen (jari),"Hordeum vulgare L., spring barley",spring barley,spring_barley,3301010402
+010,proso,Panicum miliaceum L.,Proso millet,millet_sorghum,3301010900
+011,mešanice žit (jara),Mixture of cereals (spring),Mixture of cereals (spring),spring_unspecified_cereals,3301011502
+012,sončnice,Helianthus annus L.,Common Sunflower,sunflower,3301060500
+013,oljna buča,Cucurbita pepo var.pepo,Winter squash pumkin,pumpkin_squash_gourd,3301140400
+014,oljna ogrščica (jara),Brassica napus var.napus,Rapeseed spring,spring_rapeseed_rape,3301060402
+017,krmni bob,Vicia faba L. var. minor Harz,Field bean,beans,3301020100
+019,sladkorna pesa,Beta vulgaris L. subsp. vulgaris var. Altissima,Sugar beet,sugar_beet,3301290700
+020,krompir - pozni,Solanum tuberosum L.,potatoes (late),potatoes,3301030000
+022,krompir - zgodnji,Solanum tuberosum L.,potatoes (early),potatoes,3301030000
+024,sirek,Sorghum bicolor (L.) Moench,sorghum,millet_sorghum,3301010900
+025,trda pšenica (jara),Triticum durum Desf.,Durum wheat spring,spring_durum_hard_wheat,3301010202
+026,praha,Fallow land,Fallow land,fallow_land_not_crop,3301110000
+027,konoplja,Canabis sativa var.sativa,Cannabis,hemp_cannabis,3301061000
+028,lan,Linum usitatissimum L.,Flax,flax_linen,3301060701
+029,ukorenišče hmelja,The rooting of hop seedlings,The rooting of hop seedlings,hops,3301060200
+030,soja,Glycine max (L.) Merr.,Soybean,soy_soybeans,3301160000
+031,vrtni mak (jari),Papaver somniferum L. subsp. somniferum,Spring Poppy,summer_poppy,3301060602
+033,krmni grah (jari),Pisum sativum L.,Pea spring,peas,3301020600
+035,pšenica horasan (jara),Triticum turanicum Jakubz.,Khorasan wheat spring,other_cereals,3301019900
+036,riček,Camelina sativa L. Crantz,Camelina,camelina,3301061500
+037,amarant,Amaranthus caudatus L.,Pendant amaranth,amaranth,3301150100
+038,"repa, ki ni namenjena prehrani ljudi",Brassica rapa L. var. rapa (L.) Thell.,Turnip,turnips,3301290800
+049,sladka koruza,Zea mays L. convar. saccharata Koerm.,Sweet corn,grain_maize_corn_popcorn,3301010600
+052,mešanica medovitih rastlin,A mixture of honey plants,A mixture of honey plants,fallow_land_not_crop,3301110000
+053,mešanica medonosnih rastlin z drugimi kmetijskimi rastlinami,A mixture of honey plants with other agricultural plants,A mixture of honey plants with other agricultural plants,fallow_land_not_crop,3301110000
+054,bela gorjušica - medonosna praha,Sinapis alba L.,White mustard ,mustard,3301210100
+055,oljna redkev - medonosna praha,Raphanus sativus L. var. oleiformis Pers.,Oilseed radish,radish,3301290600
+056,facelija - medonosna praha,Phacelia tanacetifolia,Phacelia,phacelia,3301061400
+057,ajda - medonosna praha,Fagopyrum esculentum Moench,Buckwheat,buckwheat,3301150200
+058,sončnice - medonosna praha,Helianthus annus L.,Sunflower,sunflower,3301060500
+100,vinska trta,Vitis vinifera L.,Common grape vine,vineyards_wine_vine_rebland_grapes,3303060000
+101,krmna pesa,Beta vulgaris spp.vulgaris,Beet fodder,mangelwurzel_fodder_beet,3301290400
+102,krmna repa,Brassica rapa L. var. rapa (L.) Thell,Turnip,turnips,3301290800
+103,oljna repica,Brassica rapa L. subsp. campestris,Oilseed rape,rapeseed_rape,3301060400
+104,krmna repica (jara),Brassica rapa L. ssp. sylvestris f. autumnalis,Oilseed rape spring,spring_rapeseed_rape,3301060402
+105,krmni ohrovt,"Brassica oleracea L., convar.: acephala var. medullosa Thell.",Fodder cabbage,other_brassica_oleracea_cabbage,3301210299
+106,krmni radič,Cichorium intybus L. var. sativum DC.  Bischoff,Common Chicory,chicory_chicories,3301310200
+107,krmno korenje,Daucus carota,Daucus,carrots_daucus,3301290300
+108,podzemna koleraba,Brassica napus L. var. napobrassica (L.) Rchb.,Swede,swede_rutabaga,3301210500
+109,krmni sirek,Sorghum bicolor (L.) Moench.,Sorghum,millet_sorghum,3301010900
+110,grašica (jara),Vicia sativa L.,Common peas spring,peas,3301020600
+111,bela gorjušica,Sinapis alba L.,White mustard,mustard,3301210100
+112,krmna ogrščica (jara),Brassica napus L. var. napus f. biennis,Spring oilseed rape,spring_rapeseed_rape,3301060402
+113,oljna redkev,Raphanus sativus L. var. oleiformis Pers.,Fodder Radish,radish,3301290600
+114,mešane rastline za krmo na njivah,Other fodder crops on arable land,Other fodder crops on arable land,other_arable_land_crops,3301990000
+116,sudanska trava,Sorghum sudannense P.,Sudan grass,millet_sorghum,3301010900
+129,"mešanice z rastlinami, ki vežejo dušik",Other mixtures with nitrogen-fixing crops,Other mixtures with nitrogen-fixing crops,not_known_and_other,3399000000
+200,trave za pridelavo semena,Grass for seed production,Grass for seed production,temporary_grass,3301090100
+201,trave,Grass on arable land,Grass on arable land,temporary_grass,3301090100
+202,travna ruša (travni tepih),Green cover (grass turf),Green cover (grass turf),sod_turf,3301090207
+203,travnodeteljne mešanice,Grass clover mixture,Grass clover mixture,temporary_grass,3301090100
+204,trajno travinje,Permanent grassland,Permanent grassland,pasture_meadow_grassland_grass,3302000000
+206,deteljnotravne mešanice,Clover grass mixture,Clover grass mixture,clover,3301090303
+207,detelja,Trifolium pratense L.,Red clover,clover,3301090303
+208,lucerna,Medicago sativa L.,Alfalfa,alfalfa_lucerne,3301090301
+210,volčji bob,Lupinus albus L.,White lupin,sweet_lupins,3301020700
+219,facelija,Phacelia tanacetifolia,Lacy phacelia,phacelia,3301061400
+221,perzijska detelja,Trifolium resupinatum L.,Reversed clover,clover,3301090303
+222,inkarnatka,Trifolium incarnatum L.,Crimson clover,clover,3301090303
+333,tehni?no ali drugo sredstvo,Not mantained because of technical obstacle,Not mantained because of technical obstacle,unmaintained,3308000000
+402,zelenjadnice,Mixed vegetables,Mixed vegetables,fresh_vegetables,3301070000
+403,različna trajna zelišča,Mixed permanent herbs,Mixed permanent herbs,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+404,enoletna in dvoletna njivska zelišča,One-year and two-year herbs on fields,One-year herbs on fields,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+405,"mešana raba pod 0,1 ha (zelenjadnice, poljščine, dišavnice in zelišča)","Mixed use (vegetables, crops, aromatic plants and medicinal herbs)","Mixed use (vegetables, crops, aromatic plants and medicinal herbs)",arable_crops,3301000000
+409,"mešane zelenjadnice pod 0,1 ha","Mixed vegetables on field under 0,1 ha size","Mixed vegetables on field under 0,1 ha size",fresh_vegetables,3301070000
+444,pridelava ni v tleh,Production not in the soil,Production not in the soil,not_known_and_other,3399000000
+611,jablana,Malus domestica Borkh.,Apple,apples,3303010200
+612,hruška,Pyrus communis L.,European pear,pears,3303011200
+613,kutina,Cydonia oblonga Mill.,Quince,quinces,3303011500
+614,nashi,Pyrus pyrifolia (Burm.f.) Nakai,Asian pear,pears,3303011200
+615,granatno jabolko,Punica granatum L.,Pomegranate,pomegranate,3303011400
+616,nešplja,Mespilus germanica L.,Common medlar,medlar_loquat,3303010800
+618,žižula,Ziziphus sativa Gaert.,Jujube red date,orchards_fruits,3303010000
+619,feijoa,Feijoa sellowiana,Feijoa,feijoa,3303010500
+621,breskev,Prunus persica BATSCH,Peach,peach,3303011100
+622,nektarina,Prunus persica (L.) Batsch. var. nucipersica (Suckow) Schneid.,Nectarine,nectarine,3303010900
+623,sliva/češplja,Prunus domestica L.,Common plum,plums,3303011300
+624,marelica,Prunus armeniaca L.,Armenian plum,plums,3303011300
+625,češnja,Prunus avium L.,Sweet cherry,cherry_cherries,3303010400
+626,višnja,Prunus cerasus L. (Cerasus vulgaris Mill.),Sour cherry,cherry_cherries,3303010400
+631,oreh,Juglans regia,English walnut,walnuts,3303030600
+632,leska,Corylus avellana,Common hazel,hazelnuts_hazel,3303030200
+633,mandelj,Prunus dulcis (Mill.) D. A. Webb,Almond,almond,3303030100
+634,pekan oreh,Carya illinoensis,Pecan,pecan,3303030300
+642,kivi,Actinidia chinensis Planch. (Actinidia deliciosa),Golden kiwifruit,kiwi,3303010700
+643,kaki,Diospyros kaki L.,Japanese Persimmon,orchards_fruits,3303010000
+644,kostanj,Castanea sativa,Chestnut,sweet_chestnuts,3303030500
+646,bezeg,Sambucus L.,Elderberry,elder_elderberry,3303080400
+647,smokva (figa),Ficus carica L.,Fig,fig,3303010600
+648,asimina,Asimina triloba,Pawpaw,pawpaw,3303011000
+649,rakitovec,Hippophae rhamnoides L.,Seaberry,hippophae_sea_buckthorns_seaberry,3303020800
+651,jagoda,Fragaria L.,Strawberries,strawberries,3301130000
+652,ameriška borovnica,Vaccinium corymbosum L.,American blueberry,blueberry,3303020400
+653,malina,Rubus idaeus L.,Red raspberry,raspberry_raspberries,3303021000
+654,robida,Rubus fruticosus L.,Blackberry,blackberry,3303020200
+655,rdeči ribez,Ribes rubrum L.,Redcurrant,redcurrant,3303021100
+656,črni ribez,Ribes nigrum L.,Blackcurrant,blackcurrant_cassis,3303020300
+657,aronija,Aronia melanocarpa,Black chokeberry,aronia_chokeberries,3303020100
+658,murva,Morus sp.,White mulberry,berries_berry_species,3303020000
+659,goji jagoda,Lycium barbarum L.,Goji berry,shrubberries_shrubs,3303080000
+660,črni ribez x kosmulja,Ribes nidigrolaria,Jostaberry,jostaberry,3303020900
+661,namizno grozdje,Vitis vinifera,Common grape vine,vineyards_wine_vine_rebland_grapes,3303060000
+662,robida x malina,Rubus fruticosus x Rubus idaeus,Tayberry,tayberry,3303021400
+671,limonovec,Citrus limon (L.) Burm. f. lemon,Lemon,citrus_plantations,3303040000
+674,mandarinovec,Citrus reticulata Blanco,Mandarin orange,citrus_plantations,3303040000
+675,dren,Cornus mas L.,Cornelian cherry,dogwood_cornus,3306040000
+676,kosmulja,Ribes uva-crispa L.,European gooseberry,gooseberry_gooseberries_cranberries,3303020700
+677,skorš,Sorbus domestica L.,Sorb tree,other_tree_wood_forest,3306990000
+678,užitno modro kosteničje,Lonicera caerulea var. Kamtschatica,Kamchatka honeysuckle,honeysuckle,3303080500
+680,šipek,Rosa canina L.,Rosa canina,roses,3301083700
+682,šmarna hrušica,Amelanchier spp.,Serviceberry,amelanchier_serviceberry,3303010100
+698,oreh in kostanj,Castanea sativa,Sweet chestnut,sweet_chestnuts,3303030500
+699,mešane sadne vrste,Mixed fruit plants,Mixed fruit plants,orchards_fruits,3303010000
+702,drevesnice,Nurseries,Nurseries,nurseries_nursery,3303070000
+703,šparglji,Asparagus officinalis,Garden asparagus,asparagus,3301200000
+704,trsnice,Vine nurseries,Vine nurseries,vineyards_wine_vine_rebland_grapes,3303070000
+705,"mešane trajne rastline pod 0,1 ha","Mixed permanent crops on field under 0,1 ha size","Mixed permanent crops on field under 0,1 ha size",permanent_crops_perennial,3303000000
+706,"trta za drugo rabo, ki ni vino ali namizno grozdje",Vines for other uses than for wine or fruits,Vines for other uses than for wine or fruits,vineyards_wine_vine_rebland_grapes,3303060000
+707,matičnjak,Root-stock nursery,Root-stock nursery,nurseries_nursery,3303070000
+710,mešane rastline za rejo polžev,Mixed plants for snail farming,Mixed plants for snail farming,other_arable_land_crops,3301990000
+720,"hitro rastoči panjevec (vrba, topol)","Short rotation coppice (willow tree, poplar)","Short rotation coppice (willow tree, poplar)",tree_wood_forest,3306000000
+721,drugi hitro rastoči panjevci,Other short rotation coppices,Other short rotation coppices,tree_wood_forest,3306000000
+722,miskant,Miscanthus,Silvergrass,miscanthus_silvergrass,3301083000
+733,artičoka,Cynara cardunculus var. Scolymus L.,Globe artichocke,artichoke,3301270000
+734,rabarbara,Rheum rhabarbarum L.,Garden rhubarb,rhubarb,3301230000
+735,okrasne rastline,Ornamental plants,Ornamental plants,flowers_ornamental_plants,3301080000
+736,vrtnice,Roses,Roses,roses,3301083700
+737,sivka,Lavandula spica L.,Lavandula,lavender_lavandula,3301061219
+738,ameriški slamnik,Echinacea purpurea (L.) Moench Echinacea angustifolia,Purple coneflower,echinacea_sun_hat,3301081500
+777,površina v odstopu,Crop not known,Crop not known,not_known_and_other,3399000000
+800,oljka,Olea europaea L. v. europaea,Olive,olive_plantations,3303050000
+801,pšenica (ozimna),Triticum L.,Common wheat winter,winter_common_soft_wheat,3301010101
+802,rž (ozimna),Secale cereale L.,Rye winter,winter_rye,3301010301
+803,pira (ozimna),Triticum spelta L.,Spelt winter,winter_spelt,3301011001
+804,krmna repica (ozimna),Brassica rapa L. var. silvestris (Lam.) Briggs,Turnip rape winter,winter_rapeseed_rape,3301060401
+807,tritikala (ozimna),X Triticosecale Wittmack (Triticum x Secale),Triticale winter,winter_triticale,3301010801
+808,oves (ozimni),Avena sativa L.,Winter oats,winter_oats,3301010501
+809,ječmen (ozimni),Hordeum L.,Barley winter,winter_barley,3301010401
+811,mešanice žit (ozimna),Mixture of cereals (winter),Mixture of cereals (winter),winter_unspecified_cereals,3301011501
+812,krmna ogrščica (ozimna),Brassica napus L. var. napus f. biennis,Fodder rape (winter),winter_rapeseed_rape,3301060401
+814,oljna ogrščica (ozimna),Brassica napus L. ssp. oleifera (Metzg.) Sinsk.,Winter rape,winter_rapeseed_rape,3301060401
+821,soržica (ozimna),Meslin (winter),Meslin (winter),winter_meslin,3301011101
+825,trda pšenica (ozimna),Triticum durum Desf.,Durum winter,winter_durum_hard_wheat,3301010201
+831,vrtni mak (ozimni),Papaver somniferum L. subsp. somniferum,Opium poppy winter,winter_poppy,3301060601
+833,krmni grah (ozimni),Pisum sativum L. (partim),Peas winter,peas,3301020600
+835,pšenica horasan (ozimna),Triticum turanicum Jakubz.,Khorasan wheat (winter),other_cereals,3301019900
+900,hmelj,Humulus lupulus L.,Common hop,hops,3301060200
+060,praha brez posevka (prazna površina),Fallow land without crops (empty area),Fallow land without crops (empty area),fallow_land_not_crop,3301110000
+400,"zelenjadnice in zelišča pod 0,1 ha (kombinacija kratkoročne in dolgoročne prisotnosti)",vegetables and herbs under 0.1 ha (combination of short-term and long-term presence),vegetables and herbs under 0.1 ha,fresh_vegetables,3301070000
+901,krajinska značilnost,Landscape feature,Landscape feature,not_known_and_other,3399000000
+063,praha za namen zagotavljanja DKOP 7 in DKOP 8,Fallow land for the purpose of GAEC 7 and GAEC 8.,Fallow land for GAEC 7 and GAEC 8,fallow_land_not_crop,3301110000
+401,"sadike zelenjadnic, zelišč in dišavnic","seedlings of vegetables, herbs and spices","seedlings of vegetables, herbs and spices",nurseries_nursery,3303070000
+701,"drevesnice in trsnice, kjer pridelava ni v tleh",nurseries and Vine nurseries where cultivation is not in the ground,nurseries and Vine nurseries (not in the ground),nurseries_nursery,3303070000
+778,nekmetijska površina,non-agricultural area,non-agricultural area,not_known_and_other,3399000000
+062,zeleni pokrov,Green cover,Green cover,temporary_grass,3301090100
+410,mešani posevki v ekološkem kmetovanju,mixed crops in organic farming,mixed crops in organic farming,arable_crops,3301000000
+061,praha s posevkom brez kmetijske proizvodnje,Fallow land without agricultural production,Fallow land without agricultural production,fallow_land_not_crop,3301110000
+397,"fižol od 0,1 ha",Phaseolus (from 0.1 ha size),Beans (from 0.1 ha),beans,3301020100
+034,rjava indijska gorčica,"Brassica juncea L",Brown mustard,mustard,3301210100
+399,"čičerika od 0,1 ha","Cicer arietinum (from 0.1 ha size)",Chickpeas (from 0.1 ha),chickpeas,3301020200
+723,tobakovec,Nicotiana tabacum L.,Tobacco,other_arable_land_crops,3301990000
+810,grašica (ozimna),Vicia villosa R.,Winter vetch,peas,3301020600
+635,pistacija,Pistacia vera,Pistachio,pistachios,3303030400
+023,kvinoja,Chenopodium quinoa,Quinoa,other_cereals,3301019900
+395,"bob od 0,1 ha","Vicia faba (from 0,1 ha size)",Field bean (from 0.1 ha),beans,3301020100
+220,aleksandrijska detelja,Trifolium alexandrinum L,Egyptian clover,clover,3301090303
+396,"grah od 0,1 ha","Pisum sativum (from 0,1 ha size)",Pea (from 0.1 ha),peas,3301020600
+398,"leča od 0,1 ha","Lens culinaris (from 0,1 ha size)",Lentils (from 0.1 ha),lentils,3301020300
+021,soržica (jara),Meslin,Meslin (spring),spring_meslin,3301011102
