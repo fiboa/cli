@@ -31,7 +31,11 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     }
 
     missing_schemas = {
-        "required": ["gerk_pid", "crop_type_class", "rastlina", "crop_lat_e", "color"],
+        # Four parcels of the 828,161 in the 2021 release carry no crop at all:
+        # SIFRA_KMRS, RASTLINA, CROP_LAT_E, COLOR and the EC_* columns are empty
+        # for them (and three parcels have no EC_NUTS3). Only the GERK parcel id
+        # is always there.
+        "required": ["gerk_pid"],
         "properties": {
             "gerk_pid": {"type": "uint64"},
             "crop_type_class": {"type": "string"},
