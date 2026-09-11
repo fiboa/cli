@@ -71,6 +71,8 @@ def _input_files(converter, *names):
 
 extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
+    # the fixture archive holds the 2024 edition only
+    "lt": {"variant": "2024"},
     "nl": {"variant": "2023"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
