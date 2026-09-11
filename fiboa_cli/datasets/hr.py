@@ -7,7 +7,6 @@ base = "https://www.apprrr.hr/wp-content/uploads/nipp"
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
-    sources = "https://www.apprrr.hr/wp-content/uploads/nipp/land_parcels.gpkg"
     variants = {
         "2024": f"{base}/land_parcels.gpkg",
         **{str(y): f"{base}/arkod_31_12_{y}.gpkg" for y in range(2023, 2010, -1)},
@@ -31,8 +30,6 @@ and supporting sustainable land use practices.
     )
 
     license = "Prostorni podaci i servisi <https://www.apprrr.hr/prostorni-podaci-servisi/>"
-    index_as_id = True
-
     column_migrations = {"land_use_id": lambda col: col.astype(int)}
 
     columns = {
@@ -68,14 +65,10 @@ and supporting sustainable land use practices.
     ec_mapping_csv = "hr_2020.csv"
 
     missing_schemas = {
-        "required": [
-            "mines_status",
-            "water_protect_zone",
-            "natura2000",
-            "sanitary_protection_zone",
-            "irrigation",
-            "jpaid",
-        ],
+        # The editions carry different subsets (17 of these columns in 2011,
+        # 25 in 2023) and leave them half empty: 2011 has no mines_status for
+        # 909k of its 1.29M parcels.
+        "required": [],
         "properties": {
             "land_use_id": {"type": "integer"},
             "home_name": {"type": "string"},
@@ -106,3 +99,19 @@ and supporting sustainable land use practices.
     area_is_in_ha = False
     area_calculate_missing = True
     use_variant_as_determination = True
+
+    # The archives leave gpkg srs_id at 0 while holding the same projected
+    # metres as the current edition: 264979..731547 E is Croatia in EPSG:3765.
+    ARCHIVE_CRS = "EPSG:3765"
+
+    def migrate(self, gdf):
+        if gdf.crs is None or gdf.crs.to_epsg() is None:
+            # Undeclared, those metres reach the STAC extent as degrees and
+            # leave every parcel in one cell of the Hilbert grid.
+            gdf = gdf.set_crs(self.ARCHIVE_CRS, allow_override=True)
+
+        # The dated archives carry ARKOD's own parcel id, unique per edition;
+        # only the rolling land_parcels.gpkg has none.
+        if "id" not in gdf.columns:
+            gdf["id"] = gdf.index
+        return super().migrate(gdf)
