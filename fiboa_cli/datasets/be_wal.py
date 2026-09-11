@@ -38,6 +38,9 @@ free-licensed version for this converter.
         "determination:datetime": "determination:datetime",
     }
     ec_mapping_csv = "be_wal_all_years.csv"
+    # 208 of that table's 298 rows carry no code, only the crop name, so every
+    # crop whose coded row is missing went unmapped: 23,216 fields over 59 codes.
+    ec_mapping_name_fallback = True
     column_additions = {
         "determination:datetime": "2022-01-01T00:00:00Z",
     }
