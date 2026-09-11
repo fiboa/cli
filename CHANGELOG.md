@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   only 20,300 of 54,038 parcels, so earlier output was incomplete. `metrics:area` is derived from
   the geometry, because the service stopped publishing the declared size.
 - Converter for South Tyrol, Italy (it_bz), reading the province's LAFIS utilised agricultural area
+- Repair the Saxony, Germany converter (de_sax): only the current year's archive is served, so the
+  2024 edition it read is gone. It now reads 2026, and a test fixture covers the dataset.
 - Update vecorel-cli to v0.2.16:
   - Converter output is sorted by Hilbert distance
   - Commands exit with a non-zero exit code when they report a failure
