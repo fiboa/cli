@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-MD: find RECINTO.shp wherever the archive puts it
 - DE-NDS: give the collection an id (the row index), which it was published without
 - DE-BB: ref_ident holds the FLIK (field block reference), not a farmer, and the shapefile is cp1252
+- Converters drop rows that cannot validate — no id, no crop:code, no geometry — up to 1% of a file, and fail rather than drop beyond that
+- Every schema a conversion needs is fetched upfront with retries, so a transient outage cannot kill a long run at the last step
 - Update vecorel-cli to v0.2.17:
   - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
   - GeoJSON files with a byte order mark no longer fail to read
