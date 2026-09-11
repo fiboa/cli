@@ -26,7 +26,7 @@ class EsriRESTConverterMixin:
         return {"REST": self.rest_base_url}
 
     def download_files(self, uris, cache_folder=None):
-        # Read-data will just stream alle pages of rest-service
+        # Read-data will just stream all pages of rest-service
         if next(iter(uris), "").startswith("REST"):
             self.cache_folder = cache_folder
             return list(uris.values())
