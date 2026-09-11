@@ -16,6 +16,7 @@ __pycache__/
 # Coverage
 .coverage
 .coverage.*
+converage.json
 coverage.xml
 htmlcov/
 
@@ -27,3 +28,5 @@ htmlcov/
 /tests/data-files/convert/*/extracted.*/
 /tests/data-files/convert/**/*.gfs
 *.tmp
+
+build/
