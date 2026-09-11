@@ -26,27 +26,34 @@ Free use of the data is permitted, but commercial exploitation is prohibited.
     license = "CC-NC: Free use of the data is permitted, but commercial exploitation is prohibited <http://ftp.itacyl.es/cartografia/LICENCIA-IGCYL-NC-2012.pdf>"
 
     columns = {
-        "DN_OID": "id",
+        # DN_OID is 0 in every row of every province; C_REFREC is SIGPAC's own
+        # 23-character recinto reference (province, municipality, agregado, zona,
+        # polígono, parcela, recinto), which identifies the field and follows it
+        # across editions.
+        "C_REFREC": "id",
         "geometry": "geometry",
-        "determination:datetime": "determination:datetime",
         "USO_SIGPAC": "crop:code",
         "crop:name": "crop:name",
         "crop:name_en": "crop:name_en",
     }
     use_code_attribute = "USO_SIGPAC"
-    column_additions = ESBaseConverter.column_additions | {
-        "determination:datetime": "2024-01-01T00:00:00Z"
-    }
+    use_variant_as_determination = True
 
     def download_files(self, uris, cache_folder=None):
         paths = super().download_files(uris, cache_folder)
         new = []
         for path, uri in paths:
             directory = os.path.dirname(path)
-            ps = [z for z in os.listdir(directory) if regex.search(z)]
+            # the 2025 archives nest the shapefiles in a province folder
+            ps = [
+                os.path.join(root, z)
+                for root, _, files in os.walk(directory)
+                for z in files
+                if regex.search(z)
+            ]
             assert len(ps), f"Missing matching shapefile in {directory}"
             for p in ps:
-                new.append((os.path.join(directory, p), uri))
+                new.append((p, uri))
         return new
 
     def get_urls(self):
@@ -55,7 +62,7 @@ Free use of the data is permitted, but commercial exploitation is prohibited.
             logger.warning(f"Choosing first year {self.variant}")
         else:
             assert 2019 <= int(self.variant) <= 2025, f"Wrong year {self.variant}"
-        base = f"http://ftp.itacyl.es/cartografia/05_SIGPAC/{self.variant}_ETRS89/Parcelario_SIGPAC_CyL_Provincias/"
+        base = f"https://ftp.itacyl.es/cartografia/05_SIGPAC/{self.variant}_ETRS89/Parcelario_SIGPAC_CyL_Provincias/"
         response = requests.get(base)
         assert response.status_code == 200, f"Error getting urls {response}\n{response.content}"
         uris = {

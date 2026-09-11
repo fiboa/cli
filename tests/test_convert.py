@@ -44,6 +44,7 @@ tests = [
     "lv",
     "ie",
     "es_cat",
+    "es_cl",
     "es",
     "nz",
     "lt",
@@ -78,6 +79,10 @@ extra_convert_parameters = {
     "de_he": _input_files("de_he", "de_he.json"),
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
     "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
+    "es_cl": {
+        "variant": "2025",
+        "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
+    },
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": _input_files("lv", "1_100.xml"),
