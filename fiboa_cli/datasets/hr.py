@@ -7,7 +7,6 @@ base = "https://www.apprrr.hr/wp-content/uploads/nipp"
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
-    sources = "https://www.apprrr.hr/wp-content/uploads/nipp/land_parcels.gpkg"
     variants = {
         "2024": f"{base}/land_parcels.gpkg",
         **{str(y): f"{base}/arkod_31_12_{y}.gpkg" for y in range(2023, 2010, -1)},

@@ -38,6 +38,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Collection-only properties are kept when merging collections
   - Default GeoParquet compression is now zstd (level 15), configurable via `--compression_level`
 - DE-SH: make the 2023, 2025 and 2026 editions convert — glob the GeoPackage inside the archive (2023 was written with user_version = 0, so the archive alone matches no driver), parse fachguelti as DD.MM.YYYY, and map the 2023 and upper-case 2025/2026 column spellings that silently dropped determination:datetime and metrics:area (their area is text with a decimal comma)
+- Add DuckDB BaseConverter for efficiently transforming large datasets
+- Update vecorel-cli to v0.2.18:
+  - The DuckDB converter base and the GeoParquet post-processing live there now
+  - Converters record the collection id in the collection metadata instead of a constant `collection` column
+  - Converters drop rows that can never validate (missing required values, empty or missing geometries), bounded by `max_dropped_share`
+  - Converters fail when both `sources` and `variants` are declared (fixed in the HR converter), and warn when no column is mapped to `id` or the id column is not unique
+  - Converters load all schemas upfront with retries
 
 ## [v0.21.0] - 2026-02-16
 
