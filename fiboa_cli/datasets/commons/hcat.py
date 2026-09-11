@@ -24,6 +24,11 @@ class AddHCATMixin:
     # names only the first leaves every later code unmapped. Rows here win over
     # the main table where both carry a code.
     ec_mapping_supplements: list[str] = []
+    # Match on the crop name where the table has no row for the code. EuroCrops
+    # keys most tables on the code, but be_wal_all_years.csv leaves
+    # original_code empty in 208 of its 298 rows and names the crop instead, so
+    # matching on the code alone loses every crop whose coded row is missing.
+    ec_mapping_name_fallback = False
     mapping_file = None
     ec_mapping: Optional[list[dict]] = None  # TODO rename to hcat_mapping
 
@@ -82,12 +87,25 @@ class AddHCATMixin:
             def map_to(attribute):
                 return {e[from_code]: e[attribute] or None for e in self.ec_mapping}
 
+            name_col = None
+            if self.ec_mapping_name_fallback and from_code == "original_code":
+                name_col = self.get_code_column(gdf, "crop:name")
+
+            def map_by_name(attribute):
+                return {
+                    e["original_name"]: e[attribute] or None
+                    for e in self.ec_mapping
+                    if not (e["original_code"] or "").strip()
+                }
+
             col = None
             for k, v in zip(
                 self.hcat_columns.keys(), ("translated_name", "HCAT3_name", "HCAT3_code")
             ):
                 if v in self.ec_mapping[0]:
                     col = crop_code_col.map(map_to(v))
+                    if name_col is not None:
+                        col = col.fillna(name_col.map(map_by_name(v)))
                     gdf[k] = col
                     assert np.unique(col[~col.isna()]).size > 0, "No HCAT crops mapped"
 
