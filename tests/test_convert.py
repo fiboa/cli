@@ -48,6 +48,8 @@ tests = [
     "lv",
     "ie",
     "es_cat",
+    "es_ib",
+    "es_ib#2024",
     "es",
     "nz",
     "lt",
@@ -107,6 +109,10 @@ extra_convert_parameters = {
     # 2018 is the one release that names KDIEL, VYMERA_KD and PLODINA_NA
     "sk#2018": {"variant": "2018"},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
+    # a page of each service: the current snapshot and a historic year, whose
+    # Catxe reads "Febrer2024.0" where the current one reads "maig 2026"
+    "es_ib": {"variant": "2026", **_input_files("es_ib", "es_ib_2026.geojson")},
+    "es_ib#2024": {"variant": "2024", **_input_files("es_ib", "es_ib_2024.geojson")},
     "fr": {"variant": "2022"},
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": _input_files("lv", "1_100.xml"),

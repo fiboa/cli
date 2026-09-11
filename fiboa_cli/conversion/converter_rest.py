@@ -58,9 +58,13 @@ class EsriRESTConverterMixin:
 
     def get_data(self, paths, **kwargs):
         if isinstance(paths[0], tuple):
-            # (path, uri) pairs from the base downloader: input_file param was used
-            for data, path, uri, layer in super().get_data(paths, **kwargs):
-                yield self._unqualify(data), path, uri, layer
+            # (path, uri) pairs from the base downloader: input_file param was used.
+            # Read them here rather than through super().get_data(), whose
+            # read_geojson() injects the GeoJSON feature id as an "id" property and
+            # collides with the "id" these converters map from their own attribute.
+            for path, uri in paths:
+                self.info(f"Reading {path} into GeoDataFrame")
+                yield self._unqualify(gpd.read_file(path)), path, uri, None
             return
 
         base_url = paths[0]  # loop over paths to support more than 1 source
