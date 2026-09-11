@@ -38,8 +38,7 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
             "year",
             "parcel_id",
             "subsidy_type",
-            "EC_NUTS3",
-            #       'PRODUCT_DE',
+            # EC_NUTS3 is not required: one parcel in the 2021 release has none.
         ],
         "properties": {
             "year": {"type": "uint16", "minLength": 4, "maxLength": 4},
