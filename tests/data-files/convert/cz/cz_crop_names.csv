@@ -1,0 +1,269 @@
+original_code,original_name
+2,Cukrovka
+3,Řepa krmná
+4,Topinambur
+5,Čekanka (jinde neuvedená)
+5,Čekanka průmyslová
+8,Bér italský
+8,Bér vlašský
+9,Čirok
+10,Ředkev olejná
+11,Sléz (jinde neuvedený)
+12,Svazenka vratičolistá
+14,Kapusta krmná
+15,Šťovík (jinde neuvedený)
+16,Tuřín
+18,Kopr vonný
+21,Andělika lékařská
+23,Benedikt lékařský (čubet)
+25,Divizna velkokvětá
+26,Heřmánek pravý
+28,Jablečník obecný
+29,Jehlice rolní
+30,Jestřabina lékařská
+31,Jitrocel kopinatý
+38,Máta peprná
+39,Meduňka lékařská
+44,Ostropestřec mariánský
+46,Pelyněk kozalec (estragon)
+48,Proskurník lékařský
+49,Topolovka růžová
+53,Řepík lékařský
+56,Šalvěj lékařská
+57,Třezalka tečkovaná
+58,Tymián obecný
+59,Včelník moldavský
+61,Yzop lékařský
+63,Řebříček chlumní
+64,Bob
+65,Cizrna
+66,Čičorka pestrá
+67,Čočka
+68,Fazol (jinde neuvedený)
+69,Hrách (jinde neuvedený)
+70,Peluška jarní
+77,Komonice
+78,Lupina (jinde neuvedená)
+82,Ptačí noha setá (seradela)
+83,Štírovník
+85,Tolice dětelová
+86,Úročník
+87,Vičenec
+89,Vikev (jinde neuvedená)
+91,Vojtěška
+92,Pískavice řecké seno
+94,Jetel
+96,Ječmen jarní
+97,Ječmen ozimý
+100,Oves
+102,Pohanka obecná
+103,Proso seté
+104,Pšenice jarní
+105,Pšenice ozimá
+109,Tritikale jarní
+110,Tritikale ozimé
+111,Žito jarní
+112,Žito ozimé
+113,Lesknice kanárská
+147,Slunečnice (jinde neuvedená)
+250,Hořčice sareptská
+250,Hořčice sareptská (hnědá)
+251,Řepice ozimá
+252,Hořčice bílá
+253,Kmín kořenný
+255,Len olejný
+256,Len přadný
+257,Lnička setá jarní
+258,Lnička setá ozimá
+259,Mák
+259,Mák setý jarní
+260,Řepka jarní
+261,Řepka ozimá
+263,Sója
+264,Světlice barvířská
+276,Jahodník
+315,Trávy
+350,Trvalý travní porost
+352,Brokolice
+353,Kedluben
+354,Celer bulvový
+356,Celer řapíkatý
+357,Cibule jarní
+358,Cibule zimní
+359,Čekanka salátová
+360,Černý kořen (hadí mord španělský)
+361,Česnek jarní
+362,Česnek ozimý
+363,Fazol zahradní
+365,Fenykl obecný
+366,Hrách zahradní dřeňový
+367,Hrách zahradní cukrový
+368,Chřest
+369,Kapusta kadeřavá (Kadeřávek)
+369,Kapusta kadeřavá (kadeřávek)
+370,Kapusta hlávková
+371,Kapusta růžičková
+373,Kukuřice cukrová
+374,Kukuřice pukancová
+375,Květák
+376,Křen selský
+377,Lilek vejcoplodý (baklažán)
+378,Mangold
+379,Meloun cukrový
+380,Meloun vodní
+382,Mrkev
+383,Okurka nakládačka
+384,Okurka salátová
+385,Paprika
+387,Pastinák
+388,Pažitka
+389,Petržel kořenová
+390,Petržel naťová
+391,Pór jarní
+392,Rajče
+394,Reveň
+395,Ředkev setá černá
+396,Ředkvička
+397,Řepa salátová
+398,Řeřicha zahradní
+399,Salát (jinde neuvedený)
+402,Špenát ozimý
+406,Tykev obecná (s výjimkou tykve olejné)
+408,Tykev velkoplodá
+409,Vodnice
+410,Zelí čínské
+411,Zelí hlávkové
+413,Zelí pekingské
+414,Cibule zimní (sečka)
+416,Šalotka
+420,Brambory konzumní
+421,Brambory sadbové
+422,Směsi s převahou bílk. p. s obilovinami (§ 28 NV PP)
+423,Ostatní směsky
+430,Brambory průmyslové
+431,Jetelotravní směs (s převahou jetelovin)
+433,Kukuřice (jinde neuvedená)
+442,Léčivé rostliny (více druhů)
+602,Tykev muškátová
+603,Krambe habešská (Katrán etiopský)
+604,Mastňák habešský
+605,Žito trsnaté (lesní)
+607,Tykev pomíchaná
+616,Roketa setá (Rukola)
+1000,Neurčená plodina
+40005,Konopí - Bialobrzeskie
+40008,Konopí - Carmagnola
+40019,Konopí - Fedora 17
+40020,Konopí - Felina 32
+40022,Konopí - Férimon
+40026,Konopí - Finola
+40027,Konopí - Futura 75
+40032,Konopí - Kompolti
+40040,Konopí - Santhica 27
+40041,Konopí - Santhica 70
+40045,Konopí - Tiborszállási
+40047,Konopí - Tygra
+40049,Konopí - Uso-31
+40053,Konopí - Rajan
+40059,Bazalka vonná
+40061,Brutnák lékařský
+40062,Citronová tráva
+40063,Dobromysl obecná
+40065,Chrpa modrá
+40066,Koriandr setý
+40067,Kozlík lékařský
+40068,Lékořice lysá
+40069,Levandule lékařská
+40070,Libeček lékařský
+40072,Majoránka zahradní
+40074,Mateřídouška vejčitá
+40075,Měsíček lékařský
+40078,Máta huňatá
+40082,Řepík vonný
+40083,Saturejka horská
+40084,Sléz maurský
+40086,Třapatka nachová
+40087,Třezalka skvrnitá x třezalka tečkovaná
+40089,Peluška ozimá
+40089,Peluška zimní
+40092,Směs krmná (čejka)
+40093,Směs pro opylovače (čejka)
+40094,Směs pro krmný biopás
+40095,Směs pro nektarodárný biopás
+40096,Laskavec zelenoklasý
+40099,Sveřep bezbranný
+40101,Sléz přeslenitý
+40103,Ozdobnice obrovská
+40105,Mužák prorostlý
+40112,Tykev (jinde neuvedená)
+40113,Špenát jarní
+40114,Směsi trav pro energetické využití
+40115,Dočasně nezpůsobilá plocha
+40116,Orná bez plodiny
+40117,Ředkev (jinde neuvedená)
+40118,Vojtěškotravní směs s převahou vojtěšky
+40119,Čekanka hlávková
+40121,Salát hlávkový
+40122,Salát listový
+40123,Salát římský
+40130,Zelenina (EZ - příl. 4 NV 76/2015)
+40131,Řebříček obecný
+40133,Šťovík kyselý - krmný OK2
+40135,Hrachor
+40136,Kozinec
+40138,Jestřabina (jinde neuvedená)
+40141,Tolice (jinde neuvedená)
+40142,Máta jemná
+40143,Směsi PVN (§ 18 a - t NV PP)
+40144,Úhor
+40147,Pór ozimý
+40148,Kapusta hlávková ozimá
+40149,Hořčice hnědá
+40150,Jílek mnohokvětý
+40151,Jílek vytrvalý
+40152,Lupina úzkolistá
+40153,Lupina bílá
+40154,Vikev setá
+40155,Vikev huňatá
+40156,Směs zlepšujících netržních plodin (jinde neuvedených)
+40157,Směs s více než 50 % jetele nebo vojtěšky (ZNP)
+40158,Vikev panonská
+40159,Kostřava červená
+40161,Lupina žlutá
+40162,Sléz krmný
+40163,Slunečnice roční
+40164,Srha laločnatá
+40273,Pšenice špalda
+40275,Chmel sadba
+40280,Konopí - Eletta Campana
+40282,Konopí - Fibror 79
+40284,Trávy čeledi lipnicovité s výjimkou obilnin
+40286,Trávy pro ochranné pásy
+40287,Trávy na semeno
+40292,Květiny
+40293,Kokrhel
+40294,Batáty
+40295,Žito energetické
+40296,Kmín kořenný jarní
+40299,Konopí - Henola
+40304,Směs pro ochranný pás (§ 14 -odst. 3 a-r NV PP)
+40304,Směs pro ochranný pás (§ 14 -q NV PP)
+40305,Směsi bílk. plodin (§ 28 a-f NV PP) bez obilovin
+40306,Směsi PVN s obilovinami §18 u NV PP (s převahou PVN)
+40307,"Směsi PVN s ost. pl § 18 u NV PP (bez obilovin, s převahou PVN)"
+40311,Merlík čilský
+40313,Konopí - Earlina 8 FC
+40318,Směsky obilovin
+40323,Mák setý ozimý
+40329,Hořčice černá
+40330,Vojtěška proměnlivá
+40359,Brambory konzumní rané
+40360,Brambory konzumní pozdní
+40361,Mrkev jedlá
+40362,Mrkev krmná
+40363,Paprika zeleninová
+40364,Paprika kořeninová
+40365,Tykev olejná
+40366,Pšenice tvrdá jarní
+40367,Pšenice tvrdá ozimá
+40369,Bob polní
