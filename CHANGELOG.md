@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - 
-- CZ: support the GPZ_DP schema of the 2019-2022 editions (renamed crop/area columns, no application date, ENTITA_ID is the block), recover the crop codes the 2020 edition leaves empty, and map the 120 crop codes EuroCrops does not carry
+- CZ: support the GPZ_DP schema of the 2019-2022 editions (renamed crop/area columns, no application date, ENTITA_ID is the block), recover the crop codes the 2020 edition leaves empty, map the 120 crop codes EuroCrops does not carry, and publish a declaration that straddles two land blocks once
 - Add DuckDB BaseConverter for efficiently transforming large datasets
 - Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
 - Declare the beautifulsoup4 dependency that the ES-PV and ES-VC converters import

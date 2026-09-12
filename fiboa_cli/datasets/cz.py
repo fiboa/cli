@@ -69,6 +69,15 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             if codes.isna().any():
                 by_name = gdf["PLOD_NAZE"].astype("string").str.strip().map(self._codes_by_name())
                 gdf["PLODINA_ID"] = codes.fillna(by_name)
+        elif gdf["ZAKRES_ID"].duplicated().any():
+            # A declaration that straddles two land blocks is listed once per
+            # block and carries the whole declaration's geometry both times —
+            # one pair in the 2026 edition. Keep the first of each repeat, so
+            # the polygon is published once; a repeat that differs in shape is
+            # something else and still fails the identity check.
+            repeats = gdf.assign(_wkb=gdf.geometry.to_wkb()).duplicated(["ZAKRES_ID", "_wkb"])
+            self.info(f"Dropping {repeats.sum()} declaration(s) listed once per land block")
+            gdf = gdf[~repeats]
         return super().migrate(gdf)
 
     def _codes_by_name(self) -> dict:
