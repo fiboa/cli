@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- Converters drop rows that cannot validate — no id, no crop:code, no geometry — up to 1% of a file, and fail rather than drop beyond that
+- Every schema a conversion needs is fetched upfront with retries, so a transient outage cannot kill a long run at the last step
 - Update vecorel-cli to v0.2.17:
   - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
   - GeoJSON files with a byte order mark no longer fail to read
