@@ -73,6 +73,8 @@ def _input_files(converter, *names):
 extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
+    # the fixture is the 2023 file; the converter's default is the newest edition
+    "fi": {"variant": "2023"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
@@ -150,7 +152,9 @@ def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
     required = expected_columns.get(converter)
     if required:
         metadata = pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata or {}
-        constants = json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+        constants = (
+            json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+        )
         missing = [c for c in required if c not in df.columns and constants.get(c) is None]
         assert not missing, (
             f"{converter} dropped {missing}: absent from the schema and from the "
