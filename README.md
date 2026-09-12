@@ -62,7 +62,7 @@ fiboa CLI supports various commands to work with the files:
     - [Improve a fiboa Parquet file](#improve-a-fiboa-parquet-file)
     - [Update an extension template with new names](#update-an-extension-template-with-new-names)
     - [Converter for existing datasets](#converter-for-existing-datasets)
-    - [Publish datasets to source coop or your own s3 repository](#publish-datasets-to-source-coop-or-your-own-s3-repository)
+    - [Publish datasets](#publish-datasets)
   - [Development](#development)
     - [Implement a converter](#implement-a-converter)
   - [Run in Docker](#run-in-docker)
@@ -193,46 +193,43 @@ Use any of the IDs from the list to convert an existing dataset to fiboa:
 
 See [Implement a converter](#implement-a-converter) for details about how to
 
-### Publish datasets to source coop or your own s3 repository
+### Publish datasets
 
 `fiboa publish <dataset> -o <target>`
 
-The publish converts and publishes a fiboa dataset to source coop or your own s3 repository. The target directory 
-will be filled with the following files:
+Converts and validates a fiboa dataset and prepares everything that is needed to publish it
+in a (STAC-based) catalog. The target directory will be filled with the following files:
 
 ```
 <target>/
-  <dataset>.parquet
-  <dataset>.pmtiles      # requires working ogr2ogr and tippecanoe
-  stac/collection.json
-  README.md              # generated if --generate-meta/-gm flag is present
-  LICENSE.txt            # generated if --generate-meta/-gm flag is present
+  <dataset>[-<variant>].parquet
+  <dataset>[-<variant>].pmtiles   # requires working ogr2ogr and tippecanoe
+  collection.json                 # STAC Collection with relative links to the files above
 ```
 
-This directory is synchronized to the s3 repository (default source.coop/fiboa/data).
+The STAC Collection carries `file:size` and `file:checksum` for the files and a
+`pmtiles` link (web-map-links extension). Existing files in the target directory are reused,
+delete them to regenerate. Uploading to a bucket and catalog-specific metadata
+(README, styles, thumbnails, ...) are the job of the catalog that publishes the data, e.g. the
+[harmonized field data catalog](https://github.com/fieldsoftheworld/harmonized-field-data-catalog).
 
-**Requirements**: Requires the [aws CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) to be installed, 
-and `AWS_ACCESS_KEY_ID` with `AWS_SECRET_ACCESS_KEY` environment variables. Also, for generating the pmtiles file, 
-it requires [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) and [tippecanoe](https://github.com/mapbox/tippecanoe).
+The command runs:
 
-The command executes the following steps:
-
-- `fiboa convert` to generate a fiboa parquet dataset. All convert parameters are passed to the converter.
-- `fiboa validate` to validate the fiboa dataset
-- creates a <dataset>.pmtiles from the parquet file. Uses ogr2ogr and tippecanoe
-- `fiboa create-stac-collection` to create a STAC collection
-- `fiboa publish` to publish the fiboa dataset to a source coop or your own s3 repository
+- `fiboa convert` to create a `<dataset>[-<variant>].parquet` file
+- `fiboa validate` to validate the GeoParquet file
+- `ogr2ogr | tippecanoe` to create the PMTiles file
+- `fiboa create-stac-collection` to create the STAC Collection
 
 Examples:
 
-- `fiboa publish at_crop -o data/at_crop`
-- `fiboa publish -c /tmp/cache -gm br_conab -o data/br_conab`
+- `fiboa publish at -o data/at`
+- `fiboa publish -c /tmp/cache nl --variant 2025 -o data/nl/2025`
 
 Relevant parameters:
 
-- `--generate-meta/-gm` Generatse the README.md and LICENSE.txt files if absent, based on data-survey and converter properties.
-- `--data-url` The URL to the data repository, used when generating the README
-- `--s3-upload-path` The `aws s3 sync` target. Defaults to `s3://source.coop/fiboa/data` . Uploading requires the `aws` CLI, and `AWS_ACCESS_KEY_ID` with `AWS_SECRET_ACCESS_KEY` environment variables.
+- `--variant` Choose the variant (e.g. year) of a dataset, defaults to the first variant.
+- `--no-pmtiles` Skip PMTiles generation.
+- `--tippecanoe-opts` Options passed to tippecanoe, defaults to `-zg --drop-densest-as-needed --extend-zooms-if-still-dropping`.
 
 Check `fiboa publish --help` for more details.
 
