@@ -61,6 +61,7 @@ tests = [
     "de_he",
     "de_st",
     "it_bz",
+    "de_sax",
 ]
 test_path = "tests/data-files/convert"
 
@@ -90,6 +91,7 @@ extra_convert_parameters = {
     "de_sl_block": _input_files("de_sl_block", "de_sl_block.gml"),
     "de_sl": _input_files("de_sl", "de_sl.gml"),
     "it_bz": _input_files("it_bz", "it_bz.json"),
+    "de_sax": {"input_files": {f"{test_path}/de_sax/gesamt_2026_RE.zip": ["2026_RE_FB_33.shp"]}},
 }
 
 
@@ -145,7 +147,9 @@ def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
     required = expected_columns.get(converter)
     if required:
         metadata = pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata or {}
-        constants = json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+        constants = (
+            json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+        )
         missing = [c for c in required if c not in df.columns and constants.get(c) is None]
         assert not missing, (
             f"{converter} dropped {missing}: absent from the schema and from the "
