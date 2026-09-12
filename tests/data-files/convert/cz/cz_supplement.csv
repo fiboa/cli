@@ -1,16 +1,34 @@
 original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+7,Tabák virginský,Virginia tobacco,tobacco,3301060100
 29,Jehlice rolní,Restharrow,other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299
+45,Parcha saflorová,Maral root,other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299
+54,Saturejka zahradní,Summer savory,other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299
 64,Bob,Broad bean,beans,3301020100
 66,Čičorka pestrá,Crown vetch,vetches,3301090305
+79,Lupina žlutá,Yellow lupin,sweet_lupins,3301020700
 83,Štírovník,Birdsfoot trefoil,lotus,3301082600
 147,Slunečnice (jinde neuvedená),Sunflower (not elsewhere specified),sunflower,3301060500
 259,Mák setý jarní,Poppy sown in spring,summer_poppy,3301060602
+329,Lipnice roční,Annual meadow grass,poaceae_grasses,3301090200
+332,Metlice trsnatá,Tufted hairgrass,poaceae_grasses,3301090200
+337,Psineček výběžkatý,Creeping bentgrass,poaceae_grasses,3301090200
+345,Psineček psí,Velvet bentgrass,poaceae_grasses,3301090200
+347,Lipnice obecná,Rough meadow grass,poaceae_grasses,3301090200
+348,Lesknice vodní,Reed canary grass,poaceae_grasses,3301090200
 350,Trvalý travní porost,Permanent grassland,pasture_meadow_grassland_grass,3302000000
 360,Černý kořen (hadí mord španělský),Black salsify,salsify,3301084000
+372,Kozlíček polní (polníček),Lamb's lettuce,lambs_lettuce_rapunzel,3301310500
 394,Reveň,Rhubarb,rhubarb,3301230000
 402,Špenát ozimý,Winter spinach,spinach,3301310800
+405,Tykev fíkolistá,Fig-leaf gourd,pumpkin_squash_gourd,3301140400
 420,Brambory konzumní,Ware potatoes,potatoes,3301030000
 442,Léčivé rostliny (více druhů),Medicinal plants (multiple species),aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+525,Brutnák lékařský,Borage,borage,3301061209
+544,Bob zahradní,Garden broad bean,beans,3301020100
+563,Máta kadeřavá,Curly mint,mints_peppermint,3301061222
+575,Sléz krmný,Fodder mallow,malva,3301082800
+585,Tolice (jinde neuvedená),Medick (not elsewhere specified),alfalfa_lucerne,3301090301
+594,Sléz (jinde neuvedený),Mallow (not elsewhere specified),malva,3301082800
 602,Tykev muškátová,Crookneck pumpkin,pumpkin_squash_gourd,3301140400
 603,Krambe habešská,Abyssinian kale,other_industrial_crops,3301069900
 604,Mastňák habešský,niger,guizotia_abyssinica_nyger,3301060900
@@ -18,6 +36,7 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code
 607,Tykev pomíchaná,Mixed pumpkin,pumpkin_squash_gourd,3301140400
 616,Roketa setá (Rukola),Rocket (arugula),rocket_arugula,3301310600
 1000,Neurčená plodina,Unspecified crop,not_known_and_other,3399000000
+20019,Olše šedá,Grey alder,other_tree_wood_forest,3306990000
 40008,Konopí - Carmagnola,Hemp (Carmagnola),hemp_cannabis,3301061000
 40022,Konopí - Férimon,Hemp (Férimon),hemp_cannabis,3301061000
 40032,Konopí - Kompolti,Hemp (Kompolti),hemp_cannabis,3301061000
@@ -119,3 +138,32 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code
 40366,Pšenice tvrdá jarní,Durum wheat spring,spring_durum_hard_wheat,3301010202
 40367,Pšenice tvrdá ozimá,"Durum wheat, winter",winter_durum_hard_wheat,3301010201
 40369,Bob polní,Field Bean,beans,3301020100
+40377,Konopí - Fiona,Hemp (Fiona),hemp_cannabis,3301061000
+40378,Konopí - Loja,Hemp (Loja),hemp_cannabis,3301061000
+50016,Směs pro meziplodiny proti utužení půdy,Catch crop mixture against soil compaction,not_known_and_other,3399000000
+50022,Šalvěj hispánská (chia),Chia,sage_chia,3301190000
+50046,Směs pro dělící pás (premiová),Dividing strip mixture (premium),not_known_and_other,3399000000
+50068,Salát (více druhů),Lettuce (several kinds),other_salads_lettuce_leaf_vegetables,3301319900
+50077,Směs pro ochranný pás kolem KP (prémiová),Protective strip mixture around a landscape feature (premium),not_known_and_other,3399000000
+50081,Kmín kořenný dvouletý,Biennial caraway,caraway,3301061211
+50082,Krajinný prvek,Landscape feature,not_known_and_other,3399000000
+50085,Dřeviny pro ochr. pás ALS,Woody plants for a protective strip,other_tree_wood_forest,3306990000
+50086,Plodiny pro vědecké účely,Crops grown for research,not_known_and_other,3399000000
+50101,Směs zeleniny a bylin podporovaných v EZ,Mixture of vegetables and herbs (organic farming),fresh_vegetables,3301070000
+50105,Konopí - Felice,Hemp (Felice),hemp_cannabis,3301061000
+50108,Konopí - Ostara 9,Hemp (Ostara 9),hemp_cannabis,3301061000
+50113,Konopí - Midwest,Hemp (Midwest),hemp_cannabis,3301061000
+50117,Konopí - Auto Power 1,Hemp (Auto Power 1),hemp_cannabis,3301061000
+50118,Konopí - Enectaliana,Hemp (Enectaliana),hemp_cannabis,3301061000
+50120,Konopí - Mona 16,Hemp (Mona 16),hemp_cannabis,3301061000
+50125,Konopí - Enectarol,Hemp (Enectarol),hemp_cannabis,3301061000
+50129,Konopí - Finola2,Hemp (Finola 2),hemp_cannabis,3301061000
+50130,Směs zeleniny a bylin,Mixture of vegetables and herbs,fresh_vegetables,3301070000
+50138,Úhor po vyklučené trvalé kultuře,Fallow after a grubbed permanent crop,fallow_land_not_crop,3301110000
+50337,Pažitka víceletá,Perennial chives,chives,3301220100
+50347,Konopí - Bialobrzeskie,Hemp (Bialobrzeskie),hemp_cannabis,3301061000
+50348,Konopí - Białobrzeskie,Hemp (Białobrzeskie),hemp_cannabis,3301061000
+50355,Konopí - Tiborszallasi,Hemp (Tiborszallasi),hemp_cannabis,3301061000
+50371,Směs pro ozeleněný kolejový řádek,Mixture for a greened tramline,not_known_and_other,3399000000
+50372,Směs pro ochranný pás kolem KP,Protective strip mixture around a landscape feature,not_known_and_other,3399000000
+50374,Chřestnatec,Unidentified species (chřestnatec),not_known_and_other,3399000000
