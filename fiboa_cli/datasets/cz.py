@@ -80,6 +80,10 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         }
 
     ec_mapping_csv = "cz_2023.csv"
+    # EuroCrops mapped the 2023 code list. The 2019-2022 editions declare 120
+    # codes it never saw — 11.4% of their rows, fallow and ware potatoes among
+    # them — so their HCAT comes from a table of our own.
+    ec_mapping_supplements = ["https://fiboa.org/code/cz/cz_supplement.csv"]
     missing_schemas = {
         "properties": {
             "block_id": {"type": "string"},
