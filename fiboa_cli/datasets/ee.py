@@ -14,11 +14,14 @@ ATTRIBUTES = ",".join(["geom" if k == "geometry" else k for k in COLUMNS.keys()]
 
 
 class Convert(AddHCATMixin, FiboaBaseConverter):
+    # explicit cache names: the WFS URL has no usable file name
     variants = {
-        str(
-            year
-        ): f"https://kls.pria.ee/geoserver/inspire_gsaa/wfs?service=WFS&version=2.0.0&request=GetFeature&typeName=inspire_gsaa:LU.GSAA.AGRICULTURAL_PARCELS_{year}&propertyName={ATTRIBUTES}"
-        for year in range(2024, 2009, -1)
+        str(year): {
+            f"https://kls.pria.ee/geoserver/inspire_gsaa/wfs?service=WFS&version=2.0.0&request=GetFeature&typeName=inspire_gsaa:LU.GSAA.AGRICULTURAL_PARCELS_{year}&propertyName={ATTRIBUTES}": f"ee_gsaa_{year}.gml"
+        }
+        # the WFS also lists layers for 2010-2015, but they return zero
+        # features (checked 2026-08-30)
+        for year in range(2024, 2015, -1)
     }
     ec_mapping_csv = "https://fiboa.org/code/ee/ee.csv"
     id = "ee"
