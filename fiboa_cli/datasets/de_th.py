@@ -12,7 +12,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     id = "de_th"
     admin_subdivision_code = "TH"
     short_name = "Germany, Thuringia"
-    title = "Field boundaries for Thuringia, Germany"
+    title = "Field blocks for Thuringia, Germany"
     description = """
 For use in the application procedure of the Integrated Administration and Control System (IACS), digital data layers are required that represent the current situation of agricultural use with the required accuracy. The field block is a contiguous agricultural area of one or more farmers surrounded by permanent boundaries. The field block thus contains information on the geographical location of the outer boundaries of the agricultural area. Reference parcels are uniquely numbered throughout Germany (Feldblockident - FBI). They also have a field block size (maximum eligible area) and a land use category.
 

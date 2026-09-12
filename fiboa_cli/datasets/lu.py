@@ -9,7 +9,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     }
     id = "lu"
     short_name = "Luxembourg"
-    title = "Luxembourg FLIK Parcels"
+    title = "Field blocks for Luxembourg"
     description = """
 The Land Parcel Identification System (LPIS) is a reference database of the agriculture parcels used as a basis for area-related payments to farmers in relation to the Common Agricultural Policy (CAP). These payments are (co)financed by the European Agricultural Guarantee Fund (‘EAGF’) and the European Agricultural Fund for Rural Development (‘EAFRD’).
 
