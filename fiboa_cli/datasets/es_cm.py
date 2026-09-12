@@ -8,7 +8,7 @@ from fiboa_cli.datasets.es_base import ESBaseConverter
 
 class ESCMConverter(EsriRESTConverterMixin, ESBaseConverter):
     id = "es_cm"
-    short_name = "Spain "
+    short_name = "Spain Castilla-La Mancha"
     title = "Spain Castilla-La Mancha Crop fields"
     description = """
 SIGPAC is a Geographic Information System dedicated to the control of agricultural aid under
@@ -19,16 +19,18 @@ the identification basis for any type of aid related to the surface area.
     attribution = "Unidad de Cartografía. Secretaría General. Consejería de Agricultura, Ganadería y Desarrollo Rural."
     provider = "Unidad de Cartografía. Secretaría General. Consejería de Agricultura, Ganadería y Desarrollo Rural. <https://datosabiertos.castillalamancha.es>"
     columns = {
-        "dn_oid": "id",
+        "DN_OID": "id",
         "geometry": "geometry",
-        "provincia": "admin_province_code",
-        "municipio": "admin_municipality_code",
-        "dn_surface": "metrics:area",
-        "uso_sigpac": "crop:code",
+        "PROVINCIA": "admin_province_code",
+        "MUNICIPIO": "admin_municipality_code",
+        "DN_SURFACE": "metrics:area",
+        "USO_SIGPAC": "crop:code",
         "crop:name": "crop:name",
         "crop:name_en": "crop:name_en",
     }
+    use_code_attribute = "USO_SIGPAC"
     area_is_in_ha = False
+    use_variant_as_determination = True
     missing_schemas = {
         "properties": {
             "admin_province_code": {"type": "string"},
@@ -38,19 +40,17 @@ the identification basis for any type of aid related to the surface area.
     variants = {str(year): str(year) for year in range(2024, 2018 - 1, -1)}
 
     rest_base_url = "https://geoservicios.castillalamancha.es/arcgis/rest/services/Vector"
-    rest_attribute = "objectid_1"
+    rest_attribute = "OBJECTID_1"
 
     def get_urls(self):
-        latest_year = next(iter(self.variants))
         if not self.variant:
-            self.variant = latest_year
-        if self.variant == latest_year:
-            layer = "Vector/Recintos_sigpac"
-        else:
-            services = requests.get(self.rest_base_url, {"f": "pjson"}).json()["services"]
-            layer = next(
-                s["name"]
-                for s in services
-                if re.search(f"Recintos_sigpac_{self.variant}", s["name"], re.IGNORECASE)
-            )
+            self.variant = next(iter(self.variants))
+        # Always use the year-named service: the unnamed "Recintos_sigpac" service is
+        # whatever year is current (2025 in August 2026) and keys on OBJECTID instead.
+        services = requests.get(self.rest_base_url, {"f": "pjson"}).json()["services"]
+        layer = next(
+            s["name"]
+            for s in services
+            if re.search(f"Recintos_sigpac_{self.variant}$", s["name"], re.IGNORECASE)
+        )
         return {"REST": self.rest_base_url.replace("Vector", layer + "/MapServer")}
