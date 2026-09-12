@@ -4,8 +4,22 @@ from .commons.ec import EuroCropsConverterMixin
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     area_is_in_ha = False
-    ec_mapping_csv = "lt_2021.csv"
+    # EuroCrops' own table carries the same mangled names, so it cannot be used
+    # against repaired text; this copy has the names spelled correctly, and two
+    # mappings that were guessed from the mangled text put right (Šlapynės is
+    # wetlands, not spinach; Ankštiniai javai is leguminous, not spring cereals).
+    ec_mapping_csv = "https://fiboa.org/code/lt/lt_2021.csv"
     ec_year = 2021
+    # EuroCrops datasets normally carry their mapping in the file itself, in
+    # EC_trans_n / EC_hcat_n / EC_hcat_c. Here those columns hold the mapping
+    # that was derived from the mangled names — Šlapynės as spinach, Ankštiniai
+    # javai as spring cereals — so they are ignored and the corrected table is
+    # mapped onto the repaired crop name instead.
+    hcat_columns = {
+        "hcat:name_en": "hcat:name_en",
+        "hcat:name": "hcat:name",
+        "hcat:code": "hcat:code",
+    }
     sources = {"https://zenodo.org/records/6868143/files/LT_2021.zip": ["LT/LT_2021_EC.shp"]}
 
     id = "ec_lt"
@@ -33,25 +47,41 @@ The download service is a set of personalized spatial data of agricultural land 
         "geometry": "geometry",
     }
     add_columns = {"determination:datetime": "2021-10-08T00:00:00Z"}
-    missing_schemas = {"properties": {"claimant_id": {"type": "int64"}}}
-    column_filters = {
-        "GRUPE": lambda col: (
-            col.isin(
-                [
-                    "Darþovës",
-                    "Grikiai",
-                    "Ankðtiniai javai",
-                    "Aviþos",
-                    "Þieminiai javai",
-                    "Summer Cereals",
-                    "Vasariniai javai",
-                    "Cukriniai runkeliai",
-                    "Uogynai",
-                    "Kukurûzai",
-                ]
-            ),
-            False,
-        )
-    }
+    # The crop groups that are crops. What is left out is grassland, forest,
+    # ditches, wetlands, fallow and the other land-cover classes the register
+    # carries beside them.
+    CROP_GROUPS = [
+        "Daržovės",
+        "Grikiai",
+        "Ankštiniai javai",
+        "Avižos",
+        "Žieminiai javai",
+        "Vasariniai javai",
+        "Cukriniai runkeliai",
+        "Uogynai",
+        "Kukurūzai",
+    ]
+    column_filters = {"GRUPE": lambda col: (col.isin(Converter.CROP_GROUPS), False)}
 
-    missing_schemas = {"required": [], "properties": {"crop_name": {"type": "string"}}}
+    def migrate(self, gdf):
+        # The release ships Lithuanian that has been through the wrong code page
+        # and been saved as UTF-8: the .cpg claims UTF-8 and the bytes decode
+        # cleanly, but to "Ankðtiniai javai" rather than "Ankštiniai javai".
+        # Re-encoding as Latin-1 and decoding as CP1257 undoes exactly that, and
+        # leaves a name that is already correct untouched.
+        if "GRUPE" in gdf.columns:
+            gdf["GRUPE"] = gdf["GRUPE"].map(self._repair_baltic_text)
+        return super().migrate(gdf)
+
+    @staticmethod
+    def _repair_baltic_text(value):
+        if not isinstance(value, str):
+            return value
+        try:
+            return value.encode("latin-1").decode("cp1257")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            return value
+
+    # Two of these used to be declared, and the second silently replaced the
+    # first, so claimant_id reached the writer with no schema at all.
+    missing_schemas = {"required": [], "properties": {"claimant_id": {"type": "int64"}}}

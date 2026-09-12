@@ -23,6 +23,7 @@ tests = [
     "bg",
     "de_sh",
     "de_bb",
+    "ec_lt",
     "ec_lv",
     "ec_si",
     "fi",
