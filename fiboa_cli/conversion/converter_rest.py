@@ -92,26 +92,15 @@ class EsriRESTConverterMixin:
         page_size = service_metadata["maxRecordCount"]
         layer_url = f"{base_url}/{layer['id']}/query"
         # Joined layers qualify every field with the table name; discover the
-        # real key field before paging on it ("OBJECTID" alone fails there).
-        probe = self._rest_json(
-            layer_url,
-            {
-                "f": "json",
-                "where": "1=1",
-                "outFields": "*",
-                "resultRecordCount": 1,
-                "returnGeometry": "false",
-            },
+        # real key field before paging on it ("OBJECTID" alone fails there). The
+        # layer's own metadata names them, where a one-row probe would be a
+        # query: the Balearic service refuses "where=1=1" on its joined views.
+        layer_metadata = self._rest_json(f"{base_url}/{layer['id']}", {"f": "pjson"})
+        names = [field["name"] for field in layer_metadata.get("fields") or []]
+        attribute = next(
+            (n for n in names if n == self.rest_attribute),
+            next((n for n in names if n.endswith("." + self.rest_attribute)), self.rest_attribute),
         )
-        attribute = self.rest_attribute
-        if probe.get("features"):
-            names = list(probe["features"][0]["attributes"].keys())
-            attribute = next(
-                (n for n in names if n == self.rest_attribute),
-                next(
-                    (n for n in names if n.endswith("." + self.rest_attribute)), self.rest_attribute
-                ),
-            )
         base_where = self.rest_params.get("where")
 
         # Page by half-open id windows rather than orderByFields + "id > last":

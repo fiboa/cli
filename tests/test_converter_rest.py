@@ -61,11 +61,11 @@ class FakeService:
                 return self._payload
 
         if params.get("f") == "pjson":
+            if url.endswith(str(LAYER_ID)):  # the layer's fields name the real key
+                return Response({"fields": [{"name": self.key}]})
             return Response(
                 {"layers": [{"id": LAYER_ID, "name": "Recintos"}], "maxRecordCount": PAGE_SIZE}
             )
-        if params.get("outFields") == "*":  # the probe for the real key field
-            return Response({"features": [{"attributes": {self.key: self.ids[0]}}]})
         bound = max(self.ids) if params["orderByFields"].endswith("DESC") else min(self.ids)
         return Response({"features": [{"attributes": {self.key: bound}}]})
 
@@ -119,7 +119,8 @@ def test_converter_where_is_kept(service, tmp_path):
 
 
 def test_qualified_key_field_is_discovered(monkeypatch, tmp_path):
-    """A joined layer qualifies every field with its table name."""
+    """A joined layer qualifies every field with its table name; the layer's
+    own metadata names them, where a one-row probe would be a query."""
     fake = FakeService(key="RECINTOS.OBJECTID")
     monkeypatch.setattr("fiboa_cli.conversion.converter_rest.requests.get", fake.get)
     monkeypatch.setattr("fiboa_cli.conversion.converter_rest.stream_file", fake.stream)
