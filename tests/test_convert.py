@@ -41,6 +41,7 @@ tests = [
     "ch",
     "cz",
     "cz#2019",
+    "cz#2020",
     "us_usda_cropland",
     "us_ca_scm",
     "jp",
@@ -100,6 +101,8 @@ extra_convert_parameters = {
     # 2019 stands for the GPZ_DP releases (2019-2022), which name their columns
     # differently and carry no application date
     "cz#2019": {"variant": "2019"},
+    # 2020 is the edition that leaves the crop code empty
+    "cz#2020": {"variant": "2020"},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "fr": {"variant": "2022"},
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},

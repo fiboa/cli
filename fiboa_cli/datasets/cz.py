@@ -49,6 +49,13 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # before 2014.
     OLD_SCHEMA = {"PLODINA_NA": "PLOD_NAZE", "DEKL_VYMER": "ZAKRES_VYM"}
 
+    # The 2020 release leaves PLODINA_ID empty in 98.1% of its rows and names
+    # the crop only, in the ministry's own vocabulary — EuroCrops spells the
+    # same crops botanically ("Pšenice setá ozimá" for "Pšenice ozimá"), so
+    # cz_2023.csv matches two names in three. This table pairs each name with
+    # the code its neighbouring editions give it.
+    crop_names_csv = "https://fiboa.org/code/cz/cz_crop_names.csv"
+
     def migrate(self, gdf):
         if "PLODINA_NA" in gdf.columns:
             gdf = gdf.rename(columns=self.OLD_SCHEMA)
@@ -58,7 +65,19 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             gdf["ZAKRES_ID"] = range(len(gdf))
             # No date in these releases; the edition is the campaign year.
             gdf["DATUM_REP"] = f"01.01.{self.variant}"
+            codes = gdf["PLODINA_ID"].astype("string").str.strip()
+            if codes.isna().any():
+                by_name = gdf["PLOD_NAZE"].astype("string").str.strip().map(self._codes_by_name())
+                gdf["PLODINA_ID"] = codes.fillna(by_name)
         return super().migrate(gdf)
+
+    def _codes_by_name(self) -> dict:
+        from .commons.hcat import load_ec_mapping
+
+        return {
+            row["original_name"].strip(): row["original_code"].strip()
+            for row in load_ec_mapping(self.crop_names_csv)
+        }
 
     ec_mapping_csv = "cz_2023.csv"
     missing_schemas = {
