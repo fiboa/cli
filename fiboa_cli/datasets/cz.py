@@ -39,6 +39,27 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         # 'OKRES_NAZE': 'admin:subdivision_code',
     }
     column_migrations = {"DATUM_REP": lambda col: pd.to_datetime(col, format="%d.%m.%Y")}
+
+    # Two releases, two vocabularies. GEOPROSTOR_ZADOSTI (2023 onwards) is what
+    # the mapping above is written for; GPZ_DP (2019-2022) names the same things
+    # differently, carries no application date, and has nothing that identifies
+    # a row: ENTITA_ID is the block part and repeats once per crop declared on
+    # it — 242,754 distinct over the 282,462 rows of 2019 — so it is the block
+    # and the row position identifies the field, as in the Danish editions
+    # before 2014.
+    OLD_SCHEMA = {"PLODINA_NA": "PLOD_NAZE", "DEKL_VYMER": "ZAKRES_VYM"}
+
+    def migrate(self, gdf):
+        if "PLODINA_NA" in gdf.columns:
+            gdf = gdf.rename(columns=self.OLD_SCHEMA)
+            gdf["DPB_ID"] = gdf["ENTITA_ID"]
+            # Count positionally: the index repeats when an edition ships more
+            # than one shapefile and read_data concatenates them.
+            gdf["ZAKRES_ID"] = range(len(gdf))
+            # No date in these releases; the edition is the campaign year.
+            gdf["DATUM_REP"] = f"01.01.{self.variant}"
+        return super().migrate(gdf)
+
     ec_mapping_csv = "cz_2023.csv"
     missing_schemas = {
         "properties": {
