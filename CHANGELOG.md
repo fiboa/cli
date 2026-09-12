@@ -27,6 +27,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Europe-LAND converters: use crop_name as crop:code when the file's crop_code column is empty (LT 2024)
 - BE-VLG: derive determination:datetime from the variant year instead of a constant date
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It creates GeoParquet, PMTiles and a STAC Collection with relative links, `file:size`/`file:checksum` and a web-map-links v1.3.0 `pmtiles` link. Publishing is done by catalogs such as the [harmonized field data catalog](https://github.com/fieldsoftheworld/harmonized-field-data-catalog).
+
+- Declare the beautifulsoup4 dependency the ES-PV and ES-VC converters import
+- ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
+- A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
+- ES-MD: find RECINTO.shp wherever the archive puts it
+- REST converters: a variant may name its own service (es_ib keeps its yearly editions in a second one), the id-bound query is retried, and a joined layer's table prefixes are stripped for every converter
+- REST converters: page by id windows instead of server-side sorting, key cached pages by service as well as layer, discover the qualified key field on joined layers, and never keep an error response or a broken download as a cached page
+- Update vecorel-cli to v0.2.17:
+  - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
+  - GeoJSON files with a byte order mark no longer fail to read
+  - Drop the per-converter UTF-8 workarounds in de_bw and de_he, now redundant
+- Converter for Spain (whole), based on the FEGA 2025+ data
 - Add Italy Tuscany (IT-1) basd on EuroCrops v2
 - Suuport multiple years for CZ
 - Multiple years for DE_sh
