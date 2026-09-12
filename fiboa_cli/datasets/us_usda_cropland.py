@@ -8,17 +8,15 @@ from .commons.hcat import AddHCATMixin
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    # One archive carries the whole sequence: CSB1724.gdb has a CDL<year> crop
+    # column for every year 2017-2024, so every variant reads the same source.
     variants = {
-        "2024": {
+        str(y): {
             "https://www.nass.usda.gov/Research_and_Science/Crop-Sequence-Boundaries/datasets/NationalCSB_2017-2024_rev23.zip": [
                 "NationalCSB_2017-2024_rev23/CSB1724.gdb"
             ]
-        },
-        "2023": {
-            "https://www.nass.usda.gov/Research_and_Science/Crop-Sequence-Boundaries/datasets/NationalCSB_2016-2023_rev23.zip": [
-                "NationalCSB_2016-2023_rev23/CSB1623.gdb"
-            ]
-        },
+        }
+        for y in range(2024, 2016, -1)
     }
     id = "us_usda_cropland"
     short_name = "US (USDA CSB)"
@@ -33,21 +31,18 @@ CSB represents non-confidential single crop field boundaries over a set time fra
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     provider = "United States Department of Agriculture <https://www.nass.usda.gov>"
     license = "License and Liability <https://gee-community-catalog.org/projects/csb/#license-and-liability>"
+    # The dissolve below merges every CSB polygon of one crop within a state into
+    # a single geometry and splits it again, so an output field is not a source
+    # CSB. Columns that survived it through `aggfunc="first"` — CSBID, CNTY —
+    # describe an arbitrary member of the group, not the field they end up on, so
+    # neither is published: CSBID gave 3,093 distinct ids to 7.5 million fields.
     columns = {
         "geometry": "geometry",
-        "CSBID": "id",
+        "id": "id",
         # "CDL2023": "crop:code", will be added in migrate
         "crop:name": "crop:name",
-        "CNTY": "administrative_area_level_2",
     }
-    column_additions = {
-        "determination:datetime": "2023-05-01T00:00:00Z",
-    }
-    missing_schemas = {
-        "properties": {
-            "administrative_area_level_2": {"type": "string"},
-        }
-    }
+    use_variant_as_determination = True
     ec_mapping_csv = "https://fiboa.org/code/us/usda/cropland.csv"
 
     def migrate(self, gdf):
@@ -79,4 +74,8 @@ CSB represents non-confidential single crop field boundaries over a set time fra
             int(e["original_code"]): e["original_name"] for e in self.ec_mapping
         }
         gdf["crop:name"] = gdf[crop_key].map(original_name_mapping)
+
+        # Number the dissolved fields: nothing from the source identifies them.
+        gdf = gdf.reset_index(drop=True)
+        gdf["id"] = gdf.index.astype(str)
         return gdf
