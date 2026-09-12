@@ -56,6 +56,21 @@ class EsriRESTConverterMixin:
         gdf = gdf.rename(columns=renames)
         return gdf.loc[:, ~gdf.columns.duplicated()]
 
+    def _rest_json(self, url, params, attempts=5):
+        """Ask a service for JSON, patiently.
+
+        The Balearic proxy answers two requests in three with a 502, and the
+        metadata, the probe and the id bounds are each asked once per run, so
+        one refusal would end it.
+        """
+        for attempt in range(attempts):
+            try:
+                return requests.get(url, params).json()
+            except Exception:
+                if attempt == attempts - 1:
+                    raise
+                time.sleep(2**attempt)
+
     def get_data(self, paths, **kwargs):
         if isinstance(paths[0], tuple):
             # (path, uri) pairs from the base downloader: input_file param was used.
@@ -71,13 +86,13 @@ class EsriRESTConverterMixin:
         source_fs = get_fs(base_url)
         cache_fs, cache_folder = self.get_cache(self.cache_folder)
 
-        service_metadata = requests.get(base_url, {"f": "pjson"}).json()
+        service_metadata = self._rest_json(base_url, {"f": "pjson"})
         layer = self.rest_layer_filter(service_metadata["layers"])
         page_size = service_metadata["maxRecordCount"]
         layer_url = f"{base_url}/{layer['id']}/query"
         # Joined layers qualify every field with the table name; discover the
         # real key field before paging on it ("OBJECTID" alone fails there).
-        probe = requests.get(
+        probe = self._rest_json(
             layer_url,
             {
                 "f": "json",
@@ -86,7 +101,7 @@ class EsriRESTConverterMixin:
                 "resultRecordCount": 1,
                 "returnGeometry": "false",
             },
-        ).json()
+        )
         attribute = self.rest_attribute
         if probe.get("features"):
             names = list(probe["features"][0]["attributes"].keys())
@@ -157,27 +172,20 @@ class EsriRESTConverterMixin:
             page += 1
             yield self._unqualify(data), base_url, base_url, layer["id"]
 
-    def _rest_id_bound(self, layer_url, attribute, base_where, direction, attempts=5):
+    def _rest_id_bound(self, layer_url, attribute, base_where, direction):
         clause = f"{attribute}>-1"
-        params = {
-            "f": "json",
-            "where": f"({base_where}) AND {clause}" if base_where else clause,
-            "outFields": attribute,
-            "returnGeometry": "false",
-            "orderByFields": f"{attribute} {direction}",
-            "resultRecordCount": 1,
-        }
-        # This is the one sorted query left, and it is the one a tired server
-        # gives up on: the Balearic proxy answers two in three with a 502. The
-        # pages themselves are range queries and do not need this.
-        for attempt in range(attempts):
-            try:
-                response = requests.get(layer_url, params).json()
-                return int(next(iter(response["features"][0]["attributes"].values())))
-            except Exception:
-                if attempt == attempts - 1:
-                    raise
-                time.sleep(2**attempt)
+        response = self._rest_json(
+            layer_url,
+            {
+                "f": "json",
+                "where": f"({base_where}) AND {clause}" if base_where else clause,
+                "outFields": attribute,
+                "returnGeometry": "false",
+                "orderByFields": f"{attribute} {direction}",
+                "resultRecordCount": 1,
+            },
+        )
+        return int(next(iter(response["features"][0]["attributes"].values())))
 
     def _window_from_legacy_cache(self, cache_fs, cache_folder, layer_id, lo, hi, page_size):
         """Pages cached by the old sorted paging are keyed by the previous page's
