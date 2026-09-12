@@ -56,20 +56,21 @@ class EsriRESTConverterMixin:
         gdf = gdf.rename(columns=renames)
         return gdf.loc[:, ~gdf.columns.duplicated()]
 
-    def _rest_json(self, url, params, attempts=5):
+    def _rest_json(self, url, params, attempts=8):
         """Ask a service for JSON, patiently.
 
         The Balearic proxy answers two requests in three with a 502, and the
         metadata, the probe and the id bounds are each asked once per run, so
-        one refusal would end it.
+        one refusal would end it. Roughly two minutes of tolerance.
         """
         for attempt in range(attempts):
             try:
                 return requests.get(url, params).json()
-            except Exception:
+            except Exception as e:
                 if attempt == attempts - 1:
                     raise
-                time.sleep(2**attempt)
+                self.warning(f"{url}: {e}, retrying ({attempt + 1}/{attempts})")
+                time.sleep(min(2**attempt, 30))
 
     def get_data(self, paths, **kwargs):
         if isinstance(paths[0], tuple):
