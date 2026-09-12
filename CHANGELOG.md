@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - 
+- SK: nine editions, 2018-2026, from the per-campaign datasets on data.slovensko.sk (the single edition was labelled by its download year and held the 2024 file); the crop names are matched with their no-break spaces normalised, which alone maps 102,835 grassland fields
 - CZ: support the GPZ_DP schema of the 2019-2022 editions (renamed crop/area columns, no application date, ENTITA_ID is the block), recover the crop codes the 2020 edition leaves empty, map the 120 crop codes EuroCrops does not carry, and publish a declaration that straddles two land blocks once
 - Add DuckDB BaseConverter for efficiently transforming large datasets
 - Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
