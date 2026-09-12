@@ -9,7 +9,9 @@ data. These tests serve a small fake service so the paging can be watched.
 import json
 import os
 
+import geopandas as gpd
 import pytest
+from shapely.geometry import Point
 
 from fiboa_cli.conversion.converter_rest import EsriRESTConverterMixin
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
@@ -130,6 +132,30 @@ def test_qualified_key_field_is_discovered(monkeypatch, tmp_path):
     assert all(page.startswith("RECINTOS.OBJECTID%3E") for page in fake.pages)
 
 
+def test_qualified_fields_lose_their_table_prefix(monkeypatch, tmp_path):
+    """A joined layer qualifies every field, so `columns` would match nothing."""
+    fake = FakeService(key="RECINTOS.OBJECTID")
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.requests.get", fake.get)
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.stream_file", fake.stream)
+
+    pages = _read(RESTConverter(), tmp_path)
+
+    assert all("OBJECTID" in data.columns for data, *_ in pages)
+    assert not any("." in column for data, *_ in pages for column in data.columns)
+
+
+def test_an_unqualified_field_wins_over_a_qualified_one():
+    """The geometry table leads, so its plain name is not overwritten."""
+    gdf = gpd.GeoDataFrame(
+        {"OBJECTID": [1], "ATTR.OBJECTID": [9], "ATTR.USO": ["TA"]},
+        geometry=[Point(0, 0)],
+    )
+    out = EsriRESTConverterMixin._unqualify(gdf)
+
+    assert out["OBJECTID"].tolist() == [1]
+    assert out["USO"].tolist() == ["TA"]
+
+
 def test_error_response_is_not_kept_as_a_page(service, tmp_path, monkeypatch):
     def error_page(_source_fs, url, file):
         file.write(b'{"error":{"code":500,"message":"Internal error"}}')
@@ -205,6 +231,50 @@ def test_get_urls_requires_a_base_url():
     assert RESTConverter().get_urls() == {"REST": BASE_URL}
     with pytest.raises(AssertionError, match="rest_base_url"):
         NoURL().get_urls()
+
+
+def test_a_variant_may_name_its_own_service():
+    """An edition can live in a service of its own (es_ib's historic layers)."""
+    other = "https://example.test/arcgis/rest/services/HISTORIC/MapServer"
+
+    class TwoServices(RESTConverter):
+        variants = {"2026": BASE_URL, "2024": other}
+
+    assert TwoServices().get_urls() == {"REST": BASE_URL}  # the first variant
+    converter = TwoServices()
+    converter.variant = "2024"
+    assert converter.get_urls() == {"REST": other}
+
+
+def test_a_variant_that_is_not_a_url_leaves_the_base_url_alone():
+    class Years(RESTConverter):
+        variants = {"2024": "2024"}
+
+    converter = Years()
+    converter.variant = "2024"
+    assert converter.get_urls() == {"REST": BASE_URL}
+
+
+def test_id_bound_is_retried(monkeypatch):
+    """The one sorted query left is the one a tired server gives up on."""
+
+    class Answer:
+        def json(self):
+            return {"features": [{"attributes": {"OBJECTID": 7}}]}
+
+    answers = [RuntimeError("502"), Answer()]
+
+    def get(url, params=None, **kwargs):
+        answer = answers.pop(0)
+        if isinstance(answer, Exception):
+            raise answer
+        return answer
+
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.requests.get", get)
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.time.sleep", lambda _s: None)
+
+    assert RESTConverter()._rest_id_bound("url", "OBJECTID", None, "ASC") == 7
+    assert answers == []
 
 
 def test_download_files_passes_the_rest_url_through(tmp_path):

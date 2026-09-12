@@ -1,5 +1,6 @@
 import os
 import re
+import time
 from urllib.parse import urlencode
 
 import geopandas as gpd
@@ -18,12 +19,16 @@ class EsriRESTConverterMixin:
         return next(iter(layers))
 
     def get_urls(self):
-        assert self.rest_base_url, (
-            "Either define {c}.rest_base_url or override {c}.get_urls()".format(
-                c=self.__class__.__name__
-            )
+        # An edition may live in a service of its own: es_ib keeps the current
+        # snapshot in one and the yearly ones in another, so a variant whose
+        # value is a URL names the service to read it from.
+        url = self.variants.get(self.variant or next(iter(self.variants), ""))
+        if not isinstance(url, str) or not url.startswith("http"):
+            url = self.rest_base_url
+        assert url, "Either define {c}.rest_base_url or override {c}.get_urls()".format(
+            c=self.__class__.__name__
         )
-        return {"REST": self.rest_base_url}
+        return {"REST": url}
 
     def download_files(self, uris, cache_folder=None):
         # Read-data will just stream all pages of rest-service
@@ -33,6 +38,24 @@ class EsriRESTConverterMixin:
 
         # This happens when input_file param is used
         return super().download_files(uris, cache_folder)
+
+    @staticmethod
+    def _unqualify(gdf):
+        """Drop the table prefix a joined layer puts on every field name.
+
+        A join answers with SIGPAC_FOGAIBA.DN_OID rather than DN_OID, so a
+        converter's `columns` match nothing. The first table wins, which is the
+        one carrying the geometry.
+        """
+        if not any("." in c for c in gdf.columns):
+            return gdf
+        renames = {}
+        for column in gdf.columns:
+            name = column.rsplit(".", 1)[-1]
+            if name not in gdf.columns and name not in renames.values():
+                renames[column] = name
+        gdf = gdf.rename(columns=renames)
+        return gdf.loc[:, ~gdf.columns.duplicated()]
 
     def get_data(self, paths, **kwargs):
         if not (isinstance(paths[0], str) and paths[0].startswith("http")):
@@ -44,7 +67,7 @@ class EsriRESTConverterMixin:
             # map from their own attribute. Reading a fixture must match a real run.
             for path, uri in paths:
                 self.info(f"Reading {path} into GeoDataFrame")
-                yield gpd.read_file(path), path, uri, None
+                yield self._unqualify(gpd.read_file(path)), path, uri, None
             return
 
         base_url = paths[0]  # loop over paths to support more than 1 source
@@ -78,11 +101,9 @@ class EsriRESTConverterMixin:
             )
         base_where = self.rest_params.get("where")
 
-        # Page by half-open id windows instead of orderByFields + "id > last":
-        # server-side sorting costs ~100 s per request on joined layers, while a
-        # range filter on the indexed key answers in about a second. The key is
-        # unique, so a window of page_size ids cannot overflow a page; id gaps
-        # only produce empty windows, which are skipped.
+        # Page by half-open id windows rather than orderByFields + "id > last":
+        # server-side sorting costs ~100 s per request on joined layers. The key
+        # is unique, so a window of page_size ids cannot overflow a page.
         min_id = self._rest_id_bound(layer_url, attribute, base_where, "ASC")
         max_id = self._rest_id_bound(layer_url, attribute, base_where, "DESC")
 
@@ -138,22 +159,29 @@ class EsriRESTConverterMixin:
                 continue
             print(f"Read {len(data)} features, page {page} from ids ({hi - page_size} ... {hi}]")
             page += 1
-            yield data, base_url, base_url, layer["id"]
+            yield self._unqualify(data), base_url, base_url, layer["id"]
 
-    def _rest_id_bound(self, layer_url, attribute, base_where, direction):
+    def _rest_id_bound(self, layer_url, attribute, base_where, direction, attempts=5):
         clause = f"{attribute}>-1"
-        response = requests.get(
-            layer_url,
-            {
-                "f": "json",
-                "where": f"{clause} AND ({base_where})" if base_where else clause,
-                "outFields": attribute,
-                "returnGeometry": "false",
-                "orderByFields": f"{attribute} {direction}",
-                "resultRecordCount": 1,
-            },
-        ).json()
-        return int(next(iter(response["features"][0]["attributes"].values())))
+        params = {
+            "f": "json",
+            "where": f"{clause} AND ({base_where})" if base_where else clause,
+            "outFields": attribute,
+            "returnGeometry": "false",
+            "orderByFields": f"{attribute} {direction}",
+            "resultRecordCount": 1,
+        }
+        # This is the one sorted query left, and it is the one a tired server
+        # gives up on: the Balearic proxy answers two in three with a 502. The
+        # pages themselves are range queries and do not need this.
+        for attempt in range(attempts):
+            try:
+                response = requests.get(layer_url, params).json()
+                return int(next(iter(response["features"][0]["attributes"].values())))
+            except Exception:
+                if attempt == attempts - 1:
+                    raise
+                time.sleep(2**attempt)
 
     def _window_from_legacy_cache(self, cache_fs, cache_folder, layer_id, lo, hi, page_size):
         """Pages cached by the old sorted paging are keyed by the previous page's
