@@ -25,8 +25,95 @@ class FiboaBaseConverter(BaseConverter):
             self.columns = {**self.columns, "determination:datetime": "determination:datetime"}
 
     def convert(self, *args, **kwargs):
+        self._require_id_mapping()
+        self._require_one_source_of_urls()
         self._prewarm_schemas()
         return super().convert(*args, **kwargs)
+
+    def _require_one_source_of_urls(self):
+        """Fail when both `sources` and `variants` are declared.
+
+        The base converter takes `sources` when it is set and ignores the
+        variants entirely, so `--variant 2011` silently converts whatever
+        `sources` points at. hr declared both and would have published thirteen
+        copies of the current file under thirteen different years. A converter
+        that inherits variants it does not want says so with `variants = {}`.
+        """
+        if self.sources and self.variants:
+            raise ValueError(
+                f"{type(self).__name__} declares both sources and variants; sources wins "
+                "and every --variant would convert the same file. Drop sources, or set "
+                "variants = {} when the inherited ones do not apply."
+            )
+
+    def _require_unique_ids(self, gdf):
+        """Fail when the column that becomes `id` does not identify a field.
+
+        fiboa asks for one identifier per field, and the catalog documents `id`
+        as unique within an edition, but nothing measured it: es_cl published
+        9,109,136 fields whose id was the string "0", us_usda_cropland mapped a
+        group id shared by thousands of fields, and every converter that reads
+        several files and sets `index_as_id` repeated the same index once per
+        file. This runs before geometries are exploded, so it judges what the
+        converter assigned rather than the split parts of one source feature.
+
+        A missing id is a different failure, dropped under a bounded rule a few
+        lines below, so it is not counted here: es_cl's C_REFREC identifies all
+        13,022,051 recintos except the 20 that carry none, and reading those as
+        repeats rejected a perfectly good identifier.
+        """
+        sources = [
+            k
+            for k, v in self.columns.items()
+            if "id" in (v if isinstance(v, (list, tuple)) else [v])
+        ]
+        column = next(
+            (c for c in sources if c in gdf.columns), "id" if "id" in gdf.columns else None
+        )
+        if column is None:
+            # The mapping exists (convert() checks that) but the data does not
+            # carry it, and the unlisted-column drop then writes a file with no
+            # id that validates — si's 2019 campaign names the field POLJINA_ID.
+            raise ValueError(
+                f"{type(self).__name__}: none of the columns mapped to 'id' "
+                f"({', '.join(sources) or 'none'}) is in this source; it has "
+                f"{', '.join(sorted(gdf.columns)[:12])}"
+            )
+        ids = gdf[column].dropna()
+        if ids.is_unique:
+            return
+        counts = ids.value_counts()
+        duplicated = int(len(ids) - len(counts))
+        worst = int(counts.iloc[0])
+        raise ValueError(
+            f"{type(self).__name__}: '{column}' is not unique — {duplicated:,} of {len(ids):,} "
+            f"rows repeat an id (one appears {worst:,} times), so it cannot be `id`. Map a column "
+            "that identifies a field, build one from the source's key columns, or use the row "
+            "index (index_as_id) only when the conversion reads a single file."
+        )
+
+    def _require_id_mapping(self):
+        """Fail before converting when nothing will end up as `id`.
+
+        Every collection needs the identifier, and nothing downstream enforces
+        it: the base converter drops columns no mapping names, so a converter
+        without one simply writes a file without `id` and validates. That is
+        how de_bb and sk reached the catalog without it, and sk shows the
+        subtler half — `index_as_id = True` fills the column and the same drop
+        step removes it again, because `columns` never named it. A converter
+        with no natural key sets both `index_as_id` and `"id": "id"`.
+        """
+        targets = set()
+        for value in list(self.columns.values()) + list(self.column_additions or {}):
+            targets.update(value if isinstance(value, (list, tuple)) else [value])
+        if "id" not in targets:
+            hint = (
+                ' — `index_as_id = True` is set, so add \'"id": "id"\' to columns'
+                if getattr(self, "index_as_id", False)
+                else " — map a unique source column to it, or set index_as_id = True"
+                ' and add \'"id": "id"\' to columns'
+            )
+            raise ValueError(f"{type(self).__name__} maps no column to 'id'{hint}")
 
     def _prewarm_schemas(self):
         """Fetch every schema this conversion will need before doing any real
@@ -59,6 +146,7 @@ class FiboaBaseConverter(BaseConverter):
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
+        self._require_unique_ids(gdf)
 
         # post_migrate runs before columns are renamed, so look up the source column
         for key in REQUIRED_NON_NULL:

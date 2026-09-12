@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- Converters must map something to `id`, that column must be in the source, and its values must be unique — checked before a conversion starts and before geometries are exploded
+- A converter may no longer declare both `sources` and `variants`, where `sources` silently won and every `--variant` converted the same file
 - Converters drop rows that cannot validate — no id, no crop:code, no geometry — up to 1% of a file, and fail rather than drop beyond that
 - Every schema a conversion needs is fetched upfront with retries, so a transient outage cannot kill a long run at the last step
 - Update vecorel-cli to v0.2.17:
