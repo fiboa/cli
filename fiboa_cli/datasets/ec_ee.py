@@ -10,7 +10,11 @@ from .commons.ec import EuroCropsConverterMixin
 class Convert(EuroCropsConverterMixin, FiboaBaseConverter):
     ec_mapping_csv = "ee_2021.csv"
     ec_year = 2021
-    sources = "https://zenodo.org/records/14094196/files/EE_2021.zip?download=1"
+    sources = {
+        "https://zenodo.org/records/14094196/files/EE_2021.zip?download=1": [
+            "EE_2021/EE_2021_EC21.shp"
+        ]
+    }
     id = "ec_ee"
     short_name = "Estonia"
     title = "Field boundaries for Estonia"
@@ -36,16 +40,16 @@ The data comes from ARIB's database of agricultural parcels.
         "taotleja_n": "taotleja_nimi",  # name of applicant
         "taotleja_r": "taotleja_registrikood",  # applicant's registration code
     }
-    column_migrations = {"JAHR": lambda col: pd.to_datetime(col, format="%Y")}
+    # The shapefile truncates taotlusaasta ("application year") to ten characters;
+    # it holds a bare year, which has to become a datetime for the STAC extent.
+    column_migrations = {"taotlusaas": lambda col: pd.to_datetime(col, format="%Y")}
     missing_schemas = {
         "required": [
-            "taotletud_kultuur",
             "taotletud_maakasutus",
             "viimase_muutmise_aeg",
             "taotleja_nimi",
         ],
         "properties": {
-            "taotletud_kultuur": {"type": "string"},
             "taotletud_maakasutus": {"type": "string"},
             "niitmise_tuvastamise_staatus": {"type": "string"},
             "niitmise_tuvast_ajavahemik": {"type": "string"},
