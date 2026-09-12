@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
@@ -6,7 +8,17 @@ from .commons.data import read_data_csv
 
 
 class NZCropConverter(FiboaBaseConverter):
-    data_access = "Download manually from https://data.mfe.govt.nz/layer/105407-irrigated-land-area-raw-2020-update/"
+    data_access = """
+    Download manually (Koordinates login required) and place the zip in the cache folder:
+    - 2020: https://data.mfe.govt.nz/layer/105407-irrigated-land-area-raw-2020-update/ (mfe-irrigated-land-area-raw-2020-update-SHP.zip)
+    - 2017: https://data.mfe.govt.nz/layer/90838-irrigated-land-area-2017/ (mfe-irrigated-land-area-2017-SHP.zip)
+    Alternatively pass the zip with the `-i` CLI parameter.
+    """
+    variants = {
+        # keys are the cache filenames vecorel resolves before attempting a download
+        "2020": {"mfe-irrigated-land-area-raw-2020-update-SHP.zip": ["*.shp"]},
+        "2017": {"mfe-irrigated-land-area-2017-SHP.zip": ["*.shp"]},
+    }
 
     id = "nz"
     short_name = "New Zealand"
@@ -19,6 +31,22 @@ The spatial data covers all mainland regions of New Zealand, with the exception 
 contain significant irrigated areas. The spatial dataset is an update of the national dataset that was first
 created in 2017. The current update has incorporated data from the 2019 – 2020 irrigation season.
     """
+
+    def download_files(self, uris, cache_folder=None):
+        """The sources are manual downloads (Koordinates login): resolve the bare
+        filenames from ``variants`` against the cache folder instead of the cwd."""
+        _, cache_dir = self.get_cache(cache_folder)
+        resolved = {}
+        for uri, target in uris.items():
+            if "://" not in uri and not os.path.isabs(uri) and not os.path.exists(uri):
+                cached = os.path.join(cache_dir, uri)
+                if not os.path.exists(cached):
+                    raise FileNotFoundError(
+                        f"{uri} is a manual download; place it in {cache_dir} (see data_access)"
+                    )
+                uri = cached
+            resolved[uri] = target
+        return super().download_files(resolved, cache_folder)
 
     provider = "Aqualinc Research Limited <https://environment.govt.nz/publications/national-irrigated-land-spatial-dataset-2020-update>"
     license = "CC-BY-4.0"
