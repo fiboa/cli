@@ -1,14 +1,13 @@
-import pandas as pd
-
-from ..conversion.fiboa_converter import FiboaBaseConverter
+from fiboa_cli.conversion.duckdb import FiboaDuckDBBaseConverter
 
 
-class JPConverter(FiboaBaseConverter):
+class JPConverter(FiboaDuckDBBaseConverter):
     variants = {
         "2024": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2024.parquet",
         "2023": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2023.parquet",
         "2022": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2022.parquet",
         "2021": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2021.parquet",
+        "test": "./tests/data-files/convert/jp/jp_field_polygons_2024.parquet",
     }
 
     id = "jp"
@@ -32,21 +31,13 @@ current conditions. Fude Polygons are created for the purpose of roughly indicat
         "local_government_cd": "admin_local_code",
         "issue_year": "determination:datetime",
     }
+    # SQL migrations (DuckDB converter): per-feature determination date from the issue year
     column_migrations = {
-        "issue_year": lambda col: pd.to_datetime(col, format="%Y"),
+        "issue_year": "make_timestamp(CAST(issue_year AS INTEGER), 1, 1, 0, 0, 0) AT TIME ZONE 'UTC'",
     }
-
     missing_schemas = {
         "properties": {
             "land_type_en": {"type": "string"},
             "admin_local_code": {"type": "string"},
         }
     }
-
-    def convert(self, *args, **kwargs):
-        # Open only these columns to limit memory usage
-        super().convert(
-            *args,
-            columns=["GEOM", "polygon_uuid", "land_type_en", "local_government_cd", "issue_year"],
-            **kwargs,
-        )
