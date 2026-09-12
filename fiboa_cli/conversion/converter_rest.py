@@ -130,30 +130,12 @@ class EsriRESTConverterMixin:
                 clause = f"{attribute}>{lo} AND {attribute}<={hi}"
                 get_dict["where"] = f"({base_where}) AND {clause}" if base_where else clause
                 url = f"{layer_url}?{urlencode(get_dict)}"
-                if cache_fs is not None:
-                    cache_file = os.path.join(
-                        cache_folder, f"{self.id}_{service}_{layer['id']}_r{lo}.geojson"
-                    )
-                    if not cache_fs.exists(cache_file):
-                        try:
-                            with cache_fs.open(cache_file, mode="wb") as file:
-                                stream_file(source_fs, url, file)
-                        except Exception:
-                            # A download that broke off must not survive as a cached page
-                            if cache_fs.exists(cache_file):
-                                cache_fs.rm(cache_file)
-                            raise
-                    url = cache_file
-
-                try:
-                    data = gpd.read_file(url)
-                except Exception as e:
-                    # An error response from the server must not survive as a cached page
-                    if cache_fs is not None and cache_fs.exists(url):
-                        cache_fs.rm(url)
-                    raise RuntimeError(
-                        f"Could not read ids ({lo} ... {hi}] of {layer_url}: {e}"
-                    ) from e
+                cache_file = (
+                    os.path.join(cache_folder, f"{self.id}_{service}_{layer['id']}_r{lo}.geojson")
+                    if cache_fs is not None
+                    else None
+                )
+                data = self._rest_page(source_fs, cache_fs, url, cache_file, lo, hi, layer_url)
 
             lo = hi
             if len(data) == 0:
@@ -161,6 +143,38 @@ class EsriRESTConverterMixin:
             print(f"Read {len(data)} features, page {page} from ids ({hi - page_size} ... {hi}]")
             page += 1
             yield self._unqualify(data), base_url, base_url, layer["id"]
+
+    def _rest_page(self, source_fs, cache_fs, url, cache_file, lo, hi, layer_url, attempts=8):
+        """Download one page, and keep nothing that is not one.
+
+        A page is the request that is made hundreds of times per edition, so the
+        server refusing one is normal rather than fatal: neither a download that
+        broke off nor an error response (Esri answers a failed query with 200 and
+        a JSON error body) survives as a cached file, and the page is asked for
+        again.
+        """
+        for attempt in range(attempts):
+            try:
+                if cache_file is not None:
+                    if not cache_fs.exists(cache_file):
+                        try:
+                            with cache_fs.open(cache_file, mode="wb") as file:
+                                stream_file(source_fs, url, file)
+                        except Exception:
+                            if cache_fs.exists(cache_file):
+                                cache_fs.rm(cache_file)
+                            raise
+                    return gpd.read_file(cache_file)
+                return gpd.read_file(url)
+            except Exception as e:
+                if cache_file is not None and cache_fs.exists(cache_file):
+                    cache_fs.rm(cache_file)
+                if attempt == attempts - 1:
+                    raise RuntimeError(
+                        f"Could not read ids ({lo} ... {hi}] of {layer_url}: {e}"
+                    ) from e
+                self.warning(f"ids ({lo} ... {hi}]: {e}, retrying ({attempt + 1}/{attempts})")
+                time.sleep(min(2**attempt, 30))
 
     def _rest_id_bound(self, layer_url, attribute, base_where, direction):
         clause = f"{attribute}>-1"

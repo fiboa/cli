@@ -159,6 +159,7 @@ def test_error_response_is_not_kept_as_a_page(service, tmp_path, monkeypatch):
         file.write(b'{"error":{"code":500,"message":"Internal error"}}')
 
     monkeypatch.setattr("fiboa_cli.conversion.converter_rest.stream_file", error_page)
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.time.sleep", lambda _s: None)
 
     with pytest.raises(RuntimeError, match=r"Could not read ids \(0 ... 2\]"):
         _read(RESTConverter(), tmp_path)
@@ -171,10 +172,31 @@ def test_broken_download_is_not_kept_as_a_page(service, tmp_path, monkeypatch):
         raise ConnectionError("connection reset")
 
     monkeypatch.setattr("fiboa_cli.conversion.converter_rest.stream_file", broken)
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.time.sleep", lambda _s: None)
 
-    with pytest.raises(ConnectionError):
+    with pytest.raises(RuntimeError, match="connection reset"):
         _read(RESTConverter(), tmp_path)
     assert os.listdir(tmp_path) == []
+
+
+def test_a_page_is_asked_for_again(service, tmp_path, monkeypatch):
+    """Hundreds of pages per edition: one refusal is normal, not fatal."""
+    attempts = []
+    real = service.stream
+
+    def flaky(source_fs, url, file):
+        attempts.append(url)
+        if len(attempts) == 1:
+            raise ConnectionError("connection reset")
+        return real(source_fs, url, file)
+
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.stream_file", flaky)
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.time.sleep", lambda _s: None)
+
+    pages = _read(RESTConverter(), tmp_path)
+
+    assert [len(data) for data, *_ in pages] == [2, 2, 1]
+    assert len(attempts) == 4  # three pages, the first of them twice
 
 
 def test_legacy_page_is_reused_when_its_ids_cover_the_window(service, tmp_path):
