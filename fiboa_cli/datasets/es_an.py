@@ -45,11 +45,13 @@ developments.
         "crop:name_en": "crop:name_en",
     }
 
+    use_code_attribute = "CD_USO"
     area_is_in_ha = False
     area_calculate_missing = True
+    use_variant_as_determination = True
 
-    column_additions = ESBaseConverter.column_additions | {
-        "determination:datetime": "2024-03-28T00:00:00Z",
+    column_migrations = {
+        "ID_RECINTO": lambda col: col.astype("int64"),
     }
 
     missing_schemas = {

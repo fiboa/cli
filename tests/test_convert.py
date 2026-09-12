@@ -45,6 +45,7 @@ tests = [
     "ie",
     "es_cat",
     "es_cl",
+    "es_an",
     "es",
     "nz",
     "lt",
@@ -82,6 +83,10 @@ extra_convert_parameters = {
     "es_cl": {
         "variant": "2025",
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
+    },
+    "es_an": {
+        "variant": "2025",
+        "input_files": {f"{test_path}/es_an/SP25_REC_PROV_04.zip": ["SP25_REC_04.shp"]},
     },
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
