@@ -11,7 +11,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     id = "de_mv"
     admin_subdivision_code = "MV"
     short_name = "Germany, Mecklenburg-Western Pomerania"
-    title = "Field boundaries for Mecklenburg-Western Pomerania, Germany"
+    title = "Field blocks for Mecklenburg-Western Pomerania, Germany"
     description = "Field block register of the Ministry of Agriculture and Environment M-V"
 
     provider = "Ministerium für Landwirtschaft und Umwelt M-V <https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34>"

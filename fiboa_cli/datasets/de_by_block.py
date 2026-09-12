@@ -23,7 +23,7 @@ PAGE_SIZE = 10_000
 class DEBYBlockConverter(AdminConverterMixin, DEIACSMixin, FiboaBaseConverter):
     id = "de_by_block"
     admin_subdivision_code = "BY"
-    short_name = "Germany, Bavaria (LPIS)"
+    short_name = "Germany, Bavaria (blocks)"
     title = "Field blocks for Bavaria, Germany"
     description = """
 This dataset contains the field blocks ("Feldstücke") of Bavaria, the reference parcels of its Land
