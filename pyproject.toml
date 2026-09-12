@@ -25,6 +25,7 @@ requires-python = ">=3.11"
 dependencies = [
     "vecorel-cli==0.2.17",
     "beautifulsoup4>=4.12",
+    "duckdb==1.4.2",
     "spdx-license-list==3.27.0",
 ]
 
