@@ -4,16 +4,16 @@ from vecorel_cli.conversion.base import BaseConverter
 from ..fiboa.version import get_fiboa_uri
 
 AREA_KEY = "metrics:area"
-# Properties that a schema requires to be non-null; rows lacking them cannot
-# validate, so they are dropped (with a warning) rather than failing the run.
-REQUIRED_NON_NULL = ("id", "crop:code")
 
 
 class FiboaBaseConverter(BaseConverter):
     area_is_in_ha = True
     area_calculate_missing = False
     use_variant_as_determination = False
-    # rows lacking a REQUIRED_NON_NULL value are dropped up to this share, else it's an error
+    # rows that cannot validate are dropped up to this share of the file, above
+    # which the conversion fails: a handful of bad rows in a source is normal,
+    # a broken mapping is not. Raise it for a source that is genuinely that
+    # patchy, and the message says how many rows it would have dropped.
     max_dropped_share = 0.01
 
     def __init__(self, *args, **kwargs):
@@ -29,11 +29,13 @@ class FiboaBaseConverter(BaseConverter):
         return super().convert(*args, **kwargs)
 
     def _prewarm_schemas(self):
-        """Fetch every schema this conversion will need before doing any real
-        work, with retries. The schema hosts (vecorel.org, fiboa.org) fail
-        intermittently; without this, a transient blip after a long source
-        download kills the conversion at the very last step. load_file caches
-        per process, so a successful pre-warm makes the write network-free."""
+        """Fetch every schema this conversion will need before doing any real work.
+
+        The schema hosts (vecorel.org, fiboa.org) fail intermittently, and
+        without this a blip after a long source download killed the conversion
+        at its very last step. load_file caches per process, so a successful
+        pre-warm makes the write network-free — and tells the converter what
+        every row must carry (see _required_properties)."""
         import time
 
         from vecorel_cli.vecorel.util import load_file
@@ -42,7 +44,10 @@ class FiboaBaseConverter(BaseConverter):
         uris = set(self.extensions)
         uris.add(get_fiboa_uri())
         uris.add(f"https://vecorel.org/specification/v{vecorel_version}/schema.yaml")
-        attempts = 8
+        # Nothing has been downloaded or converted yet, so a schema that cannot
+        # be fetched should say so now rather than after a wait: one retry for a
+        # dropped connection, then out.
+        attempts = 2
         for uri in sorted(uris):
             for attempt in range(attempts):
                 try:
@@ -54,14 +59,28 @@ class FiboaBaseConverter(BaseConverter):
                             f"Cannot load schema {uri} after {attempts} attempts: {e}"
                         ) from e
                     self.warning(f"Schema fetch failed ({uri}), retrying: {str(e)[:100]}")
-                    # ~4 min of tolerance: vecorel.org outages have outlasted a 30 s budget
-                    time.sleep(min(2**attempt * 2, 60))
+                    time.sleep(2)
+
+    def _required_properties(self) -> set[str]:
+        """What the schemas this conversion declares require of every row.
+
+        A converter should not have to list them: the core schema requires id
+        and geometry, the crop extension crop:code and crop:code_list, and a
+        converter that declares an extension takes on its rules with it. The
+        schemas are already in memory, fetched by _prewarm_schemas.
+        """
+        try:
+            schema = self.create_collection(self.id).merge_schemas()
+        except Exception as e:
+            self.warning(f"Cannot resolve the declared schemas ({e}); requiring an id only")
+            return {"id"}
+        return set(schema.get("required", []))
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
 
         # post_migrate runs before columns are renamed, so look up the source column
-        for key in REQUIRED_NON_NULL:
+        for key in sorted(self._required_properties()):
             for src, dst in self.columns.items():
                 targets = dst if isinstance(dst, (list, tuple)) else [dst]
                 if key in targets and src in gdf.columns:
