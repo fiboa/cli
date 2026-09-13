@@ -9,6 +9,7 @@ COLUMNS = {
     "taotlusaasta": "determination:datetime",  # year
     "pindala_ha": "metrics:area",  # area (in ha)
     "taotletud_kultuur": "crop:name",  # requested crop culture
+    "taotletud_maakasutus": "land_use",  # requested land use: arable, permanent grassland, restored grassland
 }
 ATTRIBUTES = ",".join(["geom" if k == "geometry" else k for k in COLUMNS.keys()])
 
@@ -36,6 +37,9 @@ The data comes from ARIB's database of agricultural parcels.
     attribution = "© Põllumajanduse Registrite ja Informatsiooni Amet"
     license = "CC-BY-SA-3.0"
     columns = COLUMNS
+    # The source publishes no crop code at all — the crop is free text, which is
+    # what hcat:code is derived from — so this is the only classification it has.
+    missing_schemas = {"properties": {"land_use": {"type": "string"}}}
     column_migrations = {"taotlusaasta": lambda col: pd.to_datetime(col, format="%Y")}
 
     def file_migration(self, gdf, path: str, uri: str, layer=None):
