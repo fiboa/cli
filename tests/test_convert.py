@@ -137,20 +137,23 @@ expected_columns = {
 def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
     from fiboa_cli import Registry  # noqa
 
+    # "<id>#<label>" runs a second edition of <id>, from the same folder of input files
+    converter_id = converter.split("#")[0]
+
     def load_ec(csv_file=None, url=None):
         if csv_file and "://" in csv_file:
             csv_file = csv_file.split("/")[-1]
-        path = url if url and "://" not in url else f"{test_path}/{converter}/{csv_file}"
+        path = url if url and "://" not in url else f"{test_path}/{converter_id}/{csv_file}"
         return list(DictReader(open(path, "r", encoding="utf-8")))
 
     load_ec_mock.side_effect = load_ec
     logger.remove()
     logger.add(sys.stdout, format="{message}", level="DEBUG", colorize=False)
 
-    path = f"tests/data-files/convert/{converter}"
+    path = f"tests/data-files/convert/{converter_id}"
     kwargs = extra_convert_parameters.get(converter, {})
 
-    ConvertData(converter).convert(target=tmp_parquet_file, cache=path, **kwargs)
+    ConvertData(converter_id).convert(target=tmp_parquet_file, cache=path, **kwargs)
     out, err = capsys.readouterr()
     output = out + err
 
