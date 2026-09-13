@@ -6,12 +6,15 @@ from typing import Optional
 import duckdb
 import pyarrow.parquet as pq
 from vecorel_cli.conversion.duckdb import DuckDBBaseConverter, _sql_path
+from vecorel_cli.encoding.geojson import VecorelJSONEncoder
 from vecorel_cli.encoding.geoparquet import GeoParquet
 from vecorel_cli.vecorel.hilbert import hilbert_reference_bounds
 
 from .fiboa_converter import FiboaBaseConverter
 
 GEO_META_KEY = b"geo"
+# Marker for a property that a part carries as a column rather than as a constant
+_IN_COLUMN = object()
 COLLECTION_META_KEY = b"collection"
 
 # The two steps that put a written Parquet file into canonical Hilbert order.
@@ -114,7 +117,7 @@ class PerFileBaseConverter(FiboaBaseConverter):
             raise ValueError("No paths to merge")
         paths = [str(p) for p in paths]
 
-        geo, collection_json, expected_rows = self._merged_metadata(paths)
+        geo, collection_json, rehydrate, expected_rows = self._merged_metadata(paths)
         primary = geo["primary_column"]
         crs = geo["columns"][primary].get("crs")
         bounds = hilbert_reference_bounds(crs, geo["columns"][primary].get("bbox"))
@@ -136,10 +139,10 @@ class PerFileBaseConverter(FiboaBaseConverter):
         con.execute(f"SET temp_directory = {_sql_path(os.path.join(directory, '.duckdb_tmp'))}")
 
         self.info(f"Merging {len(paths)} part(s) -> {output_file} (Hilbert bounds {bounds})")
-        sources = "[" + ",".join(_sql_path(path) for path in paths) + "]"
+        select = self._merge_query(paths, rehydrate)
         con.execute(
             f"""
-            COPY (SELECT * FROM read_parquet({sources})) TO ? (
+            COPY ({select}) TO ? (
                 FORMAT parquet,
                 ROW_GROUP_SIZE {GeoParquet.row_group_size},
                 compression ?,
@@ -191,26 +194,50 @@ class PerFileBaseConverter(FiboaBaseConverter):
         return output_file
 
     def _merged_metadata(self, paths: list):
-        """The geo metadata of the merged file: one schema and one CRS for every
-        part, the union of their extents and geometry types."""
-        with pq.ParquetFile(paths[0]) as pf:
-            base_schema = pf.schema_arrow
-            rows = pf.metadata.num_rows
-        base_meta = base_schema.metadata or {}
-        if GEO_META_KEY not in base_meta:
-            raise ValueError(f"{paths[0]} has no 'geo' metadata; not a GeoParquet?")
+        """What the merged file needs from its parts: the geo metadata (one
+        schema and one CRS everywhere, the union of extents and geometry types),
+        the collection metadata, and the properties that have to go back into a
+        column.
+
+        A part holds one source file, so a property that varies over the dataset
+        but not within a file — the province of a provincial GeoPackage — is
+        constant there and gets moved into the part's collection metadata. Kept
+        that way, the merged file would claim the first part's value for every
+        row, so those properties are rehydrated during the merge.
+        """
+        schemas, collections, rows = [], [], 0
+        for path in paths:
+            with pq.ParquetFile(path) as pf:
+                schemas.append(pf.schema_arrow)
+                rows += pf.metadata.num_rows
+            meta = schemas[-1].metadata or {}
+            if GEO_META_KEY not in meta:
+                raise ValueError(f"{path} has no 'geo' metadata; not a GeoParquet?")
+            collections.append(json.loads(meta.get(COLLECTION_META_KEY, b"{}")))
+
+        # A feature property that is not the same everywhere belongs in a column
+        targets = set()
+        for value in self.columns.values():
+            targets.update(value if isinstance(value, (list, tuple)) else [value])
+        targets.discard("geometry")
+        rehydrate = {}
+        for key in targets:
+            values = [c.get(key, _IN_COLUMN) for c in collections]
+            if len(set(map(repr, values))) > 1:
+                rehydrate[key] = values
+
+        base_schema, base_meta = schemas[0], schemas[0].metadata or {}
         geo = json.loads(base_meta[GEO_META_KEY])
         primary = geo["primary_column"]
         column = geo["columns"][primary]
         crs = column.get("crs")
-
         bboxes = [column["bbox"]] if column.get("bbox") is not None else []
         geom_types = set(column.get("geometry_types") or [])
-        for path in paths[1:]:
-            with pq.ParquetFile(path) as pf:
-                schema = pf.schema_arrow
-                rows += pf.metadata.num_rows
-            if not schema.equals(base_schema, check_metadata=False):
+        # A rehydrated property is a column in some parts and not in others
+        ignore = set(rehydrate)
+        base_fields = [f for f in base_schema if f.name not in ignore]
+        for path, schema in zip(paths[1:], schemas[1:]):
+            if [f for f in schema if f.name not in ignore] != base_fields:
                 raise ValueError(
                     f"Schema mismatch: {path} differs from {paths[0]}.\n"
                     f"  Expected: {base_schema}\n"
@@ -234,7 +261,52 @@ class PerFileBaseConverter(FiboaBaseConverter):
             ]
         if geom_types:
             column["geometry_types"] = sorted(geom_types)
-        return geo, base_meta.get(COLLECTION_META_KEY, b"{}"), rows
+
+        collection = collections[0]
+        for key in rehydrate:
+            self.info(f"'{key}' differs between the parts, so it stays a column")
+            collection.pop(key, None)
+        return geo, json.dumps(collection, cls=VecorelJSONEncoder).encode("utf-8"), rehydrate, rows
+
+    def _merge_query(self, paths: list, rehydrate: dict):
+        """One SELECT per part, with the rehydrated properties as literals, so
+        the parts line up on the same columns."""
+        if not rehydrate:
+            sources = "[" + ",".join(_sql_path(path) for path in paths) + "]"
+            return f"SELECT * FROM read_parquet({sources})"
+
+        selects = []
+        for index, path in enumerate(paths):
+            with pq.ParquetFile(path) as pf:
+                names = set(pf.schema_arrow.names)
+            # EXCLUDE only names the part actually has; DuckDB rejects the rest
+            present = [key for key in rehydrate if key in names]
+            star = "*"
+            if present:
+                star = "* EXCLUDE (" + ", ".join(f'"{key}"' for key in present) + ")"
+            columns = [star]
+            for key, values in rehydrate.items():
+                if values[index] is _IN_COLUMN:
+                    if key not in names:
+                        raise ValueError(f"{path} has neither a column nor a value for '{key}'")
+                    columns.append(f'"{key}"')
+                else:
+                    columns.append(f'{_sql_literal(values[index])} AS "{key}"')
+            selects.append(f"SELECT {', '.join(columns)} FROM read_parquet({_sql_path(path)})")
+        return "\n            UNION ALL BY NAME\n            ".join(selects)
+
+
+def _sql_literal(value) -> str:
+    if value is None:
+        return "NULL"
+    if isinstance(value, bool):
+        return "TRUE" if value else "FALSE"
+    if isinstance(value, (int, float)):
+        return repr(value)
+    if not isinstance(value, str):
+        raise ValueError(f"Cannot put {value!r} back into a column; it is not a scalar")
+    escaped = value.replace("'", "''")
+    return f"'{escaped}'"
 
 
 def _num_rows(path) -> int:

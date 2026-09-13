@@ -203,3 +203,59 @@ def test_merge_reproduces_a_single_file_convert(tmp_path):
     out = pq.read_table(merged)
     assert out.column("id").to_pylist() == tbl.column("id").to_pylist()
     assert out.schema.equals(tbl.schema, check_metadata=False)
+
+
+def test_a_constant_that_differs_between_parts_becomes_a_column_again(tmp_path):
+    """A part holds one source file, so the province of a provincial GeoPackage
+    is constant there and gets moved into the part's collection metadata. The
+    merged file must not claim the first part's province for every row."""
+    import json
+
+    part_a = _make_part(tmp_path, "part_a.parquet")
+    tbl = pq.read_table(part_a)
+    collection = json.loads(tbl.schema.metadata[b"collection"])
+    assert collection["admin:subdivision_code"] == "01", "the fixture is Álava"
+    assert "admin:subdivision_code" not in tbl.column_names
+
+    part_b = tmp_path / "part_b.parquet"
+    other = dict(collection, **{"admin:subdivision_code": "02"})
+    meta = dict(tbl.schema.metadata)
+    meta[b"collection"] = json.dumps(other).encode()
+    pq.write_table(tbl.replace_schema_metadata(meta), part_b, compression="zstd")
+
+    merged = tmp_path / "merged.parquet"
+    ESConverter().merge_files(str(merged), [str(part_a), str(part_b)])
+    out = pq.read_table(merged)
+    assert "admin:subdivision_code" in out.column_names
+    assert sorted(set(out.column("admin:subdivision_code").to_pylist())) == ["01", "02"]
+    # and it is gone from the collection metadata, which no longer holds for all rows
+    merged_collection = json.loads(out.schema.metadata[b"collection"])
+    assert "admin:subdivision_code" not in merged_collection
+    # the properties that really are constant stay where they were
+    assert merged_collection["admin:country_code"] == "ES"
+
+
+def test_a_part_that_kept_the_column_merges_with_one_that_did_not(tmp_path):
+    """One source file can hold two provinces and keep the column, while the
+    next holds one and has it as a constant. Both must land in the same column."""
+    import json
+
+    import pyarrow as pa
+
+    part_a = _make_part(tmp_path, "part_a.parquet")
+    tbl = pq.read_table(part_a)
+
+    part_b = tmp_path / "part_b.parquet"
+    codes = ["02" if i % 2 else "03" for i in range(tbl.num_rows)]
+    with_column = tbl.append_column("admin:subdivision_code", pa.array(codes, pa.string()))
+    collection = json.loads(tbl.schema.metadata[b"collection"])
+    del collection["admin:subdivision_code"]  # not constant here, so not dehydrated
+    meta = dict(tbl.schema.metadata)
+    meta[b"collection"] = json.dumps(collection).encode()
+    pq.write_table(with_column.replace_schema_metadata(meta), part_b, compression="zstd")
+
+    merged = tmp_path / "merged.parquet"
+    ESConverter().merge_files(str(merged), [str(part_a), str(part_b)])
+    out = pq.read_table(merged)
+    assert out.num_rows == 2 * tbl.num_rows
+    assert sorted(set(out.column("admin:subdivision_code").to_pylist())) == ["01", "02", "03"]
