@@ -46,16 +46,13 @@ of the Ministry of Agriculture, Livestock and Fisheries.
     }
 
     def migrate(self, gdf):
-        # The crop map has no identifier, and the seven island files each keep
-        # their own 0-based index, which index_as_id published as is: 177,543
-        # distinct ids for 461,729 fields. Number them after the merge.
         gdf = gdf.reset_index(drop=True)
         gdf["id"] = gdf.index.astype(str)
         return super().migrate(gdf)
 
     column_additions = {
         "admin:country_code": "ES",
-        "admin:subdivision_code": "CN",  # ES-CN Canarias; CB is Cantabria
+        "admin:subdivision_code": "CN",
         "crop:code_list": "https://fiboa.org/code/es/cn/crop.csv",
     }
     missing_schemas = {
