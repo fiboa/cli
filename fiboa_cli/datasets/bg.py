@@ -1,39 +1,56 @@
-from geopandas import GeoDataFrame
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
-from fiboa_cli.datasets.commons.data import read_data_csv
+
+# The ministry's GeoServer names the campaign in the layer, not in a parameter,
+# and publishes Agricultural_Land_<year> for 2021 onwards. Its Physical_Blocks
+# layers cover the same blocks including forest, urban and roads (1.5M of them
+# in 2025, against 226,592 agricultural); this is the agricultural subset.
+BASE = (
+    "http://inspire.mzh.government.bg:8080/geoserver/ows?request=GetFeature&service=WFS"
+    "&version=2.0.0&outputFormat=SHAPE-ZIP&typeNames=VectorData:Agricultural_Land_{year}"
+    # without this the Bulgarian names come back as ISO-8859-1 question marks
+    "&format_options=CHARSET:UTF-8"
+)
 
 
 class BGConverter(AdminConverterMixin, FiboaBaseConverter):
-    sources = {
-        "http://inspire.mzh.government.bg:8080/geoserver/ows?request=GetFeature&service=WFS&version=2.0.0&outputFormat=SHAPE-ZIP&typeNames=VectorDataSet:Arable_Land_2024": "bg_arable_land_2024.zip"
+    # the response carries no file name of its own
+    variants = {
+        str(year): {BASE.format(year=year): f"bg_agricultural_land_{year}.zip"}
+        for year in range(2025, 2020, -1)
     }
 
     id = "bg"
     short_name = "Bulgaria"
-    title = "Bulgaria"
+    title = "Field blocks for Bulgaria"
     license = "CC-BY-4.0"
-    provider = "Ministry of Health"
+    provider = "Ministry of Agriculture and Food <https://www.mzh.government.bg>"
     description = """
-Bulgarian Agriculture areas. Dataset has been produced from field checks and orthophotos mapping.
-Categorized in Arable Land, Greenhouses, Mixed Land Use and Rice fields.
-    """
+The agricultural part of the Bulgarian physical block register (физически блокове): a physical block is a
+contiguous area of land bounded by permanent features, identified as <EKATTE settlement code>-<block number>
+and classified by its use. The register has been produced from field checks and orthophoto mapping.
 
-    area_is_in_ha = False
+These layers hold the blocks used agriculturally — arable land, greenhouses, rice fields and courtyards —
+where the Physical_Blocks layers of the same service also carry forest, urban and transport land.
+    """
+    # The layer carries no area column; the blocks are in UTM 35N metres.
+    area_calculate_missing = True
+    # Only the campaign is known, not a date per block.
+    use_variant_as_determination = True
     columns = {
         "geometry": "geometry",
         "PHBIDENT": "id",
-        "USAGEENG": "crop:name",
-        "crop:code": "crop:code",
-        "AREA": "metrics:area",
+        "USAGECODE": "crop:code",
+        "USAGEBUL": "crop:name",
+        "USAGEENG": "crop:name_en",
+        # nothing in the source maps to it, so name it here for the calculation
+        "metrics:area": "metrics:area",
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    column_additions = {"crop:code_list": "https://fiboa.org/code/bg/bg_arable.csv"}
 
-    def migrate(self, gdf) -> GeoDataFrame:
-        gdf = super().migrate(gdf)
-        csv = read_data_csv("bg_arable.csv")
-        crop_to_code = {e["original_name"]: i + 1 for i, e in enumerate(csv)}
-        gdf["crop:code"] = gdf["USAGEENG"].map(crop_to_code)
-        return gdf
+    # GeoServer writes the charset into a .cst file, which GDAL does not read (it
+    # looks for .cpg), so the Bulgarian names arrive as Latin-1 mojibake.
+    def read_data(self, paths, **kwargs):
+        kwargs.setdefault("encoding", "UTF-8")
+        return super().read_data(paths, **kwargs)
