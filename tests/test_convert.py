@@ -22,6 +22,7 @@ tests = [
     "be_vlg",
     "br_ba_lem",
     "bg",
+    "bg#2022",
     "de_sh",
     "de_bb",
     "ec_lv",
@@ -95,6 +96,8 @@ extra_convert_parameters = {
     # 2018 is the one release that names KDIEL, VYMERA_KD and PLODINA_NA
     "sk#2018": {"variant": "2018"},
     "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
+    # 2021 and 2022 name the block and its usage in one field, and publish an area
+    "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": _input_files("lv", "1_100.xml"),
