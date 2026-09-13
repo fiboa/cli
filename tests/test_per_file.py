@@ -1,5 +1,4 @@
-"""Tests for the per-file streaming merge (PerFileBaseConverter) and its
-Hilbert-order helpers."""
+"""Tests for PerFileBaseConverter and the Hilbert order of what it merges."""
 
 import shutil
 from csv import DictReader
@@ -100,13 +99,10 @@ def _make_part(tmp_path, name="part_a.parquet"):
     return out
 
 
-def test_merge_files_rejects_empty_and_bad_version(tmp_path):
+def test_merge_files_rejects_empty_input(tmp_path):
     conv = ESConverter()
     with pytest.raises(ValueError, match="No paths"):
         conv.merge_files(str(tmp_path / "o.parquet"), [])
-    part = _make_part(tmp_path)
-    with pytest.raises(ValueError, match="geoparquet_version"):
-        conv.merge_files(str(tmp_path / "o.parquet"), [str(part)], geoparquet_version="9.9.9")
 
 
 def test_merge_files_rejects_non_geoparquet(tmp_path):
@@ -134,34 +130,20 @@ def test_merge_files_rejects_schema_mismatch(tmp_path):
         conv.merge_files(str(tmp_path / "o.parquet"), [str(part), str(other)])
 
 
-def test_merge_resorts_unsorted_part(tmp_path, capsys):
+def test_merge_sorts_whatever_order_the_parts_are_in(tmp_path):
     part = _make_part(tmp_path)
-    # destroy the Hilbert order of a copy: reverse the row order
+    # a second part whose rows run backwards: the merge sorts globally, so the
+    # order the parts happen to have does not reach the output
     shuffled = tmp_path / "part_b.parquet"
     tbl = pq.read_table(part)
     rev = tbl.take(list(reversed(range(tbl.num_rows))))
     pq.write_table(rev.cast(tbl.schema), shuffled)
-    conv = ESConverter()
-    # resort the shuffled file directly first: the in-place rewrite must
-    # preserve schema metadata and the narrow (non-large) column types
-    from fiboa_cli.conversion.per_file import _ensure_hilbert_sorted
 
-    resorted = _ensure_hilbert_sorted(
-        str(shuffled), "geometry", crs_total_bounds("EPSG:4258"), "zstd", None
-    )
-    assert resorted is True
-    import json as _json
-
-    with pq.ParquetFile(shuffled) as pf:
-        meta = pf.schema_arrow.metadata or {}
-        assert b"geo" in meta and b"collection" in meta
-        _json.loads(meta[b"geo"])
-        assert pf.schema_arrow.equals(pq.ParquetFile(part).schema_arrow, check_metadata=False)
     merged = tmp_path / "merged.parquet"
-    conv.merge_files(str(merged), [str(part), str(shuffled)], cleanup_parts=True)
+    ESConverter().merge_files(str(merged), [str(part), str(shuffled)], cleanup_parts=True)
     assert pq.ParquetFile(merged).metadata.num_rows == 2 * tbl.num_rows
     assert not part.exists() and not shuffled.exists()
-    # the merged file is globally Hilbert-sorted
+
     from vecorel_cli.vecorel.hilbert import bounds_array_for_table as _bounds_array_for_table
 
     out_tbl = pq.read_table(merged)
@@ -169,6 +151,10 @@ def test_merge_resorts_unsorted_part(tmp_path, capsys):
         _bounds_array_for_table(out_tbl, "geometry"), crs_total_bounds("EPSG:4258")
     )
     assert (np.diff(keys.astype("int64")) >= 0).all()
+    # the merged file is packaged like any other output
+    meta = pq.ParquetFile(merged).schema_arrow.metadata
+    assert b"geo" in meta and b"collection" in meta
+    assert pq.ParquetFile(merged).schema_arrow.equals(tbl.schema, check_metadata=False)
 
 
 def test_bounds_array_wkb_fallback(tmp_path):
@@ -182,3 +168,38 @@ def test_bounds_array_wkb_fallback(tmp_path):
     bounds = _bounds_array_for_table(tbl, "geometry")
     assert bounds.shape == (tbl.num_rows, 4)
     assert (bounds[:, 2] >= bounds[:, 0]).all() and (bounds[:, 3] >= bounds[:, 1]).all()
+
+
+def test_merge_reproduces_a_single_file_convert(tmp_path):
+    """Splitting a converted file into parts and merging them back must give
+    the same rows in the same order as converting it in one go."""
+    import json
+
+    import pyarrow as pa
+
+    whole = _make_part(tmp_path, "whole.parquet")
+    tbl = pq.read_table(whole)
+    xs = tbl.column("bbox").combine_chunks().field("xmin").to_numpy()
+    mid = float(np.median(xs))
+    parts = []
+    for i, rows in enumerate([tbl.filter(pa.array(xs < mid)), tbl.filter(pa.array(xs >= mid))]):
+        # each part carries its own extent, like a real per-file conversion
+        geo = json.loads(tbl.schema.metadata[b"geo"])
+        bbox = rows.column("bbox").combine_chunks()
+        geo["columns"]["geometry"]["bbox"] = [
+            min(bbox.field("xmin").to_pylist()),
+            min(bbox.field("ymin").to_pylist()),
+            max(bbox.field("xmax").to_pylist()),
+            max(bbox.field("ymax").to_pylist()),
+        ]
+        meta = dict(tbl.schema.metadata)
+        meta[b"geo"] = json.dumps(geo).encode()
+        path = tmp_path / f"split_{i}.parquet"
+        pq.write_table(rows.replace_schema_metadata(meta), path, compression="zstd")
+        parts.append(str(path))
+
+    merged = tmp_path / "merged.parquet"
+    ESConverter().merge_files(str(merged), parts)
+    out = pq.read_table(merged)
+    assert out.column("id").to_pylist() == tbl.column("id").to_pylist()
+    assert out.schema.equals(tbl.schema, check_metadata=False)

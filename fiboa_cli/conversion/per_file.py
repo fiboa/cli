@@ -1,24 +1,24 @@
 import json
 import os
+from pathlib import Path
 from typing import Optional
 
-import numpy as np
-import pyarrow as pa
+import duckdb
 import pyarrow.parquet as pq
-from vecorel_cli.vecorel.hilbert import (
-    ensure_hilbert_sorted as _ensure_hilbert_sorted,
-)
-from vecorel_cli.vecorel.hilbert import (
-    hilbert_keys_for_table as _hilbert_keys_for_table,
-)
-from vecorel_cli.vecorel.hilbert import (
-    hilbert_reference_bounds,
-)
+from vecorel_cli.conversion.duckdb import DuckDBBaseConverter, _sql_path
+from vecorel_cli.encoding.geoparquet import GeoParquet
+from vecorel_cli.vecorel.hilbert import hilbert_reference_bounds
 
 from .fiboa_converter import FiboaBaseConverter
 
 GEO_META_KEY = b"geo"
-DEFAULT_BATCH_SIZE = 64_000
+COLLECTION_META_KEY = b"collection"
+
+# The two steps that put a written Parquet file into canonical Hilbert order.
+# They are private on the DuckDB converter; vecorel/cli#34 asks for them to
+# become shared API, so that one routine orders every file we write.
+_write_hilbert_keys = DuckDBBaseConverter._write_hilbert_keys
+_sort_output = DuckDBBaseConverter._sort_output
 
 
 # This converter is experimental, use with caution.
@@ -96,130 +96,88 @@ class PerFileBaseConverter(FiboaBaseConverter):
         self,
         output_file: str,
         paths: list,
-        batch_size: int = DEFAULT_BATCH_SIZE,
         compression: str = "zstd",
         compression_level: Optional[int] = None,
         geoparquet_version: Optional[str] = None,
         cleanup_parts: bool = False,
     ) -> str:
         """
-        Merge a list of GeoParquet files into a single GeoParquet, globally
-        sorted by Hilbert distance. Streams via pyarrow row groups so peak
-        memory is roughly O(batch_size * k).
+        Merge GeoParquet parts into one file, sorted into the canonical Hilbert
+        order over the merged extent, so the ordering does not depend on which
+        part a feature came from.
 
-        Each input file is expected to be sorted by Hilbert distance against
-        the CRS's total bounds (see ``vecorel_cli.vecorel.hilbert``). If a
-        part file is *not* in Hilbert order it is sorted in place before the
-        streaming merge — this guards against pre-existing part files that
-        were produced by an older vecorel-cli (which sorted by WKB lex order
-        instead of Hilbert) and would otherwise silently drop rows in the
-        streaming merge (``np.searchsorted`` requires a sorted input).
-
-        ``geoparquet_version`` (``"1.0.0"`` / ``"1.1.0"`` / ``None``) sets the
-        ``version`` field of the merged file's ``geo`` metadata. When ``None``
-        (default), the value declared by the input files is preserved unchanged.
+        The parts are concatenated and sorted by DuckDB, which sorts externally
+        and spills to disk, and packaged by ``GeoParquet.postprocess`` — the same
+        two steps the DuckDB converter uses, so this writes no Parquet of its own.
         """
-        if geoparquet_version is not None:
-            from vecorel_cli.const import GEOPARQUET_VERSIONS
-
-            if geoparquet_version not in GEOPARQUET_VERSIONS:
-                raise ValueError(
-                    f"Invalid geoparquet_version {geoparquet_version!r}; "
-                    f"expected one of {GEOPARQUET_VERSIONS}"
-                )
         if not paths:
             raise ValueError("No paths to merge")
         paths = [str(p) for p in paths]
 
-        with pq.ParquetFile(paths[0]) as base_pf:
-            base_schema = base_pf.schema_arrow
-        base_meta = base_schema.metadata or {}
-        if GEO_META_KEY not in base_meta:
-            raise ValueError(f"{paths[0]} has no 'geo' metadata; not a GeoParquet?")
-        base_geo = json.loads(base_meta[GEO_META_KEY])
-        primary_col = base_geo["primary_column"]
-        primary_col_meta = base_geo["columns"][primary_col]
-        crs = primary_col_meta.get("crs")
-
-        # Validate schemas + CRS, collect per-file bboxes / geometry_types for
-        # the merged geo metadata.
-        bboxes: list = []
-        geom_types: set = set()
-        if primary_col_meta.get("bbox") is not None:
-            bboxes.append(primary_col_meta["bbox"])
-        geom_types.update(primary_col_meta.get("geometry_types") or [])
-        for path in paths[1:]:
-            with pq.ParquetFile(path) as pf:
-                sch = pf.schema_arrow
-            if not sch.equals(base_schema, check_metadata=False):
-                raise ValueError(
-                    f"Schema mismatch: {path} differs from {paths[0]}.\n"
-                    f"  Expected: {base_schema}\n"
-                    f"  Got:      {sch}"
-                )
-            geo = json.loads((sch.metadata or {})[GEO_META_KEY])
-            col = geo["columns"][primary_col]
-            if col.get("crs") != crs:
-                raise ValueError(
-                    f"CRS mismatch: {path} has crs={col.get('crs')!r}, expected {crs!r}"
-                )
-            if col.get("bbox") is not None:
-                bboxes.append(col["bbox"])
-            geom_types.update(col.get("geometry_types") or [])
-
-        merged_bbox = None
-        if bboxes:
-            merged_bbox = (
-                min(b[0] for b in bboxes),
-                min(b[1] for b in bboxes),
-                max(b[2] for b in bboxes),
-                max(b[3] for b in bboxes),
-            )
-
-        # Same Hilbert reference grid that the upstream sort used.
-        total_bounds = hilbert_reference_bounds(crs, merged_bbox)
-        if total_bounds is None:
+        geo, collection_json, expected_rows = self._merged_metadata(paths)
+        primary = geo["primary_column"]
+        crs = geo["columns"][primary].get("crs")
+        bounds = hilbert_reference_bounds(crs, geo["columns"][primary].get("bbox"))
+        if bounds is None:
             raise ValueError(
                 f"Cannot order {output_file}: its CRS declares no area of use and the "
                 "parts carry no bbox to fall back on"
             )
 
-        # Verify each part is Hilbert-sorted; sort in place if not. With a
-        # vecorel-cli that already Hilbert-sorts, this is a fast no-op read.
-        self.info(f"Verifying Hilbert order of {len(paths)} part file(s)")
-        n_resorted = 0
-        for path in paths:
-            if _ensure_hilbert_sorted(
-                path, primary_col, total_bounds, compression, compression_level
-            ):
-                n_resorted += 1
-                self.warning(
-                    f"  {path}: was not Hilbert-sorted, re-sorted in place. "
-                    "(Files written by vecorel-cli >= 0.2.16 arrive pre-sorted.)"
-                )
-        if n_resorted:
-            self.warning(f"Re-sorted {n_resorted}/{len(paths)} part file(s) before merging.")
+        if isinstance(output_file, Path):
+            output_file = str(output_file)
+        directory = os.path.dirname(output_file) or "."
 
-        self.info(f"Streaming merge -> {output_file} (Hilbert ref bounds = {total_bounds})")
-        expected_rows = sum(_num_rows(p) for p in paths)
-        _streaming_merge(
-            paths,
-            output_file,
-            primary_col,
-            total_bounds,
-            merged_bbox,
-            sorted(geom_types),
-            batch_size,
-            compression,
-            compression_level,
-            geoparquet_version,
+        con = duckdb.connect()
+        con.install_extension("spatial")
+        con.load_extension("spatial")
+        # Sorting a dataset that does not fit in memory spills; keep that next to
+        # the output rather than in a /tmp that is usually far smaller
+        con.execute(f"SET temp_directory = {_sql_path(os.path.join(directory, '.duckdb_tmp'))}")
+
+        self.info(f"Merging {len(paths)} part(s) -> {output_file} (Hilbert bounds {bounds})")
+        sources = "[" + ",".join(_sql_path(path) for path in paths) + "]"
+        con.execute(
+            f"""
+            COPY (SELECT * FROM read_parquet({sources})) TO ? (
+                FORMAT parquet,
+                ROW_GROUP_SIZE {GeoParquet.row_group_size},
+                compression ?,
+                KV_METADATA {{ geo: ?, collection: ? }}
+            )
+            """,
+            [output_file, compression, json.dumps(geo).encode("utf-8"), collection_json],
         )
+
+        keys_path, is_sorted = _write_hilbert_keys(self, output_file, primary, bounds)
+        try:
+            if not is_sorted:
+                _sort_output(
+                    self,
+                    con,
+                    output_file,
+                    keys_path,
+                    compression,
+                    collection_json,
+                    GeoParquet.row_group_size,
+                )
+        finally:
+            if os.path.exists(keys_path):
+                os.unlink(keys_path)
+
+        gp = GeoParquet(Path(output_file))
+        gp.postprocess(
+            compression=compression,
+            compression_level=compression_level,
+            geoparquet_version=geoparquet_version,
+            crs=crs,
+        )
+
         actual_rows = _num_rows(output_file)
         if actual_rows != expected_rows:
             raise RuntimeError(
-                f"Streaming merge dropped rows: expected {expected_rows:,} "
-                f"(sum of inputs), wrote {actual_rows:,} to {output_file}. "
-                "This is a bug — inputs were verified Hilbert-sorted before merge."
+                f"Merge lost rows: expected {expected_rows:,} (sum of the parts), "
+                f"wrote {actual_rows:,} to {output_file}"
             )
         self.info(f"Merged {actual_rows:,} rows into {output_file}")
 
@@ -232,114 +190,53 @@ class PerFileBaseConverter(FiboaBaseConverter):
 
         return output_file
 
+    def _merged_metadata(self, paths: list):
+        """The geo metadata of the merged file: one schema and one CRS for every
+        part, the union of their extents and geometry types."""
+        with pq.ParquetFile(paths[0]) as pf:
+            base_schema = pf.schema_arrow
+            rows = pf.metadata.num_rows
+        base_meta = base_schema.metadata or {}
+        if GEO_META_KEY not in base_meta:
+            raise ValueError(f"{paths[0]} has no 'geo' metadata; not a GeoParquet?")
+        geo = json.loads(base_meta[GEO_META_KEY])
+        primary = geo["primary_column"]
+        column = geo["columns"][primary]
+        crs = column.get("crs")
 
-# ---------- helpers ----------
+        bboxes = [column["bbox"]] if column.get("bbox") is not None else []
+        geom_types = set(column.get("geometry_types") or [])
+        for path in paths[1:]:
+            with pq.ParquetFile(path) as pf:
+                schema = pf.schema_arrow
+                rows += pf.metadata.num_rows
+            if not schema.equals(base_schema, check_metadata=False):
+                raise ValueError(
+                    f"Schema mismatch: {path} differs from {paths[0]}.\n"
+                    f"  Expected: {base_schema}\n"
+                    f"  Got:      {schema}"
+                )
+            part = json.loads((schema.metadata or {})[GEO_META_KEY])["columns"][primary]
+            if part.get("crs") != crs:
+                raise ValueError(
+                    f"CRS mismatch: {path} has crs={part.get('crs')!r}, expected {crs!r}"
+                )
+            if part.get("bbox") is not None:
+                bboxes.append(part["bbox"])
+            geom_types.update(part.get("geometry_types") or [])
+
+        if bboxes:
+            column["bbox"] = [
+                min(b[0] for b in bboxes),
+                min(b[1] for b in bboxes),
+                max(b[2] for b in bboxes),
+                max(b[3] for b in bboxes),
+            ]
+        if geom_types:
+            column["geometry_types"] = sorted(geom_types)
+        return geo, base_meta.get(COLLECTION_META_KEY, b"{}"), rows
 
 
 def _num_rows(path) -> int:
     with pq.ParquetFile(path) as pf:
         return pf.metadata.num_rows
-
-
-def _build_output_schema(
-    input_schema: pa.Schema,
-    merged_bbox,
-    geom_types,
-    geoparquet_version: Optional[str] = None,
-) -> pa.Schema:
-    """Patch the geo metadata: merged bbox + union of geometry_types, and
-    optionally overwrite the GeoParquet ``version`` field. Other schema
-    metadata and field metadata are preserved unchanged."""
-    meta = dict(input_schema.metadata or {})
-    geo = json.loads(meta[GEO_META_KEY])
-    primary_col = geo["primary_column"]
-    if merged_bbox is not None:
-        geo["columns"][primary_col]["bbox"] = [float(v) for v in merged_bbox]
-    if geom_types:
-        geo["columns"][primary_col]["geometry_types"] = list(geom_types)
-    if geoparquet_version is not None:
-        geo["version"] = geoparquet_version
-    meta[GEO_META_KEY] = json.dumps(geo).encode("utf-8")
-    return input_schema.with_metadata(meta)
-
-
-def _streaming_merge(
-    paths: list,
-    output_file: str,
-    primary_col: str,
-    total_bounds,
-    merged_bbox,
-    geom_types,
-    batch_size: int,
-    compression: str,
-    compression_level: Optional[int],
-    geoparquet_version: Optional[str] = None,
-) -> None:
-    pq_files = [pq.ParquetFile(p) for p in paths]
-    in_schema = pq_files[0].schema_arrow  # readers closed in the finally below
-    out_schema = _build_output_schema(in_schema, merged_bbox, geom_types, geoparquet_version)
-
-    iters = [pf.iter_batches(batch_size=batch_size) for pf in pq_files]
-    heads: list = [None] * len(paths)
-    hilberts: list = [None] * len(paths)
-
-    def refill(i):
-        # Skip any empty batches; mark the iterator exhausted only when next() raises.
-        while True:
-            try:
-                batch = next(iters[i])
-            except StopIteration:
-                heads[i] = None
-                hilberts[i] = None
-                return
-            if batch.num_rows == 0:
-                continue
-            tbl = pa.Table.from_batches([batch])
-            heads[i] = tbl
-            hilberts[i] = _hilbert_keys_for_table(tbl, primary_col, total_bounds)
-            return
-
-    for i in range(len(paths)):
-        refill(i)
-
-    write_kwargs = {"compression": compression}
-    if compression_level is not None:
-        write_kwargs["compression_level"] = compression_level
-    writer = pq.ParquetWriter(output_file, out_schema, **write_kwargs)
-
-    try:
-        while any(h is not None for h in heads):
-            active = [i for i, h in enumerate(heads) if h is not None]
-            # The horizon is the smallest "current max" Hilbert across active heads.
-            # Every row with hilbert <= horizon is emit-safe in this round, because
-            # no still-pending row from any other file can possibly be less than it.
-            horizon = min(hilberts[i][-1] for i in active)
-
-            chunks = []
-            chunk_h = []
-            for i in active:
-                h = hilberts[i]
-                cut = int(np.searchsorted(h, horizon, side="right"))
-                if cut == 0:
-                    continue
-                chunks.append(heads[i].slice(0, cut))
-                chunk_h.append(h[:cut])
-                if cut == heads[i].num_rows:
-                    refill(i)
-                else:
-                    heads[i] = heads[i].slice(cut)
-                    hilberts[i] = h[cut:]
-
-            if not chunks:
-                # Defensive: shouldn't happen because at least the file defining the
-                # horizon will contribute its full current batch.
-                break
-
-            combined = pa.concat_tables(chunks)
-            combined_h = np.concatenate(chunk_h)
-            order = np.argsort(combined_h, kind="stable")
-            writer.write_table(combined.take(pa.array(order)))
-    finally:
-        writer.close()
-        for pf in pq_files:
-            pf.close()
