@@ -4,7 +4,7 @@ from fiboa_cli.datasets.es_base import ESBaseConverter
 
 class ESGAConverter(EsriRESTConverterMixin, ESBaseConverter):
     id = "es_ga"
-    short_name = "Spain "
+    short_name = "Spain Galicia"
     title = "Spain Galicia Crop fields"
     description = """
 **Galician Crop Fields**: The Geographic Information System for Agricultural Plots (SIXPAC) is an official reference database for the identification of agricultural plots, which is mandatory in Spain for making applications for direct CAP aid that require declaring surface areas.
@@ -31,15 +31,52 @@ SIXPAC information is relevant to farmers applying for these aid schemes, so tha
         }
     }
 
-    variants = {str(year): str(year) for year in range(2024, 2010 - 1, -1)}
+    # ideg.xunta.gal serves one MapServer per campaign, SIXPAC_2014 .. SIXPAC_2026 (as of 2026-09)
+    variants = {str(year): str(year) for year in range(2026, 2014 - 1, -1)}
     use_code_attribute = "USO_SIGPAC"
+    use_variant_as_determination = True
 
     rest_base_url = (
         "https://ideg.xunta.gal/servizos/rest/services/ParcelasCatastrais/SIXPAC_{year}/MapServer"
     )
 
+    # The older campaigns name the same things differently:
+    #   2014: RECINTO layer, SUP_SIGPAC, no DN_OID (nor AGREGADO)
+    #   2015: SUP_SIX / USO_SIX
+    #   2020: no DN_OID, but IDGEOM (the geometry id, unique and never null)
+    file_renames = {"SUP_SIGPAC": "DN_SURFACE", "SUP_SIX": "DN_SURFACE", "USO_SIX": "USO_SIGPAC"}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        base_filter = self.column_filters[self.use_code_attribute]
+
+        def code_filter(col):
+            keep = base_filter(col)
+            # Before 2023 scrub was coded PR (pasto arbustivo), which the base
+            # filter keeps as grazing land: ~23% of features up to 2022 against
+            # ~1% once the MT code exists. Keeping it would leave the pre-2023
+            # editions ~75% larger for no change on the ground.
+            if self.variant and int(self.variant) < 2023:
+                keep &= col != "PR"
+            return keep
+
+        self.column_filters = {self.use_code_attribute: code_filter}
+
     def rest_layer_filter(self, layers):
-        return next(layer for layer in layers if "recintos" in layer["name"].lower())
+        return next(layer for layer in layers if "recinto" in layer["name"].lower())
+
+    def file_migration(self, gdf, path, uri, layer):
+        gdf = gdf.rename(columns={k: v for k, v in self.file_renames.items() if k in gdf.columns})
+        if "DN_OID" not in gdf.columns:
+            if "IDGEOM" in gdf.columns:
+                gdf["DN_OID"] = gdf["IDGEOM"]
+            else:
+                # 2014 has no surrogate id at all; the SIGPAC recinto reference is the identifier
+                parts = ["PROVINCIA", "MUNICIPIO", "ZONA", "POLIGONO", "PARCELA", "RECINTO"]
+                gdf["DN_OID"] = gdf[parts].astype(int).astype(str).agg("-".join, axis=1)
+        # ~16k pages of 1000 features are concatenated per edition; the 20 unmapped
+        # attribute columns would otherwise sit in memory until the very end
+        return gdf[[c for c in self.columns if c in gdf.columns]]
 
     def get_urls(self):
         if not self.variant:
