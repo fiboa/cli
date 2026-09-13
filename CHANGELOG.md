@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- EE: publish taotletud_maakasutus as `land_use` (arable, permanent grassland, restored grassland, permanent crops, black fallow) — the only classification the source has, since it publishes the crop as free text and no crop code at all; and keep pollu_id as `parcel_id`, because it repeats in a few rows of some editions (16 of the 165,244 in 2016); and a first test with a fixture
+- SE: eleven editions, 2015-2025 — the campaign is a filter on one WFS layer, so every year the service holds is a variant (it answers 2015 through 2025), over https because the http URL redirects
+- BG: the ministry's GeoServer publishes Agricultural_Land_<year> for 2021-2025, not the Arable_Land_2024 the converter asked for; the 2021 and 2022 layers are a different release again (block and usage in one ELGIDENT field, with an area column the later ones lack), PHBIDENT identifies the block rather than the polygon so it is published as block_id, and the Bulgarian names need UTF-8 forced because GeoServer writes the charset into a .cst file GDAL does not read
+- 
+- SK: nine editions, 2018-2026, from the per-campaign datasets on data.slovensko.sk (the single edition was labelled by its download year and held the 2024 file); the crop names are matched with their no-break spaces normalised, which alone maps 102,835 grassland fields
+- CZ: support the GPZ_DP schema of the 2019-2022 editions (renamed crop/area columns, no application date, ENTITA_ID is the block), recover the crop codes the 2020 edition leaves empty, map the 120 crop codes EuroCrops does not carry, and publish a declaration that straddles two land blocks once
+- Add DuckDB BaseConverter for efficiently transforming large datasets
+- Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
+- Declare the beautifulsoup4 dependency that the ES-PV and ES-VC converters import
+- EE: name the cached WFS responses (ee_gsaa_<year>.gml)
+- ES-MD: the archive no longer nests RECINTO.shp in a folder
+- SK: KODKD is the (non-unique, sometimes empty) LPIS block code, keep it as block_id and use the row index as id
+- ES-CM: always read the year-named SIGPAC service (the unnamed one moved on to 2025 with a different id field)
+- REST converters: do not keep an error response as a cached page
+- ES-CB: determination date from the variant year (was an empty string, which broke the STAC temporal extent)
+- ES-CAT: the 2024 download is a shapefile package, not a GeoPackage; 34 crop names new in 2024 added to the mapping
+- CZ: find the shapefile in nested archive folders (2026)
+- DE-BB: read the shapefile as cp1252 (its .cpg wrongly says UTF-8)
+- NL: new PDOK download location (rvo/gewaspercelen/atom), add the 2026 concept edition
+- DE-TH: note the INSPIRE download service
+- Drop rows without a crop:code (required by the crop extension) with a warning instead of failing the conversion (BE-VLG 2023, ES-CN had one such row each); more than 1% missing is an error
+- Europe-LAND converters: use crop_name as crop:code when the file's crop_code column is empty (LT 2024)
+- BE-VLG: derive determination:datetime from the variant year instead of a constant date
+- `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It creates GeoParquet, PMTiles and a STAC Collection with relative links, `file:size`/`file:checksum` and a web-map-links v1.3.0 `pmtiles` link. Publishing is done by catalogs such as the [harmonized field data catalog](https://github.com/fieldsoftheworld/harmonized-field-data-catalog).
 - The nine converters that publish field blocks say so in their title: at_block, de_bb_block, de_mv, de_nds_block, de_nrw, de_sh, de_th, lu and nl_block read "Field blocks for ...", where five of them read "Field boundaries" like the crop-field collections
 
 - Declare the beautifulsoup4 dependency the ES-PV and ES-VC converters import
