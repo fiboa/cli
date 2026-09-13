@@ -38,9 +38,14 @@ where the Physical_Blocks layers of the same service also carry forest, urban an
     area_calculate_missing = True
     # Only the campaign is known, not a date per block.
     use_variant_as_determination = True
+    # PHBIDENT identifies the block, and a block is listed once per usage — and
+    # sometimes twice for the same usage (42 blocks of the 226,592 in 2025, 40
+    # of them with the same code), so the row position identifies the polygon.
+    index_as_id = True
     columns = {
         "geometry": "geometry",
-        "PHBIDENT": "id",
+        "id": "id",
+        "PHBIDENT": "block_id",
         "USAGECODE": "crop:code",
         "USAGEBUL": "crop:name",
         "USAGEENG": "crop:name_en",
@@ -49,6 +54,7 @@ where the Physical_Blocks layers of the same service also carry forest, urban an
         "AREA": "metrics:area",
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
+    missing_schemas = {"properties": {"block_id": {"type": "string"}}}
 
     # 2021 and 2022 are a different release: the block and its usage are one
     # field, ELGIDENT = <settlement>-<block>-<usage>, where 2023 onwards name
@@ -56,8 +62,9 @@ where the Physical_Blocks layers of the same service also carry forest, urban an
     # Bulgarian name to ten characters and 2022 drops it altogether.
     def migrate(self, gdf):
         if "ELGIDENT" in gdf.columns:
-            gdf["PHBIDENT"] = gdf["ELGIDENT"]
-            gdf["USAGECODE"] = gdf["ELGIDENT"].str.rsplit("-", n=1).str[-1].str.zfill(3)
+            parts = gdf["ELGIDENT"].str.rsplit("-", n=1)
+            gdf["PHBIDENT"] = parts.str[0]
+            gdf["USAGECODE"] = parts.str[-1].str.zfill(3)
         if "AREA1" in gdf.columns:
             gdf = gdf.rename(columns={"AREA1": "AREA"})
         return super().migrate(gdf)
