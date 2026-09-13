@@ -1,7 +1,7 @@
 import pandas as pd
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin
+from .commons.hcat import AddHCATMixin, load_ec_mapping
 
 COLUMNS = {
     "geometry": "geometry",
@@ -10,10 +10,11 @@ COLUMNS = {
     "taotlusaasta": "determination:datetime",  # year
     "pindala_ha": "metrics:area",  # area (in ha)
     "taotletud_kultuur": "crop:name",  # requested crop culture
+    "crop:code": "crop:code",
     "taotletud_maakasutus": "land_use",  # requested land use: arable, permanent grassland, restored grassland
 }
 ATTRIBUTES = ",".join(
-    "geom" if k == "geometry" else k for k in COLUMNS if k not in ("id", "parcel_id")
+    "geom" if k == "geometry" else k for k in COLUMNS if k not in ("id", "parcel_id", "crop:code")
 )
 
 
@@ -49,11 +50,21 @@ The data comes from ARIB's database of agricultural parcels.
         }
     }
 
+    # PRIA publishes the crop as free text and no code anywhere in the layer,
+    # and the crop extension requires one, so the code list is ours: a number
+    # per crop name, frozen once published and appended to for a new crop.
+    column_additions = {"crop:code_list": "https://fiboa.org/code/ee/ee.csv"}
+
     # PRIA's parcel id repeats in a few rows of some editions — 16 of the
     # 165,244 in 2016, one of them seven times — so it is published as
     # parcel_id, and the row index identifies the field in an edition where it
     # repeats. Safe, because an edition is one layer of one file.
     def migrate(self, gdf):
+        if self.ec_mapping is None:
+            self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+        codes = {row["original_name"].strip(): row["original_code"] for row in self.ec_mapping}
+        gdf["crop:code"] = gdf["taotletud_kultuur"].str.strip().map(codes)
+
         if gdf["pollu_id"].is_unique:
             gdf["id"] = gdf["pollu_id"]
         else:
