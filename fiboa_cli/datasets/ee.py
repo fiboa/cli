@@ -5,13 +5,16 @@ from .commons.hcat import AddHCATMixin
 
 COLUMNS = {
     "geometry": "geometry",
-    "pollu_id": "id",
+    "id": "id",
+    "pollu_id": "parcel_id",
     "taotlusaasta": "determination:datetime",  # year
     "pindala_ha": "metrics:area",  # area (in ha)
     "taotletud_kultuur": "crop:name",  # requested crop culture
     "taotletud_maakasutus": "land_use",  # requested land use: arable, permanent grassland, restored grassland
 }
-ATTRIBUTES = ",".join(["geom" if k == "geometry" else k for k in COLUMNS.keys()])
+ATTRIBUTES = ",".join(
+    "geom" if k == "geometry" else k for k in COLUMNS if k not in ("id", "parcel_id")
+)
 
 
 class Convert(AddHCATMixin, FiboaBaseConverter):
@@ -39,7 +42,29 @@ The data comes from ARIB's database of agricultural parcels.
     columns = COLUMNS
     # The source publishes no crop code at all — the crop is free text, which is
     # what hcat:code is derived from — so this is the only classification it has.
-    missing_schemas = {"properties": {"land_use": {"type": "string"}}}
+    missing_schemas = {
+        "properties": {
+            "land_use": {"type": "string"},
+            "parcel_id": {"type": "int64"},
+        }
+    }
+
+    # PRIA's parcel id repeats in a few rows of some editions — 16 of the
+    # 165,244 in 2016, one of them seven times — so it is published as
+    # parcel_id, and the row index identifies the field in an edition where it
+    # repeats. Safe, because an edition is one layer of one file.
+    def migrate(self, gdf):
+        if gdf["pollu_id"].is_unique:
+            gdf["id"] = gdf["pollu_id"]
+        else:
+            repeats = len(gdf) - gdf["pollu_id"].nunique()
+            self.warning(
+                f"pollu_id repeats for {repeats:,} of {len(gdf):,} rows in this edition; "
+                "numbering the rows and keeping it as parcel_id"
+            )
+            gdf["id"] = gdf.index
+        return super().migrate(gdf)
+
     column_migrations = {"taotlusaasta": lambda col: pd.to_datetime(col, format="%Y")}
 
     def file_migration(self, gdf, path: str, uri: str, layer=None):
