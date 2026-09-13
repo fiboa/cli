@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - SE: eleven editions, 2015-2025 — the campaign is a filter on one WFS layer, so every year the service holds is a variant (it answers 2015 through 2025), over https because the http URL redirects
-- BG: the ministry's GeoServer publishes Agricultural_Land_<year> for 2021-2025, not the Arable_Land_2024 the converter asked for; the layer carries a usage code and no area, and its Bulgarian names need UTF-8 forced because GeoServer writes the charset into a .cst file GDAL does not read
+- BG: the ministry's GeoServer publishes Agricultural_Land_<year> for 2021-2025, not the Arable_Land_2024 the converter asked for; the 2021 and 2022 layers are a different release again (block and usage in one ELGIDENT field, with an area column the later ones lack), and its Bulgarian names need UTF-8 forced because GeoServer writes the charset into a .cst file GDAL does not read
 - 
 - SK: nine editions, 2018-2026, from the per-campaign datasets on data.slovensko.sk (the single edition was labelled by its download year and held the 2024 file); the crop names are matched with their no-break spaces normalised, which alone maps 102,835 grassland fields
 - CZ: support the GPZ_DP schema of the 2019-2022 editions (renamed crop/area columns, no application date, ENTITA_ID is the block), recover the crop codes the 2020 edition leaves empty, map the 120 crop codes EuroCrops does not carry, and publish a declaration that straddles two land blocks once

@@ -44,10 +44,23 @@ where the Physical_Blocks layers of the same service also carry forest, urban an
         "USAGECODE": "crop:code",
         "USAGEBUL": "crop:name",
         "USAGEENG": "crop:name_en",
-        # nothing in the source maps to it, so name it here for the calculation
-        "metrics:area": "metrics:area",
+        # only 2021 and 2022 publish an area; the rest is measured from the
+        # geometry, which is in UTM 35N metres
+        "AREA": "metrics:area",
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
+
+    # 2021 and 2022 are a different release: the block and its usage are one
+    # field, ELGIDENT = <settlement>-<block>-<usage>, where 2023 onwards name
+    # the block in PHBIDENT and the usage in USAGECODE. 2021 truncates the
+    # Bulgarian name to ten characters and 2022 drops it altogether.
+    def migrate(self, gdf):
+        if "ELGIDENT" in gdf.columns:
+            gdf["PHBIDENT"] = gdf["ELGIDENT"]
+            gdf["USAGECODE"] = gdf["ELGIDENT"].str.rsplit("-", n=1).str[-1].str.zfill(3)
+        if "AREA1" in gdf.columns:
+            gdf = gdf.rename(columns={"AREA1": "AREA"})
+        return super().migrate(gdf)
 
     # GeoServer writes the charset into a .cst file, which GDAL does not read (it
     # looks for .cpg), so the Bulgarian names arrive as Latin-1 mojibake.

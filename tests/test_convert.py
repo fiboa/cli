@@ -21,6 +21,7 @@ tests = [
     "be_vlg",
     "br_ba_lem",
     "bg",
+    "bg#2022",
     "de_sh",
     "de_bb",
     "ec_lt",
@@ -109,6 +110,8 @@ extra_convert_parameters = {
     # 2018 is the one release that names KDIEL, VYMERA_KD and PLODINA_NA
     "sk#2018": {"variant": "2018"},
     "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
+    # 2021 and 2022 name the block and its usage in one field, and publish an area
+    "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     # a page of each service: the current snapshot and a historic year, whose
     # Catxe reads "Febrer2024.0" where the current one reads "maig 2026"
