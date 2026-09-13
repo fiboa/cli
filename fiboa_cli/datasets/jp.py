@@ -1,7 +1,11 @@
-from fiboa_cli.conversion.duckdb import FiboaDuckDBBaseConverter
+from vecorel_cli.conversion.duckdb import DuckDBBaseConverter
+
+from ..conversion.fiboa_converter import FiboaBaseConverter
 
 
-class JPConverter(FiboaDuckDBBaseConverter):
+# The SQL converter is vecorel-cli's; FiboaBaseConverter adds what makes a file
+# fiboa rather than plain Vecorel.
+class JPConverter(DuckDBBaseConverter, FiboaBaseConverter):
     variants = {
         "2024": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2024.parquet",
         "2023": "https://data.source.coop/pacificspatial/field-polygon-jp/parquet/jp_field_polygons_2023.parquet",

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Adopt vecorel-cli 0.2.18, which carries the checks this repository was growing its own copies of: rows that cannot validate are dropped bounded by `max_dropped_share`, the required properties come from the declared schemas, ids are checked for uniqueness, a converter may not declare both `sources` and `variants`, and the schemas are fetched before any source data
+- JP: convert through vecorel-cli's DuckDB converter instead of a copy of it in this repository
+- HR: drop the rolling `sources`, which overruled every `--variant`
+- Europe-LAND: use the crop name as the crop code where the release ships an empty `crop_code` (LT 2024)
 - The nine converters that publish field blocks say so in their title: at_block, de_bb_block, de_mv, de_nds_block, de_nrw, de_sh, de_th, lu and nl_block read "Field blocks for ...", where five of them read "Field boundaries" like the crop-field collections
 
 - Declare the beautifulsoup4 dependency the ES-PV and ES-VC converters import
