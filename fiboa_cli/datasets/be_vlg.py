@@ -37,9 +37,7 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
     attribution = "Bron: Dept. LV"
     license = "Licentie modellicentie-gratis-hergebruik/v1.0 <https://data.vlaanderen.be/id/licentie/modellicentie-gratis-hergebruik/v1.0>"
 
-    # The 2020 GeoPackage holds a byte no UTF-8 decoder accepts, and everything
-    # else in it is ASCII. Only that campaign: forcing cp1252 on the others
-    # would mangle an accented crop name instead of failing.
+    # Fix cp1252 encoding for 2020
     CP1252_EDITIONS = {"2020"}
 
     def layer_filter(self, layer, uri):
@@ -60,9 +58,6 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
         "area_ha": "GRAF_OPP",
     }
 
-    # Flanders publishes in Lambert 72; the 2020 snapshot leaves its SRS
-    # undefined while holding those metres, which put 258615.94 into the STAC
-    # extent as an east longitude.
     LAMBERT_72 = "EPSG:31370"
 
     def migrate(self, gdf):
@@ -74,10 +69,6 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
                 gdf["BT_OMSCH"] = None
         return super().migrate(gdf)
 
-    # REF_ID references the parcel and a row is one crop declared on it, so it
-    # repeats: 183 references cover 367 of the 515,747 rows of 2018. It is
-    # published as block_id; the row index identifies the field, which is safe
-    # because an edition is one layer of one file.
     index_as_id = True
     columns = {
         "geometry": "geometry",
@@ -88,8 +79,6 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
         "GWSCOD_H": "crop:code",
         "GWSNAM_H": "crop:name",
     }
-    # Each edition is the campaign year of its variant; the old constant
-    # "2024-03-28" was the extraction date of one edition applied to all of them.
     use_variant_as_determination = True
     ec_mapping_csv = "be_vlg_2021.csv"
 
