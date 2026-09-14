@@ -11,8 +11,8 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     }
     id = "at_block"
     country = "AT"
-    short_name = "Austria (parcels)"
-    title = "Field boundaries for Austria"
+    short_name = "Austria (blocks)"
+    title = "Field blocks for Austria"
     description = """
 **Field boundaries for Austria - INVEKOS Referenzen Österreich 2021.**
 
