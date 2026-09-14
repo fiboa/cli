@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- IE: the feature id is the id, because localId is the LPIS parcel reference and repeats where a parcel is declared twice (214 of the 1,027,438 rows of 2022); it is published as `parcel_id`, and the parcels get a `metrics:area` computed from their geometry, which the GML does not carry
 - The nine converters that publish field blocks say so in their title: at_block, de_bb_block, de_mv, de_nds_block, de_nrw, de_sh, de_th, lu and nl_block read "Field blocks for ...", where five of them read "Field boundaries" like the crop-field collections
 
 - Declare the beautifulsoup4 dependency the ES-PV and ES-VC converters import
