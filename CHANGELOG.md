@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Europe-LAND converters: use crop_name as crop:code when the file's crop_code column is empty (LT 2024)
 - BE-VLG: derive determination:datetime from the variant year instead of a constant date
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It creates GeoParquet, PMTiles and a STAC Collection with relative links, `file:size`/`file:checksum` and a web-map-links v1.3.0 `pmtiles` link. Publishing is done by catalogs such as the [harmonized field data catalog](https://github.com/fieldsoftheworld/harmonized-field-data-catalog).
+- IE: the feature id is the id, because localId is the LPIS parcel reference and repeats where a parcel is declared twice (214 of the 1,027,438 rows of 2022); it is published as `parcel_id`, and the parcels get a `metrics:area` computed from their geometry, which the GML does not carry
 - The nine converters that publish field blocks say so in their title: at_block, de_bb_block, de_mv, de_nds_block, de_nrw, de_sh, de_th, lu and nl_block read "Field blocks for ...", where five of them read "Field boundaries" like the crop-field collections
 
 - Declare the beautifulsoup4 dependency the ES-PV and ES-VC converters import
