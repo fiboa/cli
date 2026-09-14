@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- FI: one variant per year (2020-2025) instead of a hard-coded 2023, with the year in the cache name
 - AT: extract the archive instead of reading the GeoPackage through /vsizip, which never finished for 2018
 - SK: KODKD is the LPIS block code (non-unique, sometimes empty), so it is kept as block_id and the row index identifies the field
 - EC-LT: nothing in the release identifies a parcel, so the row index does
