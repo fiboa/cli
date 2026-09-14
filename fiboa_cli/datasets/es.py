@@ -1,12 +1,15 @@
 import re
 
 import requests
+from vecorel_cli.conversion.admin import AdminConverterMixin
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
-from ..conversion.fiboa_converter import FiboaBaseConverter
+from fiboa_cli.datasets.commons.hcat import AddHCATMixin
+
+from ..conversion.per_file import PerFileBaseConverter
 
 
-class Converter(FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, PerFileBaseConverter):
     id = "es"
     short_name = "Spain"
     title = "Spain Declared Crops (Cultivos Declarados SIGPAC)"
@@ -25,15 +28,18 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
 
     variants = {"2025": "2025"}
 
+    # FEGA declared-crop codelist (PARC_PRODUCTO) — separate from the SIGPAC land-use list.
+    # Reference list shipped inside each provincial GPKG as the `cod_producto` layer.
+    ec_mapping_csv = "https://fiboa.org/code/es/es.csv"
+
     columns = {
         "geometry": "geometry",
         "id": "id",
-        "provincia": "admin_province_code",
-        "municipio": "admin_municipality_code",
+        "parcel_id": "parcel_id",
+        "provincia": "admin:subdivision_code",
         "dn_surface": "metrics:area",
         "parc_producto": "crop:code",
         "parc_sistexp": "irrigation_system",
-        "parc_supcult": "cultivation_surface",
     }
 
     area_is_in_ha = False
@@ -43,27 +49,16 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
         ADMIN_DIVISION,
     }
 
-    column_additions = {
-        "admin:country_code": "ES",
-        # FEGA declared-crop codelist (PARC_PRODUCTO) — separate from the SIGPAC land-use list.
-        # Reference list shipped inside each provincial GPKG as the `cod_producto` layer.
-        "crop:code_list": "https://fiboa.org/code/es/cultivos_declarados/parc_producto.csv",
-    }
-
     column_migrations = {
-        # crop:code must be a string per the crop extension; parc_producto is an integer.
-        "parc_producto": lambda col: col.astype("Int64").astype(str),
-        # admin_*_code are strings; zero-pad province to 2 digits (INE convention).
+        "parc_producto": lambda col: col.astype("Int64").fillna(0).astype(str),
         "provincia": lambda col: col.astype("Int64").astype(str).str.zfill(2),
-        "municipio": lambda col: col.astype("Int64").astype(str),
     }
 
     missing_schemas = {
         "properties": {
-            "admin_province_code": {"type": "string"},
             "admin_municipality_code": {"type": "string"},
             "irrigation_system": {"type": "string"},
-            "cultivation_surface": {"type": "int32"},
+            "parcel_id": {"type": "string"},
         }
     }
 
@@ -81,12 +76,13 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
         return layer == "cultivo_declarado"
 
     def migrate(self, gdf):
-        # The source has no globally unique row identifier. Build one from the SIGPAC cadastral key
-        # plus the declaration-line index, which is unique per record.
+        # The SIGPAC cadastral key identifies the recinto, not the row: a recinto can be
+        # declared with several crops, and 2025 has 30,514 keys covering 67,689 rows. So it
+        # is the parcel_id, and the id is the key plus the number of the row within it.
         def part(col):
             return gdf[col].astype("Int64").astype(str)
 
-        gdf["id"] = (
+        gdf["parcel_id"] = (
             part("provincia").str.zfill(2)
             + "-"
             + part("municipio")
@@ -103,6 +99,26 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
             + "-"
             + part("ld_recinto")
         )
+
+        # The base converter splits multi-part geometries after it has checked the ids, which
+        # would break uniqueness again — 21,342 of those keys are one multi-part recinto. Split
+        # here instead, with the same three steps, which leaves the base converter nothing to do.
+        gdf.geometry = gdf.geometry.make_valid()
+        gdf = gdf.explode(index_parts=False)
+        gdf = gdf[(gdf.geometry.geom_type == "Polygon") & gdf.geometry.is_valid]
+        # the explode repeats the source row labels, which would misalign the assignment below
+        gdf = gdf.reset_index(drop=True)
+
+        gdf["id"] = gdf["parcel_id"] + "_" + (gdf.groupby("parcel_id").cumcount() + 1).astype(str)
+
+        # Ten rows of 2025 carry a dn_surface at or below zero, which is not an area.
+        # Compute those from the geometry — only those, so the other 17.9M are not
+        # reprojected for the sake of ten.
+        unusable = gdf["dn_surface"] <= 0
+        if unusable.any():
+            self.info(f"Computing the area of {unusable.sum()} row(s) with a dn_surface <= 0")
+            gdf.loc[unusable, "dn_surface"] = gdf.loc[unusable, "geometry"].to_crs("EPSG:6933").area
+
         return super().migrate(gdf)
 
     def get_urls(self):

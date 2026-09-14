@@ -19,7 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - DE-NDS: give the collection an id (the row index), which it was published without
 - DE-BB: ref_ident holds the FLIK (field block reference), not a farmer, and the shapefile is cp1252
 - JP: editions 2021-2024, each with the determination date of the parcel rather than a constant
-- PerFileBaseConverter: convert a multi-file source one file at a time and merge the parts, so a dataset larger than memory can be converted; used by the Spain-wide converter
+- ES: the SIGPAC cadastral key is the parcel_id, not the id — a recinto can be declared with several crops and can be multi-part, so 30,514 keys covered 67,689 of the 17.9M rows
+- PerFileBaseConverter: convert a multi-file source one file at a time, then merge and sort the parts with the DuckDB converter's routines, so a dataset larger than memory can be converted; used by the Spain-wide converter
 - FiboaDuckDBBaseConverter: convert a source that is already Parquet with SQL, without loading it into memory
 - Update vecorel-cli to v0.2.17:
   - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
