@@ -94,15 +94,11 @@ The anonymized version is distributed as part of the public service for making r
     # Attribution example as described in the open license
     attribution = "IGN - Original data from https://geoservices.ign.fr/rpg"
     license = "Licence Ouverte / Open Licence <https://etalab.gouv.fr/licence-ouverte-open-licence>"
-    ec_mapping_csv = "fr_2018.csv"
-    # The 2018 code list misses what RPG added later: MLC, MLF, HPC and ACP
-    # alone are 37,011 fields of the 2024 edition.
-    ec_mapping_supplements = [
-        "fr_other_years.csv",
-        # Codes neither EuroCrops table carries, mapped from the sibling code
-        # each one has there: JAC (jachère) alone is 604,122 fields of 2024.
-        "https://fiboa.org/code/fr/fr_supplement.csv",
-    ]
+    # One list for every edition we publish: EuroCrops splits France over fr_2018.csv
+    # and fr_other_years.csv, and eleven codes neither carries were mapped from the
+    # sibling code each has there. Merged, so crop:code_list points at a list that
+    # covers the data — JAC (jachère) alone is 604,122 fields of 2024.
+    ec_mapping_csv = "https://fiboa.org/code/fr/fr.csv"
     use_variant_as_determination = True
 
     columns = {
