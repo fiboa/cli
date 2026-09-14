@@ -5,16 +5,18 @@ from ..conversion.fiboa_converter import FiboaBaseConverter
 
 
 class Converter(AdminConverterMixin, FiboaBaseConverter):
+    # Published annually per its INSPIRE record, and only the current year is served (2023-2025
+    # return 404), so there are no variants to offer and this URL needs bumping each year.
     sources = {
-        "https://www.smul.sachsen.de/gis-online/download/FBZ_ISS_Bereiche/gesamt_2024_RE.zip": [
-            "2024_RE_FB_33.shp"
+        "https://www.smul.sachsen.de/gis-online/download/FBZ_ISS_Bereiche/gesamt_2026_RE.zip": [
+            "2026_RE_FB_33.shp"
         ]
     }
     id = "de_sax"
     admin_subdivision_code = "SN"
     short_name = "Germany, Saxony"
     title = "Field boundaries for Saxony, Germany"
-    description = "Feldblöcke und förderfähige Elemente in Sachsen 2024"
+    description = "Feldblöcke und förderfähige Elemente in Sachsen 2026"
     provider = "Sächsisches Landesamt für Umwelt, Landwirtschaft und Geologie <https://geoportal.sachsen.de>"
     attribution = "Sächsisches Landesamt für Umwelt, Landwirtschaft und Geologie"
     license = "DL-DE-BY-2.0"
