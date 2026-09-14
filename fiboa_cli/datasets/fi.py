@@ -4,9 +4,7 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
-# The Finnish Food Authority publishes one file per year under /data/<year>/, all
-# with the same name, so the cache name has to carry the year. 2020 is the first
-# year served and 2025 the last; 2019 and 2026 answer 403.
+# The Finnish Food Authority publishes one file per year under /data/<year>/
 BASE = "https://download.inspire.ruokavirasto-awsa.com/data"
 FILE = "LandUse.ExistingLandUse.GSAAAgriculturalParcel.gpkg"
 
@@ -29,8 +27,7 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
     license = "CC-BY-4.0"
     # A peruslohko (basic parcel) is the reference parcel and holds one or more
     # kasvulohko, the growing parcels this dataset describes: PERUSLOHKOTUNNUS
-    # repeats once per growing parcel (91 distinct over 100 sampled rows), so the
-    # field is identified by the pair, and the basic parcel is the block.
+    # repeats once per growing parcel
     columns = {
         "geometry": "geometry",
         "id": "id",
