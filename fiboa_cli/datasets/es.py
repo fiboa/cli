@@ -110,6 +110,15 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
         gdf = gdf.reset_index(drop=True)
 
         gdf["id"] = gdf["parcel_id"] + "_" + (gdf.groupby("parcel_id").cumcount() + 1).astype(str)
+
+        # Ten rows of 2025 carry a dn_surface at or below zero, which is not an area.
+        # Compute those from the geometry — only those, so the other 17.9M are not
+        # reprojected for the sake of ten.
+        unusable = gdf["dn_surface"] <= 0
+        if unusable.any():
+            self.info(f"Computing the area of {unusable.sum()} row(s) with a dn_surface <= 0")
+            gdf.loc[unusable, "dn_surface"] = gdf.loc[unusable, "geometry"].to_crs("EPSG:6933").area
+
         return super().migrate(gdf)
 
     def get_urls(self):

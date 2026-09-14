@@ -259,3 +259,43 @@ def test_a_part_that_kept_the_column_merges_with_one_that_did_not(tmp_path):
     out = pq.read_table(merged)
     assert out.num_rows == 2 * tbl.num_rows
     assert sorted(set(out.column("admin:subdivision_code").to_pylist())) == ["01", "02", "03"]
+
+
+def _one_parcel(surface, recinto=1):
+    import shapely
+
+    return {
+        "provincia": 1,
+        "municipio": 55,
+        "agregado": 0,
+        "zona": 0,
+        "poligono": 1,
+        "parcela": 304,
+        "recinto": recinto,
+        "ld_recinto": 4930926 + recinto,
+        "dn_surface": surface,
+        "geometry": shapely.box(-6.0, 39.0, -5.999, 39.0009),
+    }
+
+
+def test_id_is_the_key_plus_the_row_within_it():
+    import geopandas as gpd
+
+    one = _one_parcel(1234.5, recinto=1)
+    two = _one_parcel(4321.0, recinto=1)  # the same recinto declared twice
+    gdf = gpd.GeoDataFrame([one, two], crs="EPSG:4258")
+    out = ESConverter().migrate(gdf)
+    assert out["parcel_id"].tolist() == ["01-55-0-0-1-304-1-4930927"] * 2
+    assert out["id"].tolist() == ["01-55-0-0-1-304-1-4930927_1", "01-55-0-0-1-304-1-4930927_2"]
+
+
+def test_a_surface_that_is_not_an_area_is_computed_from_the_geometry():
+    import geopandas as gpd
+
+    good = _one_parcel(1234.5, recinto=1)
+    bad = _one_parcel(-0.0021, recinto=2)
+    gdf = gpd.GeoDataFrame([good, bad], crs="EPSG:4258")
+    out = ESConverter().migrate(gdf)
+    assert out["dn_surface"].iloc[0] == 1234.5, "a usable surface is left alone"
+    # the box is about 86 m by 100 m
+    assert 8000 < out["dn_surface"].iloc[1] < 9500
