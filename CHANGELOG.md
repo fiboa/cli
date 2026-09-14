@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-MD: find RECINTO.shp wherever the archive puts it
 - REST converters: a variant may name its own service (es_ib keeps its yearly editions in a second one), the id-bound query is retried, and a joined layer's table prefixes are stripped for every converter
 - REST converters: page by id windows instead of server-side sorting, key cached pages by service as well as layer, discover the qualified key field on joined layers, and never keep an error response or a broken download as a cached page
+- ES-CB: editions 2010-2025, Cantabria's own licence instead of CC-BY-NC, and the province named as provider
 - ES-IB: editions 2022-2026 (the yearly layers moved to the GOIB_SIGPAC_HISTORIC_IB service), the provider is the Balearic government, not Navarra's, and the joined field names are handled by the REST mixin
 - Update vecorel-cli to v0.2.17:
   - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
