@@ -21,10 +21,15 @@ class FiboaBaseConverter(BaseConverter):
     def _traditional_axis_order(gdf):
         """Fix swapped x/y coordinates for faulty projections (e.g. SWEREF99 TM)"""
         crs = gdf.crs
-        if crs is not None and crs.is_projected and crs.axis_info \
-            and crs.axis_info[0].direction.lower() == "north" \
-            and crs.area_of_use and not gdf.empty:
-            
+        if (
+            crs is not None
+            and crs.is_projected
+            and crs.axis_info
+            and crs.axis_info[0].direction.lower() == "north"
+            and crs.area_of_use
+            and not gdf.empty
+        ):
+            area = crs.area_of_use
             to_crs = pyproj.Transformer.from_crs("EPSG:4326", crs, always_xy=True)
             east, north = to_crs.transform(
                 [area.west, area.east, area.west, area.east],
@@ -33,7 +38,7 @@ class FiboaBaseConverter(BaseConverter):
             bounds = gdf.total_bounds  # in the order the coordinates are stored
             fits = min(east) <= bounds[0] and bounds[2] <= max(east)
             swapped = min(north) <= bounds[0] and bounds[2] <= max(north)
-            if not fits or swapped:
+            if not fits and swapped:
                 return gdf.set_geometry(
                     shapely.transform(gdf.geometry.values, lambda coords: coords[:, ::-1])
                 )
