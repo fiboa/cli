@@ -44,9 +44,15 @@ of the Ministry of Agriculture, Livestock and Fisheries.
     column_migrations = {
         "FECHA": lambda column: pd.to_datetime(column, format="%d/%m/%Y"),
     }
+
+    def migrate(self, gdf):
+        gdf = gdf.reset_index(drop=True)
+        gdf["id"] = gdf.index.astype(str)
+        return super().migrate(gdf)
+
     column_additions = {
         "admin:country_code": "ES",
-        "admin:subdivision_code": "CB",
+        "admin:subdivision_code": "CN",
         "crop:code_list": "https://fiboa.org/code/es/cn/crop.csv",
     }
     missing_schemas = {
@@ -54,7 +60,6 @@ of the Ministry of Agriculture, Livestock and Fisheries.
             "admin_island": {"type": "string"},
         }
     }
-    index_as_id = True
     sources = {
         f"https://opendata.sitcan.es/upload/medio-rural/gobcan_mapa-cultivos_{island}_shp.zip": f"gobcan_mapa-cultivos_{island}_shp.zip"
         for island in "lz eh lp lg tf gc fv".split()

@@ -22,6 +22,7 @@ tests = [
     "be_vlg",
     "br_ba_lem",
     "bg",
+    "bg#2022",
     "de_sh",
     "de_bb",
     "ec_lv",
@@ -63,6 +64,7 @@ tests = [
     "de_he",
     "de_st",
     "it_bz",
+    "de_sax",
 ]
 test_path = "tests/data-files/convert"
 
@@ -85,6 +87,15 @@ extra_convert_parameters = {
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
     },
     "es_cm": {"variant": "2024", **_input_files("es_cm", "es_cm_0.gpkg")},
+    "es_an": {
+        "variant": "2025",
+        "input_files": {f"{test_path}/es_an/SP25_REC_PROV_04.zip": ["SP25_REC_04.shp"]},
+    },
+    "cz#2019": {"variant": "2019"},
+    "cz#2020": {"variant": "2020"},
+    "sk#2018": {"variant": "2018"},
+    "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
+    "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": _input_files("lv", "1_100.xml"),
@@ -97,6 +108,7 @@ extra_convert_parameters = {
     "de_sl_block": _input_files("de_sl_block", "de_sl_block.gml"),
     "de_sl": _input_files("de_sl", "de_sl.gml"),
     "it_bz": _input_files("it_bz", "it_bz.json"),
+    "de_sax": {"input_files": {f"{test_path}/de_sax/gesamt_2026_RE.zip": ["2026_RE_FB_33.shp"]}},
 }
 
 
@@ -124,20 +136,23 @@ expected_columns = {
 def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
     from fiboa_cli import Registry  # noqa
 
+    # "<id>#<label>" runs a second edition of <id>, from the same folder of input files
+    converter_id = converter.split("#")[0]
+
     def load_ec(csv_file=None, url=None):
         if csv_file and "://" in csv_file:
             csv_file = csv_file.split("/")[-1]
-        path = url if url and "://" not in url else f"{test_path}/{converter}/{csv_file}"
+        path = url if url and "://" not in url else f"{test_path}/{converter_id}/{csv_file}"
         return list(DictReader(open(path, "r", encoding="utf-8")))
 
     load_ec_mock.side_effect = load_ec
     logger.remove()
     logger.add(sys.stdout, format="{message}", level="DEBUG", colorize=False)
 
-    path = f"tests/data-files/convert/{converter}"
+    path = f"tests/data-files/convert/{converter_id}"
     kwargs = extra_convert_parameters.get(converter, {})
 
-    ConvertData(converter).convert(target=tmp_parquet_file, cache=path, **kwargs)
+    ConvertData(converter_id).convert(target=tmp_parquet_file, cache=path, **kwargs)
     out, err = capsys.readouterr()
     output = out + err
 
@@ -152,7 +167,9 @@ def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
     required = expected_columns.get(converter)
     if required:
         metadata = pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata or {}
-        constants = json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+        constants = (
+            json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+        )
         missing = [c for c in required if c not in df.columns and constants.get(c) is None]
         assert not missing, (
             f"{converter} dropped {missing}: absent from the schema and from the "
