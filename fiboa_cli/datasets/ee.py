@@ -38,8 +38,6 @@ The data comes from ARIB's database of agricultural parcels.
     attribution = "© Põllumajanduse Registrite ja Informatsiooni Amet"
     license = "CC-BY-SA-3.0"
     columns = COLUMNS
-    # The source publishes no crop code at all — the crop is free text, which is
-    # what hcat:code is derived from — so this is the only classification it has.
     missing_schemas = {
         "properties": {
             "land_use": {"type": "string"},
@@ -47,30 +45,17 @@ The data comes from ARIB's database of agricultural parcels.
         }
     }
 
-    # PRIA publishes the crop as free text and no code anywhere in the layer,
-    # and the crop extension requires one, so the code list is ours: a number
+    # The source lacks a crop code, so the code list is ours: a number
     # per crop name, frozen once published and appended to for a new crop.
     column_additions = {"crop:code_list": "https://fiboa.org/code/ee/ee.csv"}
 
-    # PRIA's parcel id repeats in a few rows of some editions — 16 of the
-    # 165,244 in 2016, one of them seven times — so it is published as
-    # parcel_id, and the row index identifies the field in an edition where it
-    # repeats. Safe, because an edition is one layer of one file.
     def migrate(self, gdf):
         if self.ec_mapping is None:
             self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
         codes = {row["original_name"].strip(): row["original_code"] for row in self.ec_mapping}
         gdf["crop:code"] = gdf["taotletud_kultuur"].str.strip().map(codes)
-
-        if gdf["pollu_id"].is_unique:
-            gdf["id"] = gdf["pollu_id"]
-        else:
-            repeats = len(gdf) - gdf["pollu_id"].nunique()
-            self.warning(
-                f"pollu_id repeats for {repeats:,} of {len(gdf):,} rows in this edition; "
-                "numbering the rows and keeping it as parcel_id"
-            )
-            gdf["id"] = gdf.index
+        # PRIA's parcel id can be used in multiple rows, so use gdf.index
+        gdf["id"] = gdf.index
         return super().migrate(gdf)
 
     column_migrations = {"taotlusaasta": lambda col: pd.to_datetime(col, format="%Y")}
