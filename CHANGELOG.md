@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - FI: one variant per year (2020-2025) instead of a hard-coded 2023, with the year in the cache name
 - AT: extract the archive instead of reading the GeoPackage through /vsizip, which never finished for 2018
 - SK: KODKD is the LPIS block code (non-unique, sometimes empty), so it is kept as block_id and the row index identifies the field
+- EC-LT: repair the Lithuanian crop names, which the release ships read through the wrong code page, and map them through a corrected table — Šlapynės (wetlands) was published as spinach
 - EC-LT: nothing in the release identifies a parcel, so the row index does
 - ES-CM: read the year-named SIGPAC service, whose id field is OBJECTID_1, with the determination date from the variant
 - ES-CN: the seven island files each kept their own row index, and the region was declared as Cantabria

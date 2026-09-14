@@ -25,6 +25,7 @@ tests = [
     "bg#2022",
     "de_sh",
     "de_bb",
+    "ec_lt",
     "ec_lv",
     "ec_si",
     "fi",
