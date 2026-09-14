@@ -19,40 +19,25 @@ class FiboaBaseConverter(BaseConverter):
 
     @staticmethod
     def _traditional_axis_order(gdf):
-        """Put the easting in x, whatever the source's CRS says.
-
-        EPSG defines SWEREF99 TM and a few others northing first, and a source
-        that honours that ships its coordinates that way: Jordbruksverket's
-        shapefile declares AXIS["Northing", NORTH] before AXIS["Easting", EAST]
-        and writes them so. GeoParquet stores x, y, so everything after this
-        point — the tiles, the STAC bbox, the bbox covering column — reads such
-        a file as (lat, lon), and Sweden lands in the Indian Ocean.
-
-        The declaration alone is not enough to act on: most sources in a
-        lat-lon-ordered CRS (EPSG:4258, 4326) still store lon, lat. So the
-        coordinates have to disagree with the CRS's own area of use as well.
-        """
+        """Fix swapped x/y coordinates for faulty projections (e.g. SWEREF99 TM)"""
         crs = gdf.crs
-        if crs is None or not crs.is_projected or not crs.axis_info:
-            return gdf
-        if crs.axis_info[0].direction.lower() != "north":
-            return gdf
-        area = crs.area_of_use
-        if area is None or gdf.empty:
-            return gdf
-        to_crs = pyproj.Transformer.from_crs("EPSG:4326", crs, always_xy=True)
-        east, north = to_crs.transform(
-            [area.west, area.east, area.west, area.east],
-            [area.south, area.south, area.north, area.north],
-        )
-        bounds = gdf.total_bounds  # in the order the coordinates are stored
-        fits = min(east) <= bounds[0] and bounds[2] <= max(east)
-        swapped = min(north) <= bounds[0] and bounds[2] <= max(north)
-        if fits or not swapped:
-            return gdf
-        return gdf.set_geometry(
-            shapely.transform(gdf.geometry.values, lambda coords: coords[:, ::-1])
-        )
+        if crs is not None and crs.is_projected and crs.axis_info \
+            and crs.axis_info[0].direction.lower() == "north" \
+            and crs.area_of_use and not gdf.empty:
+            
+            to_crs = pyproj.Transformer.from_crs("EPSG:4326", crs, always_xy=True)
+            east, north = to_crs.transform(
+                [area.west, area.east, area.west, area.east],
+                [area.south, area.south, area.north, area.north],
+            )
+            bounds = gdf.total_bounds  # in the order the coordinates are stored
+            fits = min(east) <= bounds[0] and bounds[2] <= max(east)
+            swapped = min(north) <= bounds[0] and bounds[2] <= max(north)
+            if not fits or swapped:
+                return gdf.set_geometry(
+                    shapely.transform(gdf.geometry.values, lambda coords: coords[:, ::-1])
+                )
+        return gdf
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
