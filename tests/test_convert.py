@@ -88,15 +88,10 @@ extra_convert_parameters = {
         "variant": "2025",
         "input_files": {f"{test_path}/es_an/SP25_REC_PROV_04.zip": ["SP25_REC_04.shp"]},
     },
-    # 2019 stands for the GPZ_DP releases (2019-2022), which name their columns
-    # differently and carry no application date
     "cz#2019": {"variant": "2019"},
-    # 2020 is the edition that leaves the crop code empty
     "cz#2020": {"variant": "2020"},
-    # 2018 is the one release that names KDIEL, VYMERA_KD and PLODINA_NA
     "sk#2018": {"variant": "2018"},
     "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
-    # 2021 and 2022 name the block and its usage in one field, and publish an area
     "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
