@@ -46,6 +46,7 @@ tests = [
     "ie",
     "es_cat",
     "es_cl",
+    "es_cm",
     "es",
     "nz",
     "lt",
@@ -85,6 +86,7 @@ extra_convert_parameters = {
         "variant": "2025",
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
     },
+    "es_cm": {"variant": "2024", **_input_files("es_cm", "es_cm_0.gpkg")},
     "es_an": {
         "variant": "2025",
         "input_files": {f"{test_path}/es_an/SP25_REC_PROV_04.zip": ["SP25_REC_04.shp"]},

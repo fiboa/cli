@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- ES-CM: read the year-named SIGPAC service, whose id field is OBJECTID_1, with the determination date from the variant
 - ES-CN: the seven island files each kept their own row index, and the region was declared as Cantabria
 - EC-EE: name the shapefile inside the archive, migrate the year column the release actually has, and require only what every parcel carries
 - ES-CAT: the 2024 download is a shapefile package, and 34 crop names new in that edition are mapped
