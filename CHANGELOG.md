@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
 - PT: the 2025 edition, whose layers, crop column and area units all changed, and CUL_ID as the identifier
+- PT: the 2020, 2021 and 2022 editions — the sub-parcel geometry ships as eight or nine regional files in four projections, so each is reprojected to WGS 84 before they are merged; the crop code is C1 on the layer in 2022 and joined in from a separate table (validated one-to-one) in 2020 and 2021; the layer filter is chosen per edition, so 2021's geometry-less `Culturas_2021` table cannot be selected; where no CUL_ID is published the land occupation identifies the field and its parcel is the block; 2020's crop table stops at the mainland, so its island fields carry no crop code
 - Update vecorel-cli to v0.2.17:
   - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
   - GeoJSON files with a byte order mark no longer fail to read
