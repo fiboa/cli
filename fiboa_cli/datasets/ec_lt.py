@@ -4,13 +4,8 @@ from .commons.ec import EuroCropsConverterMixin
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     area_is_in_ha = False
-    # EuroCrops' own table carries the same mangled names. This copy spells them
-    # correctly and fixes the two mappings guessed from the mangled text
-    # (Šlapynės is wetlands, not spinach; Ankštiniai javai is leguminous).
     ec_mapping_csv = "https://fiboa.org/code/lt/lt_2021.csv"
     ec_year = 2021
-    # The file's own EC_hcat_* columns hold the mapping derived from the mangled
-    # names, so they are ignored and the table above is used instead.
     hcat_columns = {
         "hcat:name_en": "hcat:name_en",
         "hcat:name": "hcat:name",
@@ -58,9 +53,7 @@ The download service is a set of personalized spatial data of agricultural land 
     column_filters = {"GRUPE": lambda col: (col.isin(Converter.CROP_GROUPS), False)}
 
     def migrate(self, gdf):
-        # The release ships Lithuanian run through the wrong code page and saved
-        # as UTF-8: it decodes cleanly to "Ankðtiniai javai". Latin-1 out,
-        # CP1257 in undoes that and leaves a correct name untouched.
+        # Fix CP1257 decoding
         if "GRUPE" in gdf.columns:
             gdf["GRUPE"] = gdf["GRUPE"].map(self._repair_baltic_text)
         return super().migrate(gdf)
@@ -74,6 +67,4 @@ The download service is a set of personalized spatial data of agricultural land 
         except (UnicodeEncodeError, UnicodeDecodeError):
             return value
 
-    # Two of these used to be declared, and the second silently replaced the
-    # first, so claimant_id reached the writer with no schema at all.
     missing_schemas = {"required": [], "properties": {"claimant_id": {"type": "int64"}}}
