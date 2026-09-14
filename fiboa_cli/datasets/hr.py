@@ -65,10 +65,7 @@ and supporting sustainable land use practices.
     ec_mapping_csv = "hr_2020.csv"
 
     missing_schemas = {
-        # The editions carry different subsets (17 of these columns in 2011,
-        # 25 in 2023) and leave them half empty: 2011 has no mines_status for
-        # 909k of its 1.29M parcels.
-        "required": [],
+        # The editions carry different subsets
         "properties": {
             "land_use_id": {"type": "integer"},
             "home_name": {"type": "string"},
@@ -100,8 +97,6 @@ and supporting sustainable land use practices.
     area_calculate_missing = True
     use_variant_as_determination = True
 
-    # The archives leave gpkg srs_id at 0 while holding the same projected
-    # metres as the current edition: 264979..731547 E is Croatia in EPSG:3765.
     ARCHIVE_CRS = "EPSG:3765"
 
     def migrate(self, gdf):
