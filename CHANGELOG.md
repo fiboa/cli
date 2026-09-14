@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- EC-EE: name the shapefile inside the archive, migrate the year column the release actually has, and require only what every parcel carries
 - ES-CAT: the 2024 download is a shapefile package, and 34 crop names new in that edition are mapped
 - DE-NDS: give the collection an id (the row index), which it was published without
 - DE-BB: ref_ident holds the FLIK (field block reference), not a farmer, and the shapefile is cp1252
