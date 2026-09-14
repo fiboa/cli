@@ -4,15 +4,21 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
+# One WFS layer holds every campaign; the year is a filter, not a layer. The
+# service answers 2015 through 2025 (2014 and 2026 return zero features), and
+# redirects http to https, so ask for https to save a round trip.
+WFS = (
+    "https://epub.sjv.se/inspire/inspire/wfs?SERVICE=WFS&REQUEST=GetFeature&VERSION=2.0.0"
+    "&TYPENAMES=inspire:arslager_skifte&outputFormat=shape-zip"
+    "&CQL_FILTER=arslager=%27{year}%27%20and%20geom%20is%20not%20null"
+    "&format_options=CHARSET:UTF-8"
+)
+
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    # the response has no usable file name, so each edition names its own
     variants = {
-        "2024": {
-            "http://epub.sjv.se/inspire/inspire/wfs?SERVICE=WFS%20&REQUEST=GetFeature%20&VERSION=1.0.0%20&TYPENAMES=inspire:arslager_skifte%20&outputFormat=shape-zip%20&CQL_FILTER=arslager=%272024%27%20%20and%20geom%20is%20not%20null%20&format_options=CHARSET:UTF-8": "se2024.zip"
-        },
-        "2023": {
-            "http://epub.sjv.se/inspire/inspire/wfs?SERVICE=WFS%20&REQUEST=GetFeature%20&VERSION=1.0.0%20&TYPENAMES=inspire:arslager_skifte%20&outputFormat=shape-zip%20&CQL_FILTER=arslager=%272023%27%20%20and%20geom%20is%20not%20null%20&format_options=CHARSET:UTF-8": "se2023.zip"
-        },
+        str(year): {WFS.format(year=year): f"se{year}.zip"} for year in range(2025, 2014, -1)
     }
     id = "se"
     short_name = "Sweden"
@@ -38,10 +44,12 @@ applied for and the area decided on are the same. The data is published at the e
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     ec_mapping_csv = "https://fiboa.org/code/se/se.csv"
     column_migrations = {
-        # Make year (1st January) from column "arslager"
-        "arslager": lambda col: pd.to_datetime(col, format="%Y")
+        # the campaign year, as an integer in the shapefile
+        "arslager": lambda col: pd.to_datetime(col.astype(str), format="%Y")
     }
 
+    # A skifte is one crop inside a block, numbered within it ("1A", "54B"), so
+    # the field is the pair.
     def migrate(self, gdf):
         gdf["id"] = gdf["blockid"] + "_" + gdf["skiftesbet"]
         return super().migrate(gdf)
