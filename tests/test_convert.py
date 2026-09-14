@@ -22,6 +22,7 @@ tests = [
     "be_vlg",
     "br_ba_lem",
     "bg",
+    "bg#2022",
     "de_sh",
     "de_bb",
     "ec_lv",
@@ -47,6 +48,7 @@ tests = [
     "ie",
     "es_cat",
     "es_cl",
+    "es_cm",
     "es",
     "nz",
     "lt",
@@ -64,6 +66,7 @@ tests = [
     "de_he",
     "de_st",
     "it_bz",
+    "de_sax",
 ]
 test_path = "tests/data-files/convert"
 
@@ -75,21 +78,28 @@ def _input_files(converter, *names):
 extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
+    # the fixture is the 2023 file; the converter's default is the newest edition
+    "fi": {"variant": "2023"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
     "de_he": _input_files("de_he", "de_he.json"),
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
     "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
+    "cz#2019": {"variant": "2019"},
+    "cz#2020": {"variant": "2020"},
+    "es_cm": {"variant": "2024", **_input_files("es_cm", "es_cm_0.gpkg")},
+    "es_an": {
+        "variant": "2025",
+        "input_files": {f"{test_path}/es_an/SP25_REC_PROV_04.zip": ["SP25_REC_04.shp"]},
+    },
     "es_cl": {
         "variant": "2025",
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
     },
-    # 2019 stands for the GPZ_DP releases (2019-2022), which name their columns
-    # differently and carry no application date
-    "cz#2019": {"variant": "2019"},
-    # 2020 is the edition that leaves the crop code empty
-    "cz#2020": {"variant": "2020"},
+    "sk#2018": {"variant": "2018"},
+    "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
+    "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": _input_files("lv", "1_100.xml"),
@@ -102,6 +112,7 @@ extra_convert_parameters = {
     "de_sl_block": _input_files("de_sl_block", "de_sl_block.gml"),
     "de_sl": _input_files("de_sl", "de_sl.gml"),
     "it_bz": _input_files("it_bz", "it_bz.json"),
+    "de_sax": {"input_files": {f"{test_path}/de_sax/gesamt_2026_RE.zip": ["2026_RE_FB_33.shp"]}},
 }
 
 
