@@ -31,7 +31,6 @@ SIXPAC information is relevant to farmers applying for these aid schemes, so tha
         }
     }
 
-    # ideg.xunta.gal serves one MapServer per campaign, SIXPAC_2014 .. SIXPAC_2026 (as of 2026-09)
     variants = {str(year): str(year) for year in range(2026, 2014 - 1, -1)}
     use_code_attribute = "USO_SIGPAC"
     use_variant_as_determination = True
@@ -40,7 +39,7 @@ SIXPAC information is relevant to farmers applying for these aid schemes, so tha
         "https://ideg.xunta.gal/servizos/rest/services/ParcelasCatastrais/SIXPAC_{year}/MapServer"
     )
 
-    # The older campaigns name the same things differently:
+    # Older data sets name the same things differently:
     #   2014: RECINTO layer, SUP_SIGPAC, no DN_OID (nor AGREGADO)
     #   2015: SUP_SIX / USO_SIX
     #   2020: no DN_OID, but IDGEOM (the geometry id, unique and never null)
@@ -53,9 +52,7 @@ SIXPAC information is relevant to farmers applying for these aid schemes, so tha
         def code_filter(col):
             keep = base_filter(col)
             # Before 2023 scrub was coded PR (pasto arbustivo), which the base
-            # filter keeps as grazing land: ~23% of features up to 2022 against
-            # ~1% once the MT code exists. Keeping it would leave the pre-2023
-            # editions ~75% larger for no change on the ground.
+            # filter keeps as grazing land
             if self.variant and int(self.variant) < 2023:
                 keep &= col != "PR"
             return keep
@@ -74,8 +71,6 @@ SIXPAC information is relevant to farmers applying for these aid schemes, so tha
                 # 2014 has no surrogate id at all; the SIGPAC recinto reference is the identifier
                 parts = ["PROVINCIA", "MUNICIPIO", "ZONA", "POLIGONO", "PARCELA", "RECINTO"]
                 gdf["DN_OID"] = gdf[parts].astype(int).astype(str).agg("-".join, axis=1)
-        # ~16k pages of 1000 features are concatenated per edition; the 20 unmapped
-        # attribute columns would otherwise sit in memory until the very end
         return gdf[[c for c in self.columns if c in gdf.columns]]
 
     def get_urls(self):
