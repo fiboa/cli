@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- BE-WAL: match the crop by name where EuroCrops' table leaves the code empty, which covered 6.79% of the collection
 - CZ: find the shapefile in nested archive folders (2026)
 - CZ: read the 2019-2022 editions (GPZ_DP: renamed crop and area columns, no application date, ENTITA_ID is the land block), recover the crop codes the 2020 edition leaves empty, map the 167 crop codes EuroCrops does not carry, and publish a declaration that straddles two land blocks once
 - BE-VLG: editions 2018-2026; REF_ID is published as block_id and the row index identifies the field, the QGIS styles table in the 2026 GeoPackage is skipped, and the 2020 archive is read as cp1252 with its CRS declared
