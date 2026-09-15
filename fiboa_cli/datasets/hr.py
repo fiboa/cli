@@ -100,10 +100,10 @@ and supporting sustainable land use practices.
     ARCHIVE_CRS = "EPSG:3765"
 
     def migrate(self, gdf):
-        if gdf.crs is None or gdf.crs.to_epsg() is None:
-            # Undeclared, those metres reach the STAC extent as degrees and
-            # leave every parcel in one cell of the Hilbert grid.
-            gdf = gdf.set_crs(self.ARCHIVE_CRS, allow_override=True)
+        if gdf.crs is None:
+            # Some archives ship no .prj, and those metres would reach the STAC
+            # extent as degrees. A CRS that is declared is trusted, EPSG or not.
+            gdf = gdf.set_crs(self.ARCHIVE_CRS)
 
         # The dated archives carry ARKOD's own parcel id, unique per edition;
         # only the rolling land_parcels.gpkg has none.
