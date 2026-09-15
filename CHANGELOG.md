@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- LV: editions 2015-2025 from the yearly releases on data.gov.lv, so an edition is the campaign it holds rather than the day it was downloaded; the field block becomes block_id, crop:name comes from the code list because the files carry only the code, one merged list (https://fiboa.org/code/lv/lv.csv) covers the 28 codes the register added after EuroCrops' 2021 table, and the id is minted because objectid restarts in every regional file
 - Adopt vecorel-cli 0.2.18, which carries the checks this repository was growing its own copies of: rows that cannot validate are dropped bounded by `max_dropped_share`, the required properties come from the declared schemas, ids are checked for uniqueness, a converter may not declare both `sources` and `variants`, and the schemas are fetched before any source data
 - JP: convert through vecorel-cli's DuckDB converter instead of a copy of it in this repository
 - HR: drop the rolling `sources`, which overruled every `--variant`

@@ -103,7 +103,7 @@ extra_convert_parameters = {
     "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
-    "lv": _input_files("lv", "1_100.xml"),
+    "lv": {"variant": "2024", **_input_files("lv", "lv_2024_lielriga.gpkg")},
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
     "jecam": _input_files("jecam", "BD_JECAM_CIRAD_2023_feb.shp"),
     "de_bw": _input_files("de_bw", "de_bw.json"),
