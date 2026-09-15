@@ -63,4 +63,5 @@ The download service is a set of personalized spatial data of agricultural land 
             return value.encode("latin-1").decode("cp1257")
         except (UnicodeEncodeError, UnicodeDecodeError):
             return value
+
     missing_schemas = {"properties": {"claimant_id": {"type": "int64"}}}
