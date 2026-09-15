@@ -4,9 +4,16 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
+# The Finnish Food Authority publishes one file per year under /data/<year>/
+BASE = "https://download.inspire.ruokavirasto-awsa.com/data"
+FILE = "LandUse.ExistingLandUse.GSAAAgriculturalParcel.gpkg"
+
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
-    sources = "https://download.inspire.ruokavirasto-awsa.com/data/2023/LandUse.ExistingLandUse.GSAAAgriculturalParcel.gpkg"
+    variants = {
+        str(year): {f"{BASE}/{year}/{FILE}": f"fi_gsaa_{year}.gpkg"}
+        for year in range(2025, 2019, -1)
+    }
     id = "fi"
     short_name = "Finland"
     title = "Finnish Crop Fields (Maatalousmaa)"
@@ -18,10 +25,13 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
     provider = "Finnish Food Authority <https://www.ruokavirasto.fi/en/about-us/open-information/spatial-data-sets/>"
     attribution = "Finnish Food Authority"
     license = "CC-BY-4.0"
+    # A peruslohko (basic parcel) is the reference parcel and holds one or more
+    # kasvulohko, the growing parcels this dataset describes: PERUSLOHKOTUNNUS
+    # repeats once per growing parcel
     columns = {
         "geometry": "geometry",
-        "PERUSLOHKOTUNNUS": "id",
-        "LOHKONUMERO": "block_id",
+        "id": "id",
+        "PERUSLOHKOTUNNUS": "block_id",
         "area": "metrics:area",
         "VUOSI": "determination:datetime",
         "KASVIKOODI": "crop:code",
@@ -31,6 +41,11 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
         # Make year (1st January) from column "VUOSI"
         "VUOSI": lambda col: pd.to_datetime(col, format="%Y"),
     }
+
+    def migrate(self, gdf):
+        gdf["id"] = gdf["PERUSLOHKOTUNNUS"].astype(str) + ":" + gdf["LOHKONUMERO"].astype(str)
+        return super().migrate(gdf)
+
     ec_mapping_csv = "https://fiboa.org/code/fi/fi_2023.csv"
 
     area_is_in_ha = False
@@ -38,6 +53,7 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
 
     missing_schemas = {
         "properties": {
-            "block_id": {"type": "int64"},
+            # PERUSLOHKOTUNNUS keeps its leading zeros ("0040000372")
+            "block_id": {"type": "string"},
         }
     }
