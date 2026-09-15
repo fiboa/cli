@@ -33,6 +33,9 @@ with its HCAT columns already resolved.
     }
 
     def migrate(self, gdf):
+        # split first, so ID_PARCEL stays unique: 13 parcels are multi-part
+        gdf = self.split_multipart(gdf)
+
         # SURF_PARC is rounded to 0.01 ha, so a parcel under 50 m2 reads as zero
         zero = gdf["SURF_PARC"] <= 0
         if zero.any():
