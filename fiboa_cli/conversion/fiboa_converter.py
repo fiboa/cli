@@ -16,11 +16,9 @@ class FiboaBaseConverter(BaseConverter):
         self.extensions.add(get_fiboa_uri())
 
     def split_multipart(self, gdf):
-        """Split multi-part geometries into one row per polygon.
-
-        The base converter does this too, but only after it has checked that ids are
-        unique, so a converter that mints an id from the source has to split first or
-        the parts share it. Running it again afterwards is a no-op.
+        """
+        Split multi-part geometries into one row per polygon and generate ids. 
+        Useful for subclasses that generate ids in migrate or post_migrate
         """
         gdf.geometry = gdf.geometry.make_valid()
         gdf = gdf.explode(index_parts=False)
