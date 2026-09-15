@@ -15,6 +15,19 @@ class FiboaBaseConverter(BaseConverter):
         super().__init__(*args, **kwargs)
         self.extensions.add(get_fiboa_uri())
 
+    def split_multipart(self, gdf):
+        """Split multi-part geometries into one row per polygon.
+
+        The base converter does this too, but only after it has checked that ids are
+        unique, so a converter that mints an id from the source has to split first or
+        the parts share it. Running it again afterwards is a no-op.
+        """
+        gdf.geometry = gdf.geometry.make_valid()
+        gdf = gdf.explode(index_parts=False)
+        gdf = gdf[(gdf.geometry.geom_type == "Polygon") & gdf.geometry.is_valid]
+        # explode repeats the source row labels, which misaligns a later assignment
+        return gdf.reset_index(drop=True)
+
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
 

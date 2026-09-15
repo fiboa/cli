@@ -97,11 +97,8 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         # the campaigns up to 2023 name their columns in upper case
         gdf = gdf.rename(columns=str.lower)
 
-        # the base converter splits multi-part geometries after it has checked the ids
-        gdf.geometry = gdf.geometry.make_valid()
-        gdf = gdf.explode(index_parts=False)
-        gdf = gdf[(gdf.geometry.geom_type == "Polygon") & gdf.geometry.is_valid]
-        gdf = gdf.reset_index(drop=True)
+        # split first, so the id minted below survives it
+        gdf = self.split_multipart(gdf)
 
         # objectid restarts at 1 in every regional file, so the region is part of the id
         region = _slug(layer or Path(path).stem)
