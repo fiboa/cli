@@ -17,7 +17,7 @@ class FiboaBaseConverter(BaseConverter):
 
     def split_multipart(self, gdf):
         """
-        Split multi-part geometries into one row per polygon and generate ids. 
+        Split multi-part geometries into one row per polygon and generate ids.
         Useful for subclasses that generate ids in migrate or post_migrate
         """
         gdf.geometry = gdf.geometry.make_valid()
