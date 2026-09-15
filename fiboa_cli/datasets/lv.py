@@ -9,11 +9,7 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
-# The yearly releases live on Latvia's open data portal, one package per campaign and
-# nine regional GeoPackages in each. Their URLs carry dataset and resource UUIDs, so
-# they cannot be constructed; the package is looked up by title instead. The slug is no
-# help either: it reads "klientu-..." up to 2022 and "lauksaimnieku-..." after, and the
-# 2015 package sits under a slug that says 2022.
+# The resource URLs carry UUIDs, so the package is looked up by title.
 CKAN = "https://data.gov.lv/dati/lv/api/3/action/package_search"
 SEARCH = "Lauksaimnieku deklarētās platības"
 
@@ -54,9 +50,7 @@ Each edition is the campaign the Rural Support Service published it for, taken f
             "block_id": {"type": "string"},
         }
     }
-    # One list covering every campaign: EuroCrops' lv_2021.csv holds 138 codes and the
-    # register has added 28 since, 1.43% of the 2024 fields. Merged, so crop:code_list
-    # points at a list that covers the data.
+    # EuroCrops' lv_2021.csv plus the 28 codes the register added since
     ec_mapping_csv = "https://fiboa.org/code/lv/lv.csv"
     column_migrations = {
         "product_code": lambda col: col.astype("string").str.strip(),
@@ -73,7 +67,7 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         response.raise_for_status()
         packages = response.json()["result"]["results"]
 
-        # "... 2024.gadā" and "... 2023. gadā" both occur
+        # "2024.gadā" and "2023. gadā" both occur
         wanted = re.compile(rf"\b{self.variant}\.\s*gad")
         matches = [p for p in packages if wanted.search(p.get("title", ""))]
         if len(matches) != 1:
@@ -94,17 +88,13 @@ Each edition is the campaign the Rural Support Service published it for, taken f
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
-        # The yearly files publish the code without a name, where the WFS carried both.
-        # The EuroCrops table holds the register's own name for each code, which is what
-        # crop:name means -- the HCAT columns beside it are the harmonised reading.
+        # The files carry the code without a name; the code list has it.
         names = {row["original_code"].strip(): row["original_name"] for row in self.ec_mapping}
         gdf["crop:name"] = self.get_code_column(gdf).str.strip().map(names)
         return gdf
 
     def file_migration(self, gdf, path, uri, layer):
-        # objectid is a row number that restarts at 1 in every regional file -- all 32,186
-        # of Lielrīga's also occur in Zemgale -- so the region is part of the id. The layer
-        # is named after the region, spelled differently from year to year, hence the slug.
+        # objectid restarts at 1 in every regional file, so the region is part of the id
         region = _slug(layer or Path(path).stem)
         gdf["id"] = region + "-" + gdf["objectid"].astype("int64").astype(str)
         return gdf
