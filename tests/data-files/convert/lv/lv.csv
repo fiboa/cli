@@ -25,12 +25,15 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code,HCAT2_name,HCA
 160,Griķi,Buckwheat,buckwheat,3301150200,buckwheat,3301150200,EuroCrops lv_2021.csv
 161,Griķi ar tauriņziežu pasēju,Buckwheat with legume seed,buckwheat,3301150200,buckwheat,3301150200,EuroCrops lv_2021.csv
 170,Kaņepes,Cannabis,hemp_cannabis,3301061000,hemp_cannabis,3301061000,EuroCrops lv_2021.csv
+180,"Cietie kvieši, vasaras",Spring durum wheat,spring_durum_hard_wheat,3301010202,,,fiboa
+181,"Cietie kvieši, vasaras, ar stiebrzāļu vai tauriņziežu pasēju",Spring durum wheat with grass or legume undersowing,spring_durum_hard_wheat,3301010202,,,"fiboa, from 180"
 211,"Rapsis, vasaras",Rape summer,summer_rapeseed_rape,3301060403,summer_rapeseed_rape,3301060403,EuroCrops lv_2021.csv
 212,"Rapsis, ziemas",Rape winter,winter_rapeseed_rape,3301060401,winter_rapeseed_rape,3301060401,EuroCrops lv_2021.csv
 213,"Ripsis, vasaras","Rapeseed, summer",summer_rapeseed_rape,3301060403,summer_rapeseed_rape,3301060403,EuroCrops lv_2021.csv
 214,"Ripsis, ziemas",Rapeseed winter,winter_rapeseed_rape,3301060401,winter_rapeseed_rape,3301060401,EuroCrops lv_2021.csv
 215,Sinepe,Mustard,mustard,3301210100,mustard,3301210100,EuroCrops lv_2021.csv
 216,Sinepes ar tauriņziežu pasēju,Mustard with legume paste,mustard,3301210100,mustard,3301210100,EuroCrops lv_2021.csv
+218,Eļļas rutks sēklas ieguvei,Oil radish grown for seed,radish,3301290600,,,fiboa
 310,"Lini, šķiedras",Linen fibers,flax_linen,3301060701,flax_linen,3301060701,EuroCrops lv_2021.csv
 330,"Lini, eļļas",Flax oils,flax_linseed_oil,3301060702,flax_linseed_oil,3301060702,EuroCrops lv_2021.csv
 410,Lauka pupas,Field beans,beans,3301020100,beans,3301020100,EuroCrops lv_2021.csv
@@ -78,6 +81,8 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code,HCAT2_name,HCA
 738,"Pļavas skarene, sēklas ieguvei",Kentucky bluegrass for seed production,poaceae_grasses,3301090200,festuca_fescue,3301090202,EuroCrops lv_2021.csv
 739,"Kamolzāle, sēklas ieguvei",Cocksfoot for seed production,cocksfoot_catgrass,3301090203,chamomile,3301061213,EuroCrops lv_2021.csv
 741,Citur neminēta kukurūza,Maize not elsewhere specified,grain_maize_corn_popcorn,3301010600,grain_maize_corn_popcorn,3301010600,EuroCrops lv_2021.csv
+742,Citur neminēta kukurūza ar starpkultūru,Maize not mentioned elsewhere with a catch crop,grain_maize_corn_popcorn,3301010600,,,"fiboa, from 741"
+743,Citur neminēta kukurūza ar zālāju pasēju,Maize not mentioned elsewhere with grass undersowing,grain_maize_corn_popcorn,3301010600,,,"fiboa, from 741"
 760,"Aramzemē sētu stiebrzāļu vai tauriņziežu maisījums, kur tauriņzieži >50%",Mixture of grasses or legumes sown on arable land with legumes> 50%,plants_harvested_green,3301090000,pasture_meadow_grassland_grass,3302000000,EuroCrops lv_2021.csv
 761,Auzeņairene sēklas ieguvei,Festulolium for seed production,festulolium,3301090204,festuca_fescue,3301090202,EuroCrops lv_2021.csv
 773,Sarkanais āboliņš sēklas ieguvei,Red clover grown for seed,clover,3301090303,,,"fiboa, from 723"
@@ -87,6 +92,8 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code,HCAT2_name,HCA
 777,Austrumu galega sēklas ieguvei,Eastern galega grown for seed,galega,3301081900,,,"fiboa, from 727"
 779,Amoliņš sēklas ieguvei,Melilot grown for seed,melilot,3301090304,,,"fiboa, from 729"
 781,Inkarnāta āboliņš,Crimson clover,clover,3301090303,,,fiboa
+782,Inkarnāta āboliņš sēklas ieguvei,Crimson clover grown for seed,clover,3301090303,,,"fiboa, from 781"
+785,"Sorgo, Sudānas zāle, sorgo hibrīdi sēklas ieguvei","Sorghum, Sudan grass and sorghum hybrids grown for seed",millet_sorghum,3301010900,,,fiboa
 791,Kukurūza biogāzes ieguvei,Maize for biogas production,grain_maize_corn_popcorn,3301010600,grain_maize_corn_popcorn,3301010600,EuroCrops lv_2021.csv
 792,"Platība, kurā dabiski iesējušos augu īpatsvars pārsniedz 40%, dārzeņu kultūraugu skaits vienā kvadrātmetrā ir mazāks par šo noteikumu 2.2 pielikumā noteikto skaitu un nav īstenoti nezāļu ierobežošanas agrotehniskie pasākumi vismaz t",Area where the proportion of naturally sown plants exceeds 40% the number of vegetable crops per square meter is less than the number specified in Annex 2.2 to these Regulations and no weed control agronomic measures have been implemented for at least t,not_known_and_other,3399000000,not_known_and_other,3399000000,EuroCrops lv_2021.csv
 811,"Dažādi kultūraugi nelielā aramzemes platībā vai vairāki kultūraugi, audzēti vienlaidu laukā, ja katrs no kultūraugiem attiecīgajā laukā aizņem mazāk par 0,3 ha, vai platības, ko izmanto ziedu audzēšanai","Different crops on a small area of arable land or several crops grown in a continuous field, where each of the crops occupies less than 0.3 ha in the field concerned, or areas used for the production of flowers",arable_crops,3301000000,other_arable_land_crops,3301990000,EuroCrops lv_2021.csv
@@ -118,6 +125,7 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code,HCAT2_name,HCA
 863,Mārrutki,Horseradish,horseradish,3301210400,horseradish,3301210400,EuroCrops lv_2021.csv
 864,Salāti,Salads,salads_lettuce_leaf_vegetables,3301310000,salads_lettuce_leaf_vegetables,3301310000,EuroCrops lv_2021.csv
 865,Topinambūri,Jerusalem artichokes,topinambur_jerusalem_artichoke,3301180000,topinambur_jerusalem_artichoke,3301180000,EuroCrops lv_2021.csv
+866,"Skābenes, daudzgadīgas",Perennial sorrel,sorrel,3301310700,,,fiboa
 867,Paprika,Paprika,bell_pepper_paprika,3301300100,bell_pepper_paprika,3301300100,EuroCrops lv_2021.csv
 869,Sparģeļi,Asparagus,asparagus,3301200000,aspargus,3301200000,EuroCrops lv_2021.csv
 870,"Citur neminēti kāposti (baltie vai sarkanie galviņkāposti, rožu jeb Briseles kāposti, galda kolrābji, sparģeļkāposti, virziņkāposti jeb Savojas kāposti, lapu kāposti, brokoļi, Pekinas kāposti), izņemot lopbarības kāpostus",Cabbages not elsewhere specified or included (white or red headed cabbages Brussels sprouts kohlrabi kale savoy cabbages kale broccoli Beijing cabbages) other than fodder cabbages,brassica_oleracea_cabbage,3301210200,brassica_oleracea_cabbage,3301210200,EuroCrops lv_2021.csv

@@ -97,9 +97,17 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         # the campaigns up to 2023 name their columns in upper case
         gdf = gdf.rename(columns=str.lower)
 
+        # the base converter splits multi-part geometries after it has checked the ids
+        gdf.geometry = gdf.geometry.make_valid()
+        gdf = gdf.explode(index_parts=False)
+        gdf = gdf[(gdf.geometry.geom_type == "Polygon") & gdf.geometry.is_valid]
+        gdf = gdf.reset_index(drop=True)
+
         # objectid restarts at 1 in every regional file, so the region is part of the id
         region = _slug(layer or Path(path).stem)
         gdf["id"] = region + "-" + gdf["objectid"].astype("int64").astype(str)
+        part = gdf.groupby("id").cumcount()
+        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype(str)
         return gdf
 
 
@@ -107,4 +115,6 @@ def _slug(value: str) -> str:
     """A region name as ASCII, so Lielrīga and lielrga give the same id."""
     text = unicodedata.normalize("NFKD", str(value))
     text = "".join(c for c in text if not unicodedata.combining(c))
-    return re.sub(r"[^A-Za-z0-9]+", "_", text).strip("_").lower()
+    text = re.sub(r"[^A-Za-z0-9]+", "_", text).strip("_").lower()
+    # the layer carries the campaign in some years, which the id already has
+    return re.sub(r"_?(19|20)\d\d$", "", text)
