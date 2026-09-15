@@ -44,6 +44,7 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         "id": "id",
         "block_number": "block_id",
         "product_code": "crop:code",
+        "crop:name": "crop:name",
         "period_code": "determination:datetime",
         "shape_area": "metrics:area",
         "shape_length": "metrics:perimeter",
@@ -87,6 +88,15 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         if len(urls) < 2:
             raise RuntimeError(f"{matches[0]['title']} holds {len(urls)} GeoPackage(s)")
         return urls
+
+    def post_migrate(self, gdf):
+        gdf = super().post_migrate(gdf)
+        # The yearly files publish the code without a name, where the WFS carried both.
+        # The EuroCrops table holds the register's own name for each code, which is what
+        # crop:name means -- the HCAT columns beside it are the harmonised reading.
+        names = {row["original_code"].strip(): row["original_name"] for row in self.ec_mapping}
+        gdf["crop:name"] = self.get_code_column(gdf).str.strip().map(names)
+        return gdf
 
     def file_migration(self, gdf, path, uri, layer):
         # objectid is a row number that restarts at 1 in every regional file -- all 32,186
