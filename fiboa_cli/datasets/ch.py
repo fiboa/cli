@@ -25,9 +25,13 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "id": "id",  # derived in migrate()
         "flaeche_m2": "metrics:area",
         "kanton": "admin:subdivision_code",
+        "lnf_code": "crop:code",  # code of the federal usage catalogue (LNF_Katalog_Nutzungsart)
         "nutzung": "crop:name",
         "bezugsjahr": "determination:datetime",
     }
+    # The catalogue is published by the BLW as LWB_Nutzungsflaechen_Kataloge.xlsx; this is its
+    # LNF_Katalog_Nutzungsart sheet as CSV.
+    column_additions = {"crop:code_list": "https://fiboa.org/code/ch/lnf_code.csv"}
     column_filters = {
         "ist_ueberlagernd": lambda col: col == False,  # noqa: E712
     }
@@ -35,6 +39,8 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     area_calculate_missing = True
     column_migrations = {
         "bezugsjahr": lambda col: pd.to_datetime(col, format="%Y"),
+        # crop:code must be a string per the crop extension; lnf_code is an integer.
+        "lnf_code": lambda col: col.astype(str),
     }
     ec_mapping_csv = "https://fiboa.org/code/ch/ch.csv"
 
