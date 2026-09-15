@@ -54,7 +54,10 @@ Each edition is the campaign the Rural Support Service published it for, taken f
             "block_id": {"type": "string"},
         }
     }
-    ec_mapping_csv = "lv_2021.csv"
+    # One list covering every campaign: EuroCrops' lv_2021.csv holds 138 codes and the
+    # register has added 28 since, 1.43% of the 2024 fields. Merged, so crop:code_list
+    # points at a list that covers the data.
+    ec_mapping_csv = "https://fiboa.org/code/lv/lv.csv"
     column_migrations = {
         "product_code": lambda col: col.astype("string").str.strip(),
         "period_code": lambda col: pd.to_datetime(
