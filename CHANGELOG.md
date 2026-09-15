@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Adopt vecorel-cli 0.2.18, which carries the checks this repository was growing its own copies of: rows that cannot validate are dropped bounded by `max_dropped_share`, the required properties come from the declared schemas, ids are checked for uniqueness, a converter may not declare both `sources` and `variants`, and the schemas are fetched before any source data
+- JP: convert through vecorel-cli's DuckDB converter instead of a copy of it in this repository
+- HR: drop the rolling `sources`, which overruled every `--variant`
+- Europe-LAND: use the crop name as the crop code where the release ships an empty `crop_code` (LT 2024)
 - SE: eleven editions, 2015-2025 — the campaign is a filter on one WFS layer, so every year the service holds is a variant (it answers 2015 through 2025), over https because the http URL redirects
 - BG: the ministry's GeoServer publishes Agricultural_Land_<year> for 2021-2025, not the Arable_Land_2024 the converter asked for; the 2021 and 2022 layers are a different release again (block and usage in one ELGIDENT field, with an area column the later ones lack), PHBIDENT identifies the block rather than the polygon so it is published as block_id, and the Bulgarian names need UTF-8 forced because GeoServer writes the charset into a .cst file GDAL does not read
 - 
@@ -52,6 +56,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CAT: the 2024 download is a shapefile package, and 34 crop names new in that edition are mapped
 - DE-NDS: give the collection an id (the row index), which it was published without
 - DE-BB: ref_ident holds the FLIK (field block reference), not a farmer, and the shapefile is cp1252
+- JP: editions 2021-2024, each with the determination date of the parcel rather than a constant
+- PerFileBaseConverter: convert a multi-file source one file at a time and merge the parts, so a dataset larger than memory can be converted; used by the Spain-wide converter
+- FiboaDuckDBBaseConverter: convert a source that is already Parquet with SQL, without loading it into memory
 - Update vecorel-cli to v0.2.17:
   - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
   - GeoJSON files with a byte order mark no longer fail to read
