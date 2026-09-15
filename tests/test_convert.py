@@ -100,10 +100,6 @@ extra_convert_parameters = {
         "variant": "2025",
         "input_files": {f"{test_path}/es_an/SP25_REC_PROV_04.zip": ["SP25_REC_04.shp"]},
     },
-    "es_cl": {
-        "variant": "2025",
-        "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
-    },
     "sk#2018": {"variant": "2018"},
     "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
     "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
