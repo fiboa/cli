@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - EE: mint a crop code — PRIA publishes the crop as free text and none of its own, and the crop extension requires `crop:code` and `crop:code_list` — and publish taotletud_maakasutus as `land_use` (arable, permanent grassland, restored grassland, permanent crops, black fallow) — the only classification the source has, since it publishes the crop as free text and no crop code at all; and keep pollu_id as `parcel_id`, because it repeats in a few rows of some editions (16 of the 165,244 in 2016); and a first test with a fixture
+- Adopt vecorel-cli 0.2.18, which carries the checks this repository was growing its own copies of: rows that cannot validate are dropped bounded by `max_dropped_share`, the required properties come from the declared schemas, ids are checked for uniqueness, a converter may not declare both `sources` and `variants`, and the schemas are fetched before any source data
+- JP: convert through vecorel-cli's DuckDB converter instead of a copy of it in this repository
+- HR: drop the rolling `sources`, which overruled every `--variant`
+- Europe-LAND: use the crop name as the crop code where the release ships an empty `crop_code` (LT 2024)
 - SE: eleven editions, 2015-2025 — the campaign is a filter on one WFS layer, so every year the service holds is a variant (it answers 2015 through 2025), over https because the http URL redirects
 - BG: the ministry's GeoServer publishes Agricultural_Land_<year> for 2021-2025, not the Arable_Land_2024 the converter asked for; the 2021 and 2022 layers are a different release again (block and usage in one ELGIDENT field, with an area column the later ones lack), PHBIDENT identifies the block rather than the polygon so it is published as block_id, and the Bulgarian names need UTF-8 forced because GeoServer writes the charset into a .cst file GDAL does not read
 - 
@@ -37,8 +41,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- HR: editions 2011-2024; the archives leave their CRS undefined and carry ARKOD's own parcel id, which the row index used to overwrite
+- NL: the full BRP series 2009-2026 — the 2009-2019 zips hold a FileGDB with differently prefixed columns, 2020 is a GeoPackage, and the download moved to a new PDOK location
+- SI: editions back to 2019 — the archives differ per campaign in their folder layout, CRS declaration, column names and crop-code padding
+- BE-WAL: match the crop by name where EuroCrops' table leaves the code empty, which covered 6.79% of the collection
+- CZ: find the shapefile in nested archive folders (2026)
+- CZ: read the 2019-2022 editions (GPZ_DP: renamed crop and area columns, no application date, ENTITA_ID is the land block), recover the crop codes the 2020 edition leaves empty, map the 167 crop codes EuroCrops does not carry, and publish a declaration that straddles two land blocks once
+- BE-VLG: editions 2018-2026; REF_ID is published as block_id and the row index identifies the field, the QGIS styles table in the 2026 GeoPackage is skipped, and the 2020 archive is read as cp1252 with its CRS declared
+- FI: one variant per year (2020-2025) instead of a hard-coded 2023, with the year in the cache name
+- AT: extract the archive instead of reading the GeoPackage through /vsizip, which never finished for 2018
+- SK: KODKD is the LPIS block code (non-unique, sometimes empty), so it is kept as block_id and the row index identifies the field
+- EC-LT: repair the Lithuanian crop names, which the release ships read through the wrong code page, and map them through a corrected table — Šlapynės (wetlands) was published as spinach
+- EC-LT: nothing in the release identifies a parcel, so the row index does
+- ES-CM: read the year-named SIGPAC service, whose id field is OBJECTID_1, with the determination date from the variant
+- ES-CN: the seven island files each kept their own row index, and the region was declared as Cantabria
+- EC-EE: name the shapefile inside the archive, migrate the year column the release actually has, and require only what every parcel carries
+- ES-CAT: the 2024 download is a shapefile package, and 34 crop names new in that edition are mapped
 - DE-NDS: give the collection an id (the row index), which it was published without
 - DE-BB: ref_ident holds the FLIK (field block reference), not a farmer, and the shapefile is cp1252
+- JP: editions 2021-2024, each with the determination date of the parcel rather than a constant
+- PerFileBaseConverter: convert a multi-file source one file at a time and merge the parts, so a dataset larger than memory can be converted; used by the Spain-wide converter
+- FiboaDuckDBBaseConverter: convert a source that is already Parquet with SQL, without loading it into memory
 - Update vecorel-cli to v0.2.17:
   - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
   - GeoJSON files with a byte order mark no longer fail to read
@@ -64,6 +87,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   only 20,300 of 54,038 parcels, so earlier output was incomplete. `metrics:area` is derived from
   the geometry, because the service stopped publishing the declared size.
 - Converter for South Tyrol, Italy (it_bz), reading the province's LAFIS utilised agricultural area
+- Repair the Saxony, Germany converter (de_sax): only the current year's archive is served, so the
+  2024 edition it read is gone. It now reads 2026, and a test fixture covers the dataset.
 - Update vecorel-cli to v0.2.16:
   - Converter output is sorted by Hilbert distance
   - Commands exit with a non-zero exit code when they report a failure

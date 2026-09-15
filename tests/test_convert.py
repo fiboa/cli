@@ -25,6 +25,7 @@ tests = [
     "bg#2022",
     "de_sh",
     "de_bb",
+    "ec_lt",
     "ec_lv",
     "ec_si",
     "fi",
@@ -40,6 +41,8 @@ tests = [
     "ai4sf",
     "ch",
     "cz",
+    "cz#2019",
+    "cz#2020",
     "us_usda_cropland",
     "us_ca_scm",
     "jp",
@@ -47,6 +50,7 @@ tests = [
     "ie",
     "es_cat",
     "es_cl",
+    "es_cm",
     "es",
     "nz",
     "lt",
@@ -64,6 +68,7 @@ tests = [
     "de_he",
     "de_st",
     "it_bz",
+    "de_sax",
 ]
 test_path = "tests/data-files/convert"
 
@@ -75,6 +80,8 @@ def _input_files(converter, *names):
 extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
+    # the fixture is the 2023 file; the converter's default is the newest edition
+    "fi": {"variant": "2023"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
@@ -86,12 +93,17 @@ extra_convert_parameters = {
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
     },
     "ee": {"variant": "2024", **_input_files("ee", "ee_gsaa_2024.gml")},
+    "cz#2019": {"variant": "2019"},
+    "cz#2020": {"variant": "2020"},
+    "es_cm": {"variant": "2024", **_input_files("es_cm", "es_cm_0.gpkg")},
     "es_an": {
         "variant": "2025",
         "input_files": {f"{test_path}/es_an/SP25_REC_PROV_04.zip": ["SP25_REC_04.shp"]},
     },
-    "cz#2019": {"variant": "2019"},
-    "cz#2020": {"variant": "2020"},
+    "es_cl": {
+        "variant": "2025",
+        "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
+    },
     "sk#2018": {"variant": "2018"},
     "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
     "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
@@ -107,6 +119,7 @@ extra_convert_parameters = {
     "de_sl_block": _input_files("de_sl_block", "de_sl_block.gml"),
     "de_sl": _input_files("de_sl", "de_sl.gml"),
     "it_bz": _input_files("it_bz", "it_bz.json"),
+    "de_sax": {"input_files": {f"{test_path}/de_sax/gesamt_2026_RE.zip": ["2026_RE_FB_33.shp"]}},
 }
 
 
