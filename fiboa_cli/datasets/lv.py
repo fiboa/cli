@@ -94,6 +94,9 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         return gdf
 
     def file_migration(self, gdf, path, uri, layer):
+        # the campaigns up to 2023 name their columns in upper case
+        gdf = gdf.rename(columns=str.lower)
+
         # objectid restarts at 1 in every regional file, so the region is part of the id
         region = _slug(layer or Path(path).stem)
         gdf["id"] = region + "-" + gdf["objectid"].astype("int64").astype(str)
