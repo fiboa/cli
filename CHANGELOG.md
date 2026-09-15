@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- NL: the full BRP series 2009-2026 — the 2009-2019 zips hold a FileGDB with differently prefixed columns, 2020 is a GeoPackage, and the download moved to a new PDOK location
 - SI: editions back to 2019 — the archives differ per campaign in their folder layout, CRS declaration, column names and crop-code padding
 - BE-WAL: match the crop by name where EuroCrops' table leaves the code empty, which covered 6.79% of the collection
 - CZ: find the shapefile in nested archive folders (2026)
