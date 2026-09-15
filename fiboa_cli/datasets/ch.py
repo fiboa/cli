@@ -1,24 +1,17 @@
 import pandas as pd
+import requests
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
+SERVICES_URL = "https://www.geodienste.ch/info/services.json?base_topics=lwb_nutzungsflaechen"
+# The other publication states are "Registrierung erforderlich" (NE, TI), "Freigabe
+# erforderlich" (NW, OW, VD) and "keine Daten / Bereitstellung" (FL); their downloads answer 401.
+OPEN = "Frei erhältlich"
+
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
-    sources = None
-    data_access = """
-    Data must be obtained from the Swiss open data portal at https://www.geodienste.ch/services/lwb_nutzungsflaechen .
-
-    One can filter on "Verfügbarkeit" == "Frei erhältlich" to select only the open data.
-    That leaves out Cantons AR, NW, OW, VD and LI as on this date (2014-11-12).
-    The downloaded data can be shared with a open_by license. See https://opendata.swiss/de/terms-of-use .
-
-    Use the `-i` CLI parameter to provide the data source.
-    Download the Open data response to a local gpkg file (use `.gpkg` as file extension).
-
-    fiboa convert ch -o swiss.parquet -i lwb_nutzungsflaechen_lv95/geopackage/lwb_nutzungsflaechen_v2_0_lv95.gpkg
-    """
     id = "ch"
     short_name = "Switzerland"
     title = "Field boundaries for Switzerland"
@@ -26,11 +19,10 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     provider = (
         "Konferenz der kantonalen Geoinformations- und Katasterstellen <https://www.kgk-cgc.ch>"
     )
-    index_as_id = True
     license = "opendata.swiss terms of use <https://opendata.swiss/en/terms-of-use>"
     columns = {
         "geometry": "geometry",
-        "id": "id",
+        "id": "id",  # derived in migrate()
         "flaeche_m2": "metrics:area",
         "kanton": "admin:subdivision_code",
         "nutzung": "crop:name",
@@ -45,3 +37,28 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "bezugsjahr": lambda col: pd.to_datetime(col, format="%Y"),
     }
     ec_mapping_csv = "https://fiboa.org/code/ch/ch.csv"
+
+    def get_urls(self):
+        # geodienste.ch lists every canton with its publication state, INTERLIS model version and
+        # STAC item. The GeoPackage link embeds the model version (v2_0 / v3_0), which changes when
+        # a canton migrates, so the links are looked up at run time instead of being hard-coded.
+        services = requests.get(SERVICES_URL, timeout=60)
+        services.raise_for_status()
+
+        urls = {}
+        for service in sorted(services.json()["services"], key=lambda s: s["canton"]):
+            if service["publication_data"] != OPEN:
+                self.info(f"Skipping canton {service['canton']}: {service['publication_data']}")
+                continue
+            item = requests.get(service["stac_item_url"], timeout=60)
+            item.raise_for_status()
+            urls[item.json()["assets"]["geopackage_zip"]["href"]] = ["geopackage/*.gpkg"]
+        return urls
+
+    def migrate(self, gdf):
+        # nutzungsidentifikator is the "Identifikator" of the LWB_Nutzungsflaechen model, the
+        # canton's own id of the plot. Its format differs per canton (AG 4001112N014,
+        # ZG ZG.KUL.19570, ZH 131581) and values repeat across cantons, so the canton code is
+        # prefixed to make it unique nationally.
+        gdf["id"] = gdf["kanton"] + "-" + gdf["nutzungsidentifikator"]
+        return super().migrate(gdf)
