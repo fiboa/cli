@@ -23,6 +23,8 @@ tests = [
     "bg",
     "bg#2022",
     "de_sh",
+    "de_sl",
+    "de_sl_block",
     "de_bb",
     "ec_lt",
     "ec_fr",
@@ -78,6 +80,8 @@ def _input_files(converter, *names):
 
 
 extra_convert_parameters = {
+    "de_sl": _input_files("de_sl", "de_sl.gml"),
+    "de_sl_block": _input_files("de_sl_block", "de_sl_block.gml"),
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
     "pt": {"variant": "2023"},
