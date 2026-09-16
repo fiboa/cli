@@ -61,6 +61,12 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         }
 
     def migrate(self, gdf):
+        # a parcel can be several polygons, and the base converter splits them only after it
+        # has checked the ids, so the parts would share one
+        gdf = self.split_multipart(gdf)
+        part = gdf.groupby("identifier").cumcount()
+        gdf.loc[part > 0, "identifier"] += "-" + (part[part > 0] + 1).astype(str)
+
         # The FLIK is the first 16 characters of the last underscore-separated segment of the
         # identifier, e.g. …_DESLLI00002529002224568 -> DESLLI0000252900. The remaining seven
         # digits number the application parcel within the field block.
