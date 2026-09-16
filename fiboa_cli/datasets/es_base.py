@@ -1,10 +1,12 @@
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
-from fiboa_cli.datasets.commons.data import read_data_csv
+from fiboa_cli.datasets.commons.hcat import AddHCATMixin
+
+SIGPAC_LAND_USE = "https://fiboa.org/code/es/sigpac/land_use.csv"
 
 
-class ESBaseConverter(FiboaBaseConverter):
+class ESBaseConverter(AddHCATMixin, FiboaBaseConverter):
     """
     Base Converter for Spain
     Assumes a source column with the SIGPAC-Land Use code
@@ -17,6 +19,8 @@ class ESBaseConverter(FiboaBaseConverter):
     """
 
     use_code_attribute = "uso_sigpac"
+    # the same list gives the HCAT class the land use belongs to
+    ec_mapping_csv = SIGPAC_LAND_USE
 
     extensions = {
         "https://fiboa.org/crop-extension/v0.2.0/schema.yaml",
@@ -27,7 +31,7 @@ class ESBaseConverter(FiboaBaseConverter):
         # https://www.fega.gob.es/sites/default/files/files/document/AD-CIRCULAR_2-2021_EE98293_SIGC2021.PDF
         # Very generic list
         "admin:country_code": "ES",
-        "crop:code_list": "https://fiboa.org/code/es/sigpac/land_use.csv",
+        "crop:code_list": SIGPAC_LAND_USE,
     }
 
     def __init__(self, *args, **kwargs):
@@ -40,11 +44,11 @@ class ESBaseConverter(FiboaBaseConverter):
         self.column_filters = {self.use_code_attribute: code_filter}
         self.column_additions["admin:subdivision_code"] = self.id[len("es_") :].upper()
 
-    def migrate(self, gdf):
-        # This actually is a land use code. Not sure if we should put this in crop:code
-        rows = read_data_csv("es_coda_uso.csv")
-        mapping = {row["original_code"]: row["original_name"] for row in rows}
-        mapping_en = {row["original_code"]: row["name_en"] for row in rows}
-        gdf["crop:name"] = gdf[self.use_code_attribute].map(mapping)
-        gdf["crop:name_en"] = gdf[self.use_code_attribute].map(mapping_en)
-        return super().migrate(gdf)
+    def post_migrate(self, gdf):
+        gdf = super().post_migrate(gdf)
+        # the same list the HCAT columns come from, so the two cannot drift apart
+        names = {row["original_code"]: row for row in self.ec_mapping}
+        code = gdf[self.use_code_attribute]
+        gdf["crop:name"] = code.map(lambda c: (names.get(c) or {}).get("original_name"))
+        gdf["crop:name_en"] = code.map(lambda c: (names.get(c) or {}).get("name_en"))
+        return gdf
