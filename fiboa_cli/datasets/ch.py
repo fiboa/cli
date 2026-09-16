@@ -6,9 +6,7 @@ from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
 SERVICES_URL = "https://www.geodienste.ch/info/services.json?base_topics=lwb_nutzungsflaechen"
-# The other publication states are "Registrierung erforderlich" (NE, TI), "Freigabe
-# erforderlich" (NW, OW, VD) and "keine Daten / Bereitstellung" (FL); their downloads answer 401.
-OPEN = "Frei erhältlich"
+OPEN = "Frei erhältlich"  # NE, TI need registration; NW, OW, VD approval; FL has no data
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
@@ -29,9 +27,6 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "nutzung": "crop:name",
         "bezugsjahr": "determination:datetime",
     }
-    # The catalogue is published by the BLW as LWB_Nutzungsflaechen_Kataloge.xlsx; this is its
-    # LNF_Katalog_Nutzungsart sheet as CSV.
-    column_additions = {"crop:code_list": "https://fiboa.org/code/ch/lnf_code.csv"}
     column_filters = {
         "ist_ueberlagernd": lambda col: col == False,  # noqa: E712
     }
@@ -45,9 +40,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     ec_mapping_csv = "https://fiboa.org/code/ch/ch.csv"
 
     def get_urls(self):
-        # geodienste.ch lists every canton with its publication state, INTERLIS model version and
-        # STAC item. The GeoPackage link embeds the model version (v2_0 / v3_0), which changes when
-        # a canton migrates, so the links are looked up at run time instead of being hard-coded.
+        # Look up each open canton's GeoPackage; the link embeds the model version (v2_0/v3_0).
         services = requests.get(SERVICES_URL, timeout=60)
         services.raise_for_status()
 
@@ -62,9 +55,6 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         return urls
 
     def migrate(self, gdf):
-        # nutzungsidentifikator is the "Identifikator" of the LWB_Nutzungsflaechen model, the
-        # canton's own id of the plot. Its format differs per canton (AG 4001112N014,
-        # ZG ZG.KUL.19570, ZH 131581) and values repeat across cantons, so the canton code is
-        # prefixed to make it unique nationally.
+        # Combine canton with internal id to make it unique
         gdf["id"] = gdf["kanton"] + "-" + gdf["nutzungsidentifikator"]
         return super().migrate(gdf)
