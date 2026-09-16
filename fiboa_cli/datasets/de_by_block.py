@@ -48,7 +48,8 @@ year for the application procedure.
 
     columns = {
         "geometry": "geometry",
-        "flik": ("flik", "id"),  # derived in migrate(); unique, unlike in Baden-Württemberg
+        "flik": "flik",  # derived in migrate(); unique, unlike in Baden-Württemberg
+        "id": "id",  # the flik, plus a part number where a block is several polygons
         "agricultural_area_type": "crop:code",  # added in file_migration(), trimmed in migrate()
         "validFrom": "determination:datetime",
         "area": "metrics:area",  # not in the source; created by area_calculate_missing
@@ -86,9 +87,17 @@ year for the application procedure.
         )
 
     def migrate(self, gdf):
+        # split here: the base converter explodes only after it has checked the ids
+        gdf = self.split_multipart(gdf)
+
         # The FLIK is the last dot-separated segment of the identifier URI, e.g.
         # https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI9412000570
         gdf["flik"] = gdf["id"].str.rsplit(".", n=1).str[-1]
         # …/codelist/de.iacs/AgriculturalAreaTypeValue/AL -> AL
         gdf["agricultural_area_type"] = gdf["agricultural_area_type"].str.rsplit("/", n=1).str[-1]
+
+        # the flik stays the block reference; only the id tells the parts apart
+        gdf["id"] = gdf["flik"].astype("string")
+        part = gdf.groupby("id").cumcount()
+        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype("string")
         return super().migrate(gdf)
