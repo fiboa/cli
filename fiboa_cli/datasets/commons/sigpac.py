@@ -38,6 +38,9 @@ class SigpacRecintoMixin:
         return layer == "recinto"
 
     def migrate(self, gdf):
+        # the base converter splits multi-part geometries after it has checked the ids
+        gdf = self.split_multipart(gdf)
+
         # The register has no row identifier; the cadastral key is one, and it is what
         # es.py builds for the declared crops of the same parcels.
         def part(column):
@@ -58,4 +61,7 @@ class SigpacRecintoMixin:
             + "-"
             + part("recinto")
         )
+        # a recinto can be several polygons, and then its key is not enough on its own
+        piece = gdf.groupby("id").cumcount()
+        gdf.loc[piece > 0, "id"] += "-" + (piece[piece > 0] + 1).astype(str)
         return super().migrate(gdf)
