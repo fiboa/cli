@@ -50,6 +50,7 @@ tests = [
     "ie",
     "es_cat",
     "es_cl",
+    "es_an",
     "es_cm",
     "es",
     "nz",
