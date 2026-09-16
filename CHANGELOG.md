@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- ES regions: map the SIGPAC land use to HCAT through `AddHCATMixin` on the shared base converter, so es_an, es_ar, es_cb, es_cl, es_cm, es_ga, es_ib, es_md, es_pv and es_vc publish `hcat:code`; the code list gains EP (elemento del paisaje), which five regions publish and which had no `crop:name`
+- ES-CAT, ES-CN: map the crop codes to HCAT through `AddHCATMixin`; the published Catalan code list lacked 34 codes the bundled table maps
 - EE: mint a crop code — PRIA publishes the crop as free text and none of its own, and the crop extension requires `crop:code` and `crop:code_list` — and publish taotletud_maakasutus as `land_use` (arable, permanent grassland, restored grassland, permanent crops, black fallow) — the only classification the source has, since it publishes the crop as free text and no crop code at all; and keep pollu_id as `parcel_id`, because it repeats in a few rows of some editions (16 of the 165,244 in 2016); and a first test with a fixture
 - Adopt vecorel-cli 0.2.18, which carries the checks this repository was growing its own copies of: rows that cannot validate are dropped bounded by `max_dropped_share`, the required properties come from the declared schemas, ids are checked for uniqueness, a converter may not declare both `sources` and `variants`, and the schemas are fetched before any source data
 - JP: convert through vecorel-cli's DuckDB converter instead of a copy of it in this repository

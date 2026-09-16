@@ -2,9 +2,10 @@ import pandas as pd
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.data import read_data_csv
+from .commons.hcat import AddHCATMixin
 
 
-class ESCatConverter(FiboaBaseConverter):
+class ESCatConverter(AddHCATMixin, FiboaBaseConverter):
     # Catalonia has its own coding list, not sublass of ESBaseConverter
     variants = {
         "2024": {
@@ -42,9 +43,8 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
     attribution = "Catalonia Department of Agriculture, Livestock, Fisheries and Food"
     license = "The Open Information Use License - Catalonia <https://administraciodigital.gencat.cat/ca/dades/dades-obertes/informacio-practica/llicencies/>"
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    column_additions = {
-        "crop:code_list": "https://fiboa.org/code/es/cat/crop.csv",
-    }
+    # the same table as the bundled es_cat.csv, with HCAT; the mixin publishes it as crop:code_list
+    ec_mapping_csv = "https://fiboa.org/code/es/cat/crop.csv"
     columns = {
         "geometry": "geometry",
         "id": "id",
