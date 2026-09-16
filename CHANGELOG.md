@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 - ES regions: map the SIGPAC land use to HCAT through `AddHCATMixin` on the shared base converter, so es_an, es_ar, es_cb, es_cl, es_cm, es_ga, es_ib, es_md, es_pv and es_vc publish `hcat:code`; the code list gains EP (elemento del paisaje), which five regions publish and which had no `crop:name`
 - ES-CAT, ES-CN: map the crop codes to HCAT through `AddHCATMixin`; the published Catalan code list lacked 34 codes the bundled table maps
+- CH: download the freely available cantons from geodienste.ch's per-canton STAC catalog instead of requiring a manual export via `-i`, and derive `id` from the canton code and `nutzungsidentifikator` instead of the row index, which repeated across input files
+- CH: publish `lnf_code` as `crop:code`; the crop extension requires it and the output failed validation without it
 - EE: mint a crop code — PRIA publishes the crop as free text and none of its own, and the crop extension requires `crop:code` and `crop:code_list` — and publish taotletud_maakasutus as `land_use` (arable, permanent grassland, restored grassland, permanent crops, black fallow) — the only classification the source has, since it publishes the crop as free text and no crop code at all; and keep pollu_id as `parcel_id`, because it repeats in a few rows of some editions (16 of the 165,244 in 2016); and a first test with a fixture
 - Adopt vecorel-cli 0.2.18, which carries the checks this repository was growing its own copies of: rows that cannot validate are dropped bounded by `max_dropped_share`, the required properties come from the declared schemas, ids are checked for uniqueness, a converter may not declare both `sources` and `variants`, and the schemas are fetched before any source data
 - JP: convert through vecorel-cli's DuckDB converter instead of a copy of it in this repository
@@ -43,6 +45,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- EC-SI: stop requiring columns the source leaves empty, and require only what every parcel carries
+- EC-LV: stop requiring columns the source leaves empty
+- ES-AN: CD_USO is the land-use column, with the determination date from the variant year
 - HR: editions 2011-2024; the archives leave their CRS undefined and carry ARKOD's own parcel id, which the row index used to overwrite
 - NL: the full BRP series 2009-2026 — the 2009-2019 zips hold a FileGDB with differently prefixed columns, 2020 is a GeoPackage, and the download moved to a new PDOK location
 - SI: editions back to 2019 — the archives differ per campaign in their folder layout, CRS declaration, column names and crop-code padding
