@@ -16,7 +16,7 @@ class DEHEConverter(AdminConverterMixin, DEIACSMixin, FiboaBaseConverter):
     id = "de_he"
     admin_subdivision_code = "HE"
     short_name = "Germany, Hesse"
-    title = "Field boundaries for Hesse, Germany"
+    title = "Field blocks for Hesse, Germany"
     description = """
 The reference parcel is the basic spatial unit for administering and geographically locating
 agricultural parcels in Hesse. One reference parcel may contain several parcels declared under
