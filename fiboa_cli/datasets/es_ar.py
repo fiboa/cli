@@ -85,7 +85,7 @@ Crop Fields of Spain province Aragon
             for product in self.list_products(province):
                 name = product["name"]
                 # the intersection also returns neighbouring municipalities
-                if product["esquema"] != "Municipio" or not name.startswith(f"recfeg{province}"):
+                if product["esquema"] != "Municipio" or not name.startswith(province):
                     continue
                 urls[DOWNLOAD_URL.format(name=name)] = f"es_ar_{name}.shp.zip"
                 years.add(str(product["fecha"])[:4])
