@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CB: determination date from the variant year (was an empty string, which broke the STAC temporal extent)
 - ES-CAT: the 2024 download is a shapefile package, not a GeoPackage; 34 crop names new in 2024 added to the mapping
 - CZ: find the shapefile in nested archive folders (2026)
-- CZ: read supplementary EuroCrops mapping tables declared by the converter (`ec_mapping_supplements`) when building HCAT/crop mappings
+- Add an option so that EuroCrops mapping tables can declare supplementary HCAT/crop mappings via `ec_mapping_supplements`
 - DE-BB: read the shapefile as cp1252 (its .cpg wrongly says UTF-8)
 - NL: new PDOK download location (rvo/gewaspercelen/atom), add the 2026 concept edition
 - DE-TH: note the INSPIRE download service
