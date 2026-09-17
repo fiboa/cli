@@ -33,15 +33,21 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
 
     variants = {str(year): str(year) for year in range(2025, 2022, -1)}
 
+    # Only the 2025 layer publishes a declared area, so the rest is measured from the geometry,
+    # which is in EPSG:25832 and therefore already in m2.
+    area_is_in_ha = False
+    area_calculate_missing = True
+
     columns = {
         "geometry": "geometry",
         "flik": ("flik", "id"),  # derived in migrate()
         "agriculturalAreaType": "crop:code",  # de.iacs codes; agriculturalAreaType_txt is the label
-        "declaredArea": "metrics:area",  # in hectares, hence the area_is_in_ha default
+        "declaredArea": "metrics:area",
         "validFrom": "determination:datetime",
     }
     column_migrations = {
         "validFrom": lambda col: pd.to_datetime(col, format="%d.%m.%Y"),
+        "declaredArea": lambda col: col.astype(float) * 10_000,  # published in hectares
     }
 
     def get_urls(self):
@@ -72,7 +78,21 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
         return gdf.set_crs("EPSG:25832", allow_override=True)
 
     def migrate(self, gdf):
+        # The 2023 and 2024 layers put the id in ID, beside the driver's own feature id, and
+        # carry neither a land cover class nor a declared area; a zero area is what
+        # area_calculate_missing looks for.
+        gdf["id"] = gdf.get("ID", gdf["id"])
+        gdf["agriculturalAreaType"] = gdf.get("agriculturalAreaType")
+        gdf["declaredArea"] = gdf.get("declaredArea", 0)
+
         # The FLIK is the last dot-separated segment of the id, e.g.
         # DE.HE.RP.DEHELI0004994212 -> DEHELI0004994212
         gdf["flik"] = gdf["id"].str.rsplit(".", n=1).str[-1]
         return super().migrate(gdf)
+
+    def get_columns(self, gdf):
+        columns = super().get_columns(gdf)
+        if gdf["agriculturalAreaType"].isna().all():
+            # ship no crop column at all, rather than one that is empty in every row
+            columns = {k: v for k, v in columns.items() if not str(v).startswith("crop:")}
+        return columns

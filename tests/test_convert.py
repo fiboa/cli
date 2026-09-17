@@ -67,6 +67,7 @@ tests = [
     "de_sl_block",
     "de_sl",
     "de_he",
+    "de_he#2023",
     "de_st",
     "it_bz",
     "de_sax",
@@ -87,6 +88,8 @@ extra_convert_parameters = {
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
     "de_he": _input_files("de_he", "de_he.json"),
+    # the older layers publish no land cover class and no declared area
+    "de_he#2023": {"variant": "2023", **_input_files("de_he", "de_he_2023.json")},
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
     "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
     "es_cl": {
