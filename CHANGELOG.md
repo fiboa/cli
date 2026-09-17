@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - LV: editions 2015-2025 from the yearly releases on data.gov.lv, so an edition is the campaign it holds rather than the day it was downloaded; the field block becomes block_id, crop:name comes from the code list because the files carry only the code, one merged list (https://fiboa.org/code/lv/lv.csv) covers the 28 codes the register added after EuroCrops' 2021 table, and the id is minted because objectid restarts in every regional file
+- CH: download the freely available cantons from geodienste.ch's per-canton STAC catalog instead of requiring a manual export via `-i`, and derive `id` from the canton code and `nutzungsidentifikator` instead of the row index, which repeated across input files
+- CH: publish `lnf_code` as `crop:code`; the crop extension requires it and the output failed validation without it
+- EE: mint a crop code — PRIA publishes the crop as free text and none of its own, and the crop extension requires `crop:code` and `crop:code_list` — and publish taotletud_maakasutus as `land_use` (arable, permanent grassland, restored grassland, permanent crops, black fallow) — the only classification the source has, since it publishes the crop as free text and no crop code at all; and keep pollu_id as `parcel_id`, because it repeats in a few rows of some editions (16 of the 165,244 in 2016); and a first test with a fixture
 - Adopt vecorel-cli 0.2.18, which carries the checks this repository was growing its own copies of: rows that cannot validate are dropped bounded by `max_dropped_share`, the required properties come from the declared schemas, ids are checked for uniqueness, a converter may not declare both `sources` and `variants`, and the schemas are fetched before any source data
 - JP: convert through vecorel-cli's DuckDB converter instead of a copy of it in this repository
 - HR: drop the rolling `sources`, which overruled every `--variant`
@@ -41,6 +44,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- EC-SI: stop requiring columns the source leaves empty, and require only what every parcel carries
+- EC-LV: stop requiring columns the source leaves empty
+- ES-AN: CD_USO is the land-use column, with the determination date from the variant year
+- HR: editions 2011-2024; the archives leave their CRS undefined and carry ARKOD's own parcel id, which the row index used to overwrite
+- NL: the full BRP series 2009-2026 — the 2009-2019 zips hold a FileGDB with differently prefixed columns, 2020 is a GeoPackage, and the download moved to a new PDOK location
 - SI: editions back to 2019 — the archives differ per campaign in their folder layout, CRS declaration, column names and crop-code padding
 - BE-WAL: match the crop by name where EuroCrops' table leaves the code empty, which covered 6.79% of the collection
 - CZ: find the shapefile in nested archive folders (2026)
