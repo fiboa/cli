@@ -26,6 +26,7 @@ tests = [
     "de_sh",
     "de_bb",
     "ec_lt",
+    "ec_fr",
     "ec_lv",
     "ec_si",
     "fi",

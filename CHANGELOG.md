@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - LV: editions 2015-2025 from the yearly releases on data.gov.lv, so an edition is the campaign it holds rather than the day it was downloaded; the field block becomes block_id, crop:name comes from the code list because the files carry only the code, one merged list (https://fiboa.org/code/lv/lv.csv) covers the 28 codes the register added after EuroCrops' 2021 table, and the id is minted because objectid restarts in every regional file
+- EC-FR: the 2018 RPG campaign, which IGN publishes no archive for, from EuroCrops
+- Update aiohttp, which since 3.13.5 accepts the two Content-Type headers Zenodo answers with; before that no EuroCrops converter could download on a cold cache
 - CH: download the freely available cantons from geodienste.ch's per-canton STAC catalog instead of requiring a manual export via `-i`, and derive `id` from the canton code and `nutzungsidentifikator` instead of the row index, which repeated across input files
 - CH: publish `lnf_code` as `crop:code`; the crop extension requires it and the output failed validation without it
 - EE: mint a crop code — PRIA publishes the crop as free text and none of its own, and the crop extension requires `crop:code` and `crop:code_list` — and publish taotletud_maakasutus as `land_use` (arable, permanent grassland, restored grassland, permanent crops, black fallow) — the only classification the source has, since it publishes the crop as free text and no crop code at all; and keep pollu_id as `parcel_id`, because it repeats in a few rows of some editions (16 of the 165,244 in 2016); and a first test with a fixture
