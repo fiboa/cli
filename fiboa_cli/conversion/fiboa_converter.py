@@ -8,6 +8,13 @@ from ..fiboa.version import get_fiboa_uri
 AREA_KEY = "metrics:area"
 
 
+def _swap_xy(coords):
+    """Exchange the first two coordinate columns, leaving any others (z) in place"""
+    coords = coords.copy()
+    coords[:, [0, 1]] = coords[:, [1, 0]]
+    return coords
+
+
 class FiboaBaseConverter(BaseConverter):
     area_is_in_ha = True
     area_calculate_missing = False
@@ -40,7 +47,7 @@ class FiboaBaseConverter(BaseConverter):
             swapped = min(north) <= bounds[0] and bounds[2] <= max(north)
             if not fits and swapped:
                 return gdf.set_geometry(
-                    shapely.transform(gdf.geometry.values, lambda coords: coords[:, ::-1])
+                    shapely.transform(gdf.geometry.values, _swap_xy, include_z=None)
                 )
         return gdf
 
