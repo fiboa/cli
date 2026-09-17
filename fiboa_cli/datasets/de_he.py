@@ -45,9 +45,6 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
     }
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
-
         params = {
             "service": "WFS",
             "version": "2.0.0",

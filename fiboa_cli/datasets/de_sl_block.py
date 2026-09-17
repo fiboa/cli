@@ -55,7 +55,8 @@ published separately.
 
     columns = {
         "geometry": "geometry",
-        "flik": ("flik", "id"),  # derived in migrate(); unique
+        "flik": "flik",  # derived in migrate(); the block reference
+        "id": "id",  # the flik, plus a part number where a block is several polygons
         "area_type": "crop:code",  # added in file_migration(), trimmed in migrate()
         "area": "metrics:area",  # derived in migrate(); in hectares
     }
@@ -89,10 +90,19 @@ published separately.
         )
 
     def migrate(self, gdf):
+        # a block can be several polygons, and the base converter splits them only after it
+        # has checked the ids, so the parts would share one
+        gdf = self.split_multipart(gdf)
+
         # The FLIK and the size are both encoded in the INSPIRE description, e.g.
         # "Size in ha: 0.11206, flik: DESLLI0000248744"
         gdf["flik"] = gdf["description"].apply(parse_flik)
         gdf["area"] = gdf["description"].apply(parse_size)
         # …/codelist/de.iacs/AgriculturalAreaTypeValue/GL -> GL
         gdf["area_type"] = gdf["area_type"].str.rsplit("/", n=1).str[-1]
+
+        # the flik stays the block reference; only the id has to tell the parts apart
+        gdf["id"] = gdf["flik"]
+        part = gdf.groupby("id").cumcount()
+        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype(str)
         return super().migrate(gdf)

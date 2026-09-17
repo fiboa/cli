@@ -26,6 +26,7 @@ tests = [
     "de_sh",
     "de_bb",
     "ec_lt",
+    "ec_fr",
     "ec_lv",
     "ec_si",
     "fi",
@@ -81,6 +82,8 @@ def _input_files(converter, *names):
 extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
+    # the fixture is the 2022 archive; the default is the latest year, 2024
+    "fr": {"variant": "2022"},
     # the fixture is the 2023 file; the converter's default is the newest edition
     "fi": {"variant": "2023"},
     "se": {"variant": "2023"},
@@ -106,7 +109,7 @@ extra_convert_parameters = {
     "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
-    "lv": _input_files("lv", "1_100.xml"),
+    "lv": {"variant": "2024", **_input_files("lv", "lv_2024_lielriga.gpkg")},
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
     "jecam": _input_files("jecam", "BD_JECAM_CIRAD_2023_feb.shp"),
     "de_bw": _input_files("de_bw", "de_bw.json"),
