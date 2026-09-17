@@ -40,7 +40,8 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
 
     columns = {
         "geometry": "geometry",
-        "flik": ("flik", "id"),  # derived in migrate()
+        "flik": "flik",  # derived in migrate()
+        "id": "id",  # the flik, plus a part number where a block is several polygons
         "agriculturalAreaType": "crop:code",  # de.iacs codes; agriculturalAreaType_txt is the label
         "declaredArea": "metrics:area",
         "validFrom": "determination:datetime",
@@ -85,9 +86,17 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
         gdf["agriculturalAreaType"] = gdf.get("agriculturalAreaType")
         gdf["declaredArea"] = gdf.get("declaredArea", 0)
 
+        # split here: the base converter explodes only after it has checked the ids
+        gdf = self.split_multipart(gdf)
+
         # The FLIK is the last dot-separated segment of the id, e.g.
         # DE.HE.RP.DEHELI0004994212 -> DEHELI0004994212
-        gdf["flik"] = gdf["id"].str.rsplit(".", n=1).str[-1]
+        gdf["flik"] = gdf["id"].str.rsplit(".", n=1).str[-1].astype("string")
+
+        # a handful of blocks are several polygons; only the id has to tell the parts apart
+        gdf["id"] = gdf["flik"]
+        part = gdf.groupby("id").cumcount()
+        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype("string")
         return super().migrate(gdf)
 
     def get_columns(self, gdf):
