@@ -1,24 +1,30 @@
 import pandas as pd
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin
+from .commons.hcat import AddHCATMixin, load_ec_mapping
 
 COLUMNS = {
     "geometry": "geometry",
-    "pollu_id": "id",
+    "id": "id",
+    "pollu_id": "parcel_id",
     "taotlusaasta": "determination:datetime",  # year
     "pindala_ha": "metrics:area",  # area (in ha)
     "taotletud_kultuur": "crop:name",  # requested crop culture
+    "crop:code": "crop:code",
+    "taotletud_maakasutus": "land_use",  # requested land use: arable, permanent grassland, restored grassland
 }
-ATTRIBUTES = ",".join(["geom" if k == "geometry" else k for k in COLUMNS.keys()])
+ATTRIBUTES = ",".join(
+    "geom" if k == "geometry" else k for k in COLUMNS if k not in ("id", "parcel_id", "crop:code")
+)
 
 
 class Convert(AddHCATMixin, FiboaBaseConverter):
     variants = {
-        str(
-            year
-        ): f"https://kls.pria.ee/geoserver/inspire_gsaa/wfs?service=WFS&version=2.0.0&request=GetFeature&typeName=inspire_gsaa:LU.GSAA.AGRICULTURAL_PARCELS_{year}&propertyName={ATTRIBUTES}"
-        for year in range(2024, 2009, -1)
+        str(year): {
+            f"https://kls.pria.ee/geoserver/inspire_gsaa/wfs?service=WFS&version=2.0.0&request=GetFeature&typeName=inspire_gsaa:LU.GSAA.AGRICULTURAL_PARCELS_{year}&propertyName={ATTRIBUTES}": f"ee_gsaa_{year}.gml"
+        }
+        # The declared WFS layers for 2010-2015 are empty (checked 2026-08-30)
+        for year in range(2024, 2015, -1)
     }
     ec_mapping_csv = "https://fiboa.org/code/ee/ee.csv"
     id = "ee"
@@ -34,6 +40,21 @@ The data comes from ARIB's database of agricultural parcels.
     license = "CC-BY-SA-3.0"
     columns = COLUMNS
     column_migrations = {"taotlusaasta": lambda col: pd.to_datetime(col, format="%Y")}
+    missing_schemas = {
+        "properties": {
+            "land_use": {"type": "string"},
+            "parcel_id": {"type": "int64"},
+        }
+    }
+    index_as_id = True
+
+    def migrate(self, gdf):
+        # do a reverse mapping (from name to crop:code)
+        if self.ec_mapping is None:
+            self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+        codes = {row["original_name"].strip(): row["original_code"] for row in self.ec_mapping}
+        gdf["crop:code"] = gdf["taotletud_kultuur"].str.strip().map(codes)
+        return super().migrate(gdf)
 
     def file_migration(self, gdf, path: str, uri: str, layer=None):
         return gdf.set_crs(3301)
