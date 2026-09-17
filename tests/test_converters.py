@@ -142,7 +142,8 @@ def test_lv_requires_the_nine_regional_geopackages(monkeypatch):
     packages = [
         package("Lauksaimnieku deklarētās platības 2024.gadā", regions),
         package("Lauksaimnieku deklarētās platības 2023. gadā", regions[:-1]),
-        package("Something else in 2024", []),
+        # matched the search through its description, and carries the campaign pattern
+        package("Cita datu kopa 2024. gadā", regions),
     ]
 
     class Response:

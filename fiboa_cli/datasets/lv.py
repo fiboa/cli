@@ -79,9 +79,14 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         response.raise_for_status()
         packages = response.json()["result"]["results"]
 
-        # "2024.gadā" and "2023. gadā" both occur
+        # "2024.gadā" and "2023. gadā" both occur; the search also matches descriptions,
+        # so the title has to carry the phrase as well as the campaign
         wanted = re.compile(rf"\b{self.variant}\.\s*gad")
-        matches = [p for p in packages if wanted.search(p.get("title", ""))]
+        matches = [
+            p
+            for p in packages
+            if SEARCH.lower() in p.get("title", "").lower() and wanted.search(p["title"])
+        ]
         if len(matches) != 1:
             titles = ", ".join(sorted(p.get("title", "") for p in matches)) or "none"
             raise ValueError(

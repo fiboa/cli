@@ -1,4 +1,3 @@
-import numpy as np
 import pyproj
 import shapely
 from vecorel_cli.conversion.base import BaseConverter
@@ -83,33 +82,35 @@ class FiboaBaseConverter(BaseConverter):
         gdf = self._traditional_axis_order(gdf)
 
         area_key = self._source_column(AREA_KEY)
-        # If CRS is not in meters, reproject to an equal-area projection for area calculation
         crs_is_in_meters = gdf.crs.axis_info[0].unit_name in ("m", "metre", "meter")
-        metric = gdf.geometry if crs_is_in_meters else gdf.geometry.to_crs("EPSG:6933")
+
+        def in_metres(geometry):
+            # Reprojecting is costly, so only the geometries whose area is computed are,
+            # and only when the CRS is not in metres: to an equal-area projection.
+            return geometry if crs_is_in_meters else geometry.to_crs("EPSG:6933")
 
         if SPLIT_KEY in gdf.columns:
             split = gdf.pop(SPLIT_KEY).fillna(False).astype(bool).to_numpy()
             if split.any():
                 # the parts of one source feature inherited its area and perimeter
+                parts = gdf.geometry[split]
                 if area_key in gdf.columns:
                     factor = 10_000 if self.area_is_in_ha else 1
-                    gdf.loc[split, area_key] = metric.area[split] / factor
+                    gdf.loc[split, area_key] = in_metres(parts).area / factor
                 perimeter_key = self._source_column(PERIMETER_KEY)
                 if perimeter_key in gdf.columns:
                     # an equal-area projection distorts lengths, so measure those in UTM
-                    lengths = (
-                        gdf.geometry
-                        if crs_is_in_meters
-                        else gdf.geometry.to_crs(gdf.estimate_utm_crs())
-                    )
-                    gdf.loc[split, perimeter_key] = lengths.length[split]
+                    lengths = parts if crs_is_in_meters else parts.to_crs(parts.estimate_utm_crs())
+                    gdf.loc[split, perimeter_key] = lengths.length
 
         if self.area_calculate_missing:
             if area_key in gdf.columns:
                 factor = 10_000 if self.area_is_in_ha else 1
-                gdf[area_key] = np.where(gdf[area_key] == 0, metric.area * factor, gdf[area_key])
+                missing = (gdf[area_key] == 0).to_numpy()
+                if missing.any():
+                    gdf.loc[missing, area_key] = in_metres(gdf.geometry[missing]).area * factor
             else:
-                gdf[area_key] = metric.area
+                gdf[area_key] = in_metres(gdf.geometry).area
         elif self.area_is_in_ha and area_key in gdf.columns:
             # convert area in ha to meters
             gdf[area_key] = gdf[area_key].astype(float) * 10_000
