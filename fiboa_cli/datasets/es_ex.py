@@ -41,9 +41,6 @@ class EXConverter(ESBaseConverter):
     }
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
-
         from bs4 import BeautifulSoup
 
         base = "http://sitex.gobex.es/SITEX/centrodescargas/"

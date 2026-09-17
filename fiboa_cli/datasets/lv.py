@@ -12,6 +12,18 @@ from .commons.hcat import AddHCATMixin
 # The resource URLs carry UUIDs, so the package is looked up by title.
 CKAN = "https://data.gov.lv/dati/lv/api/3/action/package_search"
 SEARCH = "Lauksaimnieku deklarētās platības"
+# One GeoPackage per region, the same nine in every campaign; see _slug() for the spelling.
+REGIONS = {
+    "austrumlatgale",
+    "dienvidkurzeme",
+    "dienvidlatgale",
+    "lielriga",
+    "viduslatvija",
+    "zemgale",
+    "ziemelaustrumi",
+    "ziemelkurzeme",
+    "ziemelvidzeme",
+}
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
@@ -50,7 +62,7 @@ Each edition is the campaign the Rural Support Service published it for, taken f
             "block_id": {"type": "string"},
         }
     }
-    # EuroCrops' lv_2021.csv plus the 28 codes the register added since
+    # EuroCrops' lv_2021.csv plus the 34 codes the register added since
     ec_mapping_csv = "https://fiboa.org/code/lv/lv.csv"
     column_migrations = {
         "product_code": lambda col: col.astype("string").str.strip(),
@@ -76,15 +88,20 @@ Each edition is the campaign the Rural Support Service published it for, taken f
                 f"Expected one package for {self.variant} on data.gov.lv, found {len(matches)}: {titles}"
             )
 
-        urls = {}
+        regions = {}
         for resource in matches[0]["resources"]:
             url = resource.get("url", "")
-            if not url.lower().endswith(".gpkg"):
-                continue
-            urls[url] = f"lv_{self.variant}_{_slug(resource.get('name') or Path(url).stem)}.gpkg"
-        if len(urls) < 2:
-            raise RuntimeError(f"{matches[0]['title']} holds {len(urls)} GeoPackage(s)")
-        return urls
+            if url.lower().endswith(".gpkg"):
+                regions[_slug(resource.get("name") or Path(url).stem)] = url
+        # a package that lost a region would otherwise be published as a partial edition
+        if set(regions) != REGIONS:
+            missing = ", ".join(sorted(REGIONS - set(regions))) or "none"
+            unexpected = ", ".join(sorted(set(regions) - REGIONS)) or "none"
+            raise RuntimeError(
+                f"{matches[0]['title']} does not hold the nine regional GeoPackages "
+                f"(missing: {missing}; unexpected: {unexpected})"
+            )
+        return {url: f"lv_{self.variant}_{region}.gpkg" for region, url in regions.items()}
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
@@ -109,7 +126,8 @@ Each edition is the campaign the Rural Support Service published it for, taken f
 
 
 def _slug(value: str) -> str:
-    """A region name as ASCII, so Lielrīga and lielrga give the same id."""
+    """A region name as ASCII, so the portal's "Lielrīga" (up to 2023) and "Lielriga" (2024
+    onwards) give the same id."""
     text = unicodedata.normalize("NFKD", str(value))
     text = "".join(c for c in text if not unicodedata.combining(c))
     text = re.sub(r"[^A-Za-z0-9]+", "_", text).strip("_").lower()

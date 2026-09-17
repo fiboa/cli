@@ -42,6 +42,4 @@ SIXPAC information is relevant to farmers applying for these aid schemes, so tha
         return next(layer for layer in layers if "recintos" in layer["name"].lower())
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
         return {"REST": self.rest_base_url.format(year=self.variant)}

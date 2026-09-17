@@ -48,7 +48,5 @@ class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
     }
 
     def rest_layer_filter(self, layers):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
         regex = re.compile("SIGPAC .* " + self.variant)
         return next(layer for layer in layers if regex.match(layer["name"]))
