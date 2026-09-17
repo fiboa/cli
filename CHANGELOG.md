@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CB: determination date from the variant year (was an empty string, which broke the STAC temporal extent)
 - ES-CAT: the 2024 download is a shapefile package, not a GeoPackage; 34 crop names new in 2024 added to the mapping
 - CZ: find the shapefile in nested archive folders (2026)
+- Add an option so that EuroCrops mapping tables can declare supplementary HCAT/crop mappings via `ec_mapping_supplements`
 - DE-BB: read the shapefile as cp1252 (its .cpg wrongly says UTF-8)
 - NL: new PDOK download location (rvo/gewaspercelen/atom), add the 2026 concept edition
 - DE-TH: note the INSPIRE download service
@@ -52,6 +53,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- ES-GA: editions 2014-2026 with per-campaign column names, determination date from the variant, and pasto arbustivo excluded before the 2023 campaign
 - EC-SI: stop requiring columns the source leaves empty, and require only what every parcel carries
 - EC-LV: stop requiring columns the source leaves empty
 - ES-AN: CD_USO is the land-use column, with the determination date from the variant year
