@@ -119,14 +119,10 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         # the campaigns up to 2023 name their columns in upper case
         gdf = gdf.rename(columns=str.lower)
 
-        # split first, so the id minted below survives it
-        gdf = self.split_multipart(gdf)
-
-        # objectid restarts at 1 in every regional file, so the region is part of the id
+        # objectid restarts at 1 in every regional file, so the region is part of the id:
+        # 83,423 distinct objectids cover the 449,696 rows of the 2023 campaign
         region = _slug(layer or Path(path).stem)
         gdf["id"] = region + "-" + gdf["objectid"].astype("int64").astype(str)
-        part = gdf.groupby("id").cumcount()
-        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype(str)
         return gdf
 
 
