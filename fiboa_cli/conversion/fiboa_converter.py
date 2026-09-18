@@ -1,9 +1,18 @@
 import numpy as np
+import pyproj
+import shapely
 from vecorel_cli.conversion.base import BaseConverter
 
 from ..fiboa.version import get_fiboa_uri
 
 AREA_KEY = "metrics:area"
+
+
+def _swap_xy(coords):
+    """Exchange the first two coordinate columns, leaving any others (z) in place"""
+    coords = coords.copy()
+    coords[:, [0, 1]] = coords[:, [1, 0]]
+    return coords
 
 
 class FiboaBaseConverter(BaseConverter):
@@ -15,8 +24,36 @@ class FiboaBaseConverter(BaseConverter):
         super().__init__(*args, **kwargs)
         self.extensions.add(get_fiboa_uri())
 
+    @staticmethod
+    def _traditional_axis_order(gdf):
+        """Fix swapped x/y coordinates for faulty projections (e.g. SWEREF99 TM)"""
+        crs = gdf.crs
+        if (
+            crs is not None
+            and crs.is_projected
+            and crs.axis_info
+            and crs.axis_info[0].direction.lower() == "north"
+            and crs.area_of_use
+            and not gdf.empty
+        ):
+            area = crs.area_of_use
+            to_crs = pyproj.Transformer.from_crs("EPSG:4326", crs, always_xy=True)
+            east, north = to_crs.transform(
+                [area.west, area.east, area.west, area.east],
+                [area.south, area.south, area.north, area.north],
+            )
+            bounds = gdf.total_bounds  # in the order the coordinates are stored
+            fits = min(east) <= bounds[0] and bounds[2] <= max(east)
+            swapped = min(north) <= bounds[0] and bounds[2] <= max(north)
+            if not fits and swapped:
+                return gdf.set_geometry(
+                    shapely.transform(gdf.geometry.values, _swap_xy, include_z=None)
+                )
+        return gdf
+
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
+        gdf = self._traditional_axis_order(gdf)
 
         gdf_area_key = next((k for k, v in self.columns.items() if v == AREA_KEY), None)
         if self.area_calculate_missing:

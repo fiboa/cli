@@ -2,9 +2,10 @@ import pandas as pd
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+from fiboa_cli.datasets.commons.hcat import AddHCATMixin
 
 
-class ESCNConverter(FiboaBaseConverter):
+class ESCNConverter(AddHCATMixin, FiboaBaseConverter):
     id = "es_cn"
     short_name = "Spain Canary Islands"
     title = "Spain Crop fields of Canary Islands"
@@ -44,17 +45,23 @@ of the Ministry of Agriculture, Livestock and Fisheries.
     column_migrations = {
         "FECHA": lambda column: pd.to_datetime(column, format="%d/%m/%Y"),
     }
+
+    def migrate(self, gdf):
+        gdf = gdf.reset_index(drop=True)
+        gdf["id"] = gdf.index.astype(str)
+        return super().migrate(gdf)
+
     column_additions = {
         "admin:country_code": "ES",
-        "admin:subdivision_code": "CB",
-        "crop:code_list": "https://fiboa.org/code/es/cn/crop.csv",
+        "admin:subdivision_code": "CN",
     }
+    # crop codes of the crop map with HCAT; the mixin publishes it as crop:code_list
+    ec_mapping_csv = "https://fiboa.org/code/es/cn/crop.csv"
     missing_schemas = {
         "properties": {
             "admin_island": {"type": "string"},
         }
     }
-    index_as_id = True
     sources = {
         f"https://opendata.sitcan.es/upload/medio-rural/gobcan_mapa-cultivos_{island}_shp.zip": f"gobcan_mapa-cultivos_{island}_shp.zip"
         for island in "lz eh lp lg tf gc fv".split()

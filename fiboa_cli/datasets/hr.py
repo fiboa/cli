@@ -7,7 +7,6 @@ base = "https://www.apprrr.hr/wp-content/uploads/nipp"
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
-    sources = "https://www.apprrr.hr/wp-content/uploads/nipp/land_parcels.gpkg"
     variants = {
         "2024": f"{base}/land_parcels.gpkg",
         **{str(y): f"{base}/arkod_31_12_{y}.gpkg" for y in range(2023, 2010, -1)},
@@ -31,8 +30,6 @@ and supporting sustainable land use practices.
     )
 
     license = "Prostorni podaci i servisi <https://www.apprrr.hr/prostorni-podaci-servisi/>"
-    index_as_id = True
-
     column_migrations = {"land_use_id": lambda col: col.astype(int)}
 
     columns = {
@@ -68,14 +65,7 @@ and supporting sustainable land use practices.
     ec_mapping_csv = "hr_2020.csv"
 
     missing_schemas = {
-        "required": [
-            "mines_status",
-            "water_protect_zone",
-            "natura2000",
-            "sanitary_protection_zone",
-            "irrigation",
-            "jpaid",
-        ],
+        # The editions carry different subsets
         "properties": {
             "land_use_id": {"type": "integer"},
             "home_name": {"type": "string"},
@@ -106,3 +96,17 @@ and supporting sustainable land use practices.
     area_is_in_ha = False
     area_calculate_missing = True
     use_variant_as_determination = True
+
+    ARCHIVE_CRS = "EPSG:3765"
+
+    def migrate(self, gdf):
+        if gdf.crs is None:
+            # Some archives ship no .prj, and those metres would reach the STAC
+            # extent as degrees. A CRS that is declared is trusted, EPSG or not.
+            gdf = gdf.set_crs(self.ARCHIVE_CRS)
+
+        # The dated archives carry ARKOD's own parcel id, unique per edition;
+        # only the rolling land_parcels.gpkg has none.
+        if "id" not in gdf.columns:
+            gdf["id"] = gdf.index
+        return super().migrate(gdf)

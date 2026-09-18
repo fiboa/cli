@@ -2,9 +2,10 @@ from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 from fiboa_cli.datasets.commons.data import read_data_csv
+from fiboa_cli.datasets.commons.hcat import AddHCATMixin
 
 
-class ESBaseConverter(FiboaBaseConverter):
+class ESBaseConverter(AddHCATMixin, FiboaBaseConverter):
     """
     Base Converter for Spain
     Assumes a source column with the SIGPAC-Land Use code
@@ -27,8 +28,9 @@ class ESBaseConverter(FiboaBaseConverter):
         # https://www.fega.gob.es/sites/default/files/files/document/AD-CIRCULAR_2-2021_EE98293_SIGC2021.PDF
         # Very generic list
         "admin:country_code": "ES",
-        "crop:code_list": "https://fiboa.org/code/es/sigpac/land_use.csv",
     }
+    # SIGPAC land use to HCAT; the mixin also publishes it as crop:code_list
+    ec_mapping_csv = "https://fiboa.org/code/es/sigpac/land_use.csv"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
