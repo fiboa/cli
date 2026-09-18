@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- DE-BB: leave out the NBF records (ineligible patches, not fields), which were published with an empty crop code
 - Put the easting in x whatever the source's CRS says: a source that honours EPSG's axis order ships its coordinates northing first (Jordbruksverket's shapefile declares it), while GeoParquet stores x, y — so the tiles, the STAC bbox and the collection-wide bbox all read such a file as (lat, lon). The swap keeps any z coordinate, so `--original-geometries` still delivers 3D geometries
 - ES regions: map the SIGPAC land use to HCAT through `AddHCATMixin` on the shared base converter, so es_an, es_ar, es_cb, es_cl, es_cm, es_ex, es_ga, es_ib, es_md, es_nc, es_pv and es_vc publish `hcat:code`; the code list gains EP (elemento del paisaje), which five regions publish and which had no `crop:name`
 - ES-CAT, ES-CN: map the crop codes to HCAT through `AddHCATMixin`; the published Catalan code list lacked 34 codes the bundled table maps
