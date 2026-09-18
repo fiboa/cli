@@ -269,6 +269,10 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         self._name_to_code = None
         self._seen_ids = {}
         self._island_rows = 0
+        # The largest OSA_ID the source has published so far, which is what the island id
+        # range has to stay clear of. Kept apart from _seen_ids, because that also holds
+        # the ids this converter mints and comparing against those would be circular.
+        self._max_published_id = None
         self._unmapped_names = {}
 
     def _crop_name_lookup(self):
@@ -334,6 +338,27 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
 
     def _island_ids(self, gdf, name):
         """Synthesise ids for a file the source left without one. See ISLAND_ID_BASE."""
+        # The invariant this range depends on: no land occupation the provider numbers can
+        # ever reach ISLAND_ID_BASE, so a synthesised id can never be mistaken for or
+        # collide with a real one. That is an observation about IFAP's numbering rather
+        # than anything the format enforces -- the largest OSA_ID in any edition from 2017
+        # to 2025 is 46,449,461, four orders of magnitude below the base -- so it is
+        # asserted here rather than left to a comment. Lowering ISLAND_ID_BASE, or reusing
+        # this path for a source whose identifiers are larger, then fails loudly instead of
+        # silently merging two id namespaces.
+        #
+        # Only the members read before this one are visible here; post_migrate's duplicate
+        # check is the backstop for the rest, since an actual collision would surface there
+        # as a repeated id.
+        if self._max_published_id is not None:
+            assert self._max_published_id < ISLAND_ID_BASE, (
+                f"{name}: synthesised island ids start at {ISLAND_ID_BASE:,}, but the "
+                f"source has already published the land occupation "
+                f"{self._max_published_id:,}. The two id ranges must not overlap: raise "
+                f"ISLAND_ID_BASE above every published OSA_ID, or the synthesised ids and "
+                f"the provider's own share a namespace."
+            )
+
         point = gdf.geometry.representative_point()
         order = pd.DataFrame(
             {"par": gdf["PAR_NUM"].astype("string"), "x": point.x, "y": point.y}
@@ -487,7 +512,10 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         if "PAR_NUM" in gdf.columns:
             gdf["PAR_ID"] = gdf["PAR_NUM"].astype("int64")
 
-        if "OSA_ID" not in gdf.columns:
+        if "OSA_ID" in gdf.columns:
+            published = gdf["OSA_ID"].astype("int64")
+            self._max_published_id = max(self._max_published_id or 0, int(published.max()))
+        else:
             gdf["OSA_ID"] = self._island_ids(gdf, name)
 
         rows = len(gdf)
