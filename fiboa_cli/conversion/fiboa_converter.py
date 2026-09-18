@@ -82,7 +82,11 @@ class FiboaBaseConverter(BaseConverter):
         gdf = self._traditional_axis_order(gdf)
 
         area_key = self._source_column(AREA_KEY)
-        crs_is_in_meters = gdf.crs.axis_info[0].unit_name in ("m", "metre", "meter")
+        crs_is_in_meters = bool(
+            gdf.crs
+            and gdf.crs.axis_info
+            and gdf.crs.axis_info[0].unit_name in ("m", "metre", "meter")
+        )
 
         def in_metres(geometry):
             # Reprojecting is costly, so only the geometries whose area is computed are,
