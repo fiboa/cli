@@ -33,5 +33,5 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "code_bez": "crop:name",
         "code": "crop:code",
     }
-    # NBF (nicht-beihilfefähige Fläche) are ineligible patches, not fields, and carry no crop code
+    # NBF: areas in a field block the cadastre marks as not usable for agriculture (pylons, ditches, woods); no crop code
     column_filters = {"tf_typ": lambda col: col != "NBF"}
