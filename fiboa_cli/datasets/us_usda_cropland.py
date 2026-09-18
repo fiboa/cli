@@ -31,16 +31,24 @@ CSB represents non-confidential single crop field boundaries over a set time fra
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     provider = "United States Department of Agriculture <https://www.nass.usda.gov>"
     license = "License and Liability <https://gee-community-catalog.org/projects/csb/#license-and-liability>"
-    # The dissolve below merges every CSB polygon of one crop within a state into
-    # a single geometry and splits it again, so an output field is not a source
-    # CSB. Columns that survived it through `aggfunc="first"` — CSBID, CNTY —
-    # describe an arbitrary member of the group, not the field they end up on, so
-    # neither is published: CSBID gave 3,093 distinct ids to 7.5 million fields.
+    # The dissolve below merges adjacent CSB polygons of one crop and splits the
+    # result again, so an output field is not a source CSB and `CSBID`, kept by
+    # `aggfunc="first"`, names an arbitrary member of the group: it gave 3,093
+    # distinct ids to 7.5 million fields. The county is part of the dissolve key,
+    # so it does hold for every field the group produces.
     columns = {
         "geometry": "geometry",
         "id": "id",
         # "CDL2023": "crop:code", will be added in migrate
         "crop:name": "crop:name",
+        "CNTY": "administrative_area_level_2",
+        "CNTYFIPS": "administrative_area_level_2_code",
+    }
+    missing_schemas = {
+        "properties": {
+            "administrative_area_level_2": {"type": "string"},
+            "administrative_area_level_2_code": {"type": "string"},
+        }
     }
     use_variant_as_determination = True
     ec_mapping_csv = "https://fiboa.org/code/us/usda/cropland.csv"
@@ -64,7 +72,10 @@ CSB represents non-confidential single crop field boundaries over a set time fra
         for state in states:
             logger.info(f"Handling State {state}")
             df = gdf[gdf["STATEFIPS"] == state].explode()
-            df = df.dissolve(by=[crop_key], aggfunc="first", as_index=False).explode()
+            # County is in the key so it stays true of every field: a group spans one
+            # county, and a dissolve on attributes never cuts a source polygon, it only
+            # declines to merge across the line. In Delaware that is 13 fields in 14,308.
+            df = df.dissolve(by=[crop_key, "CNTYFIPS"], aggfunc="first", as_index=False).explode()
             gdfs.append(df)
         gdf = pd.concat(gdfs)
         del gdfs
