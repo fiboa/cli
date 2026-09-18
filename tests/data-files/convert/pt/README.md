@@ -38,3 +38,35 @@ ogr2ogr -f "ESRI Shapefile" -nlt NONE Culturas_2021.dbf $DOWNLOADED_SOURCE/Cultu
 zip -9 2021.zip *.shp *.shx *.dbf *.prj *.cpg      # plain deflate: the source archives are
                                                     # Deflate64, which python's zipfile refuses
 ```
+
+## 2017-2019
+
+Same shape as the 2020-2022 fixtures (a zip of regional files), but these editions are
+plain shapefiles with one layer each, so the member list is the only thing that decides
+what gets read. All ten members of each edition must be present or `get_data` fails on
+the missing path, so the uninteresting regions are cut to 20 rows and the budget spent on
+the ones that carry a mechanism:
+
+- **2018 `Ocupacoes_solo_Norte_N` and `Ocupacoes_solo_Norte_S`** keep 100 rows each, of
+  which **30 share an OSA_ID**. The real edition repeats 154,980 fields between these two
+  members, byte for byte, and converting both as published inflates it by that many rows.
+  The unique halves deliberately exclude every other shared id, so the fixture overlap is
+  exactly 30 and `test_2018_drops_exactly_the_duplicated_rows` can assert the count.
+- **2017 `Ocupacoes_solo_RAA` and `Ocupacoes_solo_RAM`** publish no `OSA_ID` at all and
+  repeat `PAR_NUM`, so the fixtures are chosen to keep rows whose `PAR_NUM` repeats. They
+  exercise the synthesised id on the condition that forced it.
+- **2018 `ocupacoes.solo.Norte_N1.2018jun10`** is awkward three ways at once and carries
+  all fourteen crop names in which the provider lost an accent to a literal `?`. It is
+  also the only member with lowercase, non-contiguous crop columns (`c1..c7`, `c9`, no
+  `c8`) and one of two published in EPSG:3763. Note the dots inside the filename.
+- **2019 `Ocupacoes_solo_RAA`** keeps 100 rows for its 28 crop columns, and
+  **`ocupacoes_solo_n_1`** is the EPSG:3763 case for that year.
+- **`Parcelas_*`** is in each zip but in no member list: it is the parcel block geometry,
+  not field boundaries. 2019 also keeps an orphan `osas_az_ocidental.qpj` and one of the
+  `*.sr.lock` files the provider shipped, so the fixture proves the junk is simply never
+  named rather than actively skipped.
+
+Built by `build_fixtures.py` (pyogrio rather than `ogr2ogr`, because the row selection is
+not a plain `-limit`). Written with plain Deflate, like the 2020-2022 fixtures: the real
+archives are Deflate64, which `zipfile` refuses and which needs `zipfile-deflate64`, a
+package nothing in the dependency graph currently installs.
