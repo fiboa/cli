@@ -33,6 +33,12 @@ tests = [
     "nl_block",
     "pt",
     "pt#2025",
+    "pt#2022",
+    "pt#2021",
+    "pt#2020",
+    "pt#2019",
+    "pt#2018",
+    "pt#2017",
     "dk",
     "be_wal",
     "se",
@@ -74,6 +80,14 @@ def _input_files(converter, *names):
 extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
+    "pt": {"variant": "2023"},
+    "pt#2025": {"variant": "2025"},
+    "pt#2022": {"variant": "2022"},
+    "pt#2019": {"variant": "2019"},
+    "pt#2018": {"variant": "2018"},
+    "pt#2017": {"variant": "2017"},
+    "pt#2021": {"variant": "2021"},
+    "pt#2020": {"variant": "2020"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
@@ -115,6 +129,82 @@ extra_convert_parameters = {
 # expectation per edition where the editions genuinely differ.
 expected_columns = {
     "de_sh": ("determination:datetime", "metrics:area", "flik", "hbn", "id"),
+    # 2023 is the only pt edition that publishes a crop name.
+    "pt": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "crop:name",
+        "block_id",
+        "id",
+    ),
+    "pt#2025": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    # 2020-2022 reach every target by a different route: the crop code is renamed
+    # from C1 (2020 and 2021 join it in from a separate table), the identifiers are
+    # copied off the land occupation, and both metrics are measured rather than
+    # read. crop:name is absent because no edition after 2023 publishes one.
+    "pt#2022": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    "pt#2021": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    "pt#2020": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    # 2017-2019 publish the crop as a Portuguese name, so unlike 2020-2022 they deliver
+    # crop:name as well -- they and 2023 are the only editions that carry one. The code
+    # behind it is resolved from pt.csv original_name rather than read from the source.
+    "pt#2019": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "crop:name",
+        "block_id",
+        "id",
+    ),
+    "pt#2018": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "crop:name",
+        "block_id",
+        "id",
+    ),
+    "pt#2017": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "crop:name",
+        "block_id",
+        "id",
+    ),
 }
 
 
@@ -161,6 +251,17 @@ def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
         assert not missing, (
             f"{converter} dropped {missing}: absent from the schema and from the "
             f"collection metadata. Produced columns: {sorted(df.columns)}"
+        )
+
+    # An identifier that arrives as a float stringifies as "2315738.0": unique,
+    # valid, and silently wrong. pt types its ids as floats from 2025 on, and the
+    # cast that fixes it was removable without any test noticing. Scoped to the
+    # converters listed above, opt-in like the rest of that table.
+    if required and "id" in df.columns:
+        floaty = df["id"].astype("string").str.fullmatch(r"-?\d+\.0*").fillna(False)
+        assert not floaty.any(), (
+            f"{converter}: {int(floaty.sum()):,} id(s) are stringified floats, "
+            f"e.g. {df.loc[floaty, 'id'].head(3).tolist()}"
         )
 
     if "metrics:area" in df.columns and converter not in ("de_bb",):
