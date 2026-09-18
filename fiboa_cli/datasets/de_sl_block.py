@@ -90,10 +90,6 @@ published separately.
         )
 
     def migrate(self, gdf):
-        # a block can be several polygons, and the base converter splits them only after it
-        # has checked the ids, so the parts would share one
-        gdf = self.split_multipart(gdf)
-
         # The FLIK and the size are both encoded in the INSPIRE description, e.g.
         # "Size in ha: 0.11206, flik: DESLLI0000248744"
         gdf["flik"] = gdf["description"].apply(parse_flik)
@@ -101,7 +97,8 @@ published separately.
         # …/codelist/de.iacs/AgriculturalAreaTypeValue/GL -> GL
         gdf["area_type"] = gdf["area_type"].str.rsplit("/", n=1).str[-1]
 
-        # the flik stays the block reference; only the id has to tell the parts apart
+        # the source publishes several land cover records for one block, each with its own
+        # polygon, so the flik alone does not identify a row
         gdf["id"] = gdf["flik"]
         part = gdf.groupby("id").cumcount()
         gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype(str)
