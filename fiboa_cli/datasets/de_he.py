@@ -33,8 +33,8 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
 
     variants = {str(year): str(year) for year in range(2025, 2022, -1)}
 
-    # Only the 2025 layer publishes a declared area, so the rest is measured from the geometry,
-    # which is in EPSG:25832 and therefore already in m2.
+    # 2023 and 2024 publish no area, and the declaredArea 2025 does publish is the area of
+    # the polygon to three decimals, so every edition measures it: EPSG:25832, already m2.
     area_is_in_ha = False
     area_calculate_missing = True
 
@@ -43,13 +43,9 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
         "flik": "flik",  # derived in migrate()
         "id": "id",  # the flik, plus a part number where a block is several polygons
         "agriculturalAreaType": "crop:code",  # de.iacs codes; agriculturalAreaType_txt is the label
-        "declaredArea": "metrics:area",
         "validFrom": "determination:datetime",
     }
-    column_migrations = {
-        "validFrom": lambda col: pd.to_datetime(col, format="%d.%m.%Y"),
-        "declaredArea": lambda col: col.astype(float) * 10_000,  # published in hectares
-    }
+    column_migrations = {"validFrom": lambda col: pd.to_datetime(col, format="%d.%m.%Y")}
 
     def get_urls(self):
         if not self.variant:
@@ -79,12 +75,10 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
         return gdf.set_crs("EPSG:25832", allow_override=True)
 
     def migrate(self, gdf):
-        # The 2023 and 2024 layers put the id in ID, beside the driver's own feature id, and
-        # carry neither a land cover class nor a declared area; a zero area is what
-        # area_calculate_missing looks for.
+        # The 2023 and 2024 layers put the id in ID, beside the driver's own feature id,
+        # and carry no land cover class.
         gdf["id"] = gdf.get("ID", gdf["id"])
         gdf["agriculturalAreaType"] = gdf.get("agriculturalAreaType")
-        gdf["declaredArea"] = gdf.get("declaredArea", 0)
 
         # split here: the base converter explodes only after it has checked the ids
         gdf = self.split_multipart(gdf)
