@@ -1,4 +1,5 @@
 import geopandas as gpd
+import pandas as pd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
@@ -39,9 +40,15 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             key = gdf["Journalnr"].astype(str) + ":" + gdf["Marknr"].astype(str)
             gdf["id"] = key.where(gdf["Journalnr"].notna() & gdf["Marknr"].notna())
         else:
-            gdf["id"] = gdf.index
+            # the edition is part of it: a bare row number matches the same number in
+            # another edition, and 476,097 of 2009's rows would join 2010's on nothing
+            gdf["id"] = f"{self.variant}:" + gdf.index.astype(str)
 
         if "Afgkode" in gdf.columns:
-            gdf["Afgkode"] = gdf["Afgkode"].astype(float).fillna(value=0).astype(int).astype(str)
+            # the codes arrive as floats, and a missing one stays missing: filling it with 0
+            # gave 36,133 rows across the series a crop code that no Danish list defines
+            gdf["Afgkode"] = (
+                pd.to_numeric(gdf["Afgkode"], errors="coerce").astype("Int64").astype("string")
+            )
         # the 2008 and 2009 editions carry no crop columns (boundaries only)
         return super().migrate(gdf)
