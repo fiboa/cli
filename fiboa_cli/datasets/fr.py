@@ -115,19 +115,15 @@ The anonymized version is distributed as part of the public service for making r
             # Make column names lowercase, harmonize for different years
             gdf = gdf.rename(columns={k: k.lower() for k in gdf.columns})
 
-        # RPG's parcel id identifies a field in every edition but 2024, where
-        # 361 ids cover 736 of the 9,679,888 rows. It is published as parcel_id
-        # throughout; id falls back to the row index where it repeats.
+        # RPG's parcel id names the parcel, and two things make it repeat: a parcel can be
+        # several polygons (5,289 of them in 2024, up to 12 each) and the source itself
+        # reissues 375 of the ids. Split before the base checks the ids, then number what
+        # is left over; parcel_id keeps the source value either way.
+        gdf = self.split_multipart(gdf)
         gdf["parcel_id"] = gdf["id_parcel"]
-        if gdf["id_parcel"].is_unique:
-            gdf["id"] = gdf["id_parcel"]
-        else:
-            repeats = len(gdf) - gdf["id_parcel"].nunique()
-            self.warning(
-                f"id_parcel repeats for {repeats:,} of {len(gdf):,} rows in this edition; "
-                "numbering the rows and keeping it as parcel_id"
-            )
-            gdf["id"] = gdf.index
+        gdf["id"] = gdf["id_parcel"].astype("string")
+        part = gdf.groupby("id").cumcount()
+        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype("string")
         return super().migrate(gdf)
 
     column_filters = {
