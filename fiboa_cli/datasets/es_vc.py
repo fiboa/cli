@@ -39,8 +39,6 @@ Geographic Information System (SIGPAC) in the Valencian Community valid for the 
     use_code_attribute = "USO_SIGPAC"
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
         self.column_additions["determination:datetime"] = datetime(int(self.variant), 1, 1)
 
         from bs4 import BeautifulSoup
