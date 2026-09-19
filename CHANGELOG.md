@@ -53,6 +53,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- FR: editions 2017-2024, one crop code list covering all of them (https://fiboa.org/code/fr/fr.csv) instead of the 2018 list alone, and RPG's parcel id published as parcel_id because it repeats in 2024
 - ES-GA: editions 2014-2026 with per-campaign column names, determination date from the variant, and pasto arbustivo excluded before the 2023 campaign
 - EC-SI: stop requiring columns the source leaves empty, and require only what every parcel carries
 - EC-LV: stop requiring columns the source leaves empty

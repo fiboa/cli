@@ -108,6 +108,8 @@ extra_convert_parameters = {
     "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
     "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
+    # the fixture is the 2022 archive; the converter's default is the newest edition
+    "fr": {"variant": "2022"},
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": {"variant": "2024", **_input_files("lv", "lv_2024_lielriga.gpkg")},
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
