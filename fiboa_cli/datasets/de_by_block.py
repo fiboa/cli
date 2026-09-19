@@ -15,6 +15,8 @@ PARAMS = {
     "version": "2.0.0",
     "request": "GetFeature",
     "typeNames": "lpis:AgriculturalArea",
+    # Without a sort the server pages in an unstable order: pages overlap and others are skipped.
+    "sortBy": "lpis:id",
 }
 # Server-enforced maximum. Larger values are silently capped, so paging must use this number.
 PAGE_SIZE = 10_000

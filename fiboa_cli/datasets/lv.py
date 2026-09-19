@@ -12,6 +12,18 @@ from .commons.hcat import AddHCATMixin
 # The resource URLs carry UUIDs, so the package is looked up by title.
 CKAN = "https://data.gov.lv/dati/lv/api/3/action/package_search"
 SEARCH = "Lauksaimnieku deklarētās platības"
+# One GeoPackage per region, the same nine in every campaign; see _slug() for the spelling.
+REGIONS = {
+    "austrumlatgale",
+    "dienvidkurzeme",
+    "dienvidlatgale",
+    "lielriga",
+    "viduslatvija",
+    "zemgale",
+    "ziemelaustrumi",
+    "ziemelkurzeme",
+    "ziemelvidzeme",
+}
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
@@ -50,7 +62,7 @@ Each edition is the campaign the Rural Support Service published it for, taken f
             "block_id": {"type": "string"},
         }
     }
-    # EuroCrops' lv_2021.csv plus the 28 codes the register added since
+    # EuroCrops' lv_2021.csv plus the 34 codes the register added since
     ec_mapping_csv = "https://fiboa.org/code/lv/lv.csv"
     column_migrations = {
         "product_code": lambda col: col.astype("string").str.strip(),
@@ -67,24 +79,34 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         response.raise_for_status()
         packages = response.json()["result"]["results"]
 
-        # "2024.gadā" and "2023. gadā" both occur
+        # "2024.gadā" and "2023. gadā" both occur; the search also matches descriptions,
+        # so the title has to carry the phrase as well as the campaign
         wanted = re.compile(rf"\b{self.variant}\.\s*gad")
-        matches = [p for p in packages if wanted.search(p.get("title", ""))]
+        matches = [
+            p
+            for p in packages
+            if SEARCH.lower() in p.get("title", "").lower() and wanted.search(p["title"])
+        ]
         if len(matches) != 1:
             titles = ", ".join(sorted(p.get("title", "") for p in matches)) or "none"
             raise ValueError(
                 f"Expected one package for {self.variant} on data.gov.lv, found {len(matches)}: {titles}"
             )
 
-        urls = {}
+        regions = {}
         for resource in matches[0]["resources"]:
             url = resource.get("url", "")
-            if not url.lower().endswith(".gpkg"):
-                continue
-            urls[url] = f"lv_{self.variant}_{_slug(resource.get('name') or Path(url).stem)}.gpkg"
-        if len(urls) < 2:
-            raise RuntimeError(f"{matches[0]['title']} holds {len(urls)} GeoPackage(s)")
-        return urls
+            if url.lower().endswith(".gpkg"):
+                regions[_slug(resource.get("name") or Path(url).stem)] = url
+        # a package that lost a region would otherwise be published as a partial edition
+        if set(regions) != REGIONS:
+            missing = ", ".join(sorted(REGIONS - set(regions))) or "none"
+            unexpected = ", ".join(sorted(set(regions) - REGIONS)) or "none"
+            raise RuntimeError(
+                f"{matches[0]['title']} does not hold the nine regional GeoPackages "
+                f"(missing: {missing}; unexpected: {unexpected})"
+            )
+        return {url: f"lv_{self.variant}_{region}.gpkg" for region, url in regions.items()}
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
@@ -97,19 +119,16 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         # the campaigns up to 2023 name their columns in upper case
         gdf = gdf.rename(columns=str.lower)
 
-        # split first, so the id minted below survives it
-        gdf = self.split_multipart(gdf)
-
-        # objectid restarts at 1 in every regional file, so the region is part of the id
+        # objectid restarts at 1 in every regional file, so the region is part of the id:
+        # 83,423 distinct objectids cover the 449,696 rows of the 2023 campaign
         region = _slug(layer or Path(path).stem)
         gdf["id"] = region + "-" + gdf["objectid"].astype("int64").astype(str)
-        part = gdf.groupby("id").cumcount()
-        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype(str)
         return gdf
 
 
 def _slug(value: str) -> str:
-    """A region name as ASCII, so Lielrīga and lielrga give the same id."""
+    """A region name as ASCII, so the portal's "Lielrīga" (up to 2023) and "Lielriga" (2024
+    onwards) give the same id."""
     text = unicodedata.normalize("NFKD", str(value))
     text = "".join(c for c in text if not unicodedata.combining(c))
     text = re.sub(r"[^A-Za-z0-9]+", "_", text).strip("_").lower()

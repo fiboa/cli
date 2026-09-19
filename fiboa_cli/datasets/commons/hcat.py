@@ -18,6 +18,9 @@ class AddHCATMixin:
     """
 
     ec_mapping_csv: Optional[str] = None  # TODO rename to hcat_mapping_csv
+    # Tables that fill gaps in the main one, for a country whose EuroCrops table does
+    # not carry every code the source uses. Rows here win where both carry a code.
+    ec_mapping_supplements: list[str] = []
     # Match on the crop name where the table has no row for the code:
     # be_wal_all_years.csv leaves original_code empty in 208 of its 298 rows.
     ec_mapping_name_fallback = False
@@ -61,6 +64,8 @@ class AddHCATMixin:
 
             if self.ec_mapping is None:
                 self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+                for supplement in self.ec_mapping_supplements:
+                    self.ec_mapping = self.ec_mapping + load_ec_mapping(supplement)
 
             from_code = "original_code"
             if from_code not in self.ec_mapping[0]:
