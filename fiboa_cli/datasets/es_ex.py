@@ -1,19 +1,20 @@
-import re
-from datetime import datetime
-
-import requests
-
-from fiboa_cli.datasets.es_base import ESBaseConverter
+from .commons.sigpac import SigpacRecintoMixin
+from .es_base import ESBaseConverter
 
 
-class EXConverter(ESBaseConverter):
+class EXConverter(SigpacRecintoMixin, ESBaseConverter):
     id = "es_ex"
+    # Badajoz and Cáceres
+    provinces = ("06", "10")
     short_name = "Spain Extremadura"
     title = "Spain Extremadura Crop fields"
-    description = """SIGPAC Crop fields of Spain - Extremadura"""
-    license = "CC-BY-4.0"  # See http://sitex.gobex.es/SITEX/files/CondicionesUsoCICTEX.pdf
-    attribution = "Junta de Extremadura"
-    provider = "Junta de Extremadura <https://www.juntaex.es/lajunta/consejeria-de-infraestructuras-transporte-y-vivienda>"
+    description = """SIGPAC recintos of Extremadura, from the national release by the Spanish
+paying agency. The region's own download portal (sitex.gobex.es) has not answered since at
+least 2026-09-10."""
+    license = "CC-BY-4.0"
+    attribution = "©FEGA / Ministerio de Agricultura, Pesca y Alimentación"
+    provider = "Fondo Español de Garantía Agraria (FEGA) <https://www.fega.gob.es>"
+
     columns = {
         "geometry": "geometry",
         "id": "id",
@@ -23,16 +24,8 @@ class EXConverter(ESBaseConverter):
         "crop:name": "crop:name",
         "crop:name_en": "crop:name_en",
         "dn_surface": "metrics:area",
-        "determination:datetime": "determination:datetime",
+        "determination:datetime": "determination:datetime",  # the campaign, from the variant
     }
-
-    area_is_in_ha = False
-
-    def migrate(self, gdf):
-        gdf = super().migrate(gdf)
-        gdf["determination:datetime"] = datetime(year=int(self.variant), month=1, day=1)
-        return gdf
-
     missing_schemas = {
         "properties": {
             "admin_province_code": {"type": "string"},

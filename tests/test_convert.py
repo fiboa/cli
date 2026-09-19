@@ -50,6 +50,7 @@ tests = [
     "lv",
     "ie",
     "es_cat",
+    "es_nc",
     "es_cl",
     "es_an",
     "es_cm",
@@ -80,6 +81,7 @@ def _input_files(converter, *names):
 
 
 extra_convert_parameters = {
+    "es_nc": {"variant": "2025", **_input_files("es_nc", "es_nc.gpkg")},
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
     # the fixture is the 2022 archive; the default is the latest year, 2024
