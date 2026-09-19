@@ -18,6 +18,8 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
 
     provider = "Danish Agricultural Agency <https://lbst.dk/>"
     ec_mapping_csv = "dk_2019.csv"
+    # the codes that table has no row for, mapped from its own siblings
+    ec_mapping_supplements = ["https://fiboa.org/code/dk/dk_supplement.csv"]
     license = "CC0-1.0"
     columns = {
         "geometry": "geometry",

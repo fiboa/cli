@@ -18,6 +18,12 @@ class AddHCATMixin:
     """
 
     ec_mapping_csv: Optional[str] = None  # TODO rename to hcat_mapping_csv
+    # Tables that fill gaps in the main one, for a country whose EuroCrops table does
+    # not carry every code the source uses. Rows here win where both carry a code.
+    ec_mapping_supplements: list[str] = []
+    # Match on the crop name where the table has no row for the code:
+    # be_wal_all_years.csv leaves original_code empty in 208 of its 298 rows.
+    ec_mapping_name_fallback = False
     mapping_file = None
     ec_mapping: Optional[list[dict]] = None  # TODO rename to hcat_mapping
 
@@ -62,6 +68,8 @@ class AddHCATMixin:
 
             if self.ec_mapping is None:
                 self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+                for supplement in self.ec_mapping_supplements:
+                    self.ec_mapping = self.ec_mapping + load_ec_mapping(supplement)
 
             from_code = "original_code"
             if from_code not in self.ec_mapping[0]:
@@ -74,12 +82,26 @@ class AddHCATMixin:
             def map_to(attribute):
                 return {e[from_code]: e[attribute] or None for e in self.ec_mapping}
 
+            name_col = None
+            if self.ec_mapping_name_fallback and from_code == "original_code":
+                name_col = self.get_code_column(gdf, "crop:name")
+
+            def map_by_name(attribute):
+                # Three Walloon crops carry a trailing space in the table.
+                return {
+                    (e["original_name"] or "").strip(): e[attribute] or None
+                    for e in self.ec_mapping
+                    if not (e["original_code"] or "").strip()
+                }
+
             col = None
             for k, v in zip(
                 self.hcat_columns.keys(), ("translated_name", "HCAT3_name", "HCAT3_code")
             ):
                 if v in self.ec_mapping[0]:
                     col = crop_code_col.map(map_to(v))
+                    if name_col is not None:
+                        col = col.fillna(name_col.str.strip().map(map_by_name(v)))
                     gdf[k] = col
                     assert np.unique(col[~col.isna()]).size > 1, "No HCAT crops mapped"
 

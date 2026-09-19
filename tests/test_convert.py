@@ -22,8 +22,10 @@ tests = [
     "be_vlg",
     "br_ba_lem",
     "bg",
+    "bg#2022",
     "de_sh",
     "de_bb",
+    "ec_lt",
     "ec_lv",
     "ec_si",
     "fi",
@@ -36,9 +38,12 @@ tests = [
     "dk#2008",
     "be_wal",
     "se",
+    "ee",
     "ai4sf",
     "ch",
     "cz",
+    "cz#2019",
+    "cz#2020",
     "us_usda_cropland",
     "us_ca_scm",
     "jp",
@@ -46,6 +51,9 @@ tests = [
     "ie",
     "es_cat",
     "es_cl",
+    "es_ar",
+    "es_an",
+    "es_cm",
     "es",
     "nz",
     "lt",
@@ -63,6 +71,7 @@ tests = [
     "de_he",
     "de_st",
     "it_bz",
+    "de_sax",
 ]
 test_path = "tests/data-files/convert"
 
@@ -74,9 +83,11 @@ def _input_files(converter, *names):
 extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
-    # 2008 stands for the editions before 2014: no crop columns, and no application
-    # number to make Marknr identify a field, so `id` is the row index
     "dk#2008": {"variant": "2008"},
+    # the fixture archive holds the 2024 edition only; the published one holds both
+    "lt": {"variant": "2024"},
+    # the fixture is the 2023 file; the converter's default is the newest edition
+    "fi": {"variant": "2023"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
@@ -87,6 +98,18 @@ extra_convert_parameters = {
         "variant": "2025",
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
     },
+    "es_ar": {"variant": "2026", **_input_files("es_ar", "es_ar_44216.shp.zip")},
+    "ee": {"variant": "2024", **_input_files("ee", "ee_gsaa_2024.gml")},
+    "cz#2019": {"variant": "2019"},
+    "cz#2020": {"variant": "2020"},
+    "es_cm": {"variant": "2024", **_input_files("es_cm", "es_cm_0.gpkg")},
+    "es_an": {
+        "variant": "2025",
+        "input_files": {f"{test_path}/es_an/SP25_REC_PROV_04.zip": ["SP25_REC_04.shp"]},
+    },
+    "sk#2018": {"variant": "2018"},
+    "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
+    "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": _input_files("lv", "1_100.xml"),
@@ -99,6 +122,7 @@ extra_convert_parameters = {
     "de_sl_block": _input_files("de_sl_block", "de_sl_block.gml"),
     "de_sl": _input_files("de_sl", "de_sl.gml"),
     "it_bz": _input_files("it_bz", "it_bz.json"),
+    "de_sax": {"input_files": {f"{test_path}/de_sax/gesamt_2026_RE.zip": ["2026_RE_FB_33.shp"]}},
 }
 
 
