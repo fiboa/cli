@@ -5,7 +5,6 @@ from .commons.ec import EuroCropsConverterMixin
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     area_is_in_ha = False
     ec_mapping_csv = "si_2021.csv"
-    # the rows EuroCrops names in a way the HCAT enum does not have
     ec_mapping_supplements = ["https://fiboa.org/code/si/si_2021_supplement.csv"]
     ec_year = 2021
     sources = {
