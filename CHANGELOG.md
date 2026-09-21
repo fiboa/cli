@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 - LV: editions 2015-2025 from the yearly releases on data.gov.lv, so an edition is the campaign it holds rather than the day it was downloaded; the field block becomes block_id, crop:name comes from the code list because the files carry only the code, one merged list (https://fiboa.org/code/lv/lv.csv) covers the 28 codes the register added after EuroCrops' 2021 table, and the id is minted because objectid restarts in every regional file
 - ES-EX, ES-NC: read the SIGPAC recintos from FEGA's national release, in editions 2025 and 2026 — neither region's own portal answers any more (sitex.gobex.es, sigpac.navarra.es)
+- DE-BB: leave out the NBF records (ineligible patches, not fields), which were published with an empty crop code
 - EC-FR: the 2018 RPG campaign, which IGN publishes no archive for, from EuroCrops
 - Update aiohttp, which since 3.13.5 accepts the two Content-Type headers Zenodo answers with; before that no EuroCrops converter could download on a cold cache
 - Put the easting in x whatever the source's CRS says: a source that honours EPSG's axis order ships its coordinates northing first (Jordbruksverket's shapefile declares it), while GeoParquet stores x, y — so the tiles, the STAC bbox and the collection-wide bbox all read such a file as (lat, lon). The swap keeps any z coordinate, so `--original-geometries` still delivers 3D geometries
@@ -55,6 +56,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- US CSB: editions 2017-2024 from the single archive, and numbered fields because the dissolve leaves no source identifier
+- ES-AR: per-municipality SIGPAC files listed from IDEAragon
+- LT: read Europe-LAND v1.3, which carries 2025 beside 2024
 - ES-GA: editions 2014-2026 with per-campaign column names, determination date from the variant, and pasto arbustivo excluded before the 2023 campaign
 - EC-SI: stop requiring columns the source leaves empty, and require only what every parcel carries
 - EC-LV: stop requiring columns the source leaves empty

@@ -52,6 +52,7 @@ tests = [
     "es_cat",
     "es_nc",
     "es_cl",
+    "es_ar",
     "es_an",
     "es_cm",
     "es",
@@ -69,6 +70,7 @@ tests = [
     "de_sl_block",
     "de_sl",
     "de_he",
+    "de_he#2023",
     "de_st",
     "it_bz",
     "de_sax",
@@ -86,18 +88,23 @@ extra_convert_parameters = {
     "nl": {"variant": "2023"},
     # the fixture is the 2022 archive; the default is the latest year, 2024
     "fr": {"variant": "2022"},
+    # the fixture archive holds the 2024 edition only; the published one holds both
+    "lt": {"variant": "2024"},
     # the fixture is the 2023 file; the converter's default is the newest edition
     "fi": {"variant": "2023"},
     "se": {"variant": "2023"},
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
     "de_he": _input_files("de_he", "de_he.json"),
+    # the older layers publish no land cover class and no declared area
+    "de_he#2023": {"variant": "2023", **_input_files("de_he", "de_he_2023.json")},
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
     "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
     "es_cl": {
         "variant": "2025",
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
     },
+    "es_ar": {"variant": "2026", **_input_files("es_ar", "es_ar_44216.shp.zip")},
     "ee": {"variant": "2024", **_input_files("ee", "ee_gsaa_2024.gml")},
     "cz#2019": {"variant": "2019"},
     "cz#2020": {"variant": "2020"},

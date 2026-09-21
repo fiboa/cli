@@ -8,17 +8,15 @@ from .commons.hcat import AddHCATMixin
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    # One archive carries the whole sequence: CSB1724.gdb has a CDL<year> crop
+    # column for every year 2017-2024, so every variant reads the same source.
     variants = {
-        "2024": {
+        str(y): {
             "https://www.nass.usda.gov/Research_and_Science/Crop-Sequence-Boundaries/datasets/NationalCSB_2017-2024_rev23.zip": [
                 "NationalCSB_2017-2024_rev23/CSB1724.gdb"
             ]
-        },
-        "2023": {
-            "https://www.nass.usda.gov/Research_and_Science/Crop-Sequence-Boundaries/datasets/NationalCSB_2016-2023_rev23.zip": [
-                "NationalCSB_2016-2023_rev23/CSB1623.gdb"
-            ]
-        },
+        }
+        for y in range(2024, 2016, -1)
     }
     id = "us_usda_cropland"
     short_name = "US (USDA CSB)"
@@ -33,21 +31,26 @@ CSB represents non-confidential single crop field boundaries over a set time fra
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     provider = "United States Department of Agriculture <https://www.nass.usda.gov>"
     license = "License and Liability <https://gee-community-catalog.org/projects/csb/#license-and-liability>"
+    # The dissolve below merges adjacent CSB polygons of one crop and splits the
+    # result again, so an output field is not a source CSB and `CSBID`, kept by
+    # `aggfunc="first"`, names an arbitrary member of the group: it gave 3,093
+    # distinct ids to 7.5 million fields. The county is part of the dissolve key,
+    # so it does hold for every field the group produces.
     columns = {
         "geometry": "geometry",
-        "CSBID": "id",
+        "id": "id",
         # "CDL2023": "crop:code", will be added in migrate
         "crop:name": "crop:name",
         "CNTY": "administrative_area_level_2",
-    }
-    column_additions = {
-        "determination:datetime": "2023-05-01T00:00:00Z",
+        "CNTYFIPS": "administrative_area_level_2_code",
     }
     missing_schemas = {
         "properties": {
             "administrative_area_level_2": {"type": "string"},
+            "administrative_area_level_2_code": {"type": "string"},
         }
     }
+    use_variant_as_determination = True
     ec_mapping_csv = "https://fiboa.org/code/us/usda/cropland.csv"
 
     def migrate(self, gdf):
@@ -69,7 +72,10 @@ CSB represents non-confidential single crop field boundaries over a set time fra
         for state in states:
             logger.info(f"Handling State {state}")
             df = gdf[gdf["STATEFIPS"] == state].explode()
-            df = df.dissolve(by=[crop_key], aggfunc="first", as_index=False).explode()
+            # County is in the key so it stays true of every field: a group spans one
+            # county, and a dissolve on attributes never cuts a source polygon, it only
+            # declines to merge across the line. In Delaware that is 13 fields in 14,308.
+            df = df.dissolve(by=[crop_key, "CNTYFIPS"], aggfunc="first", as_index=False).explode()
             gdfs.append(df)
         gdf = pd.concat(gdfs)
         del gdfs
@@ -79,4 +85,8 @@ CSB represents non-confidential single crop field boundaries over a set time fra
             int(e["original_code"]): e["original_name"] for e in self.ec_mapping
         }
         gdf["crop:name"] = gdf[crop_key].map(original_name_mapping)
+
+        # Number the dissolved fields: nothing from the source identifies them.
+        gdf = gdf.reset_index(drop=True)
+        gdf["id"] = gdf.index.astype(str)
         return gdf
