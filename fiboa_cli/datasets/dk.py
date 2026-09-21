@@ -40,7 +40,10 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         # identifies, which is safe because an edition is one file.
         if "Journalnr" in gdf.columns:
             key = gdf["Journalnr"].astype(str) + ":" + gdf["Marknr"].astype(str)
-            gdf["id"] = key.where(gdf["Journalnr"].notna() & gdf["Marknr"].notna())
+            fallback = f"{self.variant}:missing-application:" + gdf.index.astype(str)
+            gdf["id"] = key.where(
+                gdf["Journalnr"].notna() & gdf["Marknr"].notna(), fallback
+            )
         else:
             # the edition is part of it: a bare row number matches the same number in
             # another edition, and 476,097 of 2009's rows would join 2010's on nothing
