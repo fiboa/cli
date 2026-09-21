@@ -20,7 +20,8 @@ ITEMS = {
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # see https://mze.gov.cz/public/app/eagriapp/lpisdata/
-    variants = {str(k): {BASE.format(v): ["*.shp"]} for k, v in ITEMS.items()}
+    # the 2026 archive nests the shapefile in a folder, older ones are flat
+    variants = {str(k): {BASE.format(v): ["**/*.shp"]} for k, v in ITEMS.items()}
     id = "cz"
     short_name = "Czech"
     title = "Field boundaries for Czech"
@@ -38,7 +39,51 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         # 'OKRES_NAZE': 'admin:subdivision_code',
     }
     column_migrations = {"DATUM_REP": lambda col: pd.to_datetime(col, format="%d.%m.%Y")}
+
+    # The GPZ_DP releases (2019-2022) name the same things differently, carry no
+    # application date, and identify nothing per row: ENTITA_ID is the land block
+    # and repeats per crop declared on it, 242,754 over the 282,462 rows of 2019.
+    OLD_SCHEMA = {"PLODINA_NA": "PLOD_NAZE", "DEKL_VYMER": "ZAKRES_VYM"}
+
+    # 2020 leaves PLODINA_ID empty in 98.1% of its rows and names the crop in the
+    # ministry's vocabulary, not EuroCrops' botanical one ("Pšenice ozimá" against
+    # "Pšenice setá ozimá"). This table has the code its neighbours give each name.
+    crop_names_csv = "https://fiboa.org/code/cz/cz_crop_names.csv"
+
+    def migrate(self, gdf):
+        if "PLODINA_NA" in gdf.columns:
+            gdf = gdf.rename(columns=self.OLD_SCHEMA)
+            gdf["DPB_ID"] = gdf["ENTITA_ID"]
+            # Positional: the index repeats when an edition ships two shapefiles.
+            gdf["ZAKRES_ID"] = range(len(gdf))
+            # No date in these releases; the edition is the campaign year.
+            gdf["DATUM_REP"] = f"01.01.{self.variant}"
+            codes = gdf["PLODINA_ID"].astype("string").str.strip()
+            if codes.isna().any():
+                by_name = gdf["PLOD_NAZE"].astype("string").str.strip().map(self._codes_by_name())
+                gdf["PLODINA_ID"] = codes.fillna(by_name)
+        elif gdf["ZAKRES_ID"].duplicated().any():
+            # A declaration straddling two land blocks is listed once per block
+            # with the same geometry both times (one pair in 2026). A repeat of
+            # a different shape is something else and still fails the id check.
+            repeats = gdf.assign(_wkb=gdf.geometry.to_wkb()).duplicated(["ZAKRES_ID", "_wkb"])
+            self.info(f"Dropping {repeats.sum()} declaration(s) listed once per land block")
+            gdf = gdf[~repeats]
+        return super().migrate(gdf)
+
+    def _codes_by_name(self) -> dict:
+        from .commons.hcat import load_ec_mapping
+
+        return {
+            row["original_name"].strip(): row["original_code"].strip()
+            for row in load_ec_mapping(self.crop_names_csv)
+        }
+
     ec_mapping_csv = "cz_2023.csv"
+    # EuroCrops mapped the 2023 code list. The 2019-2022 editions declare 120
+    # codes it never saw — 11.4% of their rows, fallow and ware potatoes among
+    # them — so their HCAT comes from a table of our own.
+    ec_mapping_supplements = ["https://fiboa.org/code/cz/cz_supplement.csv"]
     missing_schemas = {
         "properties": {
             "block_id": {"type": "string"},

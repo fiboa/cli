@@ -14,6 +14,8 @@ class IEConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
                 f"GSAA_{year}.gml"
             ]
         }
+        # the department's bucket answers for 2022 onwards; GSAA_2017 to
+        # GSAA_2021 are gone (403, checked 2026-09-13)
         for year in range(2024, 2021, -1)
     }
 
@@ -29,9 +31,17 @@ class IEConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "geometry": "geometry",
         "crop_name": "crop:name",
         "crop_code": "crop:code",
-        "localId": "id",
+        "gml_id": "id",
+        "localId": "parcel_id",
         "observationDate": "determination:datetime",
+        # the GML publishes no area; the parcels are in EPSG:4258
+        "metrics:area": "metrics:area",
     }
+    area_calculate_missing = True
+    # localId is the LPIS parcel reference and repeats where a parcel is
+    # declared more than once — 214 of the 1,027,438 rows of 2022, one of them
+    # four times — so the feature id, which the GML guarantees unique, is the id.
+    missing_schemas = {"properties": {"parcel_id": {"type": "string"}}}
     ec_mapping_csv = "https://fiboa.org/code/ie/ie.csv"
 
     column_migrations = {

@@ -55,7 +55,8 @@ published separately.
 
     columns = {
         "geometry": "geometry",
-        "flik": ("flik", "id"),  # derived in migrate(); unique
+        "flik": "flik",  # derived in migrate(); the block reference
+        "id": "id",  # the flik, plus a part number where a block is several polygons
         "area_type": "crop:code",  # added in file_migration(), trimmed in migrate()
         "area": "metrics:area",  # derived in migrate(); in hectares
     }
@@ -95,4 +96,10 @@ published separately.
         gdf["area"] = gdf["description"].apply(parse_size)
         # …/codelist/de.iacs/AgriculturalAreaTypeValue/GL -> GL
         gdf["area_type"] = gdf["area_type"].str.rsplit("/", n=1).str[-1]
+
+        # the source publishes several land cover records for one block, each with its own
+        # polygon, so the flik alone does not identify a row
+        gdf["id"] = gdf["flik"]
+        part = gdf.groupby("id").cumcount()
+        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype(str)
         return super().migrate(gdf)
