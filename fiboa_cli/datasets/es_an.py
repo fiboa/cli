@@ -1,5 +1,3 @@
-from loguru import logger
-
 from .commons.data import read_data_csv
 from .es_base import ESBaseConverter
 
@@ -45,11 +43,13 @@ developments.
         "crop:name_en": "crop:name_en",
     }
 
+    use_code_attribute = "CD_USO"
     area_is_in_ha = False
     area_calculate_missing = True
+    use_variant_as_determination = True
 
-    column_additions = ESBaseConverter.column_additions | {
-        "determination:datetime": "2024-03-28T00:00:00Z",
+    column_migrations = {
+        "ID_RECINTO": lambda col: col.astype("int64"),
     }
 
     missing_schemas = {
@@ -60,12 +60,7 @@ developments.
     }
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
-            logger.warning(f"Choosing first year {self.variant}")
-        else:
-            assert self.variant in self.variants, f"Wrong year {self.variant}"
-
+        assert self.variant in self.variants, f"Wrong year {self.variant}"
         url = self.variants[self.variant]
         data = read_data_csv("es_an_prv.csv")
 

@@ -2,14 +2,15 @@ import pandas as pd
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.data import read_data_csv
+from .commons.hcat import AddHCATMixin
 
 
-class ESCatConverter(FiboaBaseConverter):
+class ESCatConverter(AddHCATMixin, FiboaBaseConverter):
     # Catalonia has its own coding list, not sublass of ESBaseConverter
     variants = {
         "2024": {
             "https://analisi.transparenciacatalunya.cat/api/views/yh94-j2n9/files/d90f5fca-ddd8-405d-a0d5-90609985e98e?download=true&filename=Cultius_DUN2024_SHP.zip": [
-                "Cultius_DUN2024_GPKG/CULTIUS_DUN2024.gpkg"
+                "Cultius_DUN2024_SHP/Cultius_DUN2024_SHP.shp"
             ]
         },
         "2023": {
@@ -42,9 +43,8 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
     attribution = "Catalonia Department of Agriculture, Livestock, Fisheries and Food"
     license = "The Open Information Use License - Catalonia <https://administraciodigital.gencat.cat/ca/dades/dades-obertes/informacio-practica/llicencies/>"
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    column_additions = {
-        "crop:code_list": "https://fiboa.org/code/es/cat/crop.csv",
-    }
+    # the same table as the bundled es_cat.csv, with HCAT; the mixin publishes it as crop:code_list
+    ec_mapping_csv = "https://fiboa.org/code/es/cat/crop.csv"
     columns = {
         "geometry": "geometry",
         "id": "id",
@@ -54,8 +54,6 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
         "crop:code": "crop:code",
         "crop:name_en": "crop:name_en",
     }
-    # Tells GDAL how the shapefile variants are encoded, since a shapefile does not have to say.
-    # Unrelated to the GeoJSON encoding that vecorel-cli handles, so it is still needed here.
     open_options = dict(encoding="utf-8")
     column_migrations = {
         "campanya": lambda col: pd.to_datetime(col, format="%Y"),
@@ -68,7 +66,7 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
 
     def migrate(self, gdf):
         # In 2023 gpkg, names are lowercase. But in 2022 shapefile, case is mixed
-        to_lower = {k: k.lower() for k in gdf.columns if k != k.lower}
+        to_lower = {k: k.lower() for k in gdf.columns if k != k.lower()}
         if to_lower:
             gdf.rename(columns=to_lower, inplace=True)
 

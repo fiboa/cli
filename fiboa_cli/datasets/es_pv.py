@@ -1,6 +1,5 @@
 import pandas as pd
 import requests
-from loguru import logger
 
 from .es_base import ESBaseConverter
 
@@ -38,11 +37,7 @@ the 2005 community aid application period.
     index_as_id = True
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = "2024"
-            logger.warning(f"Choosing first year {self.variant}")
-        else:
-            assert self.variant in self.variants
+        assert self.variant in self.variants
 
         from bs4 import BeautifulSoup
 
