@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- DE-BB, DE-NDS, EC-SI: correct the rows whose HCAT name the taxonomy does not carry, through `ec_mapping_supplements` (https://fiboa.org/code/de/de_supplement.csv and https://fiboa.org/code/si/si_2021_supplement.csv). EuroCrops' German table spells 659 Petersilie `parsley` where the taxonomy has the typo `parsly`, and 860 Spargel `aspargus` where the taxonomy spells it out; the Slovenian table labels 704 trsnice with the vineyard name on the nurseries code 3303070000. A wrong HCAT name is invisible — the file validates and a crop query quietly returns another crop — and a supplement row wins over the table, so the output agrees with the taxonomy without waiting for EuroCrops to publish a fix
+- Add spelling fixes to HCAT codes for DE-BB, DE-NDS, EC-SI with csv_supplements
 - DE-BB: leave out the NBF records (ineligible patches, not fields), which were published with an empty crop code
 - EC-FR: the 2018 RPG campaign, which IGN publishes no archive for, from EuroCrops
 - Update aiohttp, which since 3.13.5 accepts the two Content-Type headers Zenodo answers with; before that no EuroCrops converter could download on a cold cache
