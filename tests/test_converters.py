@@ -1,6 +1,7 @@
 from urllib.parse import parse_qs, urlparse
 
 import geopandas as gpd
+import pytest
 import spdx_license_list
 from shapely.geometry import Point
 from vecorel_cli.vecorel.schemas import VecorelSchema
@@ -104,3 +105,101 @@ def test_overriden_base_properties():
                 assert s == converter_properties[property], (
                     "Converter {converter} overrides schema for base property {property}"
                 )
+
+
+def test_default_variant_reaches_a_converter_that_overrides_get_urls():
+    """LV looks its files up by year and used to fail without --variant: the base
+    get_urls() that chose the default was the method it replaced."""
+    converter = Converters().load("lv")
+    converter.select_variant(None)
+    assert converter.variant == "2025"
+
+
+def test_lv_requires_the_nine_regional_geopackages(monkeypatch):
+    from fiboa_cli.datasets import lv
+
+    # the portal's spellings: a trailing space in 2021, Lielrīga until 2023, Lielriga since
+    regions = [
+        "Austrumlatgale ",
+        "Dienvidkurzeme",
+        "Dienvidlatgale",
+        "Lielrīga",
+        "Viduslatvija",
+        "Zemgale",
+        "Ziemeļaustrumi",
+        "Ziemeļkurzeme",
+        "Ziemeļvidzeme",
+    ]
+
+    def package(title, names):
+        resources = [
+            {"name": name, "url": f"https://data.gov.lv/{i}/download/{i}.gpkg"}
+            for i, name in enumerate(names)
+        ]
+        resources.append({"name": "Metadata", "url": "https://data.gov.lv/x/download/meta.pdf"})
+        return {"title": title, "resources": resources}
+
+    packages = [
+        package("Lauksaimnieku deklarētās platības 2024.gadā", regions),
+        package("Lauksaimnieku deklarētās platības 2023. gadā", regions[:-1]),
+        # matched the search through its description, and carries the campaign pattern
+        package("Cita datu kopa 2024. gadā", regions),
+    ]
+
+    class Response:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"result": {"results": packages}}
+
+    monkeypatch.setattr(lv.requests, "get", lambda *args, **kwargs: Response())
+    converter = Converters().load("lv")
+
+    converter.variant = "2024"
+    assert sorted(converter.get_urls().values()) == [
+        f"lv_2024_{region}.gpkg" for region in sorted(lv.REGIONS)
+    ]
+
+    converter.variant = "2023"
+    with pytest.raises(RuntimeError, match="missing: ziemelvidzeme"):
+        converter.get_urls()
+
+    converter.variant = "2022"
+    with pytest.raises(ValueError, match="found 0"):
+        converter.get_urls()
+
+
+def test_split_multipart_recomputes_the_metrics_of_the_parts():
+    """explode() copies the source row's attributes onto every part, so the area and
+    perimeter of a two-part feature would be published twice, for the whole feature."""
+    from shapely.geometry import MultiPolygon, box
+
+    from fiboa_cli.conversion.fiboa_converter import SPLIT_KEY, FiboaBaseConverter
+
+    class Converter(FiboaBaseConverter):
+        id = "split"
+        columns = {
+            "geometry": "geometry",
+            "id": "id",
+            "shape_area": "metrics:area",
+            "shape_length": "metrics:perimeter",
+        }
+        area_is_in_ha = False
+
+    two_parts = MultiPolygon([box(0, 0, 10, 10), box(20, 0, 50, 10)])  # 100 + 300 m²
+    one_part = MultiPolygon([box(0, 20, 10, 40)])  # 200 m², a multi-part type but not split
+    gdf = gpd.GeoDataFrame(
+        {"id": ["a", "b"], "shape_area": [400.0, 200.0], "shape_length": [120.0, 60.0]},
+        geometry=[two_parts, one_part],
+        crs="EPSG:3059",
+    )
+
+    converter = Converter()
+    gdf = converter.split_multipart(gdf)
+    assert gdf["id"].tolist() == ["a", "a", "b"]
+
+    gdf = converter.post_migrate(gdf)
+    assert SPLIT_KEY not in gdf.columns
+    assert gdf["shape_area"].tolist() == [100.0, 300.0, 200.0]
+    assert gdf["shape_length"].tolist() == [40.0, 80.0, 60.0]

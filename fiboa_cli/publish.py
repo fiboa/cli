@@ -302,8 +302,9 @@ It has been converted to a fiboa GeoParquet file from data obtained from {data["
         Path(target).mkdir(parents=True, exist_ok=True)
 
         file_name = self.dataset
-        if not kwargs["variant"] and self.converter.variants:
-            kwargs["variant"] = next(iter(self.converter.variants))
+        # the choice convert() makes, so the README lists the source files of this edition
+        self.converter.select_variant(kwargs["variant"])
+        kwargs["variant"] = self.converter.variant
         if kwargs["variant"]:
             file_name += f"-{kwargs['variant']}"
         parquet_file = Path(target) / f"{file_name}.parquet"

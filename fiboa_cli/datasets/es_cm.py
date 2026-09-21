@@ -43,8 +43,6 @@ the identification basis for any type of aid related to the surface area.
     rest_attribute = "OBJECTID_1"
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
         # Always use the year-named service: the unnamed "Recintos_sigpac" service is
         # whatever year is current (2025 in August 2026) and keys on OBJECTID instead.
         services = requests.get(self.rest_base_url, {"f": "pjson"}).json()["services"]

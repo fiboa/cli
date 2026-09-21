@@ -1,5 +1,3 @@
-from loguru import logger
-
 from .commons.data import read_data_csv
 from .es_base import ESBaseConverter
 
@@ -62,12 +60,7 @@ developments.
     }
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
-            logger.warning(f"Choosing first year {self.variant}")
-        else:
-            assert self.variant in self.variants, f"Wrong year {self.variant}"
-
+        assert self.variant in self.variants, f"Wrong year {self.variant}"
         url = self.variants[self.variant]
         data = read_data_csv("es_an_prv.csv")
 
