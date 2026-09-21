@@ -34,6 +34,8 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
 
     # https://www.sla.niedersachsen.de/download/141235/Verzeichnis_Nutzungscodes.xlsx
     ec_mapping_csv = "de.csv"
+    # the rows EuroCrops names in a way the HCAT enum does not have
+    ec_mapping_supplements = ["https://fiboa.org/code/de/de_supplement.csv"]
     # The shapefile has no unique key: 880,581 features share 874,222 distinct
     # (FLIK, SCHLAGNR) pairs, so the row index is the only identifier available.
     index_as_id = True
