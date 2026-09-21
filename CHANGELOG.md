@@ -53,6 +53,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- ES-AR: per-municipality SIGPAC files listed from IDEAragon
+- LT: read Europe-LAND v1.3, which carries 2025 beside 2024
 - ES-GA: editions 2014-2026 with per-campaign column names, determination date from the variant, and pasto arbustivo excluded before the 2023 campaign
 - EC-SI: stop requiring columns the source leaves empty, and require only what every parcel carries
 - EC-LV: stop requiring columns the source leaves empty

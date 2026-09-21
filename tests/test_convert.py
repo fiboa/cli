@@ -51,6 +51,7 @@ tests = [
     "ie",
     "es_cat",
     "es_cl",
+    "es_ar",
     "es_an",
     "es_cm",
     "es",
@@ -84,6 +85,8 @@ extra_convert_parameters = {
     "nl": {"variant": "2023"},
     # the fixture is the 2022 archive; the default is the latest year, 2024
     "fr": {"variant": "2022"},
+    # the fixture archive holds the 2024 edition only; the published one holds both
+    "lt": {"variant": "2024"},
     # the fixture is the 2023 file; the converter's default is the newest edition
     "fi": {"variant": "2023"},
     "se": {"variant": "2023"},
@@ -96,6 +99,7 @@ extra_convert_parameters = {
         "variant": "2025",
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
     },
+    "es_ar": {"variant": "2026", **_input_files("es_ar", "es_ar_44216.shp.zip")},
     "ee": {"variant": "2024", **_input_files("ee", "ee_gsaa_2024.gml")},
     "cz#2019": {"variant": "2019"},
     "cz#2020": {"variant": "2020"},
