@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- PL: add pl, the crops farmers declared to ARiMR ("Uprawy rolne deklarowane GSA"), campaigns 2025 and 2026, read from the geoportal's WFS in 50,000-feature pages; the source has no crop code, so the Polish crop name is the code
 - DE-BB: leave out the NBF records (ineligible patches, not fields), which were published with an empty crop code
 - EC-FR: the 2018 RPG campaign, which IGN publishes no archive for, from EuroCrops
 - Update aiohttp, which since 3.13.5 accepts the two Content-Type headers Zenodo answers with; before that no EuroCrops converter could download on a cold cache

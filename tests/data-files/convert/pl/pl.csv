@@ -1,0 +1,25 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+aronia czarnoowocowa,aronia czarnoowocowa,chokeberry,aronia_chokeberries,3303020100
+fasola wielokwiatowa,fasola wielokwiatowa,bean,beans,3301020100
+inne niedotowane,inne niedotowane,"other, not subsidised",not_known_and_other,3399000000
+jęczmień jary,jęczmień jary,spring barley,spring_barley,3301010402
+jęczmień ozimy,jęczmień ozimy,winter barley,winter_barley,3301010401
+kukurydza na ziarno,kukurydza na ziarno,grain maize,grain_maize_corn_popcorn,3301010600
+Lucerna mieszańcowa na zielony nawóz,Lucerna mieszańcowa na zielony nawóz,hybrid alfalfa for green manure,alfalfa_lucerne,3301090301
+malina,malina,raspberry,raspberry_raspberries,3303021000
+Mieszanka zbożowa gatunków ozimych,Mieszanka zbożowa gatunków ozimych,mixture of winter cereals,winter_meslin,3301011101
+owies siewny,owies siewny,oats,oats,3301010500
+owies zwyczajny,owies zwyczajny,oats,oats,3301010500
+porzeczka,porzeczka,currant,currants,3303020600
+pszenica zwyczajna jara,pszenica zwyczajna jara,spring wheat,spring_common_soft_wheat,3301010102
+pszenica zwyczajna ozima,pszenica zwyczajna ozima,winter wheat,winter_common_soft_wheat,3301010101
+pszenżyto ozime,pszenżyto ozime,winter triticale,winter_triticale,3301010801
+rzepak ozimy,rzepak ozimy,winter rapeseed,winter_rapeseed_rape,3301060401
+Sad,Sad,orchard,orchards_fruits,3303010000
+Trawy na gruntach ornych,Trawy na gruntach ornych,grasses on arable land,temporary_grass,3301090100
+Trawy na ugorze,Trawy na ugorze,grasses on fallow land,fallow_land_not_crop,3301110000
+TUZ,TUZ,permanent grassland,pasture_meadow_grassland_grass,3302000000
+ugór,ugór,fallow,fallow_land_not_crop,3301110000
+Uprawa mieszana_,Uprawa mieszana_,mixed crop,other_plants_harvested_green,3301099900
+ziemniak,ziemniak,potato,potatoes,3301030000
+żyto ozime,żyto ozime,winter rye,winter_rye,3301010301
