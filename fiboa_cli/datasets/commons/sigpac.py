@@ -17,6 +17,10 @@ class SigpacRecintoMixin:
     variants = {year: year for year in ("2026", "2025")}
 
     use_code_attribute = "uso_sigpac"
+    column_migrations = {
+        "provincia": lambda col: col.astype("Int64").astype(str).str.zfill(2),
+        "municipio": lambda col: col.astype("Int64").astype(str),
+    }
     # dn_surface is in square metres: median 2,340, largest 8.5 million
     area_is_in_ha = False
     use_variant_as_determination = True
