@@ -16,7 +16,7 @@ class DEHEConverter(AdminConverterMixin, DEIACSMixin, FiboaBaseConverter):
     id = "de_he"
     admin_subdivision_code = "HE"
     short_name = "Germany, Hesse"
-    title = "Field boundaries for Hesse, Germany"
+    title = "Field blocks for Hesse, Germany"
     description = """
 The reference parcel is the basic spatial unit for administering and geographically locating
 agricultural parcels in Hesse. One reference parcel may contain several parcels declared under
@@ -33,21 +33,21 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
 
     variants = {str(year): str(year) for year in range(2025, 2022, -1)}
 
+    # 2023 and 2024 publish no area, and the declaredArea 2025 does publish is the area of
+    # the polygon to three decimals, so every edition measures it: EPSG:25832, already m2.
+    area_is_in_ha = False
+    area_calculate_missing = True
+
     columns = {
         "geometry": "geometry",
-        "flik": ("flik", "id"),  # derived in migrate()
+        "flik": "flik",  # derived in migrate()
+        "id": "id",  # the flik, plus a part number where a block is several polygons
         "agriculturalAreaType": "crop:code",  # de.iacs codes; agriculturalAreaType_txt is the label
-        "declaredArea": "metrics:area",  # in hectares, hence the area_is_in_ha default
         "validFrom": "determination:datetime",
     }
-    column_migrations = {
-        "validFrom": lambda col: pd.to_datetime(col, format="%d.%m.%Y"),
-    }
+    column_migrations = {"validFrom": lambda col: pd.to_datetime(col, format="%d.%m.%Y")}
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
-
         params = {
             "service": "WFS",
             "version": "2.0.0",
@@ -72,7 +72,27 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
         return gdf.set_crs("EPSG:25832", allow_override=True)
 
     def migrate(self, gdf):
+        # The 2023 and 2024 layers put the id in ID, beside the driver's own feature id,
+        # and carry no land cover class.
+        gdf["id"] = gdf.get("ID", gdf["id"])
+        gdf["agriculturalAreaType"] = gdf.get("agriculturalAreaType")
+
+        # split here: the base converter explodes only after it has checked the ids
+        gdf = self.split_multipart(gdf)
+
         # The FLIK is the last dot-separated segment of the id, e.g.
         # DE.HE.RP.DEHELI0004994212 -> DEHELI0004994212
-        gdf["flik"] = gdf["id"].str.rsplit(".", n=1).str[-1]
+        gdf["flik"] = gdf["id"].str.rsplit(".", n=1).str[-1].astype("string")
+
+        # a handful of blocks are several polygons; only the id has to tell the parts apart
+        gdf["id"] = gdf["flik"]
+        part = gdf.groupby("id").cumcount()
+        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype("string")
         return super().migrate(gdf)
+
+    def get_columns(self, gdf):
+        columns = super().get_columns(gdf)
+        if gdf["agriculturalAreaType"].isna().all():
+            # ship no crop column at all, rather than one that is empty in every row
+            columns = {k: v for k, v in columns.items() if not str(v).startswith("crop:")}
+        return columns

@@ -26,6 +26,7 @@ tests = [
     "de_sh",
     "de_bb",
     "ec_lt",
+    "ec_fr",
     "ec_lv",
     "ec_si",
     "fi",
@@ -69,6 +70,7 @@ tests = [
     "de_sl_block",
     "de_sl",
     "de_he",
+    "de_he#2023",
     "de_st",
     "it_bz",
     "de_sax",
@@ -84,6 +86,8 @@ extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
     "dk#2008": {"variant": "2008"},
+    # the fixture is the 2022 archive; the default is the latest year, 2024
+    "fr": {"variant": "2022"},
     # the fixture archive holds the 2024 edition only; the published one holds both
     "lt": {"variant": "2024"},
     # the fixture is the 2023 file; the converter's default is the newest edition
@@ -92,6 +96,8 @@ extra_convert_parameters = {
     "si": {"variant": "2023"},
     "be_vlg": {"variant": "2023"},
     "de_he": _input_files("de_he", "de_he.json"),
+    # the older layers publish no land cover class and no declared area
+    "de_he#2023": {"variant": "2023", **_input_files("de_he", "de_he_2023.json")},
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
     "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
     "es_cl": {
@@ -112,7 +118,7 @@ extra_convert_parameters = {
     "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
-    "lv": _input_files("lv", "1_100.xml"),
+    "lv": {"variant": "2024", **_input_files("lv", "lv_2024_lielriga.gpkg")},
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
     "jecam": _input_files("jecam", "BD_JECAM_CIRAD_2023_feb.shp"),
     "de_bw": _input_files("de_bw", "de_bw.json"),

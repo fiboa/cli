@@ -52,9 +52,6 @@ the geometry.
         return next(layer for layer in layers if layer["id"] == FIELD_BLOCK_LAYER)
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
-
         # All three snapshots live in one table and share their ID_LOCALID, so without this filter
         # every field block is returned three times. The mixin reads rest_params in get_data().
         self.rest_params = {"where": f"ID_VERSIONID='{self.variants[self.variant]}'"}

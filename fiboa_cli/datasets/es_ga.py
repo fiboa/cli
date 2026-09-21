@@ -74,6 +74,4 @@ SIXPAC information is relevant to farmers applying for these aid schemes, so tha
         return gdf[[c for c in self.columns if c in gdf.columns]]
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = next(iter(self.variants))
         return {"REST": self.rest_base_url.format(year=self.variant)}

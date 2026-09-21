@@ -54,10 +54,6 @@ geometric area of the polygon.
     column_migrations = {"Antragsjahr": lambda col: pd.to_datetime(col, format="%Y")}
 
     def get_urls(self):
-        latest = next(iter(self.variants))
-        if not self.variant:
-            self.variant = latest
-
         params = {
             "service": "WFS",
             "version": "2.0.0",

@@ -37,6 +37,8 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
     }
 
     area_is_in_ha = False
+    # the edition is the campaign; the variant is only known once convert() runs
+    use_variant_as_determination = True
 
     extensions = {
         "https://fiboa.org/crop-extension/v0.2.0/schema.yaml",
@@ -66,15 +68,6 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
             "cultivation_surface": {"type": "int32"},
         }
     }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if not self.variant:
-            self.variant = next(iter(self.variants))
-        self.column_additions = {
-            **self.column_additions,
-            "determination:datetime": f"{self.variant}-01-01T00:00:00Z",
-        }
 
     def layer_filter(self, layer: str, uri: str) -> bool:
         # GPKG contains the data layer plus several codelist tables (cod_*) — only read the data.

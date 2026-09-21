@@ -33,7 +33,5 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "code_bez": "crop:name",
         "code": "crop:code",
     }
-    # todo: The dataset has null values for crop code, but the crop extension
-    # requires a string. We set them to empty strings for now,
-    # but it should be reconsidered in the future.
-    column_migrations = {"code": lambda col: col.fillna("").astype(str)}
+    # NBF: areas in a field block the cadastre marks as not usable for agriculture (pylons, ditches, woods); no crop code
+    column_filters = {"tf_typ": lambda col: col != "NBF"}
