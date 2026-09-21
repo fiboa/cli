@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- DE-BB: leave out the NBF records (ineligible patches, not fields), which were published with an empty crop code
 - EC-FR: the 2018 RPG campaign, which IGN publishes no archive for, from EuroCrops
 - Update aiohttp, which since 3.13.5 accepts the two Content-Type headers Zenodo answers with; before that no EuroCrops converter could download on a cold cache
 - Put the easting in x whatever the source's CRS says: a source that honours EPSG's axis order ships its coordinates northing first (Jordbruksverket's shapefile declares it), while GeoParquet stores x, y — so the tiles, the STAC bbox and the collection-wide bbox all read such a file as (lat, lon). The swap keeps any z coordinate, so `--original-geometries` still delivers 3D geometries
