@@ -3,6 +3,7 @@ import re
 import unicodedata
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 import pyogrio
 from vecorel_cli.conversion.admin import AdminConverterMixin
@@ -294,12 +295,24 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         for entry in self.ec_mapping:
             key = normalise_crop_name(entry["original_name"])
             code = entry["original_code"]
-            # Two names carry two codes each: POUSIO as 089 and 89, which is one code
-            # zero-padded two ways, and AZEVEM as 067 and 076. Both AZEVEM codes map to
-            # HCAT3 3301090205 and both POUSIO codes to 3301110000, so the pair is
-            # indistinguishable downstream and the choice cannot change any output.
-            # min() picks the zero-padded spelling, which is how every other code in the
-            # file is written and the only one of the two POUSIO rows that matches it.
+            # Two names carry two codes each, and they are not the same case.
+            #
+            # POUSIO is 089 and 89: one code zero-padded two ways, identical in every
+            # other column, so the choice really cannot change any output. min() takes
+            # the zero-padded spelling, which is how every other code in the file is
+            # written.
+            #
+            # AZEVEM is 067 and 076, and those are two rows with the same hcat:code
+            # (3301090205) and hcat:name (lolium_ryegrass) but different translated_name:
+            # "ryegrass" for 067, "lolium" for 076. translated_name becomes hcat:name_en,
+            # so the pick is visible in the output on 35,597 rows across 2017-2019. It is
+            # a choice between two valid English renderings of one crop, not a distinction
+            # that matters, and dropping the name for being ambiguous would cost those
+            # rows their crop code for nothing. 067 is pinned deliberately: "ryegrass" is
+            # the common name, where "lolium" is the genus.
+            if key == "AZEVEM":
+                lookup[key] = "067"
+                continue
             if key not in lookup or code < lookup[key]:
                 lookup[key] = code
 
@@ -377,6 +390,46 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         )
         return ids.reindex(gdf.index)
 
+    def _perimeter_metres(self, geometry):
+        """Perimeter in metres, measured in each feature's own UTM zone.
+
+        A conformal projection is what length needs, and one zone will not do: Portugal
+        spans UTM 25N to 29N, and while 95% of fields are in 29N on the mainland, the
+        Azores fall in 25N and 26N and Madeira in 28N. Measured over a whole edition that
+        is 4.8% of features that a single-zone choice would get wrong.
+
+        This is not something the base converter can be left to do. It measures lengths in
+        UTM only for the parts of features it has split out of a multipolygon, not for
+        every row, so it does not produce metrics:perimeter in the general case at all.
+        And where it does run it calls estimate_utm_crs() once for the whole set, which
+        returns a single zone -- exactly the choice that is wrong for 4.8% of Portugal.
+        Any country spanning more than one zone has the same problem.
+        """
+        x = geometry.representative_point().x.to_numpy(dtype="float64")
+        # 2019 publishes 55 features with no geometry at all, and this runs in migrate,
+        # before the base converter drops them. Their zone is undefined, so they keep a
+        # NaN perimeter and are dropped a few steps later regardless.
+        located = np.isfinite(x)
+        # Portugal is entirely in the northern hemisphere, so the 326xx band applies.
+        epsg = np.zeros(len(x), dtype="int64")
+        epsg[located] = 32600 + (np.floor((x[located] + 180) / 6) + 1).astype("int64")
+
+        # Positional throughout: read_data concatenates the regional frames without
+        # reindexing, so the labels repeat and a label-based assignment would misalign.
+        out = np.full(len(x), np.nan, dtype="float64")
+        for code in np.unique(epsg[located]):
+            in_zone = epsg == code
+            out[in_zone] = geometry[in_zone].to_crs(f"EPSG:{int(code)}").length.to_numpy()
+        counts = ", ".join(
+            f"EPSG:{int(c)} {int((epsg == c).sum()):,}" for c in np.unique(epsg[located])
+        )
+        missing = int((~located).sum())
+        self.info(
+            f"Perimeter measured per UTM zone ({counts})"
+            + (f"; {missing:,} row(s) without a geometry left unmeasured" if missing else "")
+        )
+        return out
+
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         # 2025 renamed the crop code column and dropped the crop name.
         if "PUN_CUL_CO" in gdf.columns:
@@ -411,9 +464,13 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             # reprojected to WGS 84 in file_migration and land here too: 2020 and 2021
             # publish no area at all, and for 2022 the recomputed values differ from the
             # provider's by 0.02% over the country (0.05% at worst, in the Azores).
-            metric = gdf.geometry.to_crs("EPSG:6933")
-            gdf["Shape_Area"] = metric.area
-            gdf["Shape_Length"] = metric.length
+            #
+            # Area and length need different projections. EPSG:6933 is equal-area, so it
+            # is right for area and wrong for length: measured against UTM over 100,000
+            # polygons per edition it puts a third of every edition more than 5% out, with
+            # a signed spread from -10% to +12% depending on how a polygon is oriented.
+            gdf["Shape_Area"] = gdf.geometry.to_crs("EPSG:6933").area
+            gdf["Shape_Length"] = self._perimeter_metres(gdf.geometry)
 
         # 2017-2019 leave the crop NULL where the source published no crop column, published
         # a NULL value (the common case), or used a name pt.csv does not carry: together
@@ -547,7 +604,11 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         if self.variant not in MEMBERS:
             return gdf
 
-        name = layer or os.path.basename(path)
+        # OVERLAPPING_MEMBERS is keyed on the layer name, which for a shapefile is the
+        # basename without its extension. layer is always set for these editions, so the
+        # fallback never runs today, but it would return "<stem>.shp" and silently miss
+        # the key; strip the extension so the two can never disagree.
+        name = layer or os.path.splitext(os.path.basename(path))[0]
         crs_before = gdf.crs.name if gdf.crs else None
         # The regions arrive in different projections -- the mainland in ETRS89 / Portugal
         # TM06, Madeira and the two Azores groups each in their own UTM zone -- so they have
