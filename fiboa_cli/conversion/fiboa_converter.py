@@ -99,7 +99,9 @@ class FiboaBaseConverter(BaseConverter):
                 # the parts of one source feature inherited its area and perimeter
                 parts = gdf.geometry[split]
                 if area_key in gdf.columns:
-                    factor = 10_000 if self.area_is_in_ha else 1
+                    factor = (
+                        10_000 if self.area_is_in_ha and not self.area_calculate_missing else 1
+                    )
                     gdf.loc[split, area_key] = in_metres(parts).area / factor
                 perimeter_key = self._source_column(PERIMETER_KEY)
                 if perimeter_key in gdf.columns:
