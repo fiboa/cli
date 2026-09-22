@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- PL: add pl_block, the maximum eligible area (MKO JPO) of Poland's LPIS from ARiMR's geoportal, one shapefile per voivodeship; a parcel's eligible area can be several patches, which are split into numbered parts with their own area
 - Add spelling fixes to HCAT codes for DE-BB, DE-NDS, EC-SI with csv_supplements
 - DE-BB: leave out the NBF records (ineligible patches, not fields), which were published with an empty crop code
 - EC-FR: the 2018 RPG campaign, which IGN publishes no archive for, from EuroCrops
