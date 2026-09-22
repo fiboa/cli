@@ -36,8 +36,6 @@ where the Physical_Blocks layers of the same service also carry forest, urban an
     """
     # The layer carries no area column; the blocks are in UTM 35N metres.
     area_calculate_missing = True
-    # Only the campaign is known, not a date per block.
-    use_variant_as_determination = True
     # PHBIDENT identifies the block, and a block is listed once per usage — and
     # sometimes twice for the same usage (42 blocks of the 226,592 in 2025, 40
     # of them with the same code), so the row position identifies the polygon.

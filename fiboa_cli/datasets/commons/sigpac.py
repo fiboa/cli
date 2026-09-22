@@ -23,7 +23,6 @@ class SigpacRecintoMixin:
     }
     # dn_surface is in square metres: median 2,340, largest 8.5 million
     area_is_in_ha = False
-    use_variant_as_determination = True
 
     def get_urls(self):
         listing = requests.get(f"{HUB}/geopackages/{self.variant}/recintos/", timeout=120)

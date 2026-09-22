@@ -19,5 +19,3 @@ class LTConverter(EuroLandBaseConverter):
         str(year): {f"{BASE}/LT_years_2024-2025.zip": [f"GSA-LT-{year}.geoparquet"]}
         for year in (2025, 2024)
     }
-    # The inventory carries no per-feature date, so the edition is the year.
-    use_variant_as_determination = True

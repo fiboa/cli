@@ -33,7 +33,6 @@ SIXPAC information is relevant to farmers applying for these aid schemes, so tha
 
     variants = {str(year): str(year) for year in range(2026, 2014 - 1, -1)}
     use_code_attribute = "USO_SIGPAC"
-    use_variant_as_determination = True
 
     rest_base_url = (
         "https://ideg.xunta.gal/servizos/rest/services/ParcelasCatastrais/SIXPAC_{year}/MapServer"
