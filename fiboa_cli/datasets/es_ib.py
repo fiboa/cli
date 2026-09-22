@@ -67,6 +67,7 @@ class ESIBConverter(EsriRESTConverterMixin, ESBaseConverter):
     rest_base_url = CURRENT
     # Both services join their parcels to the municipality and land-use tables,
     # so their fields arrive table-qualified; the REST mixin strips the prefixes.
+    # ArcGIS resolves the bare field name in `where` even on those joined layers.
     rest_params = {
         "where": "USO_SIGPAC NOT IN ('AG','CA','ED','FO','IM','IS','IV','TH','ZC','ZU','ZV','MT')"
     }
