@@ -64,11 +64,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
 - Declared the `beautifulsoup4` dependency used by ES-PV and ES-VC.
-- Dropped cached error pages for REST converters.
 - REST converters:
-  - Cached pages are keyed by service and filter as well as layer; every `SIXPAC_<year>` service numbers its layers alike and DE-ST selects its edition by filter alone, so one edition's cache could serve another.
-  - A cached page's name carries its id window, so a page kept under another `maxRecordCount` cannot silently swallow the ids above its own bound. Pages cached under the old names are fetched again.
-  - Esri error bodies answered as HTTP 200 and broken downloads are no longer kept as cached pages.
+  - A cached page is identified by service, layer, filter and its exact id window: layer ids repeat across services (every `SIXPAC_<year>` numbers them alike), DE-ST selects its edition by filter alone, and a page kept under another `maxRecordCount` would silently drop the ids above its own bound. Pages cached under the old names are fetched again.
+  - Error responses — including Esri error bodies answered as HTTP 200 — and broken downloads are no longer kept as cached pages.
   - Joined layers qualify field names (`RECINTOS.OBJECTID`), which made the paging filter match nothing and return everything; the qualified key field is now discovered, and a join's table prefixes are stripped from the output columns.
 - Fixed `use_variant_as_determination` so determination dates are retained.
 - Multipart geometries now get recomputed area/perimeter for split parts.
