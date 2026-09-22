@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - PL: add pl, the crops farmers declared to ARiMR ("Uprawy rolne deklarowane GSA"), campaigns 2025 and 2026, read from the geoportal's WFS in 50,000-feature pages; the source has no crop code, so the Polish crop name is the code
+- PL: add pl_block, the maximum eligible area (MKO JPO) of Poland's LPIS from ARiMR's geoportal, one shapefile per voivodeship; a parcel's eligible area can be several patches, which are split into numbered parts with their own area
+- Add spelling fixes to HCAT codes for DE-BB, DE-NDS, EC-SI with csv_supplements
 - DE-BB: leave out the NBF records (ineligible patches, not fields), which were published with an empty crop code
 - EC-FR: the 2018 RPG campaign, which IGN publishes no archive for, from EuroCrops
 - Update aiohttp, which since 3.13.5 accepts the two Content-Type headers Zenodo answers with; before that no EuroCrops converter could download on a cold cache
