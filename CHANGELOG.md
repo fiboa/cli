@@ -45,7 +45,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - ES-AR now reads municipality SIGPAC sources listed by IDEAragon.
   - ES-GA now supports editions 2014-2026.
 - FI: Editions are now available by year (2020-2025).
-- FR: Updated converter support for 2021 and 2022 files.
+- FR: Editions now cover 2017-2024, mapped through one shared crop code list (https://fiboa.org/code/fr/fr.csv).
 - HR: Editions now cover 2011-2024.
 - LV:
   - Editions now cover 2015-2025 from yearly data.gov.lv releases.
@@ -96,6 +96,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - ES-EX and ES-NC now read FEGA national recinto releases (2025, 2026) because the regional portals are unavailable.
   - ES-MD now finds `RECINTO.shp` regardless of archive folder layout.
 - Europe-LAND: Empty source crop codes now fall back to crop names (for example LT 2024).
+- FR:
+  - Crop codes introduced after the 2018 EuroCrops table (for example JAC, the most common code of 2024) now map to HCAT; 7.50% of the 2024 fields were unmapped before.
+  - `id` is the RPG parcel id plus a part number where it repeats (multipart splits, reissued ids); the source value is kept as `parcel_id`.
 - IE: Uses stable feature IDs and publishes computed `metrics:area` when missing from source.
 - JP: Uses campaign-specific determination dates and DuckDB conversion path.
 - LT: Updated to Europe-LAND v1.3 with 2025 coverage.

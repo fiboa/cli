@@ -94,8 +94,6 @@ extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
     "dk#2008": {"variant": "2008"},
-    # the fixture is the 2022 archive; the default is the latest year, 2024
-    "fr": {"variant": "2022"},
     # the fixture archive holds the 2024 edition only; the published one holds both
     "lt": {"variant": "2024"},
     # the fixture is the 2023 file; the converter's default is the newest edition
@@ -125,6 +123,8 @@ extra_convert_parameters = {
     "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
     "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
+    # the fixture is the 2022 archive; the converter's default is the newest edition
+    "fr": {"variant": "2022"},
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": {"variant": "2024", **_input_files("lv", "lv_2024_lielriga.gpkg")},
     # the code list is minted for this dataset, so read it from the fixture folder
