@@ -6,49 +6,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- ML variants of five converters — ai4sf_ml, india_10k_ml, de_fusion_ml, za_fusion_ml and rw_rwanda_ml — publish each field's train/val/test assignment as a required `split` column through the new `MlSplitsMixin`; de_fusion, za_fusion (ESA Fusion Competition) and rw_rwanda (NASA Harvest Rwanda) are new converters serving as their bases
-- DE-BB: leave out the NBF records (ineligible patches, not fields), which were published with an empty crop code
-- EC-FR: the 2018 RPG campaign, which IGN publishes no archive for, from EuroCrops
-- Update aiohttp, which since 3.13.5 accepts the two Content-Type headers Zenodo answers with; before that no EuroCrops converter could download on a cold cache
-- Put the easting in x whatever the source's CRS says: a source that honours EPSG's axis order ships its coordinates northing first (Jordbruksverket's shapefile declares it), while GeoParquet stores x, y — so the tiles, the STAC bbox and the collection-wide bbox all read such a file as (lat, lon). The swap keeps any z coordinate, so `--original-geometries` still delivers 3D geometries
-- ES regions: map the SIGPAC land use to HCAT through `AddHCATMixin` on the shared base converter, so es_an, es_ar, es_cb, es_cl, es_cm, es_ex, es_ga, es_ib, es_md, es_nc, es_pv and es_vc publish `hcat:code`; the code list gains EP (elemento del paisaje), which five regions publish and which had no `crop:name`
-- ES-CAT, ES-CN: map the crop codes to HCAT through `AddHCATMixin`; the published Catalan code list lacked 34 codes the bundled table maps
-- CH: download the freely available cantons from geodienste.ch's per-canton STAC catalog instead of requiring a manual export via `-i`, and derive `id` from the canton code and `nutzungsidentifikator` instead of the row index, which repeated across input files
-- CH: publish `lnf_code` as `crop:code`; the crop extension requires it and the output failed validation without it
-- EE: mint a crop code — PRIA publishes the crop as free text and none of its own, and the crop extension requires `crop:code` and `crop:code_list` — and publish taotletud_maakasutus as `land_use` (arable, permanent grassland, restored grassland, permanent crops, black fallow) — the only classification the source has, since it publishes the crop as free text and no crop code at all; and keep pollu_id as `parcel_id`, because it repeats in a few rows of some editions (16 of the 165,244 in 2016); and a first test with a fixture
-- Adopt vecorel-cli 0.2.20, whose `convert()` chooses the latest year as the variant when `--variant` is not given (the first declared variant where they are not years). The converters that repeated that default in their own `get_urls()` (DE-BW, DE-HE, DE-ST, ES, ES-AN, ES-CB, ES-CM, ES-EX, ES-GA, ES-IB, ES-VC) drop it, LV gets it (it ran only with an explicit `--variant`), and the defaults of ES-PV (2024) and FR (2022) move to their latest years, 2025 and 2024, like every other converter
-- `FiboaBaseConverter.split_multipart()` marks the rows it splits and `post_migrate()` recomputes their area and perimeter: the parts had inherited the values of the whole feature (LV, DE-SL, DE-SL-Block)
-- LV: `get_urls` requires the nine regional GeoPackages of a campaign instead of any two, so a package that lost a region is not published as a partial edition
-- LV: editions 2015-2025 from the yearly releases on data.gov.lv, so an edition is the campaign it holds rather than the day it was downloaded; the field block becomes block_id, crop:name comes from the code list because the files carry only the code, one merged list (https://fiboa.org/code/lv/lv.csv) covers the 34 codes the register added after EuroCrops' 2021 table, and the id is minted because objectid restarts in every regional file
-- Adopt vecorel-cli 0.2.18, which carries the checks this repository was growing its own copies of: rows that cannot validate are dropped bounded by `max_dropped_share`, the required properties come from the declared schemas, ids are checked for uniqueness, a converter may not declare both `sources` and `variants`, and the schemas are fetched before any source data
-- JP: convert through vecorel-cli's DuckDB converter instead of a copy of it in this repository
-- HR: drop the rolling `sources`, which overruled every `--variant`
-- Europe-LAND: use the crop name as the crop code where the release ships an empty `crop_code` (LT 2024)
-- SE: eleven editions, 2015-2025 — the campaign is a filter on one WFS layer, so every year the service holds is a variant (it answers 2015 through 2025), over https because the http URL redirects
-- BG: the ministry's GeoServer publishes Agricultural_Land_<year> for 2021-2025, not the Arable_Land_2024 the converter asked for; the 2021 and 2022 layers are a different release again (block and usage in one ELGIDENT field, with an area column the later ones lack), PHBIDENT identifies the block rather than the polygon so it is published as block_id, and the Bulgarian names need UTF-8 forced because GeoServer writes the charset into a .cst file GDAL does not read
-- SK: nine editions, 2018-2026, from the per-campaign datasets on data.slovensko.sk (the single edition was labelled by its download year and held the 2024 file); the crop names are matched with their no-break spaces normalised, which alone maps 102,835 grassland fields
-- CZ: support the GPZ_DP schema of the 2019-2022 editions (renamed crop/area columns, no application date, ENTITA_ID is the block), recover the crop codes the 2020 edition leaves empty, map the 120 crop codes EuroCrops does not carry, and publish a declaration that straddles two land blocks once
-- Add DuckDB BaseConverter for efficiently transforming large datasets
-- Fix `use_variant_as_determination`: the determination:datetime column was dropped again because it was not listed in `columns` (affected DK, HR)
-- Declare the beautifulsoup4 dependency that the ES-PV and ES-VC converters import
-- EE: name the cached WFS responses (ee_gsaa_<year>.gml)
-- ES-MD: the archive no longer nests RECINTO.shp in a folder
-- SK: KODKD is the (non-unique, sometimes empty) LPIS block code, keep it as block_id and use the row index as id
-- ES-CM: always read the year-named SIGPAC service (the unnamed one moved on to 2025 with a different id field)
-- REST converters: do not keep an error response as a cached page
-- ES-CB: determination date from the variant year (was an empty string, which broke the STAC temporal extent)
-- ES-CAT: the 2024 download is a shapefile package, not a GeoPackage; 34 crop names new in 2024 added to the mapping
-- CZ: find the shapefile in nested archive folders (2026)
-- Add an option so that EuroCrops mapping tables can declare supplementary HCAT/crop mappings via `ec_mapping_supplements`
-- DE-BB: read the shapefile as cp1252 (its .cpg wrongly says UTF-8)
-- NL: new PDOK download location (rvo/gewaspercelen/atom), add the 2026 concept edition
-- DE-TH: note the INSPIRE download service
-- Drop rows without a crop:code (required by the crop extension) with a warning instead of failing the conversion (BE-VLG 2023, ES-CN had one such row each); more than 1% missing is an error
-- Europe-LAND converters: use crop_name as crop:code when the file's crop_code column is empty (LT 2024)
-- BE-VLG: derive determination:datetime from the variant year instead of a constant date
-- `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It creates GeoParquet, PMTiles and a STAC Collection with relative links, `file:size`/`file:checksum` and a web-map-links v1.3.0 `pmtiles` link. Publishing is done by catalogs such as the [harmonized field data catalog](https://github.com/fieldsoftheworld/harmonized-field-data-catalog).
-- IE: the feature id is the id, because localId is the LPIS parcel reference and repeats where a parcel is declared twice (214 of the 1,027,438 rows of 2022); it is published as `parcel_id`, and the parcels get a `metrics:area` computed from their geometry, which the GML does not carry
-- The nine converters that publish field blocks say so in their title: at_block, de_bb_block, de_mv, de_nds_block, de_nrw, de_sh, de_th, lu and nl_block read "Field blocks for ...", where five of them read "Field boundaries" like the crop-field collections
 
 ### Added
 - Added `FiboaDuckDBBaseConverter` for SQL-based conversion of large Parquet sources.
@@ -56,9 +13,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added support for supplementary HCAT/crop mappings via `ec_mapping_supplements`.
 - Added support for Esri JSON output and server-side filters in REST converters.
 - Added a test guard that rejects fixture files larger than 5 MB.
+- Added ML variants of converters (`ai4sf_ml`, `de_fusion_ml`, `india_10k_ml`, `rw_rwanda_ml`, `za_fusion_ml`) that publish each field's train/val/test split.
 - AT: Added support for 2018 by extracting archives before reading.
 - DE-BW: Added Baden-Württemberg reference parcels converter.
 - DE-BY-BLOCK: Added Bavaria field-block converter.
+- DE-FUSION: Added Brandenburg converter based on the ESA Fusion Competition dataset.
 - DE-HE: Added Hesse reference parcels converter.
 - DE-SL-BLOCK: Added Saarland field-block converter.
 - DE-ST: Added Saxony-Anhalt field-block converter.
@@ -69,6 +28,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - PL:
   - Added `pl` with campaigns 2025 and 2026 from ARiMR's declared-crop dataset.
   - Added `pl_block` with Poland LPIS maximum eligible area parcels from ARiMR.
+- RW-RWANDA: Added Rwanda converter based on the NASA Harvest field-boundary competition dataset.
+- ZA-FUSION: Added South Africa converter based on the ESA Fusion Competition dataset.
 
 ### Changed
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
