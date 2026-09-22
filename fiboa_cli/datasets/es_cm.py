@@ -30,7 +30,6 @@ the identification basis for any type of aid related to the surface area.
     }
     use_code_attribute = "USO_SIGPAC"
     area_is_in_ha = False
-    use_variant_as_determination = True
     missing_schemas = {
         "properties": {
             "admin_province_code": {"type": "string"},

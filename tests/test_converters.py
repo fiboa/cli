@@ -205,6 +205,79 @@ def test_split_multipart_recomputes_the_metrics_of_the_parts():
     assert gdf["shape_length"].tolist() == [40.0, 80.0, 60.0]
 
 
+def _determination_converter(**attrs):
+    from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+
+    columns = attrs.pop("columns", {"geometry": "geometry", "id": "id"})
+    return type("Converter", (FiboaBaseConverter,), {"id": "det", "columns": columns, **attrs})()
+
+
+def _post_migrate(converter, variant):
+    converter.variant = variant
+    gdf = gpd.GeoDataFrame(
+        {"id": ["a", "b"]},
+        geometry=[Point(0, 0), Point(1, 1)],
+        crs="EPSG:4326",
+    )
+    return converter.post_migrate(gdf)
+
+
+def test_year_variants_default_to_the_variant_as_determination():
+    """Without an explicit setting, year-like variants fill the determination date
+    from the chosen variant (fiboa/cli#284)."""
+    converter = _determination_converter(variants={str(y): str(y) for y in range(2024, 2019, -1)})
+    gdf = _post_migrate(converter, "2023")
+    assert gdf["determination:datetime"].tolist() == ["2023-01-01T00:00:00Z"] * 2
+
+
+def test_historical_year_variants_default_to_the_variant_as_determination():
+    """The year range reaches back to 1900, so pre-2000 historical editions qualify too."""
+    converter = _determination_converter(variants={"1995": "1995", "1996": "1996"})
+    gdf = _post_migrate(converter, "1995")
+    assert gdf["determination:datetime"].tolist() == ["1995-01-01T00:00:00Z"] * 2
+
+
+def test_non_year_variants_do_not_default_to_determination():
+    """Variants that are not years (e.g. region codes) carry no determination date."""
+    converter = _determination_converter(variants={"north": "north", "south": "south"})
+    gdf = _post_migrate(converter, "north")
+    assert "determination:datetime" not in gdf.columns
+
+
+def test_no_variants_do_not_default_to_determination():
+    converter = _determination_converter(variants={})
+    gdf = _post_migrate(converter, None)
+    assert "determination:datetime" not in gdf.columns
+
+
+def test_a_mapped_determination_is_not_overwritten_by_the_variant():
+    """A converter that maps its own determination:datetime keeps it, even with year
+    variants: the default only fills the gap, it never overrides."""
+    converter = _determination_converter(
+        variants={"2023": "2023"},
+        columns={"geometry": "geometry", "id": "id", "campaign": "determination:datetime"},
+    )
+    gdf = _post_migrate(converter, "2023")
+    # the source column is renamed after post_migrate, so it is untouched here
+    assert "determination:datetime" not in gdf.columns
+
+
+def test_explicit_false_overrides_the_year_variant_default():
+    converter = _determination_converter(
+        variants={"2023": "2023"}, use_variant_as_determination=False
+    )
+    gdf = _post_migrate(converter, "2023")
+    assert "determination:datetime" not in gdf.columns
+
+
+def test_explicit_true_fills_determination_for_non_year_variants():
+    converter = _determination_converter(
+        variants={"spring": "spring"}, use_variant_as_determination=True
+    )
+    gdf = _post_migrate(converter, "spring")
+    assert gdf["determination:datetime"].tolist() == ["spring-01-01T00:00:00Z"] * 2
+
+
 def test_a_variant_without_crops_drops_the_crop_promises():
     """DK 2008 publishes fields without a crop, so it may not claim the schemas.
 

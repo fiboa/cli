@@ -6,6 +6,7 @@ from ..fiboa.version import get_fiboa_uri
 
 AREA_KEY = "metrics:area"
 PERIMETER_KEY = "metrics:perimeter"
+DETERMINATION_KEY = "determination:datetime"
 # marks the rows that split_multipart() made out of one source feature
 SPLIT_KEY = "__split_part"
 
@@ -20,7 +21,10 @@ def _swap_xy(coords):
 class FiboaBaseConverter(BaseConverter):
     area_is_in_ha = True
     area_calculate_missing = False
-    use_variant_as_determination = False
+    # None (the default) resolves per edition: a converter whose variants are years
+    # and that maps no determination:datetime of its own takes the variant year as
+    # the determination date. Set True/False to force it on or off. See #284.
+    use_variant_as_determination = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -49,6 +53,31 @@ class FiboaBaseConverter(BaseConverter):
             if target == mapped or (isinstance(mapped, (list, tuple)) and target in mapped):
                 return source
         return None
+
+    def _variants_are_years(self):
+        """Whether every declared variant is a year in the range 1900–2100."""
+        return bool(self.variants) and all(
+            str(v).isdigit() and 1900 <= int(v) <= 2100 for v in self.variants
+        )
+
+    def _determination_provided(self, gdf):
+        """Whether the converter already supplies determination:datetime — mapped from a
+        source column, added as a constant, or present on the frame — so the variant year
+        must not overwrite it. The column renames come after post_migrate(), so a mapped
+        determination still lives under its source name here."""
+        return (
+            DETERMINATION_KEY in gdf.columns
+            or self._source_column(DETERMINATION_KEY) is not None
+            or DETERMINATION_KEY in (self.column_additions or {})
+        )
+
+    def _use_variant_as_determination(self, gdf):
+        """Resolve use_variant_as_determination for this edition. An explicit True/False
+        wins; the default (None) fills the determination date from the variant only when
+        the variants are years and the converter provides no determination itself (#284)."""
+        if self.use_variant_as_determination is not None:
+            return self.use_variant_as_determination
+        return self._variants_are_years() and not self._determination_provided(gdf)
 
     @staticmethod
     def _traditional_axis_order(gdf):
@@ -121,6 +150,6 @@ class FiboaBaseConverter(BaseConverter):
             # convert area in ha to meters
             gdf[area_key] = gdf[area_key].astype(float) * 10_000
 
-        if self.use_variant_as_determination:
-            gdf["determination:datetime"] = f"{self.variant}-01-01T00:00:00Z"
+        if self._use_variant_as_determination(gdf):
+            gdf[DETERMINATION_KEY] = f"{self.variant}-01-01T00:00:00Z"
         return gdf
