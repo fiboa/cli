@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- PT: the 2025 edition, whose layers, crop column and area units all changed, and CUL_ID as the identifier
 - US CSB: editions 2017-2024 from the single archive, and numbered fields because the dissolve leaves no source identifier
 - ES-AR: per-municipality SIGPAC files listed from IDEAragon
 - LT: read Europe-LAND v1.3, which carries 2025 beside 2024

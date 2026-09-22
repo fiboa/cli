@@ -35,6 +35,7 @@ tests = [
     "nl",
     "nl_block",
     "pt",
+    "pt#2025",
     "dk",
     "be_wal",
     "se",
