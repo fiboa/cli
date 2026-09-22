@@ -45,7 +45,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - ES-AR now reads municipality SIGPAC sources listed by IDEAragon.
   - ES-GA now supports editions 2014-2026.
 - FI: Editions are now available by year (2020-2025).
-- FR: Updated converter support for 2021 and 2022 files.
+- FR: Editions now cover 2017-2024, mapped through one shared crop code list (https://fiboa.org/code/fr/fr.csv).
 - HR: Editions now cover 2011-2024.
 - LV:
   - Editions now cover 2015-2025 from yearly data.gov.lv releases.
@@ -96,46 +96,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - ES-EX and ES-NC now read FEGA national recinto releases (2025, 2026) because the regional portals are unavailable.
   - ES-MD now finds `RECINTO.shp` regardless of archive folder layout.
 - Europe-LAND: Empty source crop codes now fall back to crop names (for example LT 2024).
+- FR:
+  - Crop codes introduced after the 2018 EuroCrops table (for example JAC, the most common code of 2024) now map to HCAT; 7.50% of the 2024 fields were unmapped before.
+  - `id` is the RPG parcel id plus a part number where it repeats (multipart splits, reissued ids); the source value is kept as `parcel_id`.
 - IE: Uses stable feature IDs and publishes computed `metrics:area` when missing from source.
 - JP: Uses campaign-specific determination dates and DuckDB conversion path.
 - LT: Updated to Europe-LAND v1.3 with 2025 coverage.
 - SK: Fixed edition selection, crop-name matching and block/id handling across campaigns.
-- Declare the beautifulsoup4 dependency the ES-PV and ES-VC converters import
-- ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
-- A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
-- ES-MD: find RECINTO.shp wherever the archive puts it
-- FR: editions 2017-2024, one crop code list covering all of them (https://fiboa.org/code/fr/fr.csv) instead of the 2018 list alone, and RPG's parcel id published as parcel_id because it repeats in 2024
-- Update vecorel-cli to v0.2.17:
-  - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
-  - GeoJSON files with a byte order mark no longer fail to read
-  - Drop the per-converter UTF-8 workarounds in de_bw and de_he, now redundant
-- Converter for Spain (whole), based on the FEGA 2025+ data
-- Add Italy Tuscany (IT-1) basd on EuroCrops v2
-- Suuport multiple years for CZ
-- Multiple years for DE_sh
-- Multiple year support for HR
-- Introduce FiboaBaseConverter.use_variant_as_determination for setting proper determination_date
-- Update years for DK (2025, 2026)
-- Update fr-converter to support 2021/2022 files
-- Converter for Baden-Württemberg, Germany (GISELa LPIS reference parcels, 2018-2022)
-- Converter for Lithuania KŽS reference parcels (lt_kzs), reading the geoportal.lt ArcGIS REST service
-- Support Esri JSON and server-side filters in EsriRESTConverterMixin (rest_format, rest_params["where"])
-- Converter for Bavaria, Germany LPIS field blocks (de_by_block)
-- Converter for Hesse, Germany LPIS reference parcels
-- Converter for Saxony-Anhalt, Germany LPIS field blocks (de_st)
-- Converter for Saarland, Germany LPIS field blocks (de_sl_block)
-- Fix parcel sizes written in scientific notation being read 10,000x too large (de_sl_block parser)
-- Repair the Saarland, Germany converter (de_sl), which could no longer read its source at all.
-  It now pages through the whole dataset, where the previous six hardcoded bounding boxes reached
-  only 20,300 of 54,038 parcels, so earlier output was incomplete. `metrics:area` is derived from
-  the geometry, because the service stopped publishing the declared size.
-- Converter for South Tyrol, Italy (it_bz), reading the province's LAFIS utilised agricultural area
-- Update vecorel-cli to v0.2.16:
-  - Converter output is sorted by Hilbert distance
-  - Commands exit with a non-zero exit code when they report a failure
-  - Collection-only properties are kept when merging collections
-  - Default GeoParquet compression is now zstd (level 15), configurable via `--compression_level`
-- DE-SH: make the 2023, 2025 and 2026 editions convert — glob the GeoPackage inside the archive (2023 was written with user_version = 0, so the archive alone matches no driver), parse fachguelti as DD.MM.YYYY, and map the 2023 and upper-case 2025/2026 column spellings that silently dropped determination:datetime and metrics:area (their area is text with a decimal comma)
 
 ## [v0.21.0] - 2026-02-16
 
