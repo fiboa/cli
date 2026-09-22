@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 - LV: editions 2015-2025 from the yearly releases on data.gov.lv, so an edition is the campaign it holds rather than the day it was downloaded; the field block becomes block_id, crop:name comes from the code list because the files carry only the code, one merged list (https://fiboa.org/code/lv/lv.csv) covers the 28 codes the register added after EuroCrops' 2021 table, and the id is minted because objectid restarts in every regional file
 - ES-EX, ES-NC: read the SIGPAC recintos from FEGA's national release, in editions 2025 and 2026 — neither region's own portal answers any more (sitex.gobex.es, sigpac.navarra.es)
+- PL: add pl, the crops farmers declared to ARiMR ("Uprawy rolne deklarowane GSA"), campaigns 2025 and 2026, read from the geoportal's WFS in 50,000-feature pages; the source has no crop code, so the Polish crop name is the code
+- PL: add pl_block, the maximum eligible area (MKO JPO) of Poland's LPIS from ARiMR's geoportal, one shapefile per voivodeship; a parcel's eligible area can be several patches, which are split into numbered parts with their own area
+- Add spelling fixes to HCAT codes for DE-BB, DE-NDS, EC-SI with csv_supplements
 - DE-BB: leave out the NBF records (ineligible patches, not fields), which were published with an empty crop code
 - EC-FR: the 2018 RPG campaign, which IGN publishes no archive for, from EuroCrops
 - Update aiohttp, which since 3.13.5 accepts the two Content-Type headers Zenodo answers with; before that no EuroCrops converter could download on a cold cache
@@ -56,6 +59,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
+- PT: the 2025 edition, whose layers, crop column and area units all changed, and CUL_ID as the identifier
 - US CSB: editions 2017-2024 from the single archive, and numbered fields because the dissolve leaves no source identifier
 - ES-AR: per-municipality SIGPAC files listed from IDEAragon
 - LT: read Europe-LAND v1.3, which carries 2025 beside 2024
