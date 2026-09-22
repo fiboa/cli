@@ -6,24 +6,39 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- LV: editions 2015-2025 from the yearly releases on data.gov.lv, so an edition is the campaign it holds rather than the day it was downloaded; the field block becomes block_id, crop:name comes from the code list because the files carry only the code, one merged list (https://fiboa.org/code/lv/lv.csv) covers the 28 codes the register added after EuroCrops' 2021 table, and the id is minted because objectid restarts in every regional file
-- ES-EX, ES-NC: read the SIGPAC recintos from FEGA's national release, in editions 2025 and 2026 — neither region's own portal answers any more (sitex.gobex.es, sigpac.navarra.es)
-- PL: add pl, the crops farmers declared to ARiMR ("Uprawy rolne deklarowane GSA"), campaigns 2025 and 2026, read from the geoportal's WFS in 50,000-feature pages; the source has no crop code, so the Polish crop name is the code
-- PL: add pl_block, the maximum eligible area (MKO JPO) of Poland's LPIS from ARiMR's geoportal, one shapefile per voivodeship; a parcel's eligible area can be several patches, which are split into numbered parts with their own area
-- Add spelling fixes to HCAT codes for DE-BB, DE-NDS, EC-SI with csv_supplements
-- DE-BB: leave out the NBF records (ineligible patches, not fields), which were published with an empty crop code
-- EC-FR: the 2018 RPG campaign, which IGN publishes no archive for, from EuroCrops
-- Update aiohttp, which since 3.13.5 accepts the two Content-Type headers Zenodo answers with; before that no EuroCrops converter could download on a cold cache
-- Put the easting in x whatever the source's CRS says: a source that honours EPSG's axis order ships its coordinates northing first (Jordbruksverket's shapefile declares it), while GeoParquet stores x, y — so the tiles, the STAC bbox and the collection-wide bbox all read such a file as (lat, lon). The swap keeps any z coordinate, so `--original-geometries` still delivers 3D geometries
-- ES regions: map the SIGPAC land use to HCAT through `AddHCATMixin` on the shared base converter, so es_an, es_ar, es_cb, es_cl, es_cm, es_ex, es_ga, es_ib, es_md, es_nc, es_pv and es_vc publish `hcat:code`; the code list gains EP (elemento del paisaje), which five regions publish and which had no `crop:name`
-- ES-CAT, ES-CN: map the crop codes to HCAT through `AddHCATMixin`; the published Catalan code list lacked 34 codes the bundled table maps
-- CH: download the freely available cantons from geodienste.ch's per-canton STAC catalog instead of requiring a manual export via `-i`, and derive `id` from the canton code and `nutzungsidentifikator` instead of the row index, which repeated across input files
-- CH: publish `lnf_code` as `crop:code`; the crop extension requires it and the output failed validation without it
-- EE: mint a crop code — PRIA publishes the crop as free text and none of its own, and the crop extension requires `crop:code` and `crop:code_list` — and publish taotletud_maakasutus as `land_use` (arable, permanent grassland, restored grassland, permanent crops, black fallow) — the only classification the source has, since it publishes the crop as free text and no crop code at all; and keep pollu_id as `parcel_id`, because it repeats in a few rows of some editions (16 of the 165,244 in 2016); and a first test with a fixture
-- Adopt vecorel-cli 0.2.20, whose `convert()` chooses the latest year as the variant when `--variant` is not given (the first declared variant where they are not years). The converters that repeated that default in their own `get_urls()` (DE-BW, DE-HE, DE-ST, ES, ES-AN, ES-CB, ES-CM, ES-EX, ES-GA, ES-IB, ES-VC) drop it, LV gets it (it ran only with an explicit `--variant`), and the defaults of ES-PV (2024) and FR (2022) move to their latest years, 2025 and 2024, like every other converter
-- `FiboaBaseConverter.split_multipart()` marks the rows it splits and `post_migrate()` recomputes their area and perimeter: the parts had inherited the values of the whole feature (LV, DE-SL, DE-SL-Block)
-- LV: `get_urls` requires the nine regional GeoPackages of a campaign instead of any two, so a package that lost a region is not published as a partial edition
-- LV: editions 2015-2025 from the yearly releases on data.gov.lv, so an edition is the campaign it holds rather than the day it was downloaded; the field block becomes block_id, crop:name comes from the code list because the files carry only the code, one merged list (https://fiboa.org/code/lv/lv.csv) covers the 34 codes the register added after EuroCrops' 2021 table, and the id is minted because objectid restarts in every regional file
+
+### Added
+- PL:
+  - Added `pl` with campaigns 2025 and 2026 from ARiMR's declared-crop dataset.
+  - Added `pl_block` with Poland LPIS maximum eligible area parcels from ARiMR.
+
+### Changed
+- `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
+- Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
+- Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
+- Adopt vecorel-cli 0.2.20; converters now consistently default to their latest variant when `--variant` is not provided.
+- ES:
+  - ES regions based on SIGPAC now publish `hcat:code` from land-use mapping.
+  - ES-CAT and ES-CN now map crop codes to HCAT with the extended mapping table.
+  - ES-EX and ES-NC now read FEGA national recinto releases (2025, 2026) because the regional portals are unavailable.
+- LV:
+  - Editions now cover 2015-2025 from yearly data.gov.lv releases.
+  - `block_id` is published from the field-block identifier and `crop:name` comes from the official code list.
+  - The merged code list at https://fiboa.org/code/lv/lv.csv now includes the 34 post-2021 added codes.
+  - URL discovery now requires all nine regional GeoPackages to avoid partial campaign publication.
+
+### Fixed
+- Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
+- Multipart geometries now get recomputed area/perimeter for split parts.
+- CH:
+  - CH now uses geodienste.ch STAC canton downloads.
+  - `lnf_code` is now published as `crop:code`.
+  - IDs are now derived from stable source identifiers instead of row order.
+- DE-BB now excludes NBF ineligible patches that have no crop code.
+- EC-FR now includes the 2018 RPG campaign from EuroCrops.
+- EE now publishes a valid crop code, land-use class and stable parcel identifier.
+
+### Changed
 - Adopt vecorel-cli 0.2.18, which carries the checks this repository was growing its own copies of: rows that cannot validate are dropped bounded by `max_dropped_share`, the required properties come from the declared schemas, ids are checked for uniqueness, a converter may not declare both `sources` and `variants`, and the schemas are fetched before any source data
 - JP: convert through vecorel-cli's DuckDB converter instead of a copy of it in this repository
 - HR: drop the rolling `sources`, which overruled every `--variant`
