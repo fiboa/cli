@@ -66,7 +66,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Declared the `beautifulsoup4` dependency used by ES-PV and ES-VC.
 - Dropped cached error pages for REST converters.
 - REST converters:
-  - Cached pages are keyed by service as well as layer; every `SIXPAC_<year>` service numbers its layers alike, so one year's cache could serve another.
+  - Cached pages are keyed by service and filter as well as layer; every `SIXPAC_<year>` service numbers its layers alike and DE-ST selects its edition by filter alone, so one edition's cache could serve another.
   - Esri error bodies answered as HTTP 200 and broken downloads are no longer kept as cached pages.
   - Joined layers qualify field names (`RECINTOS.OBJECTID`), which made the paging filter match nothing and return everything; the qualified key field is now discovered, and a join's table prefixes are stripped from the output columns.
 - Fixed `use_variant_as_determination` so determination dates are retained.

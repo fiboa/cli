@@ -80,6 +80,16 @@ class FakeService:
         file.write(json.dumps(_collection(oids, self.key)).encode("utf-8"))
 
 
+@pytest.fixture(autouse=True)
+def _rebind_logger():
+    """LoggerMixin binds its sink to sys.stdout once per process; a converter
+    built here would bind it to this test's capture and mute every later test."""
+    yield
+    from vecorel_cli.cli.logger import LoggerMixin
+
+    LoggerMixin.logger = None
+
+
 @pytest.fixture
 def service(monkeypatch):
     fake = FakeService()
@@ -179,36 +189,28 @@ def test_broken_download_is_not_kept_as_a_page(service, tmp_path, monkeypatch):
     assert os.listdir(tmp_path) == []
 
 
-def test_legacy_page_is_reused_when_its_ids_cover_the_window(service, tmp_path):
-    """Pages cached by the old sorted paging are keyed by the previous page's
-    last id; a dense one covers exactly the window that replaced it."""
+def test_pages_cached_under_the_old_sorted_scheme_are_not_reused(service, tmp_path):
+    """The old file name carries neither service nor filter, so nothing proves
+    where its rows came from; such pages are fetched again under the new key."""
     legacy = tmp_path / f"test_rest_{LAYER_ID}_-1.geojson"
     legacy.write_text(json.dumps(_collection([1, 2])))
 
     pages = _read(RESTConverter(), tmp_path)
 
     assert [len(data) for data, *_ in pages] == [2, 2, 1]
-    assert service.pages == [  # the first window came from the legacy file
-        "OBJECTID%3E2+AND+OBJECTID%3C%3D4",
-        "OBJECTID%3E4+AND+OBJECTID%3C%3D6",
-    ]
+    assert len(service.pages) == 3  # every window was fetched
 
 
-def test_legacy_page_that_does_not_cover_the_window_is_ignored(service, tmp_path):
-    """The old key is the last id of the previous page, which on a layer with
-    gaps says nothing about which ids the file holds."""
-    gappy = tmp_path / f"test_rest_{LAYER_ID}_-1.geojson"
-    gappy.write_text(json.dumps(_collection([1, 3])))
-    unreadable = tmp_path / f"test_rest_{LAYER_ID}_2.geojson"
-    unreadable.write_text("not geojson at all")
+def test_pages_of_one_filter_do_not_serve_another(service, tmp_path):
+    """de_st selects its edition by `where` alone, on one service and one layer."""
+    first = RESTConverter()
+    first.rest_params = {"where": "ID_VERSIONID='2023.1'"}
+    _read(first, tmp_path)
+    second = RESTConverter()
+    second.rest_params = {"where": "ID_VERSIONID='2021.1'"}
+    _read(second, tmp_path)
 
-    _read(RESTConverter(), tmp_path)
-
-    assert service.pages == [
-        "OBJECTID%3E0+AND+OBJECTID%3C%3D2",
-        "OBJECTID%3E2+AND+OBJECTID%3C%3D4",
-        "OBJECTID%3E4+AND+OBJECTID%3C%3D6",
-    ]
+    assert len(service.pages) == 6  # no page of the first edition served the second
 
 
 def test_empty_window_is_skipped(monkeypatch, tmp_path):
