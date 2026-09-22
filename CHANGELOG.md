@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
 - Updated vecorel-cli to 0.2.16, 0.2.17, 0.2.18 and 0.2.20, including improved validation defaults and latest-variant selection when `--variant` is not provided.
+- REST converters now page by half-open id windows instead of server-side sorting (which took ~100 s per request on large joined layers), retry the one remaining sorted query, and let a variant name the service that edition lives in.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
@@ -43,7 +44,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES:
   - ES regions based on SIGPAC now publish `hcat:code` from land-use mapping.
   - ES-AR now reads municipality SIGPAC sources listed by IDEAragon.
+  - ES-CB now covers editions 2010-2025.
   - ES-GA now supports editions 2014-2026.
+  - ES-IB now covers editions 2022-2026, reading the current and the historic SIGPAC services.
 - FI: Editions are now available by year (2020-2025).
 - FR: Editions now cover 2017-2024, mapped through one shared crop code list (https://fiboa.org/code/fr/fr.csv).
 - HR: Editions now cover 2011-2024.
@@ -62,6 +65,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
 - Declared the `beautifulsoup4` dependency used by ES-PV and ES-VC.
 - Dropped cached error pages for REST converters.
+- REST converters:
+  - Cached pages are keyed by service as well as layer; every `SIXPAC_<year>` service numbers its layers alike, so one year's cache could serve another.
+  - Esri error bodies answered as HTTP 200 and broken downloads are no longer kept as cached pages.
+  - Joined layers qualify field names (`RECINTOS.OBJECTID`), which made the paging filter match nothing and return everything; the qualified key field is now discovered, and a join's table prefixes are stripped from the output columns.
 - Fixed `use_variant_as_determination` so determination dates are retained.
 - Multipart geometries now get recomputed area/perimeter for split parts.
 - Rows missing `crop:code` are now dropped with a warning (and an error threshold), instead of failing whole conversions.
@@ -90,10 +97,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - ES-AN now uses the correct land-use column and campaign-based determination date.
   - ES-CAT and ES-CN now map crop codes to HCAT with the extended mapping table.
   - ES-CB now derives determination date from the campaign.
+  - ES-CB now ships Cantabria's own licence instead of CC-BY-NC, with the province as provider.
   - ES-CL now reads the HTTPS source and 2025 province subfolders.
   - ES-CM now uses the campaign-specific SIGPAC service and schema.
   - ES-CN now keeps distinct island records and correct region metadata.
   - ES-EX and ES-NC now read FEGA national recinto releases (2025, 2026) because the regional portals are unavailable.
+  - ES-IB now names the Balearic government as provider instead of Navarra's.
   - ES-MD now finds `RECINTO.shp` regardless of archive folder layout.
 - Europe-LAND: Empty source crop codes now fall back to crop names (for example LT 2024).
 - FR:
@@ -103,45 +112,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - JP: Uses campaign-specific determination dates and DuckDB conversion path.
 - LT: Updated to Europe-LAND v1.3 with 2025 coverage.
 - SK: Fixed edition selection, crop-name matching and block/id handling across campaigns.
-- Declare the beautifulsoup4 dependency the ES-PV and ES-VC converters import
-- ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
-- A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
-- ES-MD: find RECINTO.shp wherever the archive puts it
-- REST converters: a variant may name its own service (es_ib keeps its yearly editions in a second one), the id-bound query is retried, and a joined layer's table prefixes are stripped for every converter
-- REST converters: page by id windows instead of server-side sorting, key cached pages by service as well as layer, discover the qualified key field on joined layers, and never keep an error response or a broken download as a cached page
-- ES-CB: editions 2010-2025, Cantabria's own licence instead of CC-BY-NC, and the province named as provider
-- ES-IB: editions 2022-2026 (the yearly layers moved to the GOIB_SIGPAC_HISTORIC_IB service), the provider is the Balearic government, not Navarra's, and the joined field names are handled by the REST mixin
-- Update vecorel-cli to v0.2.17:
-  - GeoJSON is read as UTF-8 as the format mandates, instead of the platform locale (cp1252 on Windows mangled umlauts)
-  - GeoJSON files with a byte order mark no longer fail to read
-  - Drop the per-converter UTF-8 workarounds in de_bw and de_he, now redundant
-- Converter for Spain (whole), based on the FEGA 2025+ data
-- Add Italy Tuscany (IT-1) basd on EuroCrops v2
-- Suuport multiple years for CZ
-- Multiple years for DE_sh
-- Multiple year support for HR
-- Introduce FiboaBaseConverter.use_variant_as_determination for setting proper determination_date
-- Update years for DK (2025, 2026)
-- Update fr-converter to support 2021/2022 files
-- Converter for Baden-Württemberg, Germany (GISELa LPIS reference parcels, 2018-2022)
-- Converter for Lithuania KŽS reference parcels (lt_kzs), reading the geoportal.lt ArcGIS REST service
-- Support Esri JSON and server-side filters in EsriRESTConverterMixin (rest_format, rest_params["where"])
-- Converter for Bavaria, Germany LPIS field blocks (de_by_block)
-- Converter for Hesse, Germany LPIS reference parcels
-- Converter for Saxony-Anhalt, Germany LPIS field blocks (de_st)
-- Converter for Saarland, Germany LPIS field blocks (de_sl_block)
-- Fix parcel sizes written in scientific notation being read 10,000x too large (de_sl_block parser)
-- Repair the Saarland, Germany converter (de_sl), which could no longer read its source at all.
-  It now pages through the whole dataset, where the previous six hardcoded bounding boxes reached
-  only 20,300 of 54,038 parcels, so earlier output was incomplete. `metrics:area` is derived from
-  the geometry, because the service stopped publishing the declared size.
-- Converter for South Tyrol, Italy (it_bz), reading the province's LAFIS utilised agricultural area
-- Update vecorel-cli to v0.2.16:
-  - Converter output is sorted by Hilbert distance
-  - Commands exit with a non-zero exit code when they report a failure
-  - Collection-only properties are kept when merging collections
-  - Default GeoParquet compression is now zstd (level 15), configurable via `--compression_level`
-- DE-SH: make the 2023, 2025 and 2026 editions convert — glob the GeoPackage inside the archive (2023 was written with user_version = 0, so the archive alone matches no driver), parse fachguelti as DD.MM.YYYY, and map the 2023 and upper-case 2025/2026 column spellings that silently dropped determination:datetime and metrics:area (their area is text with a decimal comma)
 
 ## [v0.21.0] - 2026-02-16
 
