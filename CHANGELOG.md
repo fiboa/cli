@@ -57,7 +57,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES-CL: the ITACyL server is https-only, the 2025 shapefiles sit in province subfolders, and C_REFREC is the identifier
 - A test refuses a fixture above 5 MB, committed or merely lying in the fixture folder, because a failing convert test downloads the real source there
 - ES-MD: find RECINTO.shp wherever the archive puts it
-- DK: Journalnr:Marknr identifies a field from 2014; the older editions number their rows, and 2008/2009 carry no crop columns, so they publish without the crop and HCAT extensions
+- DK: support editions 2008-2026; older editions use row numbering for IDs, and 2008/2009 publish without crop and HCAT because the source has no crop columns
 - PT: the 2025 edition, whose layers, crop column and area units all changed, and CUL_ID as the identifier
 - US CSB: editions 2017-2024 from the single archive, and numbered fields because the dissolve leaves no source identifier
 - ES-AR: per-municipality SIGPAC files listed from IDEAragon
@@ -97,7 +97,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Multiple years for DE_sh
 - Multiple year support for HR
 - Introduce FiboaBaseConverter.use_variant_as_determination for setting proper determination_date
-- Update years for DK (2025, 2026)
 - Update fr-converter to support 2021/2022 files
 - Converter for Baden-Württemberg, Germany (GISELa LPIS reference parcels, 2018-2022)
 - Converter for Lithuania KŽS reference parcels (lt_kzs), reading the geoportal.lt ArcGIS REST service
