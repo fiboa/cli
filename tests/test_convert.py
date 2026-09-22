@@ -50,6 +50,7 @@ tests = [
     "jp",
     "lv",
     "ie",
+    "pl",
     "pl_block",
     "es_cat",
     "es_cl",
@@ -119,6 +120,12 @@ extra_convert_parameters = {
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": {"variant": "2024", **_input_files("lv", "lv_2024_lielriga.gpkg")},
+    # the code list is minted for this dataset, so read it from the fixture folder
+    "pl": {
+        "variant": "2026",
+        "mapping_file": f"{test_path}/pl/pl.csv",
+        **_input_files("pl", "pl_2026_00000000.zip"),
+    },
     "pl_block": _input_files("pl_block", "mko_woj_16_akt_public.zip"),
     "nz": _input_files("nz", "irrigated-land-area-raw-2020-update.zip"),
     "jecam": _input_files("jecam", "BD_JECAM_CIRAD_2023_feb.shp"),
