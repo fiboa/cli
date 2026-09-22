@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
 - Updated vecorel-cli to 0.2.16, 0.2.17, 0.2.18 and 0.2.20, including improved validation defaults and latest-variant selection when `--variant` is not provided.
-- REST converters now page by half-open id windows instead of server-side sorting (which took ~100 s per request on large joined layers), retry the one remaining sorted query, cross an id gap wider than a page with one query instead of a page per window, and let a variant name the service that edition lives in.
+- REST converters download much faster from large layers and retry when a service answers with intermittent errors.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
@@ -65,9 +65,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
 - Declared the `beautifulsoup4` dependency used by ES-PV and ES-VC.
 - REST converters:
-  - A cached page is identified by service, layer, filter and its exact id window: layer ids repeat across services (every `SIXPAC_<year>` numbers them alike), DE-ST selects its edition by filter alone, and a page kept under another `maxRecordCount` would silently drop the ids above its own bound. Pages cached under the old names are fetched again.
-  - Error responses — including Esri error bodies answered as HTTP 200 — and broken downloads are no longer kept as cached pages.
-  - Joined layers qualify field names (`RECINTOS.OBJECTID`), which made the paging filter match nothing and return everything; the qualified key field is now discovered, and a join's table prefixes are stripped from the output columns.
+  - Downloaded data cached for one dataset, edition or service is no longer served for another. Previously cached downloads are fetched again once.
+  - Error responses and interrupted downloads are no longer cached.
+  - Layers that join several tables (some ES-CB and ES-IB editions) are now filtered and paged correctly, and their column names no longer carry table prefixes.
 - Fixed `use_variant_as_determination` so determination dates are retained.
 - Multipart geometries now get recomputed area/perimeter for split parts.
 - Rows missing `crop:code` are now dropped with a warning (and an error threshold), instead of failing whole conversions.
