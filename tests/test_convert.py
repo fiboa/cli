@@ -54,6 +54,7 @@ tests = [
     "pl",
     "pl_block",
     "es_cat",
+    "es_nc",
     "es_cl",
     "es_ar",
     "es_an",
@@ -86,6 +87,7 @@ def _input_files(converter, *names):
 
 
 extra_convert_parameters = {
+    "es_nc": {"variant": "2025", **_input_files("es_nc", "es_nc.gpkg")},
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
     "dk#2008": {"variant": "2008"},
