@@ -27,12 +27,9 @@ class AddHCATMixin:
     mapping_file = None
     ec_mapping: Optional[list[dict]] = None  # TODO rename to hcat_mapping
 
-    # The variants whose source carries no crop at all: no crop code and no crop
-    # name, so nothing to map and nothing to publish under the crop extension
-    # either. DK numbered its fields from 2008 but did not publish what grew on
-    # them until 2010. Naming the variants is the point — a crop column that
-    # disappears from an edition that should have one must still fail loudly, and
-    # it does, because only the variants listed here take this path.
+    # Variants whose source has no crop columns at all; they convert without the
+    # crop/HCAT extensions. Only variants listed here take that path, so a crop
+    # column missing anywhere else still fails loudly.
     variants_without_crops: set[str] = set()
 
     hcat_columns = {
@@ -47,28 +44,21 @@ class AddHCATMixin:
         self.extensions = getattr(self, "extensions", set()) | {CROP_EXTENSION, HCAT_EXTENSION}
 
     def has_no_crops(self) -> bool:
-        """Whether this edition carries no crop columns at all.
-
-        A converter whose every edition is without crops overrides this to return
-        True; the attribute covers the usual case, where one source gained its crop
-        columns partway through its history.
-        """
+        """Whether the selected variant has no crop columns; override when no edition has any."""
         return self.variant in self.variants_without_crops
 
     def select_variant(self, variant):
-        """Drop the crop promises once the edition is known.
-
-        `__init__` runs before the variant is chosen, so it advertises the CROP and
-        HCAT extensions for every edition. For an edition without crops that would
-        claim schemas whose data is absent, and the collection is written from
-        `self.extensions`. This is the first moment the variant is known, and it runs
-        before the schemas are fetched and before the collection is built.
-        """
+        # __init__ ran before the variant was known, so align the extensions and
+        # columns with the chosen variant (in both directions)
         super().select_variant(variant)
+        crop_entries = self.hcat_columns | {"crop:code_list": "crop:code_list"}
         if self.has_no_crops():
-            self.extensions = self.extensions - {CROP_EXTENSION, HCAT_EXTENSION}
-            added_here = set(self.hcat_columns.values()) | {"crop:code_list"}
-            self.columns = {k: v for k, v in self.columns.items() if v not in added_here}
+            self.extensions -= {CROP_EXTENSION, HCAT_EXTENSION}
+            removed = set(crop_entries.values())
+            self.columns = {k: v for k, v in self.columns.items() if v not in removed}
+        else:
+            self.extensions |= {CROP_EXTENSION, HCAT_EXTENSION}
+            self.columns |= crop_entries
 
     def convert(self, *args, **kwargs):
         self.mapping_file = kwargs.get("mapping_file")
@@ -89,10 +79,6 @@ class AddHCATMixin:
 
     def add_hcat(self, gdf):
         if self.has_no_crops():
-            # No crop code and no crop name in this edition, so there is nothing to
-            # map. Only the variants the converter names take this path; anywhere
-            # else a missing crop column still raises, because a typo or a dropped
-            # upstream column must not quietly produce a file without HCAT.
             return gdf
 
         # Lookup column that will be renamed after the migration to hcat:code

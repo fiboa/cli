@@ -20,9 +20,7 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     ec_mapping_csv = "dk_2019.csv"
     # the codes that table has no row for, mapped from its own siblings
     ec_mapping_supplements = ["https://fiboa.org/code/dk/dk_supplement.csv"]
-    # The first two editions publish the field and its area, and nothing about the
-    # crop: no Afgkode, no Afgroede. They are therefore converted without the crop
-    # and HCAT extensions; every later edition carries both columns and must.
+    # 2008 and 2009 publish no crop columns at all (no Afgkode, no Afgroede)
     variants_without_crops = {"2008", "2009"}
     license = "CC0-1.0"
     columns = {
@@ -35,26 +33,20 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     use_variant_as_determination = True
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
-        # Marknr numbers a field within one application, so alone it repeats
-        # across holdings. From 2014 the pair Journalnr:Marknr identifies a
-        # field; where the application is missing (70 of 599,008 rows in 2015)
-        # the id is left empty rather than shared as "nan". Before 2014 the
-        # source names the applicant instead and that pair repeats too — 5,124
-        # keys over 11,534 of the 678,347 fields of 2008 — so the row index
-        # identifies, which is safe because an edition is one file.
+        # Marknr numbers a field within one application, so alone it repeats across
+        # holdings. From 2014, Journalnr:Marknr identifies a field; rows missing
+        # either part get a variant-scoped row number instead of all sharing "nan".
         if "Journalnr" in gdf.columns:
             key = gdf["Journalnr"].astype(str) + ":" + gdf["Marknr"].astype(str)
             fallback = f"{self.variant}:missing-application:" + gdf.index.astype(str)
             gdf["id"] = key.where(gdf["Journalnr"].notna() & gdf["Marknr"].notna(), fallback)
         else:
-            # the edition is part of it: a bare row number matches the same number in
-            # another edition, and 476,097 of 2009's rows would join 2010's on nothing
+            # older editions carry no field identifier; the variant prefix keeps
+            # row numbers unique across editions
             gdf["id"] = f"{self.variant}:" + gdf.index.astype(str)
 
-        # guarded because the editions without crops have no such column
-        if "Afgkode" in gdf.columns:
-            # the codes arrive as floats, and a missing one stays missing: filling it with 0
-            # gave 36,133 rows across the series a crop code that no Danish list defines
+        if "Afgkode" in gdf.columns:  # absent in the editions without crops
+            # nullable int, so a missing code stays missing instead of becoming 0
             gdf["Afgkode"] = (
                 pd.to_numeric(gdf["Afgkode"], errors="coerce").astype("Int64").astype("string")
             )

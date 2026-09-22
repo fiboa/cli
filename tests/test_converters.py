@@ -233,6 +233,19 @@ def test_a_normal_variant_keeps_them():
     assert "hcat:code" in converter.columns.values()
 
 
+def test_reselecting_a_crop_variant_restores_the_crop_promises():
+    from fiboa_cli.datasets.commons.hcat import CROP_EXTENSION, HCAT_EXTENSION
+
+    converter = Converters().load("dk")
+    converter.select_variant("2008")
+    converter.select_variant("2024")
+
+    assert CROP_EXTENSION in converter.extensions
+    assert HCAT_EXTENSION in converter.extensions
+    assert "hcat:code" in converter.columns.values()
+    assert "crop:code_list" in converter.columns.values()
+
+
 def test_a_missing_crop_column_still_fails_where_it_should():
     """The reason the opt-in is a list of variants and not a fallback: a typo or a
     column that disappears upstream must not quietly produce a file without HCAT."""
