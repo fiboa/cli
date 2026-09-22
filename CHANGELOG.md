@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - DE-SL-BLOCK: Added Saarland field-block converter.
 - DE-ST: Added Saxony-Anhalt field-block converter.
 - ES: Added Spain-wide converter based on FEGA 2025+.
+- IE: Added `ie_lpis` with DAFM's Anonymous LPIS parcels for 2017-2022 and 2025, one row per parcel with the crop of its largest claim and its digitised, eligible and claimed area.
 - IT-1: Added Tuscany converter based on EuroCrops v2.
 - IT-BZ: Added South Tyrol converter.
 - LT-KZS: Added Lithuania KŽS reference parcels converter.

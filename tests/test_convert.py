@@ -52,6 +52,8 @@ tests = [
     "jp",
     "lv",
     "ie",
+    "ie_lpis",
+    "ie_lpis#2025",
     "pl",
     "pl_block",
     "es_cat",
@@ -136,6 +138,18 @@ extra_convert_parameters = {
     "es_ib#2024": {"variant": "2024", **_input_files("es_ib", "es_ib_2024.geojson")},
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": {"variant": "2024", **_input_files("lv", "lv_2024_lielriga.gpkg")},
+    # the list on fiboa.org gains the LPIS-only names with this converter, so read the fixture copy
+    "ie_lpis": {
+        "variant": "2019",
+        "mapping_file": f"{test_path}/ie_lpis/ie.csv",
+        **_input_files("ie_lpis", "parcels_2019.zip"),
+    },
+    # the 2025 edition is a GeoPackage with other field names and rows without any attribute
+    "ie_lpis#2025": {
+        "variant": "2025",
+        "mapping_file": f"{test_path}/ie_lpis/ie.csv",
+        **_input_files("ie_lpis", "parcels_2025.gpkg"),
+    },
     # the code list is minted for this dataset, so read it from the fixture folder
     "pl": {
         "variant": "2026",
