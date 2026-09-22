@@ -59,7 +59,6 @@ position in the download, since the source carries no parcel identifier.
     }
 
     def get_urls(self):
-        self.variant = self.variant or next(iter(self.variants))
         layer = f"gsa_public:{self.variants[self.variant]}"
         # Any GeoJSON response carries the total; a hits request is capped at the page size
         first = requests.get(
