@@ -94,10 +94,8 @@ The anonymized version is distributed as part of the public service for making r
     # Attribution example as described in the open license
     attribution = "IGN - Original data from https://geoservices.ign.fr/rpg"
     license = "Licence Ouverte / Open Licence <https://etalab.gouv.fr/licence-ouverte-open-licence>"
-    # One list for every edition we publish: EuroCrops splits France over fr_2018.csv
-    # and fr_other_years.csv, and eleven codes neither carries were mapped from the
-    # sibling code each has there. Merged, so crop:code_list points at a list that
-    # covers the data — JAC (jachère) alone is 604,122 fields of 2024.
+    # One merged list for all editions: EuroCrops splits France over two tables
+    # and misses eleven newer codes (e.g. JAC, the most common code of 2024)
     ec_mapping_csv = "https://fiboa.org/code/fr/fr.csv"
     use_variant_as_determination = True
 
@@ -115,10 +113,8 @@ The anonymized version is distributed as part of the public service for making r
             # Make column names lowercase, harmonize for different years
             gdf = gdf.rename(columns={k: k.lower() for k in gdf.columns})
 
-        # RPG's parcel id names the parcel, and two things make it repeat: a parcel can be
-        # several polygons (5,289 of them in 2024, up to 12 each) and the source itself
-        # reissues 375 of the ids. Split before the base checks the ids, then number what
-        # is left over; parcel_id keeps the source value either way.
+        # id_parcel repeats (multipart parcels, and the source reissues some ids):
+        # split before the base checks the ids, then number the repeats
         gdf = self.split_multipart(gdf)
         gdf["parcel_id"] = gdf["id_parcel"]
         gdf["id"] = gdf["id_parcel"].astype("string")
