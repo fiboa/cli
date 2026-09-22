@@ -27,6 +27,11 @@ class AddHCATMixin:
     mapping_file = None
     ec_mapping: Optional[list[dict]] = None  # TODO rename to hcat_mapping
 
+    # Variants whose source has no crop columns at all; they convert without the
+    # crop/HCAT extensions. Only variants listed here take that path, so a crop
+    # column missing anywhere else still fails loudly.
+    variants_without_crops: set[str] = set()
+
     hcat_columns = {
         "hcat:name_en": "hcat:name_en",
         "hcat:name": "hcat:name",
@@ -37,6 +42,23 @@ class AddHCATMixin:
         super().__init__(*args, **kwargs)
         self.columns |= self.hcat_columns | {"crop:code_list": "crop:code_list"}
         self.extensions = getattr(self, "extensions", set()) | {CROP_EXTENSION, HCAT_EXTENSION}
+
+    def has_no_crops(self) -> bool:
+        """Whether the selected variant has no crop columns; override when no edition has any."""
+        return self.variant in self.variants_without_crops
+
+    def select_variant(self, variant):
+        # __init__ ran before the variant was known, so align the extensions and
+        # columns with the chosen variant (in both directions)
+        super().select_variant(variant)
+        crop_entries = self.hcat_columns | {"crop:code_list": "crop:code_list"}
+        if self.has_no_crops():
+            self.extensions -= {CROP_EXTENSION, HCAT_EXTENSION}
+            removed = set(crop_entries.values())
+            self.columns = {k: v for k, v in self.columns.items() if v not in removed}
+        else:
+            self.extensions |= {CROP_EXTENSION, HCAT_EXTENSION}
+            self.columns |= crop_entries
 
     def convert(self, *args, **kwargs):
         self.mapping_file = kwargs.get("mapping_file")
@@ -56,6 +78,9 @@ class AddHCATMixin:
         return col if col.dtype == "object" else col.astype(str)
 
     def add_hcat(self, gdf):
+        if self.has_no_crops():
+            return gdf
+
         # Lookup column that will be renamed after the migration to hcat:code
         hcat_code_column = next(k for k, v in self.hcat_columns.items() if v == "hcat:code")
         if hcat_code_column not in gdf.columns:

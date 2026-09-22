@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
-- DK: Added 2025 and 2026 editions.
+- DK: Editions now cover 2008-2026. The 2008 and 2009 editions are published without the crop and HCAT extensions because the source has no crop columns.
 - ES:
   - ES regions based on SIGPAC now publish `hcat:code` from land-use mapping.
   - ES-AR now reads municipality SIGPAC sources listed by IDEAragon.
@@ -77,6 +77,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - DE-SL:
   - Fixed parser issues with scientific notation in area values.
   - Restored full paging coverage and area derivation for complete output.
+- DK:
+  - IDs are now derived from `Journalnr` and `Marknr` together (or the row number in editions without either), because `Marknr` alone repeats across holdings.
+  - Missing crop codes are kept empty instead of being filled with the undefined code 0.
 - EC-EE: Fixed shapefile naming and year-column migration.
 - EC-FR: Added the missing 2018 RPG campaign from EuroCrops.
 - EC-LT: Fixed Lithuanian crop-name decoding and parcel identifier handling.

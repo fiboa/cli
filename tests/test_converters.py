@@ -203,3 +203,55 @@ def test_split_multipart_recomputes_the_metrics_of_the_parts():
     assert SPLIT_KEY not in gdf.columns
     assert gdf["shape_area"].tolist() == [100.0, 300.0, 200.0]
     assert gdf["shape_length"].tolist() == [40.0, 80.0, 60.0]
+
+
+def test_a_variant_without_crops_drops_the_crop_promises():
+    """DK 2008 publishes fields without a crop, so it may not claim the schemas.
+
+    The extensions are added in `__init__`, before a variant is chosen; only after
+    `select_variant` can a converter know that this edition has nothing to map.
+    """
+    from fiboa_cli.datasets.commons.hcat import CROP_EXTENSION, HCAT_EXTENSION
+
+    converter = Converters().load("dk")
+    converter.select_variant("2008")
+
+    assert CROP_EXTENSION not in converter.extensions
+    assert HCAT_EXTENSION not in converter.extensions
+    assert "hcat:code" not in converter.columns.values()
+    assert "crop:code_list" not in converter.columns.values()
+
+
+def test_a_normal_variant_keeps_them():
+    from fiboa_cli.datasets.commons.hcat import CROP_EXTENSION, HCAT_EXTENSION
+
+    converter = Converters().load("dk")
+    converter.select_variant("2024")
+
+    assert CROP_EXTENSION in converter.extensions
+    assert HCAT_EXTENSION in converter.extensions
+    assert "hcat:code" in converter.columns.values()
+
+
+def test_reselecting_a_crop_variant_restores_the_crop_promises():
+    from fiboa_cli.datasets.commons.hcat import CROP_EXTENSION, HCAT_EXTENSION
+
+    converter = Converters().load("dk")
+    converter.select_variant("2008")
+    converter.select_variant("2024")
+
+    assert CROP_EXTENSION in converter.extensions
+    assert HCAT_EXTENSION in converter.extensions
+    assert "hcat:code" in converter.columns.values()
+    assert "crop:code_list" in converter.columns.values()
+
+
+def test_a_missing_crop_column_still_fails_where_it_should():
+    """The reason the opt-in is a list of variants and not a fallback: a typo or a
+    column that disappears upstream must not quietly produce a file without HCAT."""
+    converter = Converters().load("dk")
+    converter.select_variant("2024")
+    gdf = gpd.GeoDataFrame({"id": ["a"]}, geometry=[Point(0, 0)], crs="EPSG:4326")
+
+    with pytest.raises(KeyError):
+        converter.add_hcat(gdf)

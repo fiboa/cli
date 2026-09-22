@@ -37,6 +37,7 @@ tests = [
     "pt",
     "pt#2025",
     "dk",
+    "dk#2008",
     "be_wal",
     "se",
     "ee",
@@ -92,6 +93,7 @@ extra_convert_parameters = {
     "es_nc": {"variant": "2025", **_input_files("es_nc", "es_nc.gpkg")},
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
+    "dk#2008": {"variant": "2008"},
     # the fixture is the 2022 archive; the default is the latest year, 2024
     "fr": {"variant": "2022"},
     # the fixture archive holds the 2024 edition only; the published one holds both
