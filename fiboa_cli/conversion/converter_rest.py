@@ -115,23 +115,29 @@ class EsriRESTConverterMixin:
         }
         # Layer ids repeat across services (every SIXPAC_<year> MapServer has its
         # Recintos layer at id 2), so the service must be part of the cache key.
-        # So must the filter: de_st selects its edition by `where` alone, on one
-        # service and one layer.
+        # So must the filter (de_st selects its edition by `where` alone, on one
+        # service and one layer) and the window's upper bound: page_size follows
+        # the service's maxRecordCount, and a page kept from a smaller one would
+        # silently drop every id above its own bound.
         service = re.sub(r"\W+", "_", base_url.rstrip("/").split("/rest/services/")[-1])
         where_key = f"_w{zlib.crc32(base_where.encode()):08x}" if base_where else ""
+        prefix = f"{self.id}_{service}_{layer['id']}{where_key}_r"
+        windows = self._cached_windows(cache_fs, cache_folder, prefix)
         page = 0
         lo = min_id - 1
         while lo < max_id:
-            hi = lo + page_size
-            clause = f"{attribute}>{lo} AND {attribute}<={hi}"
-            get_dict["where"] = f"{clause} AND ({base_where})" if base_where else clause
-            url = f"{layer_url}?{urlencode(get_dict)}"
-            if cache_fs is not None:
-                cache_file = os.path.join(
-                    cache_folder,
-                    f"{self.id}_{service}_{layer['id']}{where_key}_r{lo}.{self.rest_format}",
-                )
-                if not cache_fs.exists(cache_file):
+            cached = lo in windows
+            hi = windows[lo] if cached else lo + page_size
+            if cached:
+                url = os.path.join(cache_folder, f"{prefix}{lo}-{hi}.{self.rest_format}")
+            else:
+                clause = f"{attribute}>{lo} AND {attribute}<={hi}"
+                get_dict["where"] = f"{clause} AND ({base_where})" if base_where else clause
+                url = f"{layer_url}?{urlencode(get_dict)}"
+                if cache_fs is not None:
+                    cache_file = os.path.join(
+                        cache_folder, f"{prefix}{lo}-{hi}.{self.rest_format}"
+                    )
                     try:
                         with cache_fs.open(cache_file, mode="wb") as file:
                             stream_file(source_fs, url, file)
@@ -140,7 +146,7 @@ class EsriRESTConverterMixin:
                         if cache_fs.exists(cache_file):
                             cache_fs.rm(cache_file)
                         raise
-                url = cache_file
+                    url = cache_file
 
             try:
                 data = gpd.read_file(url)
@@ -152,17 +158,39 @@ class EsriRESTConverterMixin:
                     f"Could not read ids ({lo} ... {hi}] of {layer_url}: {e}"
                 ) from e
 
+            if len(data) == 0 and not cached:
+                # An id gap wider than a page: ask once where the ids resume, and
+                # let the empty page cover the whole gap on later runs, instead of
+                # paging through a span that may hold millions of absent ids.
+                resume = self._rest_id_bound(layer_url, attribute, base_where, "ASC", floor=lo)
+                if resume - 1 > hi and cache_fs is not None:
+                    gap = os.path.join(cache_folder, f"{prefix}{lo}-{resume - 1}.{self.rest_format}")
+                    cache_fs.mv(url, gap)
+                hi = max(hi, resume - 1)
+
             lo = hi
             if len(data) == 0:
                 continue
-            self.info(
-                f"Read {len(data)} features, page {page} from ids ({hi - page_size} ... {hi}]"
-            )
+            self.info(f"Read {len(data)} features, page {page} up to id {hi}")
             page += 1
             yield self._unqualify(data), base_url, base_url, layer["id"]
 
-    def _rest_id_bound(self, layer_url, attribute, base_where, direction, attempts=5):
-        clause = f"{attribute}>-1"
+    @staticmethod
+    def _cached_windows(cache_fs, cache_folder, prefix):
+        """The cached (lo, hi] windows, keyed by lo. The name carries both bounds,
+        so a page is only ever read as exactly the window it was fetched for."""
+        if cache_fs is None or not cache_fs.exists(cache_folder):
+            return {}
+        pattern = re.compile(re.escape(prefix) + r"(-?\d+)-(-?\d+)\.")
+        windows = {}
+        for path in cache_fs.ls(cache_folder, detail=False):
+            match = pattern.search(os.path.basename(str(path)))
+            if match:
+                windows[int(match.group(1))] = int(match.group(2))
+        return windows
+
+    def _rest_id_bound(self, layer_url, attribute, base_where, direction, floor=-1, attempts=5):
+        clause = f"{attribute}>{floor}"
         params = {
             "f": "json",
             "where": f"{clause} AND ({base_where})" if base_where else clause,

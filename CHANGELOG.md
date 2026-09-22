@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
 - Updated vecorel-cli to 0.2.16, 0.2.17, 0.2.18 and 0.2.20, including improved validation defaults and latest-variant selection when `--variant` is not provided.
-- REST converters now page by half-open id windows instead of server-side sorting (which took ~100 s per request on large joined layers), retry the one remaining sorted query, and let a variant name the service that edition lives in.
+- REST converters now page by half-open id windows instead of server-side sorting (which took ~100 s per request on large joined layers), retry the one remaining sorted query, cross an id gap wider than a page with one query instead of a page per window, and let a variant name the service that edition lives in.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
@@ -67,6 +67,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Dropped cached error pages for REST converters.
 - REST converters:
   - Cached pages are keyed by service and filter as well as layer; every `SIXPAC_<year>` service numbers its layers alike and DE-ST selects its edition by filter alone, so one edition's cache could serve another.
+  - A cached page's name carries its id window, so a page kept under another `maxRecordCount` cannot silently swallow the ids above its own bound. Pages cached under the old names are fetched again.
   - Esri error bodies answered as HTTP 200 and broken downloads are no longer kept as cached pages.
   - Joined layers qualify field names (`RECINTOS.OBJECTID`), which made the paging filter match nothing and return everything; the qualified key field is now discovered, and a join's table prefixes are stripped from the output columns.
 - Fixed `use_variant_as_determination` so determination dates are retained.

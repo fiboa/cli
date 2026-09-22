@@ -8,6 +8,7 @@ data. These tests serve a small fake service so the paging can be watched.
 
 import json
 import os
+import re
 
 import geopandas as gpd
 import pytest
@@ -45,9 +46,10 @@ def _collection(oids, key="OBJECTID"):
 class FakeService:
     """Answers the three metadata calls and records every page request."""
 
-    def __init__(self, key="OBJECTID", ids=FEATURE_IDS):
+    def __init__(self, key="OBJECTID", ids=FEATURE_IDS, page_size=PAGE_SIZE):
         self.key = key
         self.ids = ids
+        self.page_size = page_size
         self.pages = []  # the `where` of every page the mixin downloaded
 
     def get(self, url, params=None, **kwargs):
@@ -62,11 +64,16 @@ class FakeService:
 
         if params.get("f") == "pjson":
             return Response(
-                {"layers": [{"id": LAYER_ID, "name": "Recintos"}], "maxRecordCount": PAGE_SIZE}
+                {
+                    "layers": [{"id": LAYER_ID, "name": "Recintos"}],
+                    "maxRecordCount": self.page_size,
+                }
             )
         if params.get("outFields") == "*":  # the probe for the real key field
             return Response({"features": [{"attributes": {self.key: self.ids[0]}}]})
-        bound = max(self.ids) if params["orderByFields"].endswith("DESC") else min(self.ids)
+        floor = int(re.search(r">(-?\d+)", params["where"]).group(1))
+        above = [o for o in self.ids if o > floor]
+        bound = max(above) if params["orderByFields"].endswith("DESC") else min(above)
         return Response({"features": [{"attributes": {self.key: bound}}]})
 
     def stream(self, _source_fs, url, file):
@@ -116,9 +123,10 @@ def test_pages_by_id_window_and_caches_per_service(service, tmp_path):
         "OBJECTID%3E4+AND+OBJECTID%3C%3D6",
     ]
     # layer ids repeat across services (every SIXPAC_<year> has its Recintos at 2),
-    # so the service name has to be part of the file name
+    # so the service name has to be part of the file name; the window bounds are
+    # in it too, so a page kept under another page size is never misread
     assert sorted(os.listdir(tmp_path)) == [
-        f"test_rest_{SERVICE}_{LAYER_ID}_r{lo}.geojson" for lo in (0, 2, 4)
+        f"test_rest_{SERVICE}_{LAYER_ID}_r{lo}-{lo + PAGE_SIZE}.geojson" for lo in (0, 2, 4)
     ]
 
 
@@ -211,6 +219,40 @@ def test_pages_of_one_filter_do_not_serve_another(service, tmp_path):
     _read(second, tmp_path)
 
     assert len(service.pages) == 6  # no page of the first edition served the second
+
+
+def test_pages_kept_under_another_page_size_still_cover_everything(monkeypatch, tmp_path):
+    """maxRecordCount follows the service's configuration. The file name carries
+    the window it was fetched for, so after a size change a kept page is either
+    followed at its own bounds or ignored — never misread as a wider window."""
+    small = FakeService(page_size=2)
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.requests.get", small.get)
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.stream_file", small.stream)
+    _read(RESTConverter(), tmp_path)
+
+    big = FakeService(page_size=3)
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.requests.get", big.get)
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.stream_file", big.stream)
+    pages = _read(RESTConverter(), tmp_path)
+
+    assert big.pages == []  # the kept windows still cover the layer completely
+    assert sorted(o for data, *_ in pages for o in data["OBJECTID"]) == FEATURE_IDS
+
+
+def test_a_wide_id_gap_is_walked_once_and_cached(monkeypatch, tmp_path):
+    """Two rows at ids 1 and 10001: the gap between them costs one empty page
+    and one bound query, not five thousand page downloads."""
+    fake = FakeService(ids=[1, 10001])
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.requests.get", fake.get)
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.stream_file", fake.stream)
+
+    pages = _read(RESTConverter(), tmp_path)
+
+    assert [len(data) for data, *_ in pages] == [1, 1]
+    assert len(fake.pages) == 3  # (0,2], the empty (2,4] widened to (2,10000], (10000,10002]
+
+    assert [len(data) for data, *_ in _read(RESTConverter(), tmp_path)] == [1, 1]
+    assert len(fake.pages) == 3  # the second run was answered by the cache alone
 
 
 def test_empty_window_is_skipped(monkeypatch, tmp_path):
