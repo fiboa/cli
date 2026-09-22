@@ -13,9 +13,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added support for supplementary HCAT/crop mappings via `ec_mapping_supplements`.
 - Added support for Esri JSON output and server-side filters in REST converters.
 - Added a test guard that rejects fixture files larger than 5 MB.
+- Added ML variants of converters (`ai4sf_ml`, `de_fusion_ml`, `india_10k_ml`, `rw_rwanda_ml`, `za_fusion_ml`) that publish each field's train/val/test split.
 - AT: Added support for 2018 by extracting archives before reading.
 - DE-BW: Added Baden-Württemberg reference parcels converter.
 - DE-BY-BLOCK: Added Bavaria field-block converter.
+- DE-FUSION: Added Brandenburg converter based on the ESA Fusion Competition dataset.
 - DE-HE: Added Hesse reference parcels converter.
 - DE-SL-BLOCK: Added Saarland field-block converter.
 - DE-ST: Added Saxony-Anhalt field-block converter.
@@ -26,6 +28,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - PL:
   - Added `pl` with campaigns 2025 and 2026 from ARiMR's declared-crop dataset.
   - Added `pl_block` with Poland LPIS maximum eligible area parcels from ARiMR.
+- RW-RWANDA: Added Rwanda converter based on the NASA Harvest field-boundary competition dataset.
+- ZA-FUSION: Added South Africa converter based on the ESA Fusion Competition dataset.
 
 ### Changed
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.

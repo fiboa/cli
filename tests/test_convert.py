@@ -77,6 +77,9 @@ tests = [
     "de_st",
     "it_bz",
     "de_sax",
+    "de_fusion_ml",
+    "za_fusion_ml",
+    "rw_rwanda_ml",
 ]
 test_path = "tests/data-files/convert"
 
@@ -139,6 +142,9 @@ extra_convert_parameters = {
     "de_sl": _input_files("de_sl", "de_sl.gml"),
     "it_bz": _input_files("it_bz", "it_bz.json"),
     "de_sax": {"input_files": {f"{test_path}/de_sax/gesamt_2026_RE.zip": ["2026_RE_FB_33.shp"]}},
+    "de_fusion_ml": _input_files("de_fusion", "de_test_2019.geojson", "de_train_2018.geojson"),
+    "za_fusion_ml": _input_files("za_fusion", "za_train_258N.geojson", "za_train_259N.geojson", "za_test_2017.geojson"),
+    "rw_rwanda_ml": _input_files("rw_rwanda", "rw_rwanda_2021.geojson"),
 }
 
 
@@ -159,7 +165,6 @@ extra_convert_parameters = {
 expected_columns = {
     "de_sh": ("determination:datetime", "metrics:area", "flik", "hbn", "id"),
 }
-
 
 @mark.parametrize("converter", tests)
 @patch("fiboa_cli.datasets.commons.ec.load_ec_mapping")
