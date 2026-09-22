@@ -80,7 +80,6 @@ class FiboaBaseConverter(BaseConverter):
 
     def get_columns(self, gdf):
         columns = super().get_columns(gdf)
-        # the base converter drops every column that is not listed
         if self._use_variant_as_determination(gdf):
             columns.setdefault(DETERMINATION_KEY, DETERMINATION_KEY)
         return columns
