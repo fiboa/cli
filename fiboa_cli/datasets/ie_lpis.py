@@ -81,6 +81,8 @@ multipart parcels become numbered parts.
     ec_mapping_csv = (
         "https://fiboa.org/code/ie/ie.csv"  # the GSAA list, extended by the LPIS-only names
     )
+    area_is_in_ha = False
+    area_calculate_missing = True
     use_variant_as_determination = True
     columns = {
         "geometry": "geometry",
@@ -92,6 +94,10 @@ multipart parcels become numbered parts.
         "CLAIM_AREA": "claimed_area",
         "COM_IND": "commonage",
         "determination:datetime": "determination:datetime",
+    }
+    column_migrations = {
+        "DIGIT_AREA": lambda col: col.astype(float) * 10_000,  # float32 in the GeoPackage
+        "COM_IND": lambda col: col == "Y",
     }
     missing_schemas = {
         "properties": {
@@ -109,25 +115,19 @@ multipart parcels become numbered parts.
             kwargs["columns"] = list(FIELDS.values())
         return super().read_data(paths, **kwargs)
 
+    def file_migration(self, gdf, path, uri, layer=None):
+        return gdf.rename(columns=FIELDS)
+
     def migrate(self, gdf):
-        gdf = gdf.rename(columns=FIELDS)
-        for column in ("DIGIT_AREA", "MEA", "CLAIM_AREA"):
-            gdf[column] = gdf[column].astype(float)  # float32 in the GeoPackage
         # A row is a claim and carries the parcel's geometry: commonage and partnerships repeat a
         # parcel per applicant, a parcel split into crops per crop. Keep one row per parcel with
         # the crop of the largest claim and the claims added up.
-        gdf["CLAIM_AREA"] = gdf["CLAIM_AREA"].fillna(0)
-        gdf["claimed"] = gdf.groupby("PARC_LAB")["CLAIM_AREA"].transform("sum")
         gdf = gdf.sort_values(
             ["PARC_LAB", "CLAIM_AREA", "CROP_DESC"], ascending=[True, False, True]
         )
-        gdf = gdf.drop_duplicates("PARC_LAB").drop(columns="CLAIM_AREA")
-        gdf = gdf.rename(columns={"claimed": "CLAIM_AREA"})
+        gdf["CLAIM_AREA"] = gdf.groupby("PARC_LAB")["CLAIM_AREA"].transform("sum")
+        gdf = gdf.drop_duplicates("PARC_LAB")
         gdf["crop:code"] = gdf["CROP_DESC"]
-        gdf["COM_IND"] = gdf["COM_IND"] == "Y"
-        # digitised to three decimals of a hectare, so slivers below 5 m² read 0
-        sliver = gdf["DIGIT_AREA"] == 0
-        gdf.loc[sliver, "DIGIT_AREA"] = gdf.geometry[sliver].area / 10_000
         # a few dozen parcels per edition are several polygons; number the parts so the id stays unique
         gdf = self.split_multipart(gdf)
         part = gdf.groupby("PARC_LAB").cumcount()
