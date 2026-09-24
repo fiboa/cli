@@ -2,7 +2,6 @@ import os
 import re
 
 import requests
-from loguru import logger
 
 from .es_base import ESBaseConverter
 
@@ -37,7 +36,7 @@ Free use of the data is permitted, but commercial exploitation is prohibited.
         "crop:name_en": "crop:name_en",
     }
     use_code_attribute = "USO_SIGPAC"
-    use_variant_as_determination = True
+    variants = {str(year): str(year) for year in range(2025, 2019 - 1, -1)}
 
     def download_files(self, uris, cache_folder=None):
         paths = super().download_files(uris, cache_folder)
@@ -57,11 +56,6 @@ Free use of the data is permitted, but commercial exploitation is prohibited.
         return new
 
     def get_urls(self):
-        if not self.variant:
-            self.variant = "2025"
-            logger.warning(f"Choosing first year {self.variant}")
-        else:
-            assert 2019 <= int(self.variant) <= 2025, f"Wrong year {self.variant}"
         base = f"https://ftp.itacyl.es/cartografia/05_SIGPAC/{self.variant}_ETRS89/Parcelario_SIGPAC_CyL_Provincias/"
         response = requests.get(base)
         assert response.status_code == 200, f"Error getting urls {response}\n{response.content}"

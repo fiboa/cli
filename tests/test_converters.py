@@ -229,42 +229,46 @@ def _determination_converter(**attrs):
     return type("Converter", (FiboaBaseConverter,), {"id": "det", "columns": columns, **attrs})()
 
 
-def _post_migrate(converter, variant):
-    converter.variant = variant
-    gdf = gpd.GeoDataFrame(
-        {"id": ["a", "b"]},
-        geometry=[Point(0, 0), Point(1, 1)],
-        crs="EPSG:4326",
-    )
-    return converter.post_migrate(gdf)
+def _determination(converter, variant):
+    """The determination date the chosen variant adds as a constant column, if any."""
+    converter.select_variant(variant)
+    return converter.column_additions.get("determination:datetime")
 
 
 def test_year_variants_default_to_the_variant_as_determination():
     """Without an explicit setting, year-like variants fill the determination date
     from the chosen variant (fiboa/cli#284)."""
     converter = _determination_converter(variants={str(y): str(y) for y in range(2024, 2019, -1)})
-    gdf = _post_migrate(converter, "2023")
-    assert gdf["determination:datetime"].tolist() == ["2023-01-01T00:00:00Z"] * 2
+    assert _determination(converter, "2023") == "2023-01-01T00:00:00Z"
+
+
+def test_the_default_variant_fills_the_determination():
+    converter = _determination_converter(variants={"2023": "2023", "2024": "2024"})
+    assert _determination(converter, None) == "2024-01-01T00:00:00Z"
+
+
+def test_reselecting_a_variant_updates_the_determination():
+    """The first date added must not count as provided by the converter."""
+    converter = _determination_converter(variants={"2023": "2023", "2024": "2024"})
+    _determination(converter, "2023")
+    assert _determination(converter, "2024") == "2024-01-01T00:00:00Z"
 
 
 def test_historical_year_variants_default_to_the_variant_as_determination():
     """The year range reaches back to 1900, so pre-2000 historical editions qualify too."""
     converter = _determination_converter(variants={"1995": "1995", "1996": "1996"})
-    gdf = _post_migrate(converter, "1995")
-    assert gdf["determination:datetime"].tolist() == ["1995-01-01T00:00:00Z"] * 2
+    assert _determination(converter, "1995") == "1995-01-01T00:00:00Z"
 
 
 def test_non_year_variants_do_not_default_to_determination():
     """Variants that are not years (e.g. region codes) carry no determination date."""
     converter = _determination_converter(variants={"north": "north", "south": "south"})
-    gdf = _post_migrate(converter, "north")
-    assert "determination:datetime" not in gdf.columns
+    assert _determination(converter, "north") is None
 
 
 def test_no_variants_do_not_default_to_determination():
     converter = _determination_converter(variants={})
-    gdf = _post_migrate(converter, None)
-    assert "determination:datetime" not in gdf.columns
+    assert _determination(converter, None) is None
 
 
 def test_a_mapped_determination_is_not_overwritten_by_the_variant():
@@ -274,13 +278,12 @@ def test_a_mapped_determination_is_not_overwritten_by_the_variant():
         variants={"2023": "2023"},
         columns={"geometry": "geometry", "id": "id", "campaign": "determination:datetime"},
     )
-    gdf = _post_migrate(converter, "2023")
-    # the source column is renamed after post_migrate, so it is untouched here
-    assert "determination:datetime" not in gdf.columns
+    assert _determination(converter, "2023") is None
 
 
-def test_a_self_mapped_determination_is_filled_from_the_variant():
-    """Mapping the key to itself only keeps the column (SIGPAC), so the variant fills it."""
+def test_a_self_mapped_determination_is_not_overwritten_by_the_variant():
+    """Mapping the key to itself means the converter fills the column in its own code
+    (e.g. pl_block from the archive date), so the variant must not overwrite it."""
     converter = _determination_converter(
         variants={"2023": "2023"},
         columns={
@@ -289,24 +292,41 @@ def test_a_self_mapped_determination_is_filled_from_the_variant():
             "determination:datetime": "determination:datetime",
         },
     )
-    gdf = _post_migrate(converter, "2023")
-    assert gdf["determination:datetime"].tolist() == ["2023-01-01T00:00:00Z"] * 2
+    assert _determination(converter, "2023") is None
+
+
+def test_a_constant_determination_is_not_overwritten_by_the_variant():
+    converter = _determination_converter(
+        variants={"2023": "2023"},
+        column_additions={"determination:datetime": "2023-06-15T00:00:00Z"},
+    )
+    assert _determination(converter, "2023") == "2023-06-15T00:00:00Z"
 
 
 def test_explicit_false_overrides_the_year_variant_default():
     converter = _determination_converter(
         variants={"2023": "2023"}, use_variant_as_determination=False
     )
-    gdf = _post_migrate(converter, "2023")
-    assert "determination:datetime" not in gdf.columns
+    assert _determination(converter, "2023") is None
 
 
 def test_explicit_true_fills_determination_for_non_year_variants():
     converter = _determination_converter(
         variants={"spring": "spring"}, use_variant_as_determination=True
     )
-    gdf = _post_migrate(converter, "spring")
-    assert gdf["determination:datetime"].tolist() == ["spring-01-01T00:00:00Z"] * 2
+    assert _determination(converter, "spring") == "spring-01-01T00:00:00Z"
+
+
+def test_explicit_true_without_a_variant_adds_no_determination():
+    converter = _determination_converter(variants={}, use_variant_as_determination=True)
+    assert _determination(converter, None) is None
+
+
+def test_es_cl_defaults_to_the_latest_campaign():
+    """ES-CL used to choose its year in get_urls(), after the determination is set."""
+    from fiboa_cli.datasets.es_cl import ESCLConverter
+
+    assert _determination(ESCLConverter(), None) == "2025-01-01T00:00:00Z"
 
 
 def test_a_variant_without_crops_drops_the_crop_promises():

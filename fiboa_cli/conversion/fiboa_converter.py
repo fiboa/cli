@@ -40,29 +40,29 @@ class FiboaBaseConverter(BaseConverter):
             str(v).isdigit() and 1900 <= int(v) <= 2100 for v in self.variants
         )
 
-    def _determination_provided(self, gdf):
-        """Whether the converter supplies determination:datetime itself."""
-        # mapping the key to itself only keeps the column, it provides no value
-        source = self._source_column(DETERMINATION_KEY)
+    def _determination_provided(self):
+        """Whether the converter supplies determination:datetime itself: mapped from a
+        source column (a self-mapping means the converter fills the column in its own
+        code) or added as a constant."""
+        # the declared constants: the instance copy also holds the variant date added below
         return (
-            DETERMINATION_KEY in gdf.columns
-            or source not in (None, DETERMINATION_KEY)
-            or DETERMINATION_KEY in (self.column_additions or {})
+            self._source_column(DETERMINATION_KEY) is not None
+            or DETERMINATION_KEY in type(self).column_additions
         )
 
-    def _use_variant_as_determination(self, gdf):
+    def _use_variant_as_determination(self):
         """Resolve use_variant_as_determination for this edition. An explicit True/False
         wins; the default (None) fills the determination date from the variant only when
         the variants are years and the converter provides no determination itself (#284)."""
         if self.use_variant_as_determination is not None:
             return self.use_variant_as_determination
-        return self._variants_are_years() and not self._determination_provided(gdf)
+        return self._variants_are_years() and not self._determination_provided()
 
-    def get_columns(self, gdf):
-        columns = super().get_columns(gdf)
-        if self._use_variant_as_determination(gdf):
-            columns.setdefault(DETERMINATION_KEY, DETERMINATION_KEY)
-        return columns
+    def select_variant(self, variant):
+        super().select_variant(variant)
+        # a constant column: the base converter adds it and keeps it in the output
+        if self.variant is not None and self._use_variant_as_determination():
+            self.column_additions[DETERMINATION_KEY] = f"{self.variant}-01-01T00:00:00Z"
 
     @staticmethod
     def _traditional_axis_order(gdf):
@@ -123,6 +123,4 @@ class FiboaBaseConverter(BaseConverter):
             # convert area in ha to meters
             gdf[area_key] = gdf[area_key].astype(float) * 10_000
 
-        if self._use_variant_as_determination(gdf):
-            gdf[DETERMINATION_KEY] = f"{self.variant}-01-01T00:00:00Z"
         return gdf

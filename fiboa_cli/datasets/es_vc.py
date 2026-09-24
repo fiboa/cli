@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 
 import requests
 
@@ -39,8 +38,6 @@ Geographic Information System (SIGPAC) in the Valencian Community valid for the 
     use_code_attribute = "USO_SIGPAC"
 
     def get_urls(self):
-        self.column_additions["determination:datetime"] = datetime(int(self.variant), 1, 1)
-
         from bs4 import BeautifulSoup
 
         base = f"https://descargas.icv.gva.es/dcd/14_mediorural/03_pac/{self.variant}_SIGPAC_0050"

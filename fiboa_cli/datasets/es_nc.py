@@ -23,7 +23,6 @@ least 2026-09-10."""
         "crop:name": "crop:name",
         "crop:name_en": "crop:name_en",
         "dn_surface": "metrics:area",
-        "determination:datetime": "determination:datetime",  # the campaign, from the variant
     }
     missing_schemas = {
         "properties": {

@@ -39,7 +39,6 @@ position in the download, since the source carries no parcel identifier.
     license = "Publiczne dane ARiMR, no licence stated <https://geoportal.arimr.gov.pl/mapy/apps/sites/#/portal>"
     ec_mapping_csv = "https://fiboa.org/code/pl/pl.csv"
     open_options = dict(encoding="UTF-8")  # GDAL does not read the .cst GeoServer writes
-    use_variant_as_determination = True
     columns = {
         "geometry": "geometry",
         "id": "id",  # derived in file_migration()
@@ -48,7 +47,6 @@ position in the download, since the source carries no parcel identifier.
         "grupa_rosl": "crop_group",
         "gr_upraw": "support_schemes",
         "pow": "metrics:area",
-        "determination:datetime": "determination:datetime",
     }
     column_migrations = {"pow": lambda col: col.str.removesuffix(" ha").astype(float)}
     missing_schemas = {

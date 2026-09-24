@@ -180,7 +180,11 @@ expected_columns = {
     # the determination date comes from the year variant
     "dk": ("determination:datetime",),
     "es_nc": ("determination:datetime",),
+    "es_cl": ("determination:datetime",),
     "fr": ("determination:datetime",),
+    "pl": ("determination:datetime",),
+    # filled from the archive date, which the variant must not overwrite
+    "pl_block": ("determination:datetime",),
 }
 
 
