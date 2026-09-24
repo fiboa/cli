@@ -30,7 +30,6 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "Afgkode": "crop:code",
         "Afgroede": "crop:name",
     }
-    use_variant_as_determination = True
 
     def migrate(self, gdf) -> gpd.GeoDataFrame:
         # Marknr numbers a field within one application, so alone it repeats across

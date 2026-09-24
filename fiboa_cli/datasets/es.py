@@ -37,8 +37,6 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
     }
 
     area_is_in_ha = False
-    # the edition is the campaign; the variant is only known once convert() runs
-    use_variant_as_determination = True
 
     extensions = {
         "https://fiboa.org/crop-extension/v0.2.0/schema.yaml",

@@ -31,7 +31,7 @@ The download service is a set of personalized spatial data of agricultural land 
         "Shape_Area": "metrics:area",
         "geometry": "geometry",
     }
-    add_columns = {"determination:datetime": "2021-10-08T00:00:00Z"}
+    column_additions = {"determination:datetime": "2021-10-08T00:00:00Z"}
     # The groups that are crops; the rest is grassland, forest, ditches,
     # wetlands, fallow and other land cover.
     CROP_GROUPS = [

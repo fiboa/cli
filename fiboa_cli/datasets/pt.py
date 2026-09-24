@@ -55,7 +55,6 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     ec_mapping_csv = "https://fiboa.org/code/pt/pt.csv"
-    use_variant_as_determination = True
     area_is_in_ha = False
     missing_schemas = {
         "properties": {

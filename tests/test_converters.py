@@ -222,6 +222,121 @@ def test_multipart_features_keep_their_row_and_metrics(tmp_parquet_file):
     assert result["metrics:perimeter"].tolist() == [120.0, 60.0]
 
 
+def _determination_converter(**attrs):
+    from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+
+    columns = attrs.pop("columns", {"geometry": "geometry", "id": "id"})
+    return type("Converter", (FiboaBaseConverter,), {"id": "det", "columns": columns, **attrs})()
+
+
+def _determination(converter, variant):
+    """The determination date the chosen variant adds as a constant column, if any."""
+    converter.select_variant(variant)
+    return converter.column_additions.get("determination:datetime")
+
+
+def test_year_variants_default_to_the_variant_as_determination():
+    """Without an explicit setting, year-like variants fill the determination date
+    from the chosen variant (fiboa/cli#284)."""
+    converter = _determination_converter(variants={str(y): str(y) for y in range(2024, 2019, -1)})
+    assert _determination(converter, "2023") == "2023-01-01T00:00:00Z"
+
+
+def test_the_default_variant_fills_the_determination():
+    converter = _determination_converter(variants={"2023": "2023", "2024": "2024"})
+    assert _determination(converter, None) == "2024-01-01T00:00:00Z"
+
+
+def test_reselecting_a_variant_updates_the_determination():
+    """The first date added must not count as provided by the converter."""
+    converter = _determination_converter(variants={"2023": "2023", "2024": "2024"})
+    _determination(converter, "2023")
+    assert _determination(converter, "2024") == "2024-01-01T00:00:00Z"
+
+
+def test_historical_year_variants_default_to_the_variant_as_determination():
+    """The year range reaches back to 1900, so pre-2000 historical editions qualify too."""
+    converter = _determination_converter(variants={"1995": "1995", "1996": "1996"})
+    assert _determination(converter, "1995") == "1995-01-01T00:00:00Z"
+
+
+def test_non_year_variants_do_not_default_to_determination():
+    """Variants that are not years (e.g. region codes) carry no determination date."""
+    converter = _determination_converter(variants={"north": "north", "south": "south"})
+    assert _determination(converter, "north") is None
+
+
+@pytest.mark.parametrize("variant", ["02023", "²", "٢٠٢٣", "1899", "2101"])
+def test_malformed_or_out_of_range_year_variants_do_not_default_to_determination(variant):
+    """Only four ASCII digits in 1900–2100 are years: a padded year would give an
+    invalid timestamp, and some Unicode digits make int() fail."""
+    converter = _determination_converter(variants={variant: variant})
+    assert _determination(converter, variant) is None
+
+
+def test_no_variants_do_not_default_to_determination():
+    converter = _determination_converter(variants={})
+    assert _determination(converter, None) is None
+
+
+def test_a_mapped_determination_is_not_overwritten_by_the_variant():
+    """A converter that maps its own determination:datetime keeps it, even with year
+    variants: the default only fills the gap, it never overrides."""
+    converter = _determination_converter(
+        variants={"2023": "2023"},
+        columns={"geometry": "geometry", "id": "id", "campaign": "determination:datetime"},
+    )
+    assert _determination(converter, "2023") is None
+
+
+def test_a_self_mapped_determination_is_not_overwritten_by_the_variant():
+    """Mapping the key to itself means the converter fills the column in its own code
+    (e.g. pl_block from the archive date), so the variant must not overwrite it."""
+    converter = _determination_converter(
+        variants={"2023": "2023"},
+        columns={
+            "geometry": "geometry",
+            "id": "id",
+            "determination:datetime": "determination:datetime",
+        },
+    )
+    assert _determination(converter, "2023") is None
+
+
+def test_a_constant_determination_is_not_overwritten_by_the_variant():
+    converter = _determination_converter(
+        variants={"2023": "2023"},
+        column_additions={"determination:datetime": "2023-06-15T00:00:00Z"},
+    )
+    assert _determination(converter, "2023") == "2023-06-15T00:00:00Z"
+
+
+def test_explicit_false_overrides_the_year_variant_default():
+    converter = _determination_converter(
+        variants={"2023": "2023"}, use_variant_as_determination=False
+    )
+    assert _determination(converter, "2023") is None
+
+
+def test_explicit_true_fills_determination_for_non_year_variants():
+    converter = _determination_converter(
+        variants={"spring": "spring"}, use_variant_as_determination=True
+    )
+    assert _determination(converter, "spring") == "spring-01-01T00:00:00Z"
+
+
+def test_explicit_true_without_a_variant_adds_no_determination():
+    converter = _determination_converter(variants={}, use_variant_as_determination=True)
+    assert _determination(converter, None) is None
+
+
+def test_es_cl_defaults_to_the_latest_campaign():
+    """ES-CL used to choose its year in get_urls(), after the determination is set."""
+    from fiboa_cli.datasets.es_cl import ESCLConverter
+
+    assert _determination(ESCLConverter(), None) == "2025-01-01T00:00:00Z"
+
+
 def test_a_variant_without_crops_drops_the_crop_promises():
     """DK 2008 publishes fields without a crop, so it may not claim the schemas.
 

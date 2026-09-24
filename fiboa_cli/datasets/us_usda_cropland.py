@@ -49,7 +49,6 @@ CSB represents non-confidential single crop field boundaries over a set time fra
             "administrative_area_level_2_code": {"type": "string"},
         }
     }
-    use_variant_as_determination = True
     ec_mapping_csv = "https://fiboa.org/code/us/usda/cropland.csv"
 
     def migrate(self, gdf):

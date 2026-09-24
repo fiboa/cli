@@ -1,3 +1,5 @@
+import re
+
 import pyproj
 import shapely
 from vecorel_cli.conversion.base import BaseConverter
@@ -5,6 +7,7 @@ from vecorel_cli.conversion.base import BaseConverter
 from ..fiboa.version import get_fiboa_uri
 
 AREA_KEY = "metrics:area"
+DETERMINATION_KEY = "determination:datetime"
 
 
 def _swap_xy(coords):
@@ -17,7 +20,10 @@ def _swap_xy(coords):
 class FiboaBaseConverter(BaseConverter):
     area_is_in_ha = True
     area_calculate_missing = False
-    use_variant_as_determination = False
+    # None (the default) resolves per edition: a converter whose variants are years
+    # and that maps no determination:datetime of its own takes the variant year as
+    # the determination date. Set True/False to force it on or off. See #284.
+    use_variant_as_determination = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,6 +35,37 @@ class FiboaBaseConverter(BaseConverter):
             if target == mapped or (isinstance(mapped, (list, tuple)) and target in mapped):
                 return source
         return None
+
+    def _variants_are_years(self):
+        """Whether every declared variant is a year in the range 1900–2100."""
+        # four ASCII digits: isdigit() also accepts e.g. "²" (int() fails) and "02023"
+        return bool(self.variants) and all(
+            re.fullmatch("[0-9]{4}", str(v)) and 1900 <= int(v) <= 2100 for v in self.variants
+        )
+
+    def _determination_provided(self):
+        """Whether the converter supplies determination:datetime itself: mapped from a
+        source column (a self-mapping means the converter fills the column in its own
+        code) or added as a constant."""
+        # the declared constants: the instance copy also holds the variant date added below
+        return (
+            self._source_column(DETERMINATION_KEY) is not None
+            or DETERMINATION_KEY in type(self).column_additions
+        )
+
+    def _use_variant_as_determination(self):
+        """Resolve use_variant_as_determination for this edition. An explicit True/False
+        wins; the default (None) fills the determination date from the variant only when
+        the variants are years and the converter provides no determination itself (#284)."""
+        if self.use_variant_as_determination is not None:
+            return self.use_variant_as_determination
+        return self._variants_are_years() and not self._determination_provided()
+
+    def select_variant(self, variant):
+        super().select_variant(variant)
+        # a constant column: the base converter adds it and keeps it in the output
+        if self.variant is not None and self._use_variant_as_determination():
+            self.column_additions[DETERMINATION_KEY] = f"{self.variant}-01-01T00:00:00Z"
 
     @staticmethod
     def _traditional_axis_order(gdf):
@@ -89,6 +126,4 @@ class FiboaBaseConverter(BaseConverter):
             # convert area in ha to meters
             gdf[area_key] = gdf[area_key].astype(float) * 10_000
 
-        if self.use_variant_as_determination:
-            gdf["determination:datetime"] = f"{self.variant}-01-01T00:00:00Z"
         return gdf

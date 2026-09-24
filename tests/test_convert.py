@@ -154,7 +154,9 @@ extra_convert_parameters = {
     "it_bz": _input_files("it_bz", "it_bz.json"),
     "de_sax": {"input_files": {f"{test_path}/de_sax/gesamt_2026_RE.zip": ["2026_RE_FB_33.shp"]}},
     "de_fusion_ml": _input_files("de_fusion", "de_test_2019.geojson", "de_train_2018.geojson"),
-    "za_fusion_ml": _input_files("za_fusion", "za_train_258N.geojson", "za_train_259N.geojson", "za_test_2017.geojson"),
+    "za_fusion_ml": _input_files(
+        "za_fusion", "za_train_258N.geojson", "za_train_259N.geojson", "za_test_2017.geojson"
+    ),
     "rw_rwanda_ml": _input_files("rw_rwanda", "rw_rwanda_2021.geojson"),
 }
 
@@ -175,7 +177,16 @@ extra_convert_parameters = {
 # expectation per edition where the editions genuinely differ.
 expected_columns = {
     "de_sh": ("determination:datetime", "metrics:area", "flik", "hbn", "id"),
+    # the determination date comes from the year variant
+    "dk": ("determination:datetime",),
+    "es_nc": ("determination:datetime",),
+    "es_cl": ("determination:datetime",),
+    "fr": ("determination:datetime",),
+    "pl": ("determination:datetime",),
+    # derived from the archive date in file_migration()
+    "pl_block": ("determination:datetime",),
 }
+
 
 @mark.parametrize("converter", tests)
 @patch("fiboa_cli.datasets.commons.ec.load_ec_mapping")

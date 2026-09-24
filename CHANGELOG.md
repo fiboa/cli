@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Updated vecorel-cli to 0.3.0, including improved validation defaults, latest-variant selection when `--variant` is not provided, multi-volume 7z download support, and more.
 - REST converters download much faster from large layers and retry when a service answers with intermittent errors.
 - Converters no longer split multi-part geometries into one row per polygon: fields keep the geometry modeling of the source (Polygon or MultiPolygon), the source-published area and perimeter, and one id per source feature. Use `fiboa improve --explode-geometries` when single polygons are needed.
+- Converters whose variants are years (1900-2100) now fill `determination:datetime` from the selected year unless they provide a determination date themselves.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
@@ -46,6 +47,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - ES regions based on SIGPAC now publish `hcat:code` from land-use mapping.
   - ES-AR now reads municipality SIGPAC sources listed by IDEAragon.
   - ES-CB now covers editions 2010-2025.
+  - ES-CL now declares its editions (2019-2025) as variants.
   - ES-GA now supports editions 2014-2026.
   - ES-IB now covers editions 2022-2026, reading the current and the historic SIGPAC services.
 - FI: Editions are now available by year (2020-2025).
@@ -89,7 +91,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Missing crop codes are kept empty instead of being filled with the undefined code 0.
 - EC-EE: Fixed shapefile naming and year-column migration.
 - EC-FR: Added the missing 2018 RPG campaign from EuroCrops.
-- EC-LT: Fixed Lithuanian crop-name decoding and parcel identifier handling.
+- EC-LT:
+  - Fixed Lithuanian crop-name decoding and parcel identifier handling.
+  - `determination:datetime` is now published; it was declared under a name the converter does not read.
 - EC-LV: Relaxed requirements to match fields present in source data.
 - EC-SI: Relaxed requirements to match fields present in source data.
 - EE: Published valid crop code, land-use class and stable parcel identifier; cache files are now campaign-specific.
