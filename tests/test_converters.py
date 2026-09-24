@@ -181,15 +181,20 @@ def test_lv_requires_the_nine_regional_geopackages(monkeypatch):
         converter.get_urls()
 
 
-def test_split_multipart_recomputes_the_metrics_of_the_parts():
-    """explode() copies the source row's attributes onto every part, so the area and
-    perimeter of a two-part feature would be published twice, for the whole feature."""
+def test_multipart_features_keep_their_row_and_metrics(tmp_parquet_file):
+    """Multi-part geometries are no longer split into one row per polygon, so the
+    source-published area and perimeter stay correct for the whole feature and the
+    ids stay 1:1 with the source (fiboa/cli#282)."""
     from shapely.geometry import MultiPolygon, box
 
-    from fiboa_cli.conversion.fiboa_converter import SPLIT_KEY, FiboaBaseConverter
+    from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 
     class Converter(FiboaBaseConverter):
-        id = "split"
+        id = "multipart"
+        short_name = "Multipart"
+        title = "Multipart"
+        description = "Multipart"
+        license = "CC0-1.0"
         columns = {
             "geometry": "geometry",
             "id": "id",
@@ -199,21 +204,22 @@ def test_split_multipart_recomputes_the_metrics_of_the_parts():
         area_is_in_ha = False
 
     two_parts = MultiPolygon([box(0, 0, 10, 10), box(20, 0, 50, 10)])  # 100 + 300 m²
-    one_part = MultiPolygon([box(0, 20, 10, 40)])  # 200 m², a multi-part type but not split
+    one_part = box(0, 20, 10, 40)  # 200 m²
     gdf = gpd.GeoDataFrame(
         {"id": ["a", "b"], "shape_area": [400.0, 200.0], "shape_length": [120.0, 60.0]},
         geometry=[two_parts, one_part],
         crs="EPSG:3059",
     )
+    src = tmp_parquet_file.parent / "source.parquet"
+    gdf.to_parquet(src)
 
-    converter = Converter()
-    gdf = converter.split_multipart(gdf)
-    assert gdf["id"].tolist() == ["a", "a", "b"]
+    Converter().convert(tmp_parquet_file, input_files={str(src): "source.parquet"})
 
-    gdf = converter.post_migrate(gdf)
-    assert SPLIT_KEY not in gdf.columns
-    assert gdf["shape_area"].tolist() == [100.0, 300.0, 200.0]
-    assert gdf["shape_length"].tolist() == [40.0, 80.0, 60.0]
+    result = gpd.read_parquet(tmp_parquet_file).sort_values("id")
+    assert result["id"].tolist() == ["a", "b"]
+    assert result.geometry.geom_type.tolist() == ["MultiPolygon", "Polygon"]
+    assert result["metrics:area"].tolist() == [400.0, 200.0]
+    assert result["metrics:perimeter"].tolist() == [120.0, 60.0]
 
 
 def test_a_variant_without_crops_drops_the_crop_promises():

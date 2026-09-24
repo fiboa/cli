@@ -30,7 +30,6 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
     # repeats once per growing parcel
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "PERUSLOHKOTUNNUS": "block_id",
         "area": "metrics:area",
         "VUOSI": "determination:datetime",
@@ -42,9 +41,8 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
         "VUOSI": lambda col: pd.to_datetime(col, format="%Y"),
     }
 
-    def migrate(self, gdf):
-        gdf["id"] = gdf["PERUSLOHKOTUNNUS"].astype(str) + ":" + gdf["LOHKONUMERO"].astype(str)
-        return super().migrate(gdf)
+    id_columns = ("PERUSLOHKOTUNNUS", "LOHKONUMERO")
+    id_separator = ":"
 
     ec_mapping_csv = "https://fiboa.org/code/fi/fi_2023.csv"
 

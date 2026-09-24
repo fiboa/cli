@@ -34,7 +34,6 @@ free-licensed version for this converter.
         "geometry": "geometry",
         "crop_name": "crop:name",
         "crop_code": "crop:code",
-        "id": "id",
         "determination:datetime": "determination:datetime",
     }
     ec_mapping_csv = "be_wal_all_years.csv"
@@ -44,7 +43,6 @@ free-licensed version for this converter.
     column_additions = {
         "determination:datetime": "2022-01-01T00:00:00Z",
     }
-    index_as_id = True
 
     def layer_filter(self, layer: str, uri: str) -> bool:
         return layer == "ExistingLandUseObject"

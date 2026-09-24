@@ -66,11 +66,6 @@ payment. The layer carries no crop or land-cover class. ARiMR publishes only the
 
     def migrate(self, gdf):
         gdf["powierzchn"] = gdf["powierzchn"].str.removesuffix(" m2").astype(float)
-        # A parcel's eligible area can be several patches; split first so the parts can be
-        # numbered, post_migrate() then gives each part its own area
-        gdf = self.split_multipart(gdf)
         gdf["id"] = gdf["id_ewidenc"].astype("string")
-        part = gdf.groupby("id").cumcount()
-        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype("string")
         gdf["admin:subdivision_code"] = gdf["id_ewidenc"].str[:2]
         return super().migrate(gdf)

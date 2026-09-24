@@ -41,28 +41,7 @@ class SigpacRecintoMixin:
         # the archive also holds the code lists the register refers to
         return layer == "recinto"
 
-    def migrate(self, gdf):
-        # The register has no row identifier; the cadastral key is one, and it is what
-        # es.py builds for the declared crops of the same parcels.
-        def part(column):
-            return gdf[column].astype("Int64").astype(str)
-
-        gdf["id"] = (
-            part("provincia").str.zfill(2)
-            + "-"
-            + part("municipio")
-            + "-"
-            + part("agregado")
-            + "-"
-            + part("zona")
-            + "-"
-            + part("poligono")
-            + "-"
-            + part("parcela")
-            + "-"
-            + part("recinto")
-        )
-        # the key is not quite unique: Badajoz 2026 repeats 19 of its 1,313,841 rows
-        piece = gdf.groupby("id").cumcount()
-        gdf.loc[piece > 0, "id"] += "-" + (piece[piece > 0] + 1).astype(str)
-        return super().migrate(gdf)
+    # The register has no row identifier; the cadastral key is one, and it is what
+    # es.py builds for the declared crops of the same parcels. It is not quite unique
+    # (Badajoz 2026 repeats 19 of its 1,313,841 rows); the base numbers the repeats.
+    id_columns = ("provincia", "municipio", "agregado", "zona", "poligono", "parcela", "recinto")

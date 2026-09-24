@@ -35,8 +35,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
-- Updated vecorel-cli to 0.3.0, including improved validation defaults, latest-variant selection when `--variant` is not provided, and multi-volume 7z download support.
+- Updated vecorel-cli to 0.3.0, including improved validation defaults, latest-variant selection when `--variant` is not provided, multi-volume 7z download support, and more.
 - REST converters download much faster from large layers and retry when a service answers with intermittent errors.
+- Converters no longer split multi-part geometries into one row per polygon: fields keep the geometry modeling of the source (Polygon or MultiPolygon), the source-published area and perimeter, and one id per source feature. Use `fiboa improve --explode-geometries` when single polygons are needed.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
@@ -69,7 +70,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Error responses and interrupted downloads are no longer cached.
   - Layers that join several tables (some ES-CB and ES-IB editions) are now filtered and paged correctly, and their column names no longer carry table prefixes.
 - Fixed `use_variant_as_determination` so determination dates are retained.
-- Multipart geometries now get recomputed area/perimeter for split parts.
+- Converters no longer publish duplicate `id`s (#282): row-numbered ids count over all source files instead of restarting per file, and ids the source repeats get a `~<n>` suffix.
 - Rows missing `crop:code` are now dropped with a warning (and an error threshold), instead of failing whole conversions.
 - CH:
   - CH now uses geodienste.ch STAC canton downloads.

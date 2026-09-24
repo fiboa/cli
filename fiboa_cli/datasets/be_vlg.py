@@ -69,10 +69,8 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
                 gdf["BT_OMSCH"] = None
         return super().migrate(gdf)
 
-    index_as_id = True
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "BT_OMSCH": "typology",
         "GRAF_OPP": "metrics:area",
         "REF_ID": "block_id",

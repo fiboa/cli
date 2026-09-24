@@ -47,7 +47,6 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
     ec_mapping_csv = "https://fiboa.org/code/es/cat/crop.csv"
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "campanya": "determination:datetime",
         "ha": "metrics:area",
         "cultiu": "crop:name",
@@ -59,7 +58,6 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
         "campanya": lambda col: pd.to_datetime(col, format="%Y"),
     }
 
-    index_as_id = True
 
     def layer_filter(self, layer, uri):
         return "cultius" in layer.lower()

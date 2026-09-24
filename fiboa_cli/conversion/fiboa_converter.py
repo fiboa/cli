@@ -5,9 +5,6 @@ from vecorel_cli.conversion.base import BaseConverter
 from ..fiboa.version import get_fiboa_uri
 
 AREA_KEY = "metrics:area"
-PERIMETER_KEY = "metrics:perimeter"
-# marks the rows that split_multipart() made out of one source feature
-SPLIT_KEY = "__split_part"
 
 
 def _swap_xy(coords):
@@ -25,23 +22,6 @@ class FiboaBaseConverter(BaseConverter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.extensions.add(get_fiboa_uri())
-
-    def split_multipart(self, gdf):
-        """
-        Split multi-part geometries into one row per polygon.
-
-        The base converter does the same, but only after it has checked the ids. A
-        converter that mints its ids in file_migration(), migrate() or post_migrate()
-        splits first, so that it can number the parts that share an id. The parts keep
-        the attributes of the source feature, so post_migrate() recomputes the area and
-        perimeter of the rows this made: the source values describe the whole feature.
-        """
-        gdf.geometry = gdf.geometry.make_valid()
-        gdf[SPLIT_KEY] = shapely.get_num_geometries(gdf.geometry.values) > 1
-        gdf = gdf.explode(index_parts=False)
-        gdf = gdf[(gdf.geometry.geom_type == "Polygon") & gdf.geometry.is_valid]
-        # explode repeats the source row labels, which misaligns a later assignment
-        return gdf.reset_index(drop=True)
 
     def _source_column(self, target):
         """The source column that `columns` maps to `target`; the rename comes later."""
@@ -77,37 +57,25 @@ class FiboaBaseConverter(BaseConverter):
                 )
         return gdf
 
-    def post_migrate(self, gdf):
-        gdf = super().post_migrate(gdf)
-        gdf = self._traditional_axis_order(gdf)
-
-        area_key = self._source_column(AREA_KEY)
-        crs_is_in_meters = bool(
+    @staticmethod
+    def _crs_in_meters(gdf):
+        return bool(
             gdf.crs
             and gdf.crs.axis_info
             and gdf.crs.axis_info[0].unit_name in ("m", "metre", "meter")
         )
 
+    def post_migrate(self, gdf):
+        gdf = super().post_migrate(gdf)
+        gdf = self._traditional_axis_order(gdf)
+
+        area_key = self._source_column(AREA_KEY)
+        crs_is_in_meters = self._crs_in_meters(gdf)
+
         def in_metres(geometry):
             # Reprojecting is costly, so only the geometries whose area is computed are,
             # and only when the CRS is not in metres: to an equal-area projection.
             return geometry if crs_is_in_meters else geometry.to_crs("EPSG:6933")
-
-        if SPLIT_KEY in gdf.columns:
-            split = gdf.pop(SPLIT_KEY).fillna(False).astype(bool).to_numpy()
-            if split.any():
-                # the parts of one source feature inherited its area and perimeter
-                parts = gdf.geometry[split]
-                if area_key in gdf.columns:
-                    factor = (
-                        10_000 if self.area_is_in_ha and not self.area_calculate_missing else 1
-                    )
-                    gdf.loc[split, area_key] = in_metres(parts).area / factor
-                perimeter_key = self._source_column(PERIMETER_KEY)
-                if perimeter_key in gdf.columns:
-                    # an equal-area projection distorts lengths, so measure those in UTM
-                    lengths = parts if crs_is_in_meters else parts.to_crs(parts.estimate_utm_crs())
-                    gdf.loc[split, perimeter_key] = lengths.length
 
         if self.area_calculate_missing:
             if area_key in gdf.columns:

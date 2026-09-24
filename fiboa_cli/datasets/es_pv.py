@@ -26,7 +26,6 @@ the 2005 community aid application period.
     license = "CC-BY-4.0"
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "CAMPANA": "determination:datetime",
         "USO": "crop:code",
         "crop:name": "crop:name",
@@ -34,7 +33,6 @@ the 2005 community aid application period.
 
     column_migrations = {"CAMPANA": lambda col: pd.to_datetime(col, format="%Y")}
     use_code_attribute = "USO"
-    index_as_id = True
 
     def get_urls(self):
         assert self.variant in self.variants

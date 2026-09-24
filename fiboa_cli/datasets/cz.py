@@ -65,7 +65,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         elif gdf["ZAKRES_ID"].duplicated().any():
             # A declaration straddling two land blocks is listed once per block
             # with the same geometry both times (one pair in 2026). A repeat of
-            # a different shape is something else and still fails the id check.
+            # a different shape is something else and is still flagged by the id check.
             repeats = gdf.assign(_wkb=gdf.geometry.to_wkb()).duplicated(["ZAKRES_ID", "_wkb"])
             self.info(f"Dropping {repeats.sum()} declaration(s) listed once per land block")
             gdf = gdf[~repeats]

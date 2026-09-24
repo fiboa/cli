@@ -98,8 +98,6 @@ published separately.
         gdf["area_type"] = gdf["area_type"].str.rsplit("/", n=1).str[-1]
 
         # the source publishes several land cover records for one block, each with its own
-        # polygon, so the flik alone does not identify a row
+        # polygon, so the flik alone does not identify a row; the base numbers the repeats
         gdf["id"] = gdf["flik"]
-        part = gdf.groupby("id").cumcount()
-        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype(str)
         return super().migrate(gdf)

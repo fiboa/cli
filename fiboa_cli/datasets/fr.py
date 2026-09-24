@@ -83,13 +83,9 @@ The anonymized version is distributed as part of the public service for making r
             # Make column names lowercase, harmonize for different years
             gdf = gdf.rename(columns={k: k.lower() for k in gdf.columns})
 
-        # id_parcel repeats (multipart parcels, and the source reissues some ids):
-        # split before the base checks the ids, then number the repeats
-        gdf = self.split_multipart(gdf)
+        # the source reissues some parcel ids; the base converter numbers the repeats
         gdf["parcel_id"] = gdf["id_parcel"]
         gdf["id"] = gdf["id_parcel"].astype("string")
-        part = gdf.groupby("id").cumcount()
-        gdf.loc[part > 0, "id"] += "-" + (part[part > 0] + 1).astype("string")
         return super().migrate(gdf)
 
     column_filters = {

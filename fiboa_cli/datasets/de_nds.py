@@ -37,9 +37,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     ec_mapping_supplements = ["https://fiboa.org/code/de/de_supplement.csv"]
     # The shapefile has no unique key: 880,581 features share 874,222 distinct
     # (FLIK, SCHLAGNR) pairs, so the row index is the only identifier available.
-    index_as_id = True
     columns = {
-        "id": "id",
         "geometry": "geometry",
         "FLIK": "flik",
         "SCHLAGNR": "subfield_id",
