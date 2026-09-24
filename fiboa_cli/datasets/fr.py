@@ -1,11 +1,5 @@
-import os
-import re
-
-import multivolumefile
-import py7zr
 from geopandas import GeoDataFrame
 from vecorel_cli.conversion.admin import AdminConverterMixin
-from vecorel_cli.vecorel.util import name_from_uri
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.ec import AddHCATMixin
@@ -39,7 +33,9 @@ class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             ]
         },
         "2020": {
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FR_2020-01-01/RPG_2-0__GPKG_LAMB93_FR_2020-01-01.7z.001": [],
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FR_2020-01-01/RPG_2-0__GPKG_LAMB93_FR_2020-01-01.7z.001": [
+                "**/PARCELLES_GRAPHIQUES.gpkg"
+            ],
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-0__GPKG_LAMB93_FR_2020-01-01/RPG_2-0__GPKG_LAMB93_FR_2020-01-01.7z.002": [],
         },
         "2019": {
@@ -54,32 +50,6 @@ class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             ]
         },
     }
-
-    def download_files(self, uris, cache_folder=None):
-        """Multi-volume 7z archives (.7z.001, .7z.002, ...) are one 7z stream split
-        into parts; py7zr reads them through multivolumefile, vecorel-cli does not."""
-        volumes = [uri for uri in uris if re.search(r"\.7z\.\d{3}$", uri)]
-        if not volumes:
-            return super().download_files(uris, cache_folder)
-        others = {uri: target for uri, target in uris.items() if uri not in volumes}
-        # download the parts as plain files (no extraction by the base class)
-        parts = super().download_files({uri: name_from_uri(uri) for uri in volumes}, cache_folder)
-        name = name_from_uri(volumes[0])  # <name>.7z.001
-        archive = parts[0][0][: -len(".001")]
-        _, cache_dir = self.get_cache(cache_folder)
-        folder = os.path.join(cache_dir, "extracted." + os.path.splitext(name)[0])
-        if not os.path.exists(folder):
-            self.info(f"Extracting {len(parts)} volumes of {os.path.basename(archive)}")
-            with multivolumefile.MultiVolume(archive, mode="rb", ext_digits=3) as volume:
-                with py7zr.SevenZipFile(volume, "r") as sz:
-                    sz.extractall(folder)
-        targets = next(
-            (uris[uri] for uri in volumes if uris[uri]), ["**/PARCELLES_GRAPHIQUES.gpkg"]
-        )
-        paths = [(os.path.join(folder, target), volumes[0]) for target in targets]
-        if others:
-            paths.extend(super().download_files(others, cache_folder))
-        return paths
 
     id = "fr"
     short_name = "France"
