@@ -47,7 +47,6 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
     ec_mapping_csv = "https://fiboa.org/code/fi/fi_2023.csv"
 
     area_is_in_ha = False
-    area_calculate_missing = True
 
     missing_schemas = {
         "properties": {

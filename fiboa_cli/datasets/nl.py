@@ -10,7 +10,6 @@ base = "https://service.pdok.nl/rvo/gewaspercelen/atom/downloads"
 
 
 class NLCropConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
-    area_calculate_missing = True
     variants = {
         "2026": f"{base}/gewaspercelen_concept_2026.gpkg",
         **{str(y): f"{base}/brpgewaspercelen_definitief_{y}.gpkg" for y in range(2025, 2019, -1)},
@@ -46,7 +45,6 @@ Data is currently available for the years 2009 to 2025 (final) and 2026 (concept
 
     columns = {
         "geometry": "geometry",
-        "area": "metrics:area",
         "category": "coverage",
         "gewascode": "crop:code",
         "gewas": "crop:name",
@@ -56,8 +54,8 @@ Data is currently available for the years 2009 to 2025 (final) and 2026 (concept
     def migrate(self, gdf):
         if "GWS_GEWASCODE" in gdf.columns:
             # 2009-2019 FileGDB editions: prefixed names, no year column, and
-            # only a m2 shape area (left unmapped; area_calculate_missing
-            # derives metrics:area from the geometry instead)
+            # only a m2 shape area (left unmapped; metrics:area is measured
+            # from the geometry instead)
             gdf = gdf.rename(
                 columns={
                     "GWS_GEWASCODE": "gewascode",

@@ -43,17 +43,13 @@ year for the application procedure.
 
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
 
-    # The service publishes no area attribute, so it is derived from the geometry. The data is in
-    # EPSG:25832, so the result is already in m² and must not be scaled.
-    area_is_in_ha = False
-    area_calculate_missing = True
+    # The service publishes no area attribute, so metrics:area is measured from the geometry.
 
     columns = {
         "geometry": "geometry",
         "flik": ("flik", "id"),  # derived in migrate(); unique, unlike in Baden-Württemberg
         "agricultural_area_type": "crop:code",  # added in file_migration(), trimmed in migrate()
         "validFrom": "determination:datetime",
-        "area": "metrics:area",  # not in the source; created by area_calculate_missing
     }
     column_migrations = {"validFrom": lambda col: pd.to_datetime(col)}
 

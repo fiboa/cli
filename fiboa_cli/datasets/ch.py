@@ -30,7 +30,6 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "ist_ueberlagernd": lambda col: col == False,  # noqa: E712
     }
     area_is_in_ha = False
-    area_calculate_missing = True
     column_migrations = {
         "bezugsjahr": lambda col: pd.to_datetime(col, format="%Y"),
         # crop:code must be a string per the crop extension; lnf_code is an integer.

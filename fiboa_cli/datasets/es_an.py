@@ -45,7 +45,6 @@ developments.
 
     use_code_attribute = "CD_USO"
     area_is_in_ha = False
-    area_calculate_missing = True
 
     column_migrations = {
         "ID_RECINTO": lambda col: col.astype("int64"),

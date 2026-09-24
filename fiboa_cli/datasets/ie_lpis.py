@@ -81,7 +81,6 @@ digitised and eligible area and the area claimed by all applicants together. Unc
         "https://fiboa.org/code/ie/ie.csv"  # the GSAA list, extended by the LPIS-only names
     )
     area_is_in_ha = False
-    area_calculate_missing = True
     columns = {
         "geometry": "geometry",
         "PARC_LAB": "id",

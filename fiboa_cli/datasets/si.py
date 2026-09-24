@@ -47,7 +47,6 @@ around 150 different crop categories.
         "SIFRA_KMRS": lambda col: col.astype(str).str.strip().str.zfill(3),
     }
     area_is_in_ha = False
-    area_calculate_missing = True
     missing_schemas = {
         "properties": {
             "block_id": {"type": "uint64"},

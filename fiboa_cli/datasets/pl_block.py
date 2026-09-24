@@ -45,8 +45,7 @@ payment. The layer carries no crop or land-cover class. ARiMR publishes only the
     attribution = "© ARiMR"
     # The portal tags the data "Publiczne dane ARIMR" but states no licence
     license = "Publiczne dane ARiMR, no licence stated <https://geoportal.arimr.gov.pl/mapy/apps/sites/#/portal>"
-    area_is_in_ha = False
-    area_calculate_missing = True  # "0 m2" on slivers below 1 m²
+    area_is_in_ha = False  # "0 m2" on slivers below 1 m², which are measured instead
     columns = {
         "geometry": "geometry",
         "id": "id",  # derived in migrate()
