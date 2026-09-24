@@ -39,7 +39,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - REST converters download much faster from large layers and retry when a service answers with intermittent errors.
 - Converters no longer split multi-part geometries into one row per polygon: fields keep the geometry modeling of the source (Polygon or MultiPolygon), the source-published area and perimeter, and one id per source feature. Use `fiboa improve --explode-geometries` when single polygons are needed.
 - Converters whose variants are years (1900-2100) now fill `determination:datetime` from the selected year unless they provide a determination date themselves.
-- Updated vecorel-cli to 0.2.16, 0.2.17, 0.2.18 and 0.2.20, including improved validation defaults and latest-variant selection when `--variant` is not provided.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
