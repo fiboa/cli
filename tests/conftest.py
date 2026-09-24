@@ -20,9 +20,8 @@ def tmp_parquet_file():
 def tmp_folder():
     # Windows can't properly handle NamedTemporaryFile etc.
     # Let's create a folder instead and then create a file manually.
-    with tempfile.TemporaryDirectory(delete=False) as temp_dir:
-        folder = Path(temp_dir)
-        yield folder
+    # Not deleted afterwards, like TemporaryDirectory(delete=False), which needs Python 3.12
+    yield Path(tempfile.mkdtemp())
 
 
 def raiser(message):
