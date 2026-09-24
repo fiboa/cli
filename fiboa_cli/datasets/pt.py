@@ -15,16 +15,14 @@ from .commons.hcat import AddHCATMixin, load_ec_mapping
 # "T<NUTS 3 code>" layers. Both files carry other layers too (parcel blocks, land cover,
 # an empty "Culturas" container, a non-spatial "Codes" table) that are not field boundaries.
 DATA_LAYER = re.compile(r"^(Culturas_.+|T[0-9A-Z]{3})$")
-# 2021's archive also holds "Culturas_2021", a table without geometry, which DATA_LAYER
-# would select.
+# 2021 also has "Culturas_2021", a table without geometry, which DATA_LAYER would select
 EDITION_LAYER = {
     "2022": re.compile(r"^Ocupacoes_solo"),
     "2021": re.compile(r"^Ocupacoes_solo_"),
     "2020": re.compile(r"^Subparcelas"),
 }
 
-# 2017-2022 ship an archive of regional files, named differently every year. Names with
-# accents are globbed, because they extract differently depending on the tool.
+# Accented names are globbed: they extract differently depending on the tool
 MEMBERS = {
     "2022": [
         "Continente.gpkg",
@@ -64,7 +62,6 @@ MEMBERS = {
         "ocupacoes_solo_n_1.shp",
         "ocupacoes_solo_n_2.shp",
     ],
-    # Norte_N must be read before Norte_S, see OVERLAPPING_MEMBERS
     "2018": [
         "Ocupacoes_solo_AML.shp",
         "Ocupacoes_solo_Alentejo.shp",
@@ -91,26 +88,22 @@ MEMBERS = {
     ],
 }
 
-# 2020 and 2021 publish the crop code in a separate table, keyed by the land occupation.
+# 2020 and 2021 publish the crop code in a separate table
 CROP_TABLE = {"2021": "Culturas_2021.dbf", "2020": "culturas_2020.dbf"}
 
-# 2017-2019 publish the crop as a Portuguese name instead of a code.
+# 2017-2019 publish crop names instead of codes
 NAME_EDITIONS = ("2019", "2018", "2017")
 
-# The crop columns of 2017-2019. Their count, case and numbering vary per file, and the
-# range can skip a number, so the primary crop is the lowest number found.
+# Count, case and numbering of the crop columns vary per file; the lowest is the primary crop
 CROP_COLUMN = re.compile(r"^[Cc](\d{1,2})$")
 
-# 2018 publishes 154,980 fields twice, in Norte_N and Norte_S, as exact duplicates.
-# Norte_S also has fields of its own, so only the repeated rows are dropped.
+# 2018 publishes 154,980 fields in both files; Norte_S also has fields of its own
 OVERLAPPING_MEMBERS = {"2018": ("Ocupacoes_solo_Norte_N", "Ocupacoes_solo_Norte_S")}
 
-# 2017's Azores and Madeira files publish no field id, and PAR_NUM repeats, so ids are
-# numbered from here: far above any published OSA_ID (at most ~46 million).
+# 2017's island files publish no field id; numbered from here, far above any OSA_ID (~46M)
 ISLAND_ID_BASE = 10**12
 
-# 2018 replaced an accented letter in some crop names with "?". Each was resolved offline
-# to the only pt.csv name it can stand for; an unknown "?" name raises.
+# 2018 replaced accented letters in some crop names with "?", resolved offline against pt.csv
 QUESTION_MARK_ALIASES = {
     "AGRI?O": "AGRIAO",
     "AVEL?": "AVELA",
@@ -132,19 +125,41 @@ QUESTION_MARK_ALIASES = {
     "SUPERFICIE ARBUSTIVA N?O PASTOREAVEL": "SUPERFICIE ARBUSTIVA NAO PASTOREAVEL",
 }
 
-# The columns each regional file is reduced to, in the layout of 2023: dropping the rest
-# before the regions are merged keeps millions of unused strings out of memory.
-KEEP = ("geometry", "CUL_ID", "OSA_ID", "CUL_CODIGO", "CT_português")
+# Dropping the other columns per file keeps millions of unused strings out of memory
+KEEP = ("geometry", "OSA_ID", "PAR_ID", "PAR_NUM", "C1", "member")
 
 
 def normalise_crop_name(value, keep_question_mark=False):
-    """Fold a crop name to its comparison key: 2017 spells one crop several ways
-    (PRADOS_TEMPORARIOS, PRADOS TEMPORÁRIOS), so accents and separators are dropped."""
+    """Accents and separators vary within an edition (PRADOS_TEMPORARIOS, PRADOS TEMPORÁRIOS)"""
     text = unicodedata.normalize("NFKD", str(value))
     text = "".join(c for c in text if not unicodedata.combining(c)).upper()
     allowed = "A-Z0-9 ?" if keep_question_mark else "A-Z0-9 "
     text = re.sub(f"[^{allowed}]+", " ", text)
     return re.sub(r"\s+", " ", text).strip()
+
+
+def read_crop_table(path):
+    # 2021 spells the key Osa_id and types it as a float
+    key = next(f for f in pyogrio.read_info(path)["fields"] if f.lower() == "osa_id")
+    df = pyogrio.read_dataframe(path, columns=[key, "C1"], read_geometry=False)
+    df = df.rename(columns={key: "OSA_ID"})
+    # 2021 has 14 empty rows keyed 0, which no field uses
+    return df[df["OSA_ID"] != 0].astype({"OSA_ID": "int64"})
+
+
+def perimeter_metres(geometry):
+    """Measured in each feature's UTM zone: EPSG:6933 distorts lengths by up to ±10% and
+    Portugal spans zones 25N to 29N."""
+    x = geometry.representative_point().x.to_numpy(dtype="float64")
+    # rows without a geometry stay NaN; the base converter drops them
+    located = np.isfinite(x)
+    zones = np.zeros(len(x), dtype="int64")
+    zones[located] = 32600 + (np.floor((x[located] + 180) / 6) + 1).astype("int64")
+    out = np.full(len(x), np.nan)
+    for zone in np.unique(zones[located]):
+        in_zone = zones == zone
+        out[in_zone] = geometry[in_zone].to_crs(f"EPSG:{zone}").length.to_numpy()
+    return out
 
 
 class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
@@ -180,7 +195,6 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "CUL_ID": "id",
         "OSA_ID": "block_id",
         "CUL_CODIGO": "crop:code",
-        # 2017-2019 and 2023 publish a crop name, the other editions only the code
         "CT_português": "crop:name",
         "Shape_Area": "metrics:area",
         "Shape_Length": "metrics:perimeter",
@@ -195,13 +209,6 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         }
     }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._crop_table = None
-        self._name_to_code = None
-        self._kept_ids = set()
-        self._island_rows = 0
-
     def layer_filter(self, layer, uri):
         # 2017-2019 are single-layer shapefiles selected by MEMBERS alone
         if self.variant in NAME_EDITIONS:
@@ -211,73 +218,87 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     def file_migration(self, gdf, path, uri, layer=None):
         if self.variant not in MEMBERS:
             return gdf
-        # The regions come in four projections, which must agree before they are merged
+        # the regions come in four projections
         gdf = gdf.to_crs("EPSG:4326")
+        gdf["member"] = layer or os.path.splitext(os.path.basename(path))[0]
         if self.variant in NAME_EDITIONS:
-            name = layer or os.path.splitext(os.path.basename(path))[0]
-            gdf = self._from_name_edition(gdf, name)
-        else:
-            gdf = self._from_code_edition(gdf, os.path.dirname(path))
-        # crop:code is required and cannot be written as null
-        gdf["CUL_CODIGO"] = gdf["CUL_CODIGO"].fillna("")
+            numbered = {int(m[1]): c for c in gdf.columns if (m := CROP_COLUMN.match(str(c)))}
+            if numbered:
+                gdf = gdf.rename(columns={numbered[min(numbered)]: "C1"})
         return gdf[[c for c in KEEP if c in gdf.columns]]
 
-    def _from_code_edition(self, gdf, folder):
-        """A regional file of 2020-2022, in the layout of 2023."""
+    def read_data(self, paths, **kwargs):
+        gdf = super().read_data(paths, **kwargs)
         if self.variant in CROP_TABLE:
+            crops = read_crop_table(
+                os.path.join(os.path.dirname(paths[0][0]), CROP_TABLE[self.variant])
+            )
             gdf["OSA_ID"] = gdf["OSA_ID"].astype("int64")
-            crops = self._load_crop_table(folder)
             gdf = gdf.merge(crops, on="OSA_ID", how="left", validate="many_to_one")
-        # No crop parcels are published: the land occupation is the field and its
-        # parcel the block, as CUL_ID lies in OSA_ID in 2023 and 2025.
-        return gdf.rename(columns={"C1": "CUL_CODIGO", "OSA_ID": "CUL_ID", "PAR_ID": "OSA_ID"})
+        return gdf
 
-    def _load_crop_table(self, folder):
-        if self._crop_table is None:
-            path = os.path.join(folder, CROP_TABLE[self.variant])
-            # 2021 spells the key Osa_id and types it as a float
-            key = next(f for f in pyogrio.read_info(path)["fields"] if f.lower() == "osa_id")
-            df = pyogrio.read_dataframe(path, columns=[key, "C1"], read_geometry=False)
-            df = df.rename(columns={key: "OSA_ID"})
-            # 2021 has 14 empty rows keyed 0, which no field uses
-            self._crop_table = df[df["OSA_ID"] != 0].astype({"OSA_ID": "int64"})
-        return self._crop_table
+    def migrate(self, gdf) -> gpd.GeoDataFrame:
+        # 2025 renamed the crop code column and dropped the crop name.
+        if "PUN_CUL_CO" in gdf.columns:
+            gdf = gdf.rename(columns={"PUN_CUL_CO": "CUL_CODIGO"})
 
-    def _from_name_edition(self, gdf, name):
-        """A regional file of 2017-2019, in the layout of 2023."""
-        numbered = {int(m[1]): c for c in gdf.columns if (m := CROP_COLUMN.match(str(c)))}
-        crop = gdf[numbered[min(numbered)]] if numbered else pd.Series(None, index=gdf.index)
-        gdf["CT_português"] = crop
-        gdf["CUL_CODIGO"] = self._crop_codes(crop)
+        if self.variant in MEMBERS:
+            gdf = self._to_2023_layout(gdf)
 
-        if "OSA_ID" in gdf.columns:
-            gdf["CUL_ID"] = gdf["OSA_ID"].astype("int64")
+        # Shape_* are in degrees: 2025 is published in WGS 84, 2017-2022 are reprojected to it.
+        # The base converter measures the area (area_calculate_missing).
+        if gdf.crs is not None and gdf.crs.is_geographic:
+            gdf = gdf.drop(columns=["Shape_Area"], errors="ignore")
+            gdf["Shape_Length"] = perimeter_metres(gdf.geometry)
+
+        # float ids would stringify as "1.0"
+        for column in ("OSA_ID", "CUL_ID"):
+            if column in gdf.columns and gdf[column].dtype.kind == "f":
+                gdf[column] = gdf[column].astype("int64")
+
+        return super().migrate(gdf)
+
+    def _to_2023_layout(self, gdf):
+        if self.variant in NAME_EDITIONS:
+            gdf = self._from_name_edition(gdf)
         else:
-            gdf["CUL_ID"] = self._island_ids(gdf)
-        # the block, a 13-digit numeric string
-        gdf["OSA_ID"] = gdf["PAR_NUM"].astype("int64")
+            # no crop parcels are published: the land occupation is the field, its parcel the block
+            gdf = gdf.rename(columns={"C1": "CUL_CODIGO", "OSA_ID": "CUL_ID", "PAR_ID": "OSA_ID"})
+        # crop:code is required and cannot be written as null
+        gdf["CUL_CODIGO"] = gdf["CUL_CODIGO"].fillna("")
+        return gdf.drop(columns="member")
 
+    def _from_name_edition(self, gdf):
         kept, repeated = OVERLAPPING_MEMBERS.get(self.variant, (None, None))
-        if name == kept:
-            self._kept_ids = set(gdf["CUL_ID"])
-        elif name == repeated:
-            gdf = gdf[~gdf["CUL_ID"].isin(self._kept_ids)]
+        repeats = (gdf["member"] == repeated) & gdf["OSA_ID"].isin(
+            gdf.loc[gdf["member"] == kept, "OSA_ID"]
+        )
+        gdf = gdf[~repeats].copy()
+
+        names = gdf["C1"] if "C1" in gdf.columns else pd.Series(None, index=gdf.index)
+        gdf["CT_português"] = names
+        gdf["CUL_CODIGO"] = self._crop_codes(names)
+        gdf["CUL_ID"] = gdf["OSA_ID"].fillna(self._island_ids(gdf))
+        gdf["OSA_ID"] = gdf["PAR_NUM"].astype("int64")
         return gdf
 
     def _island_ids(self, gdf):
-        """Number the fields of a file without ids in a stable order: PAR_NUM, then the
-        position of the field, then the order of the records in the file."""
-        point = gdf.geometry.representative_point()
+        """Stable order: file, PAR_NUM, position, then record order"""
+        islands = gdf[gdf["OSA_ID"].isna()]
+        point = islands.geometry.representative_point()
         order = pd.DataFrame(
-            {"par": gdf["PAR_NUM"].astype("string"), "x": point.x, "y": point.y}
-        ).sort_values(["par", "x", "y"], kind="stable")
-        start = ISLAND_ID_BASE + self._island_rows
-        self._island_rows += len(gdf)
-        ids = pd.Series(range(start, start + len(gdf)), index=order.index, dtype="int64")
-        return ids.reindex(gdf.index)
+            {
+                "file": islands["member"].map(
+                    {os.path.splitext(m)[0]: i for i, m in enumerate(MEMBERS[self.variant])}
+                ),
+                "par": islands["PAR_NUM"].astype("string"),
+                "x": point.x,
+                "y": point.y,
+            }
+        ).sort_values(["file", "par", "x", "y"], kind="stable")
+        return pd.Series(range(ISLAND_ID_BASE, ISLAND_ID_BASE + len(order)), index=order.index)
 
     def _crop_codes(self, names):
-        """Resolve crop names to pt.csv codes, which HCAT is mapped from."""
         keys = names.map(
             lambda v: normalise_crop_name(v, keep_question_mark=True), na_action="ignore"
         )
@@ -291,57 +312,16 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         return keys.map(self._crop_name_lookup())
 
     def _crop_name_lookup(self):
-        """pt.csv original_name -> original_code, keyed by the normalised name."""
-        if self._name_to_code is None:
-            # also used by AddHCATMixin, which then does not load the list again
-            if self.ec_mapping is None:
-                self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
-            lookup = {}
-            for entry in self.ec_mapping:
-                key = normalise_crop_name(entry["original_name"])
-                code = entry["original_code"]
-                # POUSIO is 089 and 89, one code padded two ways; the padded one wins.
-                if key not in lookup or code < lookup[key]:
-                    lookup[key] = code
-            # AZEVEM is 067 (ryegrass) and 076 (lolium), which only differ in the
-            # English name and share the HCAT code; ryegrass is the common name.
-            lookup["AZEVEM"] = "067"
-            self._name_to_code = lookup
-        return self._name_to_code
-
-    def migrate(self, gdf) -> gpd.GeoDataFrame:
-        # 2025 renamed the crop code column and dropped the crop name.
-        if "PUN_CUL_CO" in gdf.columns:
-            gdf = gdf.rename(columns={"PUN_CUL_CO": "CUL_CODIGO"})
-
-        # 2025 is published in WGS 84 with Shape_Area and Shape_Length in degrees, and
-        # 2017-2022 are reprojected to it in file_migration. The area is measured by the
-        # base converter (area_calculate_missing); up to 2023 the source values are metric.
-        if gdf.crs is not None and gdf.crs.is_geographic:
-            gdf = gdf.drop(columns=["Shape_Area"], errors="ignore")
-            gdf["Shape_Length"] = self._perimeter_metres(gdf.geometry)
-
-        # 2020-2022 and 2025 type the identifiers as floats, which would stringify as "1.0"
-        for column in ("OSA_ID", "CUL_ID"):
-            if column in gdf.columns and gdf[column].dtype.kind == "f":
-                gdf[column] = gdf[column].astype("int64")
-
-        return super().migrate(gdf)
-
-    @staticmethod
-    def _perimeter_metres(geometry):
-        """Perimeter in metres, in each feature's own UTM zone.
-
-        The equal-area EPSG:6933 distorts lengths by up to ±10%, and Portugal spans UTM
-        zones 25N to 29N (the Azores and Madeira), so no single zone fits either.
-        """
-        x = geometry.representative_point().x.to_numpy(dtype="float64")
-        # rows without a geometry (55 in 2019) stay NaN; the base converter drops them
-        located = np.isfinite(x)
-        zones = np.zeros(len(x), dtype="int64")
-        zones[located] = 32600 + (np.floor((x[located] + 180) / 6) + 1).astype("int64")
-        out = np.full(len(x), np.nan)
-        for zone in np.unique(zones[located]):
-            in_zone = zones == zone
-            out[in_zone] = geometry[in_zone].to_crs(f"EPSG:{zone}").length.to_numpy()
-        return out
+        # shared with AddHCATMixin, which then does not load it again
+        if self.ec_mapping is None:
+            self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+        lookup = {}
+        for entry in self.ec_mapping:
+            key = normalise_crop_name(entry["original_name"])
+            code = entry["original_code"]
+            # POUSIO is 089 and 89: the padded code wins
+            if key not in lookup or code < lookup[key]:
+                lookup[key] = code
+        # AZEVEM is 067 (ryegrass) and 076 (lolium), which share the HCAT code
+        lookup["AZEVEM"] = "067"
+        return lookup

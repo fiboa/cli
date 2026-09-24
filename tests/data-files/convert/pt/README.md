@@ -65,8 +65,8 @@ the ones that carry a mechanism:
   `*.sr.lock` files the provider shipped, so the fixture proves the junk is simply never
   named rather than actively skipped.
 
-Built by `build_fixtures.py` (pyogrio rather than `ogr2ogr`, because the row selection is
-not a plain `-limit`).
+The rows were selected from the real archives by these criteria rather than with a plain
+`ogr2ogr -limit`, so a regenerated fixture has to keep them for the tests to hold.
 
 ## Compression
 

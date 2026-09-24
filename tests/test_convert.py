@@ -216,7 +216,7 @@ expected_columns = {
     "ie_lpis#2025": ("determination:datetime", "metrics:area", "crop:code", "id"),
     # derived from the archive date in file_migration()
     "pl_block": ("determination:datetime",),
-    # 2023 is the only pt edition that publishes a crop name.
+    # only 2017-2019 and 2023 publish a crop name
     "pt": (
         "determination:datetime",
         "metrics:area",
@@ -234,10 +234,6 @@ expected_columns = {
         "block_id",
         "id",
     ),
-    # 2020-2022 reach every target by a different route: the crop code is renamed
-    # from C1 (2020 and 2021 join it in from a separate table), the identifiers are
-    # copied off the land occupation, and both metrics are measured rather than
-    # read. crop:name is absent because no edition after 2023 publishes one.
     "pt#2022": (
         "determination:datetime",
         "metrics:area",
@@ -262,9 +258,6 @@ expected_columns = {
         "block_id",
         "id",
     ),
-    # 2017-2019 publish the crop as a Portuguese name, so unlike 2020-2022 they deliver
-    # crop:name as well -- they and 2023 are the only editions that carry one. The code
-    # behind it is resolved from pt.csv original_name rather than read from the source.
     "pt#2019": (
         "determination:datetime",
         "metrics:area",
@@ -294,8 +287,7 @@ expected_columns = {
     ),
 }
 
-# Mapping loaders to pin to the fixture folder besides commons.ec, keyed by converter id.
-# A converter that imports load_ec_mapping by name has to be patched in its own module.
+# Mapping loaders to patch besides commons.ec, e.g. where a converter imports one by name
 mapping_lookups = {
     "pt": (
         "fiboa_cli.datasets.commons.hcat.load_ec_mapping",
@@ -352,10 +344,7 @@ def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
             f"collection metadata. Produced columns: {sorted(df.columns)}"
         )
 
-    # An identifier that arrives as a float stringifies as "2315738.0": unique,
-    # valid, and silently wrong. pt types its ids as floats from 2025 on, and the
-    # cast that fixes it was removable without any test noticing. Scoped to the
-    # converters listed above, opt-in like the rest of that table.
+    # a float id stringifies as "2315738.0": unique, valid and wrong
     if required and "id" in df.columns:
         floaty = df["id"].astype("string").str.fullmatch(r"-?\d+\.0*").fillna(False)
         assert not floaty.any(), (
