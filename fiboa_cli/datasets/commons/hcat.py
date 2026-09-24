@@ -17,15 +17,17 @@ class AddHCATMixin:
     Automatically adds crop:code_list to the columns, and adds HCAT and CROP extensions.
     """
 
-    ec_mapping_csv: Optional[str] = None  # TODO rename to hcat_mapping_csv
-    # Tables that fill gaps in the main one, for a country whose EuroCrops table does
+    # CSV that maps the source crop codes to HCAT: a URL, or a file name in the
+    # EuroCrops country_mappings folder (see hcat_mapping_url)
+    hcat_mapping_csv: Optional[str] = None
+    # Tables that fill gaps in the main one, for a country whose main table does
     # not carry every code the source uses. Rows here win where both carry a code.
-    ec_mapping_supplements: list[str] = []
+    hcat_mapping_supplements: list[str] = []
     # Match on the crop name where the table has no row for the code:
     # be_wal_all_years.csv leaves original_code empty in 208 of its 298 rows.
-    ec_mapping_name_fallback = False
+    hcat_mapping_name_fallback = False
     mapping_file = None
-    ec_mapping: Optional[list[dict]] = None  # TODO rename to hcat_mapping
+    hcat_mapping: Optional[list[dict]] = None
 
     # Variants whose source has no crop columns at all; they convert without the
     # crop/HCAT extensions. Only variants listed here take that path, so a crop
@@ -63,8 +65,8 @@ class AddHCATMixin:
     def convert(self, *args, **kwargs):
         self.mapping_file = kwargs.get("mapping_file")
         if not self.mapping_file:
-            assert self.ec_mapping_csv is not None, (
-                "Specify ec_mapping_csv in Converter, e.g. find them at https://github.com/maja601/EuroCrops/tree/main/csvs/country_mappings"
+            assert self.hcat_mapping_csv is not None, (
+                "Specify hcat_mapping_csv in Converter: a URL to an HCAT mapping CSV or a file name from https://github.com/maja601/EuroCrops/tree/main/csvs/country_mappings"
             )
         return super().convert(*args, **kwargs)
 
@@ -87,13 +89,13 @@ class AddHCATMixin:
             # Add HCAT columns based on crop-columns
             # Map to HCAT categories by using the mapping from the csv file
 
-            if self.ec_mapping is None:
-                self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
-                for supplement in self.ec_mapping_supplements:
-                    self.ec_mapping = self.ec_mapping + load_ec_mapping(supplement)
+            if self.hcat_mapping is None:
+                self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
+                for supplement in self.hcat_mapping_supplements:
+                    self.hcat_mapping = self.hcat_mapping + load_hcat_mapping(supplement)
 
             from_code = "original_code"
-            if from_code not in self.ec_mapping[0]:
+            if from_code not in self.hcat_mapping[0]:
                 # Some code lists have no code, only a crop_name
                 from_code = "original_name"
                 crop_code_col = self.get_code_column(gdf, "crop:name")
@@ -101,17 +103,17 @@ class AddHCATMixin:
                 crop_code_col = self.get_code_column(gdf)
 
             def map_to(attribute):
-                return {e[from_code]: e[attribute] or None for e in self.ec_mapping}
+                return {e[from_code]: e[attribute] or None for e in self.hcat_mapping}
 
             name_col = None
-            if self.ec_mapping_name_fallback and from_code == "original_code":
+            if self.hcat_mapping_name_fallback and from_code == "original_code":
                 name_col = self.get_code_column(gdf, "crop:name")
 
             def map_by_name(attribute):
                 # Three Walloon crops carry a trailing space in the table.
                 return {
                     (e["original_name"] or "").strip(): e[attribute] or None
-                    for e in self.ec_mapping
+                    for e in self.hcat_mapping
                     if not (e["original_code"] or "").strip()
                 }
 
@@ -119,7 +121,7 @@ class AddHCATMixin:
             for k, v in zip(
                 self.hcat_columns.keys(), ("translated_name", "HCAT3_name", "HCAT3_code")
             ):
-                if v in self.ec_mapping[0]:
+                if v in self.hcat_mapping[0]:
                     col = crop_code_col.map(map_to(v))
                     if name_col is not None:
                         col = col.fillna(name_col.str.strip().map(map_by_name(v)))
@@ -144,7 +146,9 @@ class AddHCATMixin:
 
         if "crop:code_list" not in gdf.columns:
             gdf["crop:code_list"] = (
-                ec_url(self.ec_mapping_csv) if self.ec_mapping_csv else self.mapping_file
+                hcat_mapping_url(self.hcat_mapping_csv)
+                if self.hcat_mapping_csv
+                else self.mapping_file
             )
         return gdf
 
@@ -153,16 +157,17 @@ class AddHCATMixin:
         return self.add_hcat(gdf)
 
 
-def ec_url(csv_file):
+def hcat_mapping_url(csv_file):
+    """Returns URLs as-is and resolves bare file names to the EuroCrops country_mappings folder."""
     if csv_file.startswith("https://"):
         return csv_file
     return f"https://raw.githubusercontent.com/maja601/EuroCrops/refs/heads/main/csvs/country_mappings/{csv_file}"
 
 
-def load_ec_mapping(csv_file=None, url=None):
+def load_hcat_mapping(csv_file=None, url=None):
     if not (csv_file or url):
         raise ValueError("Either csv_file or url must be specified")
     if not url:
-        url = ec_url(csv_file)
+        url = hcat_mapping_url(csv_file)
     content = load_file(url)
     return list(csv.DictReader(StringIO(content.decode("utf-8"))))

@@ -1,7 +1,7 @@
 import pandas as pd
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin, load_ec_mapping
+from .commons.hcat import AddHCATMixin, load_hcat_mapping
 
 COLUMNS = {
     "geometry": "geometry",
@@ -25,7 +25,7 @@ class Convert(AddHCATMixin, FiboaBaseConverter):
         # The declared WFS layers for 2010-2015 are empty (checked 2026-08-30)
         for year in range(2024, 2015, -1)
     }
-    ec_mapping_csv = "https://fiboa.org/code/ee/ee.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/ee/ee.csv"
     id = "ee"
     short_name = "Estonia"
     title = "Field boundaries for Estonia"
@@ -48,9 +48,9 @@ The data comes from ARIB's database of agricultural parcels.
 
     def migrate(self, gdf):
         # do a reverse mapping (from name to crop:code)
-        if self.ec_mapping is None:
-            self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
-        codes = {row["original_name"].strip(): row["original_code"] for row in self.ec_mapping}
+        if self.hcat_mapping is None:
+            self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
+        codes = {row["original_name"].strip(): row["original_code"] for row in self.hcat_mapping}
         gdf["crop:code"] = gdf["taotletud_kultuur"].str.strip().map(codes)
         return super().migrate(gdf)
 

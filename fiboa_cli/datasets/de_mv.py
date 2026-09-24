@@ -19,7 +19,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml", CROP_EXTENSION}
     column_additions = {"crop:code_list": "https://fiboa.org/code/de/de_mv.csv"}
 
-    # ec_mapping_csv = "de.csv"
+    # hcat_mapping_csv = "de.csv"
 
     columns = {
         "geometry": "geometry",

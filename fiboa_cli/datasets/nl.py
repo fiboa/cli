@@ -78,7 +78,7 @@ Data is currently available for the years 2009 to 2025 (final) and 2026 (concept
         "jaar": lambda col: pd.to_datetime(col, format="%Y") + pd.DateOffset(months=4, days=14)
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    ec_mapping_csv = "https://fiboa.org/code/nl/nl.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/nl/nl.csv"
 
     missing_schemas = {
         "properties": {

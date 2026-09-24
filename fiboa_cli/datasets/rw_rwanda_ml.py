@@ -1,5 +1,6 @@
 import geopandas as gpd
 from shapely.geometry import box
+
 from .commons.ml_splits import MlSplitsMixin
 from .rw_rwanda import RwRwandaConverter
 

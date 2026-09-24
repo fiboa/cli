@@ -72,18 +72,18 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         return super().migrate(gdf)
 
     def _codes_by_name(self) -> dict:
-        from .commons.hcat import load_ec_mapping
+        from .commons.hcat import load_hcat_mapping
 
         return {
             row["original_name"].strip(): row["original_code"].strip()
-            for row in load_ec_mapping(self.crop_names_csv)
+            for row in load_hcat_mapping(self.crop_names_csv)
         }
 
-    ec_mapping_csv = "cz_2023.csv"
+    hcat_mapping_csv = "cz_2023.csv"
     # EuroCrops mapped the 2023 code list. The 2019-2022 editions declare 120
     # codes it never saw — 11.4% of their rows, fallow and ware potatoes among
     # them — so their HCAT comes from a table of our own.
-    ec_mapping_supplements = ["https://fiboa.org/code/cz/cz_supplement.csv"]
+    hcat_mapping_supplements = ["https://fiboa.org/code/cz/cz_supplement.csv"]
     missing_schemas = {
         "properties": {
             "block_id": {"type": "string"},

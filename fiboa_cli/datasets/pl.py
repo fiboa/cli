@@ -37,7 +37,7 @@ position in the download, since the source carries no parcel identifier.
     attribution = "© ARiMR"
     # The portal tags the data "Publiczne dane ARIMR" but states no licence
     license = "Publiczne dane ARiMR, no licence stated <https://geoportal.arimr.gov.pl/mapy/apps/sites/#/portal>"
-    ec_mapping_csv = "https://fiboa.org/code/pl/pl.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/pl/pl.csv"
     open_options = dict(encoding="UTF-8")  # GDAL does not read the .cst GeoServer writes
     columns = {
         "geometry": "geometry",

@@ -4,8 +4,8 @@ from .commons.ec import EuroCropsConverterMixin
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     area_is_in_ha = False
-    ec_mapping_csv = "si_2021.csv"
-    ec_mapping_supplements = ["https://fiboa.org/code/si/si_2021_supplement.csv"]
+    hcat_mapping_csv = "si_2021.csv"
+    hcat_mapping_supplements = ["https://fiboa.org/code/si/si_2021_supplement.csv"]
     ec_year = 2021
     sources = {
         "https://zenodo.org/records/10118572/files/SI_2021.zip?download=1": ["SI_2021_EC21.shp"]

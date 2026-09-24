@@ -41,7 +41,7 @@ around 150 different crop categories.
         "CROP_LAT_E": "crop:name_en",
         "CROP_LATIN": "crop:name_en",
     }
-    ec_mapping_csv = "https://fiboa.org/code/si/si.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/si/si.csv"
     column_migrations = {
         "geometry": lambda col: col.make_valid(),
         "SIFRA_KMRS": lambda col: col.astype(str).str.strip().str.zfill(3),
