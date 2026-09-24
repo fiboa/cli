@@ -36,6 +36,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "bezugsjahr": lambda col: pd.to_datetime(col, format="%Y"),
         # crop:code must be a string per the crop extension; lnf_code is an integer.
         "lnf_code": lambda col: col.astype(str),
+        "flaeche_m2": lambda col: col.astype(float),
     }
     ec_mapping_csv = "https://fiboa.org/code/ch/ch.csv"
 
