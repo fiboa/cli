@@ -387,3 +387,66 @@ def test_a_missing_crop_column_still_fails_where_it_should():
 
     with pytest.raises(KeyError):
         converter.add_hcat(gdf)
+
+
+def test_ie_lpis_keeps_one_row_per_parcel(tmp_folder, tmp_parquet_file):
+    """A source row is a claim, several of which share a parcel's geometry. The converter keeps
+    one row per parcel with the crop of the largest claim and the claims added up, keeps a
+    multipart parcel as one row, drops the crop-less rows of the 2025 GeoPackage, fills a
+    digitised area rounded to 0 from the geometry and dates the parcels by the campaign year."""
+    import json
+
+    import pyarrow.parquet as pq
+    from shapely.geometry import MultiPolygon, box
+
+    from fiboa_cli.datasets.ie_lpis import Converter
+
+    def square(x, side):
+        return box(x, 0, x + side, side)
+
+    rows = [  # (par_lab, crop, digitised, eh_area, claim_area, commonage_ind, geometry), 2025 names
+        ("A", "Permanent Pasture", 7.0, 6.5, 2.0, "N", square(0, 100)),
+        ("A", "Maize", 7.0, 6.5, 3.5, "N", square(0, 100)),
+        ("A", "Permanent Pasture", 7.0, 6.5, 1.0, "N", square(0, 100)),
+        (
+            "B",
+            "Maize",
+            0.04,
+            0.04,
+            0.04,
+            "N",
+            MultiPolygon([square(200, 10), square(300, 300**0.5)]),
+        ),
+        (None, None, None, None, None, None, square(400, 5)),
+        ("D", "Permanent Pasture", 0.0, 0.0, 0.0, "Y", square(500, 50**0.5)),
+    ]
+    columns = ("par_lab", "crop", "digitised", "eh_area", "claim_area", "commonage_ind")
+    gdf = gpd.GeoDataFrame(
+        {name: [row[i] for row in rows] for i, name in enumerate(columns)},
+        geometry=[row[6] for row in rows],
+        crs="EPSG:2157",
+    )
+    src = tmp_folder / "parcels_2025.gpkg"
+    gdf.to_file(src, layer="GEO_860_PARCELS_ANON", driver="GPKG")
+
+    Converter().convert(
+        tmp_parquet_file,
+        cache=str(tmp_folder),
+        variant="2025",
+        input_files={str(src): "parcels_2025.gpkg"},
+        mapping_file="tests/data-files/convert/ie_lpis/ie.csv",
+    )
+
+    result = gpd.read_parquet(tmp_parquet_file).set_index("id").sort_index()
+    assert result.index.tolist() == ["A", "B", "D"]  # no crop, no row
+    a = result.loc["A"]
+    assert a["crop:name"] == "Maize"  # the largest single claim, not the largest crop total
+    assert a["claimed_area"] == 6.5 and a["eligible_area"] == 6.5
+    assert a["metrics:area"] == 70_000 and not a["commonage"]
+    b = result.loc["B"]  # two polygons, one parcel, one row
+    assert b.geometry.geom_type == "MultiPolygon"
+    assert b["metrics:area"] == pytest.approx(400)
+    assert result.loc["D", "metrics:area"] == 50 and result.loc["D", "commonage"]  # digitised 0
+    # one value for every row, so it is written to the collection metadata
+    collection = json.loads(pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata[b"collection"])
+    assert collection["determination:datetime"] == "2025-01-01T00:00:00Z"
