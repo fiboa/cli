@@ -61,6 +61,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - URL discovery now requires all nine regional GeoPackages to avoid partial campaign publication.
 - NL: Extended BRP coverage to 2009-2026 and moved to the newer PDOK source.
 - PT: Updated for the 2025 edition and its schema/unit changes.
+- PT: Editions now cover 2017-2025.
+  - 2020-2022 merge the regional files, which come in four projections; 2020 and 2021 join the crop code from a separate table.
+  - 2017-2019 publish the crop as a Portuguese name, which is resolved to a code through pt.csv and kept as `crop:name`.
+  - The Deflate64-compressed 2017-2022 archives are extracted through `inflate64`.
+  - Perimeters are measured in each feature's UTM zone.
 - SE: Editions now cover 2015-2025 from the yearly WFS filter.
 - SI: Extended editions back to 2019.
 - US-CSB: Editions now cover 2017-2024.

@@ -1,6 +1,7 @@
 import json
 import re
 import sys
+from contextlib import ExitStack
 from csv import DictReader
 from unittest.mock import patch
 
@@ -37,6 +38,12 @@ tests = [
     "nl_block",
     "pt",
     "pt#2025",
+    "pt#2022",
+    "pt#2021",
+    "pt#2020",
+    "pt#2019",
+    "pt#2018",
+    "pt#2017",
     "dk",
     "dk#2008",
     "be_wal",
@@ -99,6 +106,14 @@ extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
     "dk#2008": {"variant": "2008"},
+    "pt": {"variant": "2023"},
+    "pt#2025": {"variant": "2025"},
+    "pt#2022": {"variant": "2022"},
+    "pt#2019": {"variant": "2019"},
+    "pt#2018": {"variant": "2018"},
+    "pt#2017": {"variant": "2017"},
+    "pt#2021": {"variant": "2021"},
+    "pt#2020": {"variant": "2020"},
     # the fixture archive holds the 2024 edition only; the published one holds both
     "lt": {"variant": "2024"},
     # the fixture is the 2023 file; the converter's default is the newest edition
@@ -201,6 +216,91 @@ expected_columns = {
     "ie_lpis#2025": ("determination:datetime", "metrics:area", "crop:code", "id"),
     # derived from the archive date in file_migration()
     "pl_block": ("determination:datetime",),
+    # 2023 is the only pt edition that publishes a crop name.
+    "pt": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "crop:name",
+        "block_id",
+        "id",
+    ),
+    "pt#2025": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    # 2020-2022 reach every target by a different route: the crop code is renamed
+    # from C1 (2020 and 2021 join it in from a separate table), the identifiers are
+    # copied off the land occupation, and both metrics are measured rather than
+    # read. crop:name is absent because no edition after 2023 publishes one.
+    "pt#2022": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    "pt#2021": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    "pt#2020": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "block_id",
+        "id",
+    ),
+    # 2017-2019 publish the crop as a Portuguese name, so unlike 2020-2022 they deliver
+    # crop:name as well -- they and 2023 are the only editions that carry one. The code
+    # behind it is resolved from pt.csv original_name rather than read from the source.
+    "pt#2019": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "crop:name",
+        "block_id",
+        "id",
+    ),
+    "pt#2018": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "crop:name",
+        "block_id",
+        "id",
+    ),
+    "pt#2017": (
+        "determination:datetime",
+        "metrics:area",
+        "metrics:perimeter",
+        "crop:code",
+        "crop:name",
+        "block_id",
+        "id",
+    ),
+}
+
+# Mapping loaders to pin to the fixture folder besides commons.ec, keyed by converter id.
+# A converter that imports load_ec_mapping by name has to be patched in its own module.
+mapping_lookups = {
+    "pt": (
+        "fiboa_cli.datasets.commons.hcat.load_ec_mapping",
+        "fiboa_cli.datasets.pt.load_ec_mapping",
+    ),
 }
 
 
@@ -225,7 +325,10 @@ def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
     path = f"tests/data-files/convert/{converter_id}"
     kwargs = extra_convert_parameters.get(converter, {})
 
-    ConvertData(converter_id).convert(target=tmp_parquet_file, cache=path, **kwargs)
+    with ExitStack() as stack:
+        for target in mapping_lookups.get(converter_id, ()):
+            stack.enter_context(patch(target, side_effect=load_ec))
+        ConvertData(converter_id).convert(target=tmp_parquet_file, cache=path, **kwargs)
     out, err = capsys.readouterr()
     output = out + err
 
@@ -247,6 +350,17 @@ def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
         assert not missing, (
             f"{converter} dropped {missing}: absent from the schema and from the "
             f"collection metadata. Produced columns: {sorted(df.columns)}"
+        )
+
+    # An identifier that arrives as a float stringifies as "2315738.0": unique,
+    # valid, and silently wrong. pt types its ids as floats from 2025 on, and the
+    # cast that fixes it was removable without any test noticing. Scoped to the
+    # converters listed above, opt-in like the rest of that table.
+    if required and "id" in df.columns:
+        floaty = df["id"].astype("string").str.fullmatch(r"-?\d+\.0*").fillna(False)
+        assert not floaty.any(), (
+            f"{converter}: {int(floaty.sum()):,} id(s) are stringified floats, "
+            f"e.g. {df.loc[floaty, 'id'].head(3).tolist()}"
         )
 
     if "metrics:area" in df.columns and converter not in ("de_bb",):
