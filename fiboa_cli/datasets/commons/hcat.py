@@ -126,7 +126,7 @@ class AddHCATMixin:
                     if name_col is not None:
                         col = col.fillna(name_col.str.strip().map(map_by_name(v)))
                     gdf[k] = col
-                    assert np.unique(col[~col.isna()]).size > 1, "No HCAT crops mapped"
+                    assert np.unique(col[~col.isna()]).size > 0, "No HCAT crops mapped"
 
             if col is not None and col.isna().any():
                 index = [

@@ -453,3 +453,9 @@ def test_ie_lpis_keeps_one_row_per_parcel(tmp_folder, tmp_parquet_file):
     # one value for every row, so it is written to the collection metadata
     collection = json.loads(pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata[b"collection"])
     assert collection["determination:datetime"] == "2025-01-01T00:00:00Z"
+
+
+def test_no_converter_declares_both_sources_and_variants():
+    c = Converters()
+    for _id in c.list_ids():
+        c.load(_id)._require_one_source_of_urls()

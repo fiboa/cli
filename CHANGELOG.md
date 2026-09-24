@@ -73,6 +73,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - US-CSB: Editions now cover 2017-2024.
 
 ### Fixed
+- EC-BE-VLG: converting no longer fails on the variants inherited from BE-VLG.
+- ES: crops are mapped to HCAT, and `crop:code_list` points to a code list that exists.
 - Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
 - Declared the `beautifulsoup4` dependency used by ES-PV and ES-VC.
 - REST converters:
