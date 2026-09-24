@@ -476,7 +476,7 @@ def test_ch_own_layer_is_brought_into_the_model():
         geometry=[Point(0, 0), Point(1, 1)],
         crs="EPSG:2056",
     )
-    out = converter.file_migration(gdf, "ch_zh_2025_0.zip", "https://example.test")
+    out = converter.file_migration(gdf, "ch_zh_2025_0.gml", "https://example.test")
     assert out["lnf_code"].tolist() == [613, 399]
     assert out["flaeche_m2"].tolist() == [2200.0, 50.0]
     assert out["kanton"].tolist() == ["ZH", "ZH"] and out["bezugsjahr"].tolist() == [2025, 2025]

@@ -148,7 +148,7 @@ extra_convert_parameters = {
     },
     "ch_zh": {
         "variant": "2025",
-        **_input_files("ch_zh", "ch_zh_2025.zip"),
+        **_input_files("ch_zh", "ch_zh_2025.gml"),
         "mapping_file": f"{test_path}/ch/lnf_code.csv",
     },
     "es_cl": {
