@@ -64,6 +64,12 @@ ruff = "==0.12.8"
 [tool.pixi.feature.dev.pypi-dependencies]
 build = ">=1.0.0,<2.0.0"
 
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+
+[tool.pixi.feature.py314.dependencies]
+python = "3.14.*"
+
 [tool.pixi.feature.cloud.dependencies]
 s3fs = ">=2025.7.0"
 gcsfs = ">=2025.7.0"
@@ -73,6 +79,9 @@ default = {solve-group = "default"}
 dev = {features = ["dev"], solve-group = "default"}
 cloud = {features = ["cloud"], solve-group = "default"}
 all = {features = ["dev", "cloud"], solve-group = "default"}
+# CI tests the oldest and newest supported Python; pixi, not setup-python, decides the version
+dev-py311 = {features = ["dev", "py311"], solve-group = "py311"}
+dev-py314 = {features = ["dev", "py314"], solve-group = "py314"}
 
 [tool.pixi.tasks]
 # Development tasks

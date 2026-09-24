@@ -22,6 +22,12 @@ jobs:
         python-version:
           - "3.11"
           - "3.14"
+        # the pixi environment decides the Python version the tests run on
+        include:
+          - python-version: "3.11"
+            pixi-env: dev-py311
+          - python-version: "3.14"
+            pixi-env: dev-py314
 
     steps:
     # Pixi should manage Python versions, but it doesn't work on Windows in GitHub Actions
@@ -35,22 +41,25 @@ jobs:
       uses: prefix-dev/setup-pixi@v0.8.1
       with:
         pixi-version: v0.49.0
-        environments: dev
+        environments: ${{ matrix.pixi-env }}
+
+    - name: Check the Python version
+      run: pixi run -e ${{ matrix.pixi-env }} python -c "import sys; assert sys.version.startswith(sys.argv[1] + chr(46)), sys.version" ${{ matrix.python-version }}
 
     - name: Install project in editable mode
-      run: pixi run -e dev install-dev
+      run: pixi run -e ${{ matrix.pixi-env }} install-dev
 
     - name: Test CLI command in development env
-      run: pixi run -e dev fiboa --help
+      run: pixi run -e ${{ matrix.pixi-env }} fiboa --help
 
     - name: Run linting
-      run: pixi run -e dev lint
+      run: pixi run -e ${{ matrix.pixi-env }} lint
 
     - name: Run tests
-      run: pixi run -e dev test
+      run: pixi run -e ${{ matrix.pixi-env }} test
 
     - name: Build package
-      run: pixi run -e dev build
+      run: pixi run -e ${{ matrix.pixi-env }} build
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
