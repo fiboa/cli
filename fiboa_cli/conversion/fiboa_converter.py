@@ -41,13 +41,12 @@ class FiboaBaseConverter(BaseConverter):
         )
 
     def _determination_provided(self, gdf):
-        """Whether the converter already supplies determination:datetime — mapped from a
-        source column, added as a constant, or present on the frame — so the variant year
-        must not overwrite it. The column renames come after post_migrate(), so a mapped
-        determination still lives under its source name here."""
+        """Whether the converter supplies determination:datetime itself."""
+        # mapping the key to itself only keeps the column, it provides no value
+        source = self._source_column(DETERMINATION_KEY)
         return (
             DETERMINATION_KEY in gdf.columns
-            or self._source_column(DETERMINATION_KEY) is not None
+            or source not in (None, DETERMINATION_KEY)
             or DETERMINATION_KEY in (self.column_additions or {})
         )
 
@@ -58,6 +57,12 @@ class FiboaBaseConverter(BaseConverter):
         if self.use_variant_as_determination is not None:
             return self.use_variant_as_determination
         return self._variants_are_years() and not self._determination_provided(gdf)
+
+    def get_columns(self, gdf):
+        columns = super().get_columns(gdf)
+        if self._use_variant_as_determination(gdf):
+            columns.setdefault(DETERMINATION_KEY, DETERMINATION_KEY)
+        return columns
 
     @staticmethod
     def _traditional_axis_order(gdf):
