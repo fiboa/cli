@@ -32,7 +32,6 @@ position in the download, since the source carries no parcel identifier.
     wfs_url = WFS
     wfs_version = "1.1.0"
     wfs_page_size = 50_000  # the server's maximum
-    wfs_extension = "zip"
     open_options = dict(encoding="UTF-8")  # GDAL does not read the .cst GeoServer writes
     columns = {
         "geometry": "geometry",
@@ -73,6 +72,10 @@ position in the download, since the source carries no parcel identifier.
         )
         first.raise_for_status()
         return first.json()["totalFeatures"]
+
+    def get_wfs_file_name(self, start):
+        # zero-padded, so caches filled before the WFS mixin are still found
+        return f"pl_{self.variant}_{start:08d}.zip"
 
     def file_migration(self, gdf, path, uri, layer=None):
         # The shapefile has no feature id; the pages are contiguous, so number the rows

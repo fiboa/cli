@@ -110,6 +110,18 @@ def test_variant_names_query_and_pages(monkeypatch):
     assert all(_query(url)["typeNames"] == "lpis:Parcels_2024" for url in urls)
 
 
+def test_file_names_can_be_overridden(monkeypatch):
+    class PaddedConverter(WFSConverter):
+        def get_wfs_file_name(self, start):
+            return f"page_{start:04d}.gml"
+
+    _serve(monkeypatch, _hits(3))
+    urls = PaddedConverter().get_urls()
+
+    assert list(urls.values()) == ["page_0000.gml", "page_0002.gml"]
+    assert [_query(url)["startIndex"] for url in urls] == ["0", "2"]
+
+
 def test_wfs_1_pages_with_max_features(monkeypatch):
     class WFS1Converter(WFSConverter):
         wfs_version = "1.1.0"

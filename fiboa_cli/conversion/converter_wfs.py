@@ -42,6 +42,11 @@ class WFSConverterMixin:
             )
         return int(match.group(1))
 
+    def get_wfs_file_name(self, start):
+        """The name of the cached page that starts at feature `start`."""
+        prefix = f"{self.id}_{self.variant}" if self.variant else self.id
+        return f"{prefix}_{start}.{self.wfs_extension}"
+
     def get_urls(self):
         assert self.wfs_url, f"Define {self.__class__.__name__}.wfs_url"
         params = {
@@ -55,8 +60,7 @@ class WFSConverterMixin:
         # WFS 2.0 renamed maxFeatures to count; startIndex is a vendor parameter before 2.0
         limit = "maxFeatures" if self.wfs_version.startswith("1.") else "count"
         query = urlencode({**params, limit: self.wfs_page_size})
-        prefix = f"{self.id}_{self.variant}" if self.variant else self.id
         return {
-            f"{self.wfs_url}?{query}&startIndex={start}": f"{prefix}_{start}.{self.wfs_extension}"
+            f"{self.wfs_url}?{query}&startIndex={start}": self.get_wfs_file_name(start)
             for start in range(0, total, self.wfs_page_size)
         }
