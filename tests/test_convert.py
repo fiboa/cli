@@ -31,6 +31,7 @@ tests = [
     "ec_si",
     "fi",
     "fr",
+    "fr#2020",
     "hr",
     "nl",
     "nl_block",
@@ -127,6 +128,8 @@ extra_convert_parameters = {
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     # the fixture is the 2022 archive; the converter's default is the newest edition
     "fr": {"variant": "2022"},
+    # two real volumes (.7z.001 + .7z.002), so the parts must be joined before extracting
+    "fr#2020": {"variant": "2020"},
     # a page of each service: the current snapshot and a historic year, whose
     # Catxe reads "Febrer2024.0" where the current one reads "maig 2026"
     "es_ib": {"variant": "2026", **_input_files("es_ib", "es_ib_2026.geojson")},

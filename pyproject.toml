@@ -23,7 +23,7 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "vecorel-cli==0.2.20",
+    "vecorel-cli==0.3.0",
     "beautifulsoup4>=4.12",
     "spdx-license-list==3.27.0",
 ]
