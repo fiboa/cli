@@ -33,7 +33,6 @@ of the Ministry of Agriculture, Livestock and Fisheries.
         ADMIN_DIVISION,
     }
     columns = {
-        "id": "id",
         "geometry": "geometry",
         "FECHA": "determination:datetime",
         "ISLA_NA": "admin_island",
@@ -45,11 +44,6 @@ of the Ministry of Agriculture, Livestock and Fisheries.
     column_migrations = {
         "FECHA": lambda column: pd.to_datetime(column, format="%d/%m/%Y"),
     }
-
-    def migrate(self, gdf):
-        gdf = gdf.reset_index(drop=True)
-        gdf["id"] = gdf.index.astype(str)
-        return super().migrate(gdf)
 
     column_additions = {
         "admin:country_code": "ES",

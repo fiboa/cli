@@ -24,9 +24,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # mapped to; several fields share one block, and gp_xx repeats across rows
     # too, so neither identifies a parcel and the row index is the id.
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
-    index_as_id = True
     columns = {
-        "id": "id",
         "geometry": "geometry",
         "ref_ident": "flik",
         "groesse": "metrics:area",

@@ -36,7 +36,6 @@ applied for and the area decided on are the same. The data is published at the e
     license = "CC0-1.0"  # "Open Data"
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "faststalld": "metrics:area",
         "grdkod_mar": "crop:code",
         "arslager": "determination:datetime",
@@ -50,6 +49,5 @@ applied for and the area decided on are the same. The data is published at the e
 
     # A skifte is one crop inside a block, numbered within it ("1A", "54B"), so
     # the field is the pair.
-    def migrate(self, gdf):
-        gdf["id"] = gdf["blockid"] + "_" + gdf["skiftesbet"]
-        return super().migrate(gdf)
+    id_columns = ("blockid", "skiftesbet")
+    id_separator = "_"

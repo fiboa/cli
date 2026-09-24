@@ -29,9 +29,7 @@ Dataset Hranice užívania contains the use declared by applicants for direct su
     ec_mapping_csv = "https://fiboa.org/code/sk/sk.csv"
     # KODKD is the LPIS block code, shared by several fields and sometimes empty;
     # the row index is the field id and the code is kept as block_id.
-    index_as_id = True
     columns = {
-        "id": "id",
         "geometry": "geometry",
         "KODKD": "block_id",
         "PLODINA": "crop:name",

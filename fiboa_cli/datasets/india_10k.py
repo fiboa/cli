@@ -17,13 +17,11 @@ of high-resolution satellite imagery (Airbus SPOT). We also provide the weights 
 neural network (FracTAL ResUNet architecture) pre-trained in France and fine-tuned on Airbus SPOT images in India.
 The model was trained in MXNet 1.6.0 and can be loaded with the "model.load_parameters()" function.
     """
-    index_as_id = True
     provider = "Zenodo <https://zenodo.org>"
     attribution = "https://doi.org/10.5281/zenodo.7315090"
     license = "CC-BY-4.0"
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "area": "metrics:area",
     }
     column_additions = {"determination:datetime": "2022-11-12T00:00:00Z"}

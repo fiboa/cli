@@ -17,7 +17,6 @@ least 2026-09-10."""
 
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "provincia": "admin_province_code",
         "municipio": "admin_municipality_code",
         "uso_sigpac": "crop:code",

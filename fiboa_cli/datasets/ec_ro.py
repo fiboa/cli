@@ -24,9 +24,7 @@ The dataset is in line with the conceptual framework described in the Land Cover
         "determination:datetime": "2017-01-01T00:00:00Z",
         "crop:code_list": ec_url("ro_no_year.csv"),
     }
-    index_as_id = True
     columns = {
-        "id": "id",
         "geometry": "geometry",
         "AREA_HA": "metrics:area",
         "SOURCE": "source",

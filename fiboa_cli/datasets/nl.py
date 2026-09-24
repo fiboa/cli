@@ -46,7 +46,6 @@ Data is currently available for the years 2009 to 2025 (final) and 2026 (concept
 
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "area": "metrics:area",
         "category": "coverage",
         "gewascode": "crop:code",
@@ -80,7 +79,6 @@ Data is currently available for the years 2009 to 2025 (final) and 2026 (concept
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     ec_mapping_csv = "https://fiboa.org/code/nl/nl.csv"
-    index_as_id = True
 
     missing_schemas = {
         "properties": {

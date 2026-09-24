@@ -23,9 +23,7 @@ created in 2017. The current update has incorporated data from the 2019 – 2020
     provider = "Aqualinc Research Limited <https://environment.govt.nz/publications/national-irrigated-land-spatial-dataset-2020-update>"
     license = "CC-BY-4.0"
     extensions = {ADMIN_DIVISION}
-    index_as_id = True
     columns = {
-        "id": "id",
         "geometry": "geometry",
         "type": "type",
         "area_ha": "metrics:area",

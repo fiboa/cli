@@ -5,7 +5,6 @@ from .commons.hcat import AddHCATMixin, load_ec_mapping
 
 COLUMNS = {
     "geometry": "geometry",
-    "id": "id",
     "pollu_id": "parcel_id",
     "taotlusaasta": "determination:datetime",  # year
     "pindala_ha": "metrics:area",  # area (in ha)
@@ -46,7 +45,6 @@ The data comes from ARIB's database of agricultural parcels.
             "parcel_id": {"type": "int64"},
         }
     }
-    index_as_id = True
 
     def migrate(self, gdf):
         # do a reverse mapping (from name to crop:code)

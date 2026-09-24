@@ -20,7 +20,6 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     license = "opendata.swiss terms of use <https://opendata.swiss/en/terms-of-use>"
     columns = {
         "geometry": "geometry",
-        "id": "id",  # derived in migrate()
         "flaeche_m2": "metrics:area",
         "kanton": "admin:subdivision_code",
         "lnf_code": "crop:code",  # code of the federal usage catalogue (LNF_Katalog_Nutzungsart)
@@ -54,7 +53,5 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             urls[item.json()["assets"]["geopackage_zip"]["href"]] = ["geopackage/*.gpkg"]
         return urls
 
-    def migrate(self, gdf):
-        # Combine canton with internal id to make it unique
-        gdf["id"] = gdf["kanton"] + "-" + gdf["nutzungsidentifikator"]
-        return super().migrate(gdf)
+    # Combine canton with internal id to make it unique
+    id_columns = ("kanton", "nutzungsidentifikator")

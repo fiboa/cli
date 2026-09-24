@@ -38,7 +38,6 @@ CSB represents non-confidential single crop field boundaries over a set time fra
     # so it does hold for every field the group produces.
     columns = {
         "geometry": "geometry",
-        "id": "id",
         # "CDL2023": "crop:code", will be added in migrate
         "crop:name": "crop:name",
         "CNTY": "administrative_area_level_2",
@@ -86,7 +85,5 @@ CSB represents non-confidential single crop field boundaries over a set time fra
         }
         gdf["crop:name"] = gdf[crop_key].map(original_name_mapping)
 
-        # Number the dissolved fields: nothing from the source identifies them.
-        gdf = gdf.reset_index(drop=True)
-        gdf["id"] = gdf.index.astype(str)
+        # nothing from the source identifies the dissolved fields; the base numbers them
         return gdf

@@ -8,6 +8,6 @@ class ZaFusionMlConverter(MlSplitsMixin, ZaFusionConverter):
         gdf["split"] = "train" if "train" in path else "test"
         return super().file_migration(gdf, path, uri, layer)
 
-    def migrate(self, gdf):
-        gdf["id"] = gdf["split"] + "_" + gdf["fid"].astype(str)
-        return super().migrate(gdf)
+    # Build unique IDs from split + fid to avoid collisions between files
+    id_columns = ("split", "fid")
+    id_separator = "_"

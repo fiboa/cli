@@ -41,10 +41,8 @@ where the Physical_Blocks layers of the same service also carry forest, urban an
     # PHBIDENT identifies the block, and a block is listed once per usage — and
     # sometimes twice for the same usage (42 blocks of the 226,592 in 2025, 40
     # of them with the same code), so the row position identifies the polygon.
-    index_as_id = True
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "PHBIDENT": "block_id",
         "USAGECODE": "crop:code",
         "USAGEBUL": "crop:name",
