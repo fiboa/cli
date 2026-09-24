@@ -72,8 +72,7 @@ Every parcel of Ireland's LPIS with the crop declared on it, from the "Anonymous
 Department of Agriculture, Food and the Marine publishes per campaign year (none for 2023 and 2024).
 The source has one row per claim; here a parcel is one row with the crop of its largest claim, its
 digitised and eligible area and the area claimed by all applicants together. Unclaimed parcels
-(buildings, farmyards, bog) are kept, parcel identifiers are hashed by the department, and the few
-multipart parcels become numbered parts.
+(buildings, farmyards, bog) are kept and parcel identifiers are hashed by the department.
     """
     provider = "Department of Agriculture, Food and the Marine <https://data.gov.ie/organization/department-of-agriculture-food-and-the-marine>"
     attribution = "Ireland Department of Agriculture, Food and the Marine"
@@ -83,7 +82,6 @@ multipart parcels become numbered parts.
     )
     area_is_in_ha = False
     area_calculate_missing = True
-    use_variant_as_determination = True
     columns = {
         "geometry": "geometry",
         "PARC_LAB": "id",
@@ -93,7 +91,6 @@ multipart parcels become numbered parts.
         "MEA": "eligible_area",
         "CLAIM_AREA": "claimed_area",
         "COM_IND": "commonage",
-        "determination:datetime": "determination:datetime",
     }
     column_migrations = {
         "DIGIT_AREA": lambda col: col.astype(float) * 10_000,  # float32 in the GeoPackage
@@ -128,8 +125,4 @@ multipart parcels become numbered parts.
         gdf["CLAIM_AREA"] = gdf.groupby("PARC_LAB")["CLAIM_AREA"].transform("sum")
         gdf = gdf.drop_duplicates("PARC_LAB")
         gdf["crop:code"] = gdf["CROP_DESC"]
-        # a few dozen parcels per edition are several polygons; number the parts so the id stays unique
-        gdf = self.split_multipart(gdf)
-        part = gdf.groupby("PARC_LAB").cumcount()
-        gdf.loc[part > 0, "PARC_LAB"] += "-" + (part[part > 0] + 1).astype("string")
         return super().migrate(gdf)

@@ -197,6 +197,8 @@ expected_columns = {
     "es_cl": ("determination:datetime",),
     "fr": ("determination:datetime",),
     "pl": ("determination:datetime",),
+    "ie_lpis": ("determination:datetime", "metrics:area", "crop:code", "id"),
+    "ie_lpis#2025": ("determination:datetime", "metrics:area", "crop:code", "id"),
     # derived from the archive date in file_migration()
     "pl_block": ("determination:datetime",),
 }

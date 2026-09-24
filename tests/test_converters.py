@@ -391,9 +391,12 @@ def test_a_missing_crop_column_still_fails_where_it_should():
 
 def test_ie_lpis_keeps_one_row_per_parcel(tmp_folder, tmp_parquet_file):
     """A source row is a claim, several of which share a parcel's geometry. The converter keeps
-    one row per parcel with the crop of the largest claim and the claims added up, numbers the
-    parts of a multipart parcel, drops the crop-less rows of the 2025 GeoPackage and fills a
-    digitised area rounded to 0 from the geometry."""
+    one row per parcel with the crop of the largest claim and the claims added up, keeps a
+    multipart parcel as one row, drops the crop-less rows of the 2025 GeoPackage, fills a
+    digitised area rounded to 0 from the geometry and dates the parcels by the campaign year."""
+    import json
+
+    import pyarrow.parquet as pq
     from shapely.geometry import MultiPolygon, box
 
     from fiboa_cli.datasets.ie_lpis import Converter
@@ -435,10 +438,15 @@ def test_ie_lpis_keeps_one_row_per_parcel(tmp_folder, tmp_parquet_file):
     )
 
     result = gpd.read_parquet(tmp_parquet_file).set_index("id").sort_index()
-    assert result.index.tolist() == ["A", "B", "B-2", "D"]  # no crop, no row; two parts, two rows
+    assert result.index.tolist() == ["A", "B", "D"]  # no crop, no row
     a = result.loc["A"]
     assert a["crop:name"] == "Maize"  # the largest single claim, not the largest crop total
     assert a["claimed_area"] == 6.5 and a["eligible_area"] == 6.5
     assert a["metrics:area"] == 70_000 and not a["commonage"]
-    assert result.loc[["B", "B-2"], "metrics:area"].tolist() == [100, 300]  # the parts, measured
+    b = result.loc["B"]  # two polygons, one parcel, one row
+    assert b.geometry.geom_type == "MultiPolygon"
+    assert b["metrics:area"] == pytest.approx(400)
     assert result.loc["D", "metrics:area"] == 50 and result.loc["D", "commonage"]  # digitised 0
+    # one value for every row, so it is written to the collection metadata
+    collection = json.loads(pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata[b"collection"])
+    assert collection["determination:datetime"] == "2025-01-01T00:00:00Z"
