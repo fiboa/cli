@@ -32,7 +32,7 @@ that Zürich farms cultivate in neighbouring cantons (two per cent of the rows),
 file on geodienste.ch does.
     """
     provider = "Kanton Zürich, Amt für Landschaft und Natur <https://www.zh.ch/de/umwelt-tiere/landwirtschaft.html>"
-    license = "opendata.swiss terms: Open use; Kanton Zürich terms of use <https://geo.zh.ch/terms-of-use>"
+    license = "CC0-1.0"
     attribution = "Kanton Zürich, Amt für Landschaft und Natur — Landwirtschaftliche Kulturflächen, https://maps.zh.ch/wfs/OGDZHWFS"
 
     def file_migration(self, gdf, path, uri, layer=None):

@@ -8,5 +8,5 @@ class Converter(CHBaseConverter):
     title = "Field boundaries for the canton of Zug, Switzerland"
     description = "The agricultural usage areas (Nutzungsflächen) of the canton of Zug, in their current state on geodienste.ch."
     provider = f"Kanton Zug, via geodienste.ch <{SERVICE_PAGE}>"
-    license = "opendata.swiss terms: Open use. Must provide the source; Kanton Zug Nutzungsbedingungen <https://zg.ch/de/planen-bauen/geoinformation/geoinformationen-nutzen/nutzungsbedingungen>"
+    license = "CC-BY-4.0"
     attribution = f"Quelle: GIS Kanton Zug — Landwirtschaftliche Nutzungsflächen, {SERVICE_PAGE}"

@@ -8,7 +8,7 @@ class Converter(CHBaseConverter):
     title = "Field boundaries for the canton of Vaud, Switzerland"
     description = "The agricultural usage areas (Nutzungsflächen) of the canton of Vaud, in their current state on geodienste.ch."
     provider = f"Kanton Vaud, via geodienste.ch <{SERVICE_PAGE}>"
-    license = "État de Vaud conditions d'utilisation des géodonnées (approval required) <https://www.vd.ch/themes/territoire-et-construction/cadastre-et-geoinformation/geodonnees/commande-de-geodonnees/conditions-dutilisation/>"
+    license = "Nutzungsbedingungen <https://www.vd.ch/territoire-et-construction/cadastre-et-geoinformation/geoservices/>"
     attribution = f"État de Vaud — Landwirtschaftliche Nutzungsflächen, {SERVICE_PAGE}"
     data_access = (
         "The canton has to approve the download on geodienste.ch: apply at "
