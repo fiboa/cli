@@ -31,6 +31,7 @@ tests = [
     "ec_si",
     "fi",
     "fr",
+    "fr#2020",
     "hr",
     "nl",
     "nl_block",
@@ -125,6 +126,8 @@ extra_convert_parameters = {
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
     # the fixture is the 2022 archive; the converter's default is the newest edition
     "fr": {"variant": "2022"},
+    # two real volumes (.7z.001 + .7z.002), so the parts must be joined before extracting
+    "fr#2020": {"variant": "2020"},
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": {"variant": "2024", **_input_files("lv", "lv_2024_lielriga.gpkg")},
     # the code list is minted for this dataset, so read it from the fixture folder
