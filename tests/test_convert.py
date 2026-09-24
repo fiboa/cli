@@ -183,7 +183,7 @@ expected_columns = {
     "es_cl": ("determination:datetime",),
     "fr": ("determination:datetime",),
     "pl": ("determination:datetime",),
-    # filled from the archive date, which the variant must not overwrite
+    # derived from the archive date in file_migration()
     "pl_block": ("determination:datetime",),
 }
 

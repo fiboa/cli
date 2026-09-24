@@ -1,3 +1,5 @@
+import re
+
 import pyproj
 import shapely
 from vecorel_cli.conversion.base import BaseConverter
@@ -36,8 +38,9 @@ class FiboaBaseConverter(BaseConverter):
 
     def _variants_are_years(self):
         """Whether every declared variant is a year in the range 1900–2100."""
+        # four ASCII digits: isdigit() also accepts e.g. "²" (int() fails) and "02023"
         return bool(self.variants) and all(
-            str(v).isdigit() and 1900 <= int(v) <= 2100 for v in self.variants
+            re.fullmatch("[0-9]{4}", str(v)) and 1900 <= int(v) <= 2100 for v in self.variants
         )
 
     def _determination_provided(self):

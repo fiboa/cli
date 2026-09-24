@@ -266,6 +266,14 @@ def test_non_year_variants_do_not_default_to_determination():
     assert _determination(converter, "north") is None
 
 
+@pytest.mark.parametrize("variant", ["02023", "²", "٢٠٢٣", "1899", "2101"])
+def test_malformed_or_out_of_range_year_variants_do_not_default_to_determination(variant):
+    """Only four ASCII digits in 1900–2100 are years: a padded year would give an
+    invalid timestamp, and some Unicode digits make int() fail."""
+    converter = _determination_converter(variants={variant: variant})
+    assert _determination(converter, variant) is None
+
+
 def test_no_variants_do_not_default_to_determination():
     converter = _determination_converter(variants={})
     assert _determination(converter, None) is None

@@ -13,7 +13,7 @@ class ESCLConverter(ESBaseConverter):
     short_name = "Spain Castilla y León"
     title = "Spain Castile and León Crop fields"
     description = """
-Official SIGPAC land plan for the year 2024. (reference date 02-01-2024)
+Official SIGPAC land plans for the years 2019 to 2025.
 
 Source: SIGPAC (FEGA) database. The Land Consolidation Replacement Farms are included,
 not updated in the SIGPAC published in the Viewer.
