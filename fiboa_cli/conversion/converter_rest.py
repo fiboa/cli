@@ -8,6 +8,9 @@ import geopandas as gpd
 import requests
 from vecorel_cli.vecorel.util import get_fs, stream_file
 
+REST_ATTEMPTS = 8
+REST_MAX_BACKOFF = 30  # seconds; eight attempts span about two minutes
+
 
 class EsriRESTConverterMixin:
     cache_folder = None
@@ -75,31 +78,18 @@ class EsriRESTConverterMixin:
         source_fs = get_fs(base_url)
         cache_fs, cache_folder = self.get_cache(self.cache_folder)
 
-        service_metadata = requests.get(base_url, {"f": "pjson"}).json()
+        service_metadata = self._rest_json(base_url, {"f": "pjson"})
         layer = self.rest_layer_filter(service_metadata["layers"])
         page_size = service_metadata["maxRecordCount"]
         layer_url = f"{base_url}/{layer['id']}/query"
-        # Joined layers qualify every field with the table name; discover the
-        # real key field before paging on it ("OBJECTID" alone fails there).
-        probe = requests.get(
-            layer_url,
-            {
-                "f": "json",
-                "where": "1=1",
-                "outFields": "*",
-                "resultRecordCount": 1,
-                "returnGeometry": "false",
-            },
-        ).json()
-        attribute = self.rest_attribute
-        if probe.get("features"):
-            names = list(probe["features"][0]["attributes"].keys())
-            attribute = next(
-                (n for n in names if n == self.rest_attribute),
-                next(
-                    (n for n in names if n.endswith("." + self.rest_attribute)), self.rest_attribute
-                ),
-            )
+        # Joined layers qualify every field with the table name, so read the key
+        # field from the layer's metadata: es_ib refuses a "where=1=1" probe there.
+        layer_metadata = self._rest_json(f"{base_url}/{layer['id']}", {"f": "pjson"})
+        names = [field["name"] for field in layer_metadata.get("fields") or []]
+        attribute = next(
+            (n for n in names if n == self.rest_attribute),
+            next((n for n in names if n.endswith("." + self.rest_attribute)), self.rest_attribute),
+        )
         base_where = self.rest_params.get("where")
 
         # Page by half-open id windows rather than orderByFields + "id > last":
@@ -128,31 +118,28 @@ class EsriRESTConverterMixin:
         while lo < max_id:
             cached = lo in windows
             hi = windows[lo] if cached else lo + page_size
+            cache_file = None
+            if cache_fs is not None:
+                cache_file = os.path.join(cache_folder, f"{prefix}{lo}-{hi}.{self.rest_format}")
             if cached:
-                url = os.path.join(cache_folder, f"{prefix}{lo}-{hi}.{self.rest_format}")
+                try:
+                    data = gpd.read_file(cache_file)
+                except Exception as e:
+                    cache_fs.rm(cache_file)
+                    raise RuntimeError(f"Could not read cached page {cache_file}: {e}") from e
             else:
                 clause = f"{attribute}>{lo} AND {attribute}<={hi}"
                 get_dict["where"] = f"{clause} AND ({base_where})" if base_where else clause
                 url = f"{layer_url}?{urlencode(get_dict)}"
-                if cache_fs is not None:
-                    cache_file = os.path.join(cache_folder, f"{prefix}{lo}-{hi}.{self.rest_format}")
-                    try:
-                        with cache_fs.open(cache_file, mode="wb") as file:
-                            stream_file(source_fs, url, file)
-                    except Exception:
-                        # A download that broke off must not survive as a cached page
-                        if cache_fs.exists(cache_file):
-                            cache_fs.rm(cache_file)
-                        raise
-                    url = cache_file
-
-            try:
-                data = gpd.read_file(url)
-            except Exception as e:
-                # An error response from the server must not survive as a cached page
-                if cache_fs is not None and cache_fs.exists(url):
-                    cache_fs.rm(url)
-                raise RuntimeError(f"Could not read ids ({lo} ... {hi}] of {layer_url}: {e}") from e
+                try:
+                    data = self._rest_retry(
+                        f"ids ({lo} ... {hi}]",
+                        lambda: self._rest_page(source_fs, cache_fs, url, cache_file),
+                    )
+                except Exception as e:
+                    raise RuntimeError(
+                        f"Could not read ids ({lo} ... {hi}] of {layer_url}: {e}"
+                    ) from e
 
             if len(data) == 0 and not cached:
                 # An id gap wider than a page: ask once where the ids resume, and
@@ -163,7 +150,7 @@ class EsriRESTConverterMixin:
                     gap = os.path.join(
                         cache_folder, f"{prefix}{lo}-{resume - 1}.{self.rest_format}"
                     )
-                    cache_fs.mv(url, gap)
+                    cache_fs.mv(cache_file, gap)
                 hi = max(hi, resume - 1)
 
             lo = hi
@@ -187,7 +174,43 @@ class EsriRESTConverterMixin:
                 windows[int(match.group(1))] = int(match.group(2))
         return windows
 
-    def _rest_id_bound(self, layer_url, attribute, base_where, direction, floor=-1, attempts=5):
+    def _rest_retry(self, what, action, attempts=REST_ATTEMPTS):
+        """Run `action` until it succeeds: the Balearic proxy answers two requests
+        in three with a 502, and a run makes hundreds of them."""
+        for attempt in range(attempts):
+            try:
+                return action()
+            except Exception as e:
+                if attempt == attempts - 1:
+                    raise
+                self.warning(f"{what}: {e}, retrying ({attempt + 1}/{attempts})")
+                time.sleep(min(2**attempt, REST_MAX_BACKOFF))
+
+    def _rest_json(self, url, params):
+        def ask():
+            payload = requests.get(url, params).json()
+            if "error" in payload:  # Esri answers a failed request with 200 and an error body
+                raise RuntimeError(payload["error"])
+            return payload
+
+        return self._rest_retry(url, ask)
+
+    @staticmethod
+    def _rest_page(source_fs, cache_fs, url, cache_file):
+        """Download and read one page; neither a download that broke off nor an
+        error response survives as a cached page."""
+        if cache_file is None:
+            return gpd.read_file(url)
+        try:
+            with cache_fs.open(cache_file, mode="wb") as file:
+                stream_file(source_fs, url, file)
+            return gpd.read_file(cache_file)
+        except Exception:
+            if cache_fs.exists(cache_file):
+                cache_fs.rm(cache_file)
+            raise
+
+    def _rest_id_bound(self, layer_url, attribute, base_where, direction, floor=-1):
         clause = f"{attribute}>{floor}"
         params = {
             "f": "json",
@@ -197,14 +220,5 @@ class EsriRESTConverterMixin:
             "orderByFields": f"{attribute} {direction}",
             "resultRecordCount": 1,
         }
-        # This is the one sorted query left, and it is the one a tired server
-        # gives up on: the Balearic proxy answers two in three with a 502. The
-        # pages themselves are range queries and do not need this.
-        for attempt in range(attempts):
-            try:
-                response = requests.get(layer_url, params).json()
-                return int(next(iter(response["features"][0]["attributes"].values())))
-            except Exception:
-                if attempt == attempts - 1:
-                    raise
-                time.sleep(2**attempt)
+        response = self._rest_json(layer_url, params)
+        return int(next(iter(response["features"][0]["attributes"].values())))
