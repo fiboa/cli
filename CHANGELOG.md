@@ -35,7 +35,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
-- Updated vecorel-cli to 0.2.16, 0.2.17, 0.2.18, 0.2.20 and 0.3.0, including improved validation defaults, latest-variant selection when `--variant` is not provided, and multi-volume 7z download support.
+- Updated vecorel-cli to 0.3.0, including improved validation defaults, latest-variant selection when `--variant` is not provided, and multi-volume 7z download support.
+- REST converters download much faster from large layers and retry when a service answers with intermittent errors.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
@@ -43,7 +44,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES:
   - ES regions based on SIGPAC now publish `hcat:code` from land-use mapping.
   - ES-AR now reads municipality SIGPAC sources listed by IDEAragon.
+  - ES-CB now covers editions 2010-2025.
   - ES-GA now supports editions 2014-2026.
+  - ES-IB now covers editions 2022-2026, reading the current and the historic SIGPAC services.
 - FI: Editions are now available by year (2020-2025).
 - FR: Editions now cover 2017-2024, mapped through one shared crop code list (https://fiboa.org/code/fr/fr.csv).
 - HR: Editions now cover 2011-2024.
@@ -61,7 +64,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
 - Declared the `beautifulsoup4` dependency used by ES-PV and ES-VC.
-- Dropped cached error pages for REST converters.
+- REST converters:
+  - Downloaded data cached for one dataset, edition or service is no longer served for another. Previously cached downloads are fetched again once.
+  - Error responses and interrupted downloads are no longer cached.
+  - Layers that join several tables (some ES-CB and ES-IB editions) are now filtered and paged correctly, and their column names no longer carry table prefixes.
 - Fixed `use_variant_as_determination` so determination dates are retained.
 - Multipart geometries now get recomputed area/perimeter for split parts.
 - Rows missing `crop:code` are now dropped with a warning (and an error threshold), instead of failing whole conversions.
@@ -90,10 +96,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - ES-AN now uses the correct land-use column and campaign-based determination date.
   - ES-CAT and ES-CN now map crop codes to HCAT with the extended mapping table.
   - ES-CB now derives determination date from the campaign.
+  - ES-CB now ships Cantabria's own licence instead of CC-BY-NC, with the province as provider.
   - ES-CL now reads the HTTPS source and 2025 province subfolders.
   - ES-CM now uses the campaign-specific SIGPAC service and schema.
   - ES-CN now keeps distinct island records and correct region metadata.
   - ES-EX and ES-NC now read FEGA national recinto releases (2025, 2026) because the regional portals are unavailable.
+  - ES-IB now names the Balearic government as provider instead of Navarra's.
   - ES-MD now finds `RECINTO.shp` regardless of archive folder layout.
 - Europe-LAND: Empty source crop codes now fall back to crop names (for example LT 2024).
 - FR:

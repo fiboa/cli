@@ -56,6 +56,8 @@ tests = [
     "pl_block",
     "es_cat",
     "es_nc",
+    "es_ib",
+    "es_ib#2024",
     "es_cl",
     "es_ar",
     "es_an",
@@ -128,6 +130,10 @@ extra_convert_parameters = {
     "fr": {"variant": "2022"},
     # two real volumes (.7z.001 + .7z.002), so the parts must be joined before extracting
     "fr#2020": {"variant": "2020"},
+    # a page of each service: the current snapshot and a historic year, whose
+    # Catxe reads "Febrer2024.0" where the current one reads "maig 2026"
+    "es_ib": {"variant": "2026", **_input_files("es_ib", "es_ib_2026.geojson")},
+    "es_ib#2024": {"variant": "2024", **_input_files("es_ib", "es_ib_2024.geojson")},
     "es": {"input_files": {f"{test_path}/es/1501_ALAVA_cd_2025_20250105.gpkg.zip": ["*.gpkg"]}},
     "lv": {"variant": "2024", **_input_files("lv", "lv_2024_lielriga.gpkg")},
     # the code list is minted for this dataset, so read it from the fixture folder
