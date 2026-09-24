@@ -1,12 +1,5 @@
-from .ch_base import SERVICE_PAGE, CHBaseConverter
+from .ch_base import CHBaseConverter
 
 
 class Converter(CHBaseConverter):
-    id = "ch_ag"
     canton = "AG"
-    short_name = "Switzerland, Aargau"
-    title = "Field boundaries for the canton of Aargau, Switzerland"
-    description = "The agricultural usage areas (Nutzungsflächen) of the canton of Aargau, in their current state on geodienste.ch."
-    provider = f"Kanton Aargau, via geodienste.ch <{SERVICE_PAGE}>"
-    license = "CC-BY-4.0"
-    attribution = f"Daten des Kantons Aargau — Landwirtschaftliche Nutzungsflächen, {SERVICE_PAGE}"

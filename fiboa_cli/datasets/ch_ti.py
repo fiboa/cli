@@ -1,17 +1,5 @@
-from .ch_base import SERVICE_PAGE, CHBaseConverter
+from .ch_base import CHBaseConverter
 
 
 class Converter(CHBaseConverter):
-    id = "ch_ti"
     canton = "TI"
-    short_name = "Switzerland, Ticino"
-    title = "Field boundaries for the canton of Ticino, Switzerland"
-    description = "The agricultural usage areas (Nutzungsflächen) of the canton of Ticino, in their current state on geodienste.ch."
-    provider = f"Kanton Ticino, via geodienste.ch <{SERVICE_PAGE}>"
-    license = "CC-BY-4.0"
-    attribution = f"Fonte: Amministrazione cantonale - Canton Ticino — Landwirtschaftliche Nutzungsflächen, {SERVICE_PAGE}"
-    data_access = (
-        "Registration on geodienste.ch is required for this canton: apply at "
-        f"{SERVICE_PAGE}, export the GeoPackage and convert it with "
-        "`fiboa convert ch_ti -i <zip>|geopackage/*.gpkg`."
-    )

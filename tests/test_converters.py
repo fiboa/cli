@@ -452,57 +452,70 @@ def test_ie_lpis_keeps_one_row_per_parcel(tmp_folder, tmp_parquet_file):
     assert collection["determination:datetime"] == "2025-01-01T00:00:00Z"
 
 
-def _convert_swiss(converter_id, tmp_parquet_file, variant, filename):
-    """Convert one Swiss fixture and return the rows with the collection constants."""
-    import json
+def test_ch_canton_table_fills_the_converter():
+    """A canton file only names its canton; the base fills the rest from CANTONS."""
+    ag = Converters().load("ch_ag")
+    assert ag.id == "ch_ag" and ag.short_name == "Switzerland, Aargau"
+    assert ag.license == "CC-BY-4.0" and ag.attribution.startswith("Daten des Kantons Aargau")
+    assert ag.data_access == ""
+    assert "fiboa convert ch_ne -i" in Converters().load("ch_ne").data_access
+    assert Converters().load("ch_gr").license.startswith("Nutzungsbestimmungen")
 
-    import pyarrow.parquet as pq
 
-    from fiboa_cli.converters import Converters
-
-    folder = f"tests/data-files/convert/{converter_id}"
-    Converters().load(converter_id).convert(
-        tmp_parquet_file,
-        cache=folder,
-        variant=variant,
-        input_files={f"{folder}/{filename}": filename},
-        mapping_file=f"{folder}/lnf_code.csv",
+def test_ch_own_layer_is_brought_into_the_model():
+    """Zürich's layer has its own column names, a zero-padded code and the area in ares."""
+    converter = Converters().load("ch_zh")
+    converter.select_variant("2025")
+    gdf = gpd.GeoDataFrame(
+        {
+            "gis_nr": ["1", "2"],
+            "blw_nr": ["0613", "0399"],
+            "blw_name": ["a", "b"],
+            "flaeche": [22.0, 0.5],
+        },
+        geometry=[Point(0, 0), Point(1, 1)],
+        crs="EPSG:2056",
     )
-    collection = json.loads(pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata[b"collection"])
-    return gpd.read_parquet(tmp_parquet_file), collection
+    out = converter.file_migration(gdf, "ch_zh_2025_0.zip", "https://example.test")
+    assert out["lnf_code"].tolist() == [613, 399]
+    assert out["flaeche_m2"].tolist() == [2200.0, 50.0]
+    assert out["kanton"].tolist() == ["ZH", "ZH"] and out["bezugsjahr"].tolist() == [2025, 2025]
+    assert not out["ist_ueberlagernd"].any() and "nutzungsidentifikator" in out.columns
 
 
-def test_ch_ge_keeps_one_year_of_the_shared_file(tmp_parquet_file):
-    """Geneva publishes every year since 2017 in one file. An edition keeps its year only,
-    leaves out the rows without a usage code, and takes the year as its determination date."""
-    result, collection = _convert_swiss(
-        "ch_ge", tmp_parquet_file, "2024", "AGR_SURFACE_AGRICOLE_RECENSEE-SHP.zip"
+def test_ch_ge_keeps_its_year_and_the_rows_with_a_code():
+    """Geneva publishes every year since 2017 in one file, and a few rows carry no code."""
+    converter = Converters().load("ch_ge")
+    converter.select_variant("2024")
+    gdf = gpd.GeoDataFrame(
+        {
+            "ID": ["a", "b", "c"],
+            "CODE_FED": [513.0, 513.0, None],
+            "TYPE": ["x", "x", None],
+            "SHAPE_AREA": [1.0, 1.0, 1.0],
+            "EXERCICE": [2024.0, 2025.0, 2024.0],
+        },
+        geometry=[Point(0, 0)] * 3,
+        crs="EPSG:2056",
     )
-    assert len(result) == 47  # 51 rows of 2024 in the fixture, 4 of them without a code
-    assert result["id"].str.startswith("GE-GE_2024_").all() and result["id"].is_unique
-    assert not result["id"].str.contains("~").any()  # the repeated ids were the code-less twins
-    assert result["crop:code"].str.fullmatch(r"\d{3}").all()  # "513", not "513.0"
-    assert collection["determination:datetime"] == "2024-01-01T00:00:00Z"
-    assert collection["admin:subdivision_code"] == "GE"
+    out = converter.filter_rows(converter.file_migration(gdf, "x.zip", "https://example.test"))
+    assert out["nutzungsidentifikator"].tolist() == ["a"]
 
 
-def test_ch_sz_numbers_the_parts_of_a_field(tmp_parquet_file):
-    """The canton's WFS layers hold one feature per part of a field, all with the field's id and
-    the field's total area; the parts are numbered and their area is measured."""
-    result, collection = _convert_swiss("ch_sz", tmp_parquet_file, "2024", "ch_sz_2024.gml")
-    parts = result[result["id"].str.startswith("SZ-100016~")]
-    assert sorted(parts["id"]) == ["SZ-100016~1", "SZ-100016~2", "SZ-100016~3"]
-    assert parts["metrics:area"].sum() == pytest.approx(3500, rel=0.02)  # groesse 35 ares
-    assert result["id"].is_unique and (result["crop:code"] == "617").sum() >= 3
-    assert collection["determination:datetime"] == "2024-01-01T00:00:00Z"
+def test_ch_geodienste_file_must_hold_the_variant_year():
+    """A None variant reads the current geodienste.ch file, which must not be relabelled once
+    the canton moves on to the next year."""
+    converter = Converters().load("ch_sz")
+    converter.select_variant("2025")
+    gdf = gpd.GeoDataFrame(
+        {"nutzungsidentifikator": ["SZ.KUL.1"], "bezugsjahr": [2026]},
+        geometry=[Point(0, 0)],
+        crs="EPSG:2056",
+    )
+    with pytest.raises(ValueError, match="2026"):
+        converter.file_migration(gdf, "x.gpkg", "https://example.test")
 
 
-def test_ch_zh_converts_ares_and_strips_the_code(tmp_parquet_file):
-    """Zürich's WFS gives the area in ares and the usage code zero-padded."""
-    result, collection = _convert_swiss("ch_zh", tmp_parquet_file, "2025", "ch_zh_2025.zip")
-    assert result["id"].str.startswith("ZH-").all() and result["id"].is_unique
-    assert not result["crop:code"].str.startswith("0").any()
-    assert result["metrics:area"].median() == pytest.approx(1800)  # 18 ares in the source
-    assert (result["metrics:area"] > 0).all()  # the two rows with flaeche 0 are measured
-    assert collection["determination:datetime"] == "2025-01-01T00:00:00Z"
-    assert collection["admin:subdivision_code"] == "ZH"
+def test_ch_rejects_an_unknown_year():
+    with pytest.raises(ValueError, match="Unknown variant"):
+        Converters().load("ch_zh").select_variant("2016")
