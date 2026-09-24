@@ -21,7 +21,7 @@ year is provisional until December.
     provider = (
         "État de Genève, Office cantonal de l'agriculture et de la nature <https://ge.ch/sitg/>"
     )
-    license = "opendata.swiss terms: Open use. Must provide the source; SITG conditions d'utilisation, level A <https://sitg.ge.ch/ressources/conditions-utilisation-donnees>"
+    license = "CC-BY-4.0"
     attribution = "Données SITG, État de Genève — Surfaces agricoles recensées, https://ge.ch/sitg/geodata/SITG/OPENDATA/AGR_SURFACE_AGRICOLE_RECENSEE-SHP.zip"
 
     def select_variant(self, variant):

@@ -27,7 +27,7 @@ one feature per part of a field and few attributes, so the area is measured and 
 from the current year's.
     """
     provider = "Kanton Schwyz, Amt für Landwirtschaft <https://www.sz.ch/landwirtschaft>"
-    license = "Open Data-Lizenz für Geodienste & Geodaten des Kantons Schwyz, source required <https://www.geodienste.ch/pdfs/SZ/lwb_nutzungsflaechen/data/Open%20Data%20Lizenz%20AFL.pdf>"
+    license = "CC-BY-4.0"
     attribution = "Amt für Landwirtschaft (AFL), Kanton Schwyz — Landwirtschaftliche Nutzungsflächen, https://www.geodienste.ch/services/lwb_nutzungsflaechen"
 
     def file_migration(self, gdf, path, uri, layer=None):

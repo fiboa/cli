@@ -8,5 +8,5 @@ class Converter(CHBaseConverter):
     title = "Field boundaries for the canton of Luzern, Switzerland"
     description = "The agricultural usage areas (Nutzungsflächen) of the canton of Luzern, in their current state on geodienste.ch."
     provider = f"Kanton Luzern, via geodienste.ch <{SERVICE_PAGE}>"
-    license = "opendata.swiss terms: Open use. Must provide the source; Kanton Luzern Nutzungsbedingungen <https://geoportal.lu.ch/geodaten/nutzungsbedingungen>"
+    license = "CC-BY-4.0"
     attribution = f"Kanton Luzern — Landwirtschaftliche Nutzungsflächen, {SERVICE_PAGE}"

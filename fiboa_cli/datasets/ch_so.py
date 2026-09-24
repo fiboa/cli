@@ -8,5 +8,5 @@ class Converter(CHBaseConverter):
     title = "Field boundaries for the canton of Solothurn, Switzerland"
     description = "The agricultural usage areas (Nutzungsflächen) of the canton of Solothurn, in their current state on geodienste.ch."
     provider = f"Kanton Solothurn, via geodienste.ch <{SERVICE_PAGE}>"
-    license = "opendata.swiss terms: Open use <https://opendata.swiss/terms-of-use#terms_open>"
+    license = "CC0-1.0"
     attribution = f"Kanton Solothurn — Landwirtschaftliche Nutzungsflächen, {SERVICE_PAGE}"

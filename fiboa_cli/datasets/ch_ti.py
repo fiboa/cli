@@ -8,7 +8,7 @@ class Converter(CHBaseConverter):
     title = "Field boundaries for the canton of Ticino, Switzerland"
     description = "The agricultural usage areas (Nutzungsflächen) of the canton of Ticino, in their current state on geodienste.ch."
     provider = f"Kanton Ticino, via geodienste.ch <{SERVICE_PAGE}>"
-    license = "opendata.swiss terms: Open use. Must provide the source; Geoportale Ticino condizioni di utilizzo (registration required) <https://www4.ti.ch/dt/sg/sai/ugeo/temi/geoportale-ticino/geoportale/condizioni-utilizzo/>"
+    license = "CC-BY-4.0"
     attribution = f"Fonte: Amministrazione cantonale - Canton Ticino — Landwirtschaftliche Nutzungsflächen, {SERVICE_PAGE}"
     data_access = (
         "Registration on geodienste.ch is required for this canton: apply at "

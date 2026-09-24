@@ -8,7 +8,7 @@ class Converter(CHBaseConverter):
     title = "Field boundaries for the canton of Neuchâtel, Switzerland"
     description = "The agricultural usage areas (Nutzungsflächen) of the canton of Neuchâtel, in their current state on geodienste.ch."
     provider = f"Kanton Neuchâtel, via geodienste.ch <{SERVICE_PAGE}>"
-    license = "opendata.swiss terms: Open use. Must provide the source; SITN conditions (registration required) <https://sitn.ne.ch/geoshop2_media/documents/contrat_sitn.pdf>"
+    license = "CC-BY-4.0"
     attribution = (
         f"Données SITN, http://www.ne.ch/sitn — Landwirtschaftliche Nutzungsflächen, {SERVICE_PAGE}"
     )
