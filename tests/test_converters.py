@@ -262,6 +262,20 @@ def test_a_mapped_determination_is_not_overwritten_by_the_variant():
     assert "determination:datetime" not in gdf.columns
 
 
+def test_a_self_mapped_determination_is_filled_from_the_variant():
+    """Mapping the key to itself only keeps the column (SIGPAC), so the variant fills it."""
+    converter = _determination_converter(
+        variants={"2023": "2023"},
+        columns={
+            "geometry": "geometry",
+            "id": "id",
+            "determination:datetime": "determination:datetime",
+        },
+    )
+    gdf = _post_migrate(converter, "2023")
+    assert gdf["determination:datetime"].tolist() == ["2023-01-01T00:00:00Z"] * 2
+
+
 def test_explicit_false_overrides_the_year_variant_default():
     converter = _determination_converter(
         variants={"2023": "2023"}, use_variant_as_determination=False
