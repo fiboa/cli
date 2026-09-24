@@ -45,6 +45,5 @@ class ESCBConverter(EsriRESTConverterMixin, ESBaseConverter):
     # rest_params = {"where": "USO_SIGPAC NOT IN ('AG','CA','ED','FO','IM','IS','IV','TH','ZC','ZU','ZV','MT')"}
 
     def rest_layer_filter(self, layers):
-        self.column_additions["determination:datetime"] = ""
         regex = re.compile("Recintos SIGPAC " + self.variant)
         return next(layer for layer in layers if regex.match(layer["name"]))

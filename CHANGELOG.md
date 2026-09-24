@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES:
   - ES regions based on SIGPAC now publish `hcat:code` from land-use mapping.
   - ES-AR now reads municipality SIGPAC sources listed by IDEAragon.
+  - ES-CL now declares its editions (2019-2025) as variants.
   - ES-GA now supports editions 2014-2026.
 - FI: Editions are now available by year (2020-2025).
 - FR: Editions now cover 2017-2024, mapped through one shared crop code list (https://fiboa.org/code/fr/fr.csv).
@@ -83,7 +84,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Missing crop codes are kept empty instead of being filled with the undefined code 0.
 - EC-EE: Fixed shapefile naming and year-column migration.
 - EC-FR: Added the missing 2018 RPG campaign from EuroCrops.
-- EC-LT: Fixed Lithuanian crop-name decoding and parcel identifier handling.
+- EC-LT:
+  - Fixed Lithuanian crop-name decoding and parcel identifier handling.
+  - `determination:datetime` is now published; it was declared under a name the converter does not read.
 - EC-LV: Relaxed requirements to match fields present in source data.
 - EC-SI: Relaxed requirements to match fields present in source data.
 - EE: Published valid crop code, land-use class and stable parcel identifier; cache files are now campaign-specific.
