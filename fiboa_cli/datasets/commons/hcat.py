@@ -159,7 +159,7 @@ class AddHCATMixin:
 
 def hcat_mapping_url(csv_file):
     """Returns URLs as-is and resolves bare file names to the EuroCrops country_mappings folder."""
-    if csv_file.startswith("https://"):
+    if "://" in csv_file:
         return csv_file
     return f"https://raw.githubusercontent.com/maja601/EuroCrops/refs/heads/main/csvs/country_mappings/{csv_file}"
 
