@@ -1,10 +1,9 @@
 import re
-from urllib.parse import urlencode
 
-import requests
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.convert_gml import gml_assure_columns
+from ..conversion.converter_wfs import WFSConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.de_iacs import DEIACSMixin
 
@@ -22,18 +21,9 @@ def parse_size(x):
 
 
 BASE_URL = "https://geoportal.saarland.de/gdi-sl/inspirewfs_Bodenbedeckung_LPIS"
-PARAMS = {
-    "service": "WFS",
-    "version": "2.0.0",
-    "request": "GetFeature",
-    "typeNames": "lcv:LandCoverUnit",
-}
-# The WFS accepts larger pages, but 2500 keeps each response around 7 MB. It is also the ceiling
-# of the limit allowlist on the OGC API - Features endpoint for the same data.
-PAGE_SIZE = 2500
 
 
-class DESLBlockConverter(AdminConverterMixin, DEIACSMixin, FiboaBaseConverter):
+class DESLBlockConverter(AdminConverterMixin, DEIACSMixin, WFSConverterMixin, FiboaBaseConverter):
     id = "de_sl_block"
     admin_subdivision_code = "SL"
     short_name = "Germany, Saarland (LPIS)"
@@ -53,6 +43,12 @@ published separately.
 
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
 
+    wfs_url = BASE_URL
+    wfs_params = {"typeNames": "lcv:LandCoverUnit"}
+    # The WFS accepts larger pages, but 2500 keeps each response around 7 MB. It is also the
+    # ceiling of the limit allowlist on the OGC API - Features endpoint for the same data.
+    wfs_page_size = 2500
+
     columns = {
         "geometry": "geometry",
         "flik": "flik",  # derived in migrate(); the block reference
@@ -60,19 +56,6 @@ published separately.
         "area_type": "crop:code",  # added in file_migration(), trimmed in migrate()
         "area": "metrics:area",  # derived in migrate(); in hectares
     }
-
-    def get_urls(self):
-        # numberReturned is always reported as 0 by this server, so the page count has to come
-        # from a hits request rather than from the responses themselves.
-        hits = requests.get(BASE_URL, params={**PARAMS, "resultType": "hits"})
-        hits.raise_for_status()
-        total = int(re.search(r'numberMatched="(\d+)"', hits.text).group(1))
-
-        query = urlencode({**PARAMS, "count": PAGE_SIZE})
-        return {
-            f"{BASE_URL}?{query}&startIndex={start}": f"de_sl_block_{start}.gml"
-            for start in range(0, total, PAGE_SIZE)
-        }
 
     def file_migration(self, gdf, path, uri, layer=None):
         # The land cover class is a nested xlink attribute, which the GML driver does not guess
