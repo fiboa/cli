@@ -75,6 +75,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Perimeters are measured in each feature's UTM zone.
 - SE: Editions now cover 2015-2025 from the yearly WFS filter.
 - SI: Extended editions back to 2019.
+- SK: Editions now cover 2018-2026 from the per-campaign datasets on data.slovensko.sk.
 - US-CSB: Editions now cover 2017-2024.
 
 ### Removed
