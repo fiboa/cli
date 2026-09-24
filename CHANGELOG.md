@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
-- Updated vecorel-cli to 0.3.0, including improved validation defaults, latest-variant selection when `--variant` is not provided, multi-volume 7z download support, and more.
+- Updated vecorel-cli to 0.3.1, including improved validation defaults, latest-variant selection when `--variant` is not provided, multi-volume 7z download support, Deflate64 ZIP extraction, and more.
 - REST converters download much faster from large layers and retry when a service answers with intermittent errors.
 - Converters no longer split multi-part geometries into one row per polygon: fields keep the geometry modeling of the source (Polygon or MultiPolygon), the source-published area and perimeter, and one id per source feature. Use `fiboa improve --explode-geometries` when single polygons are needed.
 - Converters whose variants are years (1900-2100) now fill `determination:datetime` from the selected year unless they provide a determination date themselves.
