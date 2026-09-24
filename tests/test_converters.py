@@ -450,3 +450,59 @@ def test_ie_lpis_keeps_one_row_per_parcel(tmp_folder, tmp_parquet_file):
     # one value for every row, so it is written to the collection metadata
     collection = json.loads(pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata[b"collection"])
     assert collection["determination:datetime"] == "2025-01-01T00:00:00Z"
+
+
+def _convert_swiss(converter_id, tmp_parquet_file, variant, filename):
+    """Convert one Swiss fixture and return the rows with the collection constants."""
+    import json
+
+    import pyarrow.parquet as pq
+
+    from fiboa_cli.converters import Converters
+
+    folder = f"tests/data-files/convert/{converter_id}"
+    Converters().load(converter_id).convert(
+        tmp_parquet_file,
+        cache=folder,
+        variant=variant,
+        input_files={f"{folder}/{filename}": filename},
+        mapping_file=f"{folder}/lnf_code.csv",
+    )
+    collection = json.loads(pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata[b"collection"])
+    return gpd.read_parquet(tmp_parquet_file), collection
+
+
+def test_ch_ge_keeps_one_year_of_the_shared_file(tmp_parquet_file):
+    """Geneva publishes every year since 2017 in one file. An edition keeps its year only,
+    leaves out the rows without a usage code, and takes the year as its determination date."""
+    result, collection = _convert_swiss(
+        "ch_ge", tmp_parquet_file, "2024", "AGR_SURFACE_AGRICOLE_RECENSEE-SHP.zip"
+    )
+    assert len(result) == 47  # 51 rows of 2024 in the fixture, 4 of them without a code
+    assert result["id"].str.startswith("GE-GE_2024_").all() and result["id"].is_unique
+    assert not result["id"].str.contains("~").any()  # the repeated ids were the code-less twins
+    assert result["crop:code"].str.fullmatch(r"\d{3}").all()  # "513", not "513.0"
+    assert collection["determination:datetime"] == "2024-01-01T00:00:00Z"
+    assert collection["admin:subdivision_code"] == "GE"
+
+
+def test_ch_sz_numbers_the_parts_of_a_field(tmp_parquet_file):
+    """The canton's WFS layers hold one feature per part of a field, all with the field's id and
+    the field's total area; the parts are numbered and their area is measured."""
+    result, collection = _convert_swiss("ch_sz", tmp_parquet_file, "2024", "ch_sz_2024.gml")
+    parts = result[result["id"].str.startswith("SZ-100016~")]
+    assert sorted(parts["id"]) == ["SZ-100016~1", "SZ-100016~2", "SZ-100016~3"]
+    assert parts["metrics:area"].sum() == pytest.approx(3500, rel=0.02)  # groesse 35 ares
+    assert result["id"].is_unique and (result["crop:code"] == "617").sum() >= 3
+    assert collection["determination:datetime"] == "2024-01-01T00:00:00Z"
+
+
+def test_ch_zh_converts_ares_and_strips_the_code(tmp_parquet_file):
+    """Zürich's WFS gives the area in ares and the usage code zero-padded."""
+    result, collection = _convert_swiss("ch_zh", tmp_parquet_file, "2025", "ch_zh_2025.zip")
+    assert result["id"].str.startswith("ZH-").all() and result["id"].is_unique
+    assert not result["crop:code"].str.startswith("0").any()
+    assert result["metrics:area"].median() == pytest.approx(1800)  # 18 ares in the source
+    assert (result["metrics:area"] > 0).all()  # the two rows with flaeche 0 are measured
+    assert collection["determination:datetime"] == "2025-01-01T00:00:00Z"
+    assert collection["admin:subdivision_code"] == "ZH"

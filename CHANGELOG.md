@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added a test guard that rejects fixture files larger than 5 MB.
 - Added ML variants of converters (`ai4sf_ml`, `de_fusion_ml`, `india_10k_ml`, `rw_rwanda_ml`, `za_fusion_ml`) that publish each field's train/val/test split.
 - AT: Added support for 2018 by extracting archives before reading.
+- CH: Added one converter per canton (`ch_ag` … `ch_zh`) on a shared `CHBaseConverter`, each stating the canton's own terms of use. `ch_zh` (2017–2025), `ch_ge` (2017–2026) and `ch_sz` (2022–2025) read the cantons' own archives, the others the canton's GeoPackage on geodienste.ch; the cantons that require registration or approval convert an exported file with `-i`. HCAT is mapped by the federal LNF code (`code/ch/lnf_code.csv`) for every Swiss converter.
 - DE-BW: Added Baden-Württemberg reference parcels converter.
 - DE-BY-BLOCK: Added Bavaria field-block converter.
 - DE-FUSION: Added Brandenburg converter based on the ESA Fusion Competition dataset.

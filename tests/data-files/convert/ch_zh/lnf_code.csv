@@ -1,0 +1,22 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+502,Wintergerste,Winter barley,winter_barley,3301010401
+508,Körnermais,Grain maize,grain_maize_corn_popcorn,3301010600
+513,Winterweizen (ohne Futterweizen der Sortenliste swiss granum),Winter wheat (excluding feed list),winter_common_soft_wheat,3301010101
+521,Silo- und Grünmais,Silage and green maize,green_silo_maize,3301090400
+522,Zuckerrüben,Sugar beet,sugar_beet,3301290700
+543,Getreide siliert,Cereals for silage,plants_harvested_green,3301090000
+601,Kunstwiesen (ohne Weiden),Artificial meadows (without pastures),temporary_grass,3301090100
+611,Extensiv genutzte Wiesen (ohne Weiden),Extensively used meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+612,Wenig intensiv genutzte Wiesen (ohne Weiden),Low-intensity meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+613,Übrige Dauerwiesen (ohne Weiden),Other permanent meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+616,"Weiden (Heimweiden, übrige Weiden ohne Sömmerungsweiden)",Pastures (home pastures others without summering pastures),pasture_meadow_grassland_grass,3302000000
+617,Extensiv genutzte Weiden,Extensively used pastures,pasture_meadow_grassland_grass,3302000000
+701,Reben,Vines/vineyards,vineyards_wine_vine_rebland_grapes,3303060000
+702,Obstanlagen (Äpfel),Orchards (apples),orchards_fruits,3303010000
+717,Rebflächen mit natürlicher Artenvielfalt,Vineyards with natural biodiversity,vineyards_wine_vine_rebland_grapes,3303060000
+852,"Hecken-, Feld- und Ufergehölze (mit Krautsaum)",Hedges field and riparian shrubs (with herb strip),shrubberries_shrubs,3303080000
+857,"Hecken-, Feld- und Ufergehölze (mit Pufferstreifen)",Hedges field and riparian shrubs (with buffer strips),shrubberries_shrubs,3303080000
+858,"Hecken-, Feld- und Ufergehölze (mit Pufferstreifen) (regionsspezifische Biodiversitätsförderfläche)",Hedges field and riparian shrubs (with buffers) region-specific biodiversity,shrubberries_shrubs,3303080000
+901,Wald,Forest,tree_wood_forest,3306000000
+902,"Übrige unproduktive Flächen (z.B. gemulchte Flächen, stark verunkrautete Flächen, Hecken ohne Pufferstreifen)","Other unproductive areas (e.g. mulched, weedy, hedges without buffers)",not_known_and_other,3399000000
+904,"Wassergräben, Tümpel, Teiche",Ditches ponds pools,not_known_and_other,3399000000

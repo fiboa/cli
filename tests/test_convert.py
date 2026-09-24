@@ -44,6 +44,12 @@ tests = [
     "ee",
     "ai4sf",
     "ch",
+    "ch_ai",
+    "ch_ge",
+    "ch_ge#2024",
+    "ch_sz",
+    "ch_sz#2025",
+    "ch_zh",
     "cz",
     "cz#2019",
     "cz#2020",
@@ -110,7 +116,41 @@ extra_convert_parameters = {
     # the older layers publish no land cover class and no declared area
     "de_he#2023": {"variant": "2023", **_input_files("de_he", "de_he_2023.json")},
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
-    "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
+    "ch": {
+        **_input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
+        "mapping_file": f"{test_path}/ch/lnf_code.csv",
+    },
+    "ch_ai": {
+        **_input_files("ch_ai", "lwb_nutzungsflaechen_v3_0_AI_2056.gpkg"),
+        "mapping_file": f"{test_path}/ch_ai/lnf_code.csv",
+    },
+    # one file holds every year; the two editions must each keep only their year
+    "ch_ge": {
+        "variant": "2025",
+        **_input_files("ch_ge", "AGR_SURFACE_AGRICOLE_RECENSEE-SHP.zip"),
+        "mapping_file": f"{test_path}/ch_ge/lnf_code.csv",
+    },
+    "ch_ge#2024": {
+        "variant": "2024",
+        **_input_files("ch_ge", "AGR_SURFACE_AGRICOLE_RECENSEE-SHP.zip"),
+        "mapping_file": f"{test_path}/ch_ge/lnf_code.csv",
+    },
+    # the canton's own WFS layer (GML) and its geodienste.ch file
+    "ch_sz": {
+        "variant": "2024",
+        **_input_files("ch_sz", "ch_sz_2024.gml"),
+        "mapping_file": f"{test_path}/ch_sz/lnf_code.csv",
+    },
+    "ch_sz#2025": {
+        "variant": "2025",
+        **_input_files("ch_sz", "lwb_nutzungsflaechen_v3_0_SZ_2056.gpkg"),
+        "mapping_file": f"{test_path}/ch_sz/lnf_code.csv",
+    },
+    "ch_zh": {
+        "variant": "2025",
+        **_input_files("ch_zh", "ch_zh_2025.zip"),
+        "mapping_file": f"{test_path}/ch_zh/lnf_code.csv",
+    },
     "es_cl": {
         "variant": "2025",
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},

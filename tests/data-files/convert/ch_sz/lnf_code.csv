@@ -1,0 +1,19 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+501,Sommergerste,Spring barley,spring_barley,3301010402
+502,Wintergerste,Winter barley,winter_barley,3301010401
+504,Hafer,Oats,oats,3301010500
+505,Triticale,Triticale,triticale,3301010800
+507,Futterweizen gemäss Sortenliste swiss granum,Feed wheat according to swiss granum list,common_soft_wheat,3301010100
+508,Körnermais,Grain maize,grain_maize_corn_popcorn,3301010600
+512,Sommerweizen (ohne Futterweizen der Sortenliste swiss granum),Spring wheat (excluding feed list),spring_common_soft_wheat,3301010102
+513,Winterweizen (ohne Futterweizen der Sortenliste swiss granum),Winter wheat (excluding feed list),winter_common_soft_wheat,3301010101
+611,Extensiv genutzte Wiesen (ohne Weiden),Extensively used meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+613,Übrige Dauerwiesen (ohne Weiden),Other permanent meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+616,"Weiden (Heimweiden, übrige Weiden ohne Sömmerungsweiden)",Pastures (home pastures others without summering pastures),pasture_meadow_grassland_grass,3302000000
+617,Extensiv genutzte Weiden,Extensively used pastures,pasture_meadow_grassland_grass,3302000000
+851,Streueflächen in der landwirtschaftlichen Nutzfläche,Litter meadows in utilized agri area,pasture_meadow_grassland_grass,3302000000
+852,"Hecken-, Feld- und Ufergehölze (mit Krautsaum)",Hedges field and riparian shrubs (with herb strip),shrubberries_shrubs,3303080000
+902,"Übrige unproduktive Flächen (z.B. gemulchte Flächen, stark verunkrautete Flächen, Hecken ohne Pufferstreifen)","Other unproductive areas (e.g. mulched, weedy, hedges without buffers)",not_known_and_other,3399000000
+904,"Wassergräben, Tümpel, Teiche",Ditches ponds pools,not_known_and_other,3399000000
+906,Trockenmauern,Dry stone walls,not_known_and_other,3399000000
+921,Hochstamm-Feldobstbäume (Punkte oder Flächen),High-stem field fruit trees (points or areas),orchards_fruits,3303010000

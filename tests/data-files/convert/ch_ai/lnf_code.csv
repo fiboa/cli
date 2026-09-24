@@ -1,0 +1,14 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+505,Triticale,Triticale,triticale,3301010800
+508,Körnermais,Grain maize,grain_maize_corn_popcorn,3301010600
+513,Winterweizen (ohne Futterweizen der Sortenliste swiss granum),Winter wheat (excluding feed list),winter_common_soft_wheat,3301010101
+516,Dinkel,Spelt,spelt,3301011000
+521,Silo- und Grünmais,Silage and green maize,green_silo_maize,3301090400
+545,"Einjährige Freilandgemüse, ohne Konservengemüse",Annual open-field vegetables (excl. canning),fresh_vegetables,3301070000
+601,Kunstwiesen (ohne Weiden),Artificial meadows (without pastures),temporary_grass,3301090100
+611,Extensiv genutzte Wiesen (ohne Weiden),Extensively used meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+612,Wenig intensiv genutzte Wiesen (ohne Weiden),Low-intensity meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+613,Übrige Dauerwiesen (ohne Weiden),Other permanent meadows (without pastures),pasture_meadow_grassland_grass,3302000000
+616,"Weiden (Heimweiden, übrige Weiden ohne Sömmerungsweiden)",Pastures (home pastures others without summering pastures),pasture_meadow_grassland_grass,3302000000
+617,Extensiv genutzte Weiden,Extensively used pastures,pasture_meadow_grassland_grass,3302000000
+851,Streueflächen in der landwirtschaftlichen Nutzfläche,Litter meadows in utilized agri area,pasture_meadow_grassland_grass,3302000000

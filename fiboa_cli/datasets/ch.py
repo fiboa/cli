@@ -1,58 +1,23 @@
-import pandas as pd
-import requests
-from vecorel_cli.conversion.admin import AdminConverterMixin
-
-from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin
-
-SERVICES_URL = "https://www.geodienste.ch/info/services.json?base_topics=lwb_nutzungsflaechen"
-OPEN = "Frei erhältlich"  # NE, TI need registration; NW, OW, VD approval; FL has no data
+from .ch_base import OPEN, SERVICE_PAGE, CHBaseConverter
 
 
-class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+class Converter(CHBaseConverter):
     id = "ch"
     short_name = "Switzerland"
     title = "Field boundaries for Switzerland"
-    description = "The cropfields of Switzerland (Nutzungsflächen) are published per administrative subdivision called Canton."
-    provider = (
-        "Konferenz der kantonalen Geoinformations- und Katasterstellen <https://www.kgk-cgc.ch>"
-    )
-    license = "opendata.swiss terms of use <https://opendata.swiss/en/terms-of-use>"
-    columns = {
-        "geometry": "geometry",
-        "flaeche_m2": "metrics:area",
-        "kanton": "admin:subdivision_code",
-        "lnf_code": "crop:code",  # code of the federal usage catalogue (LNF_Katalog_Nutzungsart)
-        "nutzung": "crop:name",
-        "bezugsjahr": "determination:datetime",
-    }
-    column_filters = {
-        "ist_ueberlagernd": lambda col: col == False,  # noqa: E712
-    }
-    area_is_in_ha = False
-    area_calculate_missing = True
-    column_migrations = {
-        "bezugsjahr": lambda col: pd.to_datetime(col, format="%Y"),
-        # crop:code must be a string per the crop extension; lnf_code is an integer.
-        "lnf_code": lambda col: col.astype(str),
-        "flaeche_m2": lambda col: col.astype(float),
-    }
-    ec_mapping_csv = "https://fiboa.org/code/ch/ch.csv"
+    description = """
+The agricultural usage areas (Nutzungsflächen) of every canton that publishes them openly on
+geodienste.ch, in their current state. The cantons' terms of use differ; the ch_<canton>
+converters state them per canton, and three cantons (ZH, GE, SZ) also have earlier years there.
+    """
+    license = "opendata.swiss terms: Open use. Must provide the source. <https://opendata.swiss/terms-of-use#terms_by>"
+    attribution = f"Kantone, via geodienste.ch (KGK-CGC) — Landwirtschaftliche Nutzungsflächen, {SERVICE_PAGE}"
 
     def get_urls(self):
-        # Look up each open canton's GeoPackage; the link embeds the model version (v2_0/v3_0).
-        services = requests.get(SERVICES_URL, timeout=60)
-        services.raise_for_status()
-
         urls = {}
-        for service in sorted(services.json()["services"], key=lambda s: s["canton"]):
+        for service in self.get_services():
             if service["publication_data"] != OPEN:
                 self.info(f"Skipping canton {service['canton']}: {service['publication_data']}")
                 continue
-            item = requests.get(service["stac_item_url"], timeout=60)
-            item.raise_for_status()
-            urls[item.json()["assets"]["geopackage_zip"]["href"]] = ["geopackage/*.gpkg"]
+            urls[self.get_geopackage_url(service)] = ["geopackage/*.gpkg"]
         return urls
-
-    # Combine canton with internal id to make it unique
-    id_columns = ("kanton", "nutzungsidentifikator")
