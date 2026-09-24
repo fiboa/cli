@@ -7,6 +7,7 @@ northern files are the only ones published in a projected CRS.
 """
 
 import sys
+import zipfile
 from csv import DictReader
 from unittest.mock import patch
 
@@ -27,7 +28,7 @@ def _load_ec(csv_file=None, url=None):
     return list(DictReader(open(path, "r", encoding="utf-8")))
 
 
-def _convert(target, variant):
+def _convert(target, variant, **kwargs):
     # The converter logs through loguru, whose sinks are global. Binding one to this
     # test's sys.stdout would outlive the test and swallow another module's output, so
     # the sink is added and removed around the call. (test_converters asserts on captured
@@ -40,7 +41,8 @@ def _convert(target, variant):
             patch("fiboa_cli.datasets.commons.hcat.load_ec_mapping", side_effect=_load_ec),
             patch("fiboa_cli.datasets.pt.load_ec_mapping", side_effect=_load_ec),
         ):
-            ConvertData("pt").convert(target=target, cache=PT, variant=variant)
+            kwargs.setdefault("cache", PT)
+            ConvertData("pt").convert(target=target, variant=variant, **kwargs)
     finally:
         logger.remove(sink)
     return pq.read_table(target).to_pandas()
@@ -281,3 +283,22 @@ def test_an_undeclared_member_overlap_shows_as_suffixed_ids(tmp_path):
         df = _convert(tmp_path / "x.parquet", "2018")
     suffixed = df["id"].astype("string").str.contains("~")
     assert int(suffixed.sum()) == 2 * DUPLICATED_IN_2018
+
+
+def test_2022_extracts_the_deflate64_archive(tmp_path):
+    """IFAP compresses the 2017-2022 archives with Deflate64, which python's zipfile cannot
+    read, so the 2022 fixture is Deflate64 too (see to_deflate64.py). The cache is empty,
+    so the archive is extracted rather than read from an earlier run's extracted folder."""
+    from fiboa_cli.datasets.pt import MEMBERS
+
+    archive = f"{PT}/2022.zip"
+    with zipfile.ZipFile(archive) as zf:
+        assert {info.compress_type for info in zf.infolist()} == {9}
+
+    df = _convert(
+        tmp_path / "out.parquet",
+        "2022",
+        cache=str(tmp_path),
+        input_files={archive: MEMBERS["2022"]},
+    )
+    assert len(df) == 400

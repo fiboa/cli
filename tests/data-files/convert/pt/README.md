@@ -70,7 +70,6 @@ not a plain `-limit`).
 
 ## Compression
 
-All fixtures are written with plain Deflate. The real 2017-2022 archives are Deflate64,
-which python's `zipfile` refuses; the converter reads them through
-`fiboa_cli.conversion.deflate64`, which `tests/test_deflate64.py` covers with a Deflate64
-archive of its own.
+The real 2017-2022 archives are Deflate64, which python's `zipfile` cannot read. The 2022
+fixture is Deflate64 too, recompressed with `python to_deflate64.py 2022.zip`, so the tests
+extract the format IFAP publishes; the other fixtures are plain Deflate.
