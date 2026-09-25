@@ -453,3 +453,29 @@ def test_ie_lpis_keeps_one_row_per_parcel(tmp_folder, tmp_parquet_file):
     # one value for every row, so it is written to the collection metadata
     collection = json.loads(pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata[b"collection"])
     assert collection["determination:datetime"] == "2025-01-01T00:00:00Z"
+
+
+def test_supplement_corrects_hcat_the_source_resolved(monkeypatch):
+    """EuroCrops ships HCAT in the shapefile; a supplement still wins for its codes."""
+    supplement = [
+        {
+            "original_code": "TOP",
+            "translated_name": "Jerusalem artichoke",
+            "HCAT3_name": "topinambur_jerusalem_artichoke",
+            "HCAT3_code": "3301180000",
+        }
+    ]
+    monkeypatch.setattr(
+        "fiboa_cli.datasets.commons.hcat.load_hcat_mapping", lambda *a, **kw: supplement
+    )
+    gdf = gpd.GeoDataFrame(
+        {
+            "CODE_CULTU": ["TOP", "BTH"],
+            "EC_trans_n": ["Jerusalem artichoke", "Winter soft wheat"],
+            "EC_hcat_n": ["topinambur_jerusalem_artichoke", "winter_common_soft_wheat"],
+            "EC_hcat_c": ["3301290900", "3301010104"],
+        },
+        geometry=[Point(0, 0), Point(1, 1)],
+    )
+    out = Converters().load("ec_fr").correct_resolved_hcat(gdf)
+    assert out["EC_hcat_c"].tolist() == ["3301180000", "3301010104"]

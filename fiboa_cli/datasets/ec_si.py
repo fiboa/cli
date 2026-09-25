@@ -6,6 +6,7 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     area_is_in_ha = False
     hcat_mapping_csv = "si_2021.csv"
     hcat_mapping_supplements = ["https://fiboa.org/code/si/si_2021_supplement.csv"]
+    hcat_supplement_key = "crop_type_class"
     ec_year = 2021
     sources = {
         "https://zenodo.org/records/10118572/files/SI_2021.zip?download=1": ["SI_2021_EC21.shp"]
@@ -48,5 +49,5 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     }
 
     def add_hcat(self, gdf):
-        # skip adding hcat
-        return gdf
+        # the source carries HCAT and has no crop:code; only apply the supplement
+        return self.correct_resolved_hcat(gdf)
