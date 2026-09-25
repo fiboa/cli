@@ -11,7 +11,7 @@ class LTConverter(EuroLandBaseConverter):
 
     provider = "Nacionalinė mokėjimo agentūra prie Žemės ūkio ministerijos <https://www.nma.lt>"
     attribution = "Nacionalinė mokėjimo agentūra prie Žemės ūkio ministerijos"
-    ec_mapping_csv = "lt_2021.csv"
+    hcat_mapping_csv = "lt_2021.csv"
     # Europe-LAND v1.3 (record 18670815, February 2026) bundles both editions in
     # one archive; v1.1 (record 14384070), which this converter used to read,
     # carried 2024 alone.

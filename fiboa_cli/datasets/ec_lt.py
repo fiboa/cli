@@ -4,7 +4,7 @@ from .commons.ec import EuroCropsConverterMixin
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     area_is_in_ha = False
-    ec_mapping_csv = "https://fiboa.org/code/lt/lt_2021.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/lt/lt_2021.csv"
     ec_year = 2021
     hcat_columns = {
         "hcat:name_en": "hcat:name_en",

@@ -17,7 +17,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "https://fiboa.org/inspire-extension/v0.3.0/schema.yaml",
         "https://fiboa.org/flik-extension/v0.2.0/schema.yaml",
     }
-    ec_mapping_csv = "de_nrw_2021.csv"
+    hcat_mapping_csv = "de_nrw_2021.csv"
     columns = {
         "geometry": "geometry",
         "ID": "id",

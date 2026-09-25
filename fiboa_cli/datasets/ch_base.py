@@ -136,7 +136,7 @@ class CHBaseConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "lnf_code": lambda col: col.astype(str),
         "flaeche_m2": lambda col: col.astype(float),
     }
-    ec_mapping_csv = CODE_LIST
+    hcat_mapping_csv = CODE_LIST
     # Combine canton with internal id to make it unique
     id_columns = ("kanton", "nutzungsidentifikator")
 

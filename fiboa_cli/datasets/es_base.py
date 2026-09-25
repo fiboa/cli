@@ -30,7 +30,7 @@ class ESBaseConverter(AddHCATMixin, FiboaBaseConverter):
         "admin:country_code": "ES",
     }
     # SIGPAC land use to HCAT; the mixin also publishes it as crop:code_list
-    ec_mapping_csv = "https://fiboa.org/code/es/sigpac/land_use.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/es/sigpac/land_use.csv"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

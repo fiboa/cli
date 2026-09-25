@@ -8,7 +8,7 @@ from .commons.ec import EuroCropsConverterMixin
 
 
 class Convert(EuroCropsConverterMixin, FiboaBaseConverter):
-    ec_mapping_csv = "ee_2021.csv"
+    hcat_mapping_csv = "ee_2021.csv"
     ec_year = 2021
     sources = {
         "https://zenodo.org/records/14094196/files/EE_2021.zip?download=1": [

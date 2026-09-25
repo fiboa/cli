@@ -62,7 +62,7 @@ and supporting sustainable land use practices.
         "jpaid": "jpaid",
     }
 
-    ec_mapping_csv = "hr_2020.csv"
+    hcat_mapping_csv = "hr_2020.csv"
 
     missing_schemas = {
         # The editions carry different subsets

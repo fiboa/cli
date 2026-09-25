@@ -43,7 +43,7 @@ codes are joined in from the EuroCropsV2 NUTS mapping table at conversion time.
 
     admin_country_code = "IT"
     admin_subdivision_code = "1"
-    ec_mapping_csv = "https://fiboa.org/code/it/iti1.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/it/iti1.csv"
     columns = {
         "geometry": "geometry",
         "cropfield": "id",

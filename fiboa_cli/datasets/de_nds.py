@@ -33,8 +33,8 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
 
     # https://www.sla.niedersachsen.de/download/141235/Verzeichnis_Nutzungscodes.xlsx
-    ec_mapping_csv = "de.csv"
-    ec_mapping_supplements = ["https://fiboa.org/code/de/de_supplement.csv"]
+    hcat_mapping_csv = "de.csv"
+    hcat_mapping_supplements = ["https://fiboa.org/code/de/de_supplement.csv"]
     # The shapefile has no unique key: 880,581 features share 874,222 distinct
     # (FLIK, SCHLAGNR) pairs, so the row index is the only identifier available.
     columns = {

@@ -28,7 +28,7 @@ position in the download, since the source carries no parcel identifier.
     attribution = "© ARiMR"
     # The portal tags the data "Publiczne dane ARIMR" but states no licence
     license = "Publiczne dane ARiMR, no licence stated <https://geoportal.arimr.gov.pl/mapy/apps/sites/#/portal>"
-    ec_mapping_csv = "https://fiboa.org/code/pl/pl.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/pl/pl.csv"
     wfs_url = WFS
     wfs_version = "1.1.0"
     wfs_page_size = 50_000  # the server's maximum

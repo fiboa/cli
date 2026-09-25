@@ -17,9 +17,9 @@ class DKConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     description = "The Danish Ministry of Food, Agriculture and Fisheries publishes Crop Fields (Marker) for each year."
 
     provider = "Danish Agricultural Agency <https://lbst.dk/>"
-    ec_mapping_csv = "dk_2019.csv"
+    hcat_mapping_csv = "dk_2019.csv"
     # the codes that table has no row for, mapped from its own siblings
-    ec_mapping_supplements = ["https://fiboa.org/code/dk/dk_supplement.csv"]
+    hcat_mapping_supplements = ["https://fiboa.org/code/dk/dk_supplement.csv"]
     # 2008 and 2009 publish no crop columns at all (no Afgkode, no Afgroede)
     variants_without_crops = {"2008", "2009"}
     license = "CC0-1.0"
