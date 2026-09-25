@@ -459,10 +459,10 @@ def test_supplement_corrects_hcat_the_source_resolved(monkeypatch):
     """EuroCrops ships HCAT in the shapefile; a supplement still wins for its codes."""
     supplement = [
         {
-            "original_code": "TOP",
-            "translated_name": "Jerusalem artichoke",
-            "HCAT3_name": "topinambur_jerusalem_artichoke",
-            "HCAT3_code": "3301180000",
+            "original_code": "704",
+            "translated_name": "Vine nurseries",
+            "HCAT3_name": "nurseries_nursery",
+            "HCAT3_code": "3303070000",
         }
     ]
     monkeypatch.setattr(
@@ -470,12 +470,14 @@ def test_supplement_corrects_hcat_the_source_resolved(monkeypatch):
     )
     gdf = gpd.GeoDataFrame(
         {
-            "CODE_CULTU": ["TOP", "BTH"],
-            "EC_trans_n": ["Jerusalem artichoke", "Winter soft wheat"],
-            "EC_hcat_n": ["topinambur_jerusalem_artichoke", "winter_common_soft_wheat"],
-            "EC_hcat_c": ["3301290900", "3301010104"],
+            "SIFRA_KMRS": ["704", "001"],
+            "EC_trans_n": ["Vineyards", "Maize"],
+            "EC_hcat_n": ["vineyards_wine_vine_rebland_grapes", "grain_maize_corn_popcorn"],
+            "EC_hcat_c": ["3303070000", "3301010699"],
         },
         geometry=[Point(0, 0), Point(1, 1)],
     )
-    out = Converters().load("ec_fr").correct_resolved_hcat(gdf)
-    assert out["EC_hcat_c"].tolist() == ["3301180000", "3301010104"]
+    out = Converters().load("ec_si").correct_resolved_hcat(gdf)
+    assert out["EC_trans_n"].tolist() == ["Vine nurseries", "Maize"]
+    assert out["EC_hcat_n"].tolist() == ["nurseries_nursery", "grain_maize_corn_popcorn"]
+    assert out["EC_hcat_c"].tolist() == ["3303070000", "3301010699"]

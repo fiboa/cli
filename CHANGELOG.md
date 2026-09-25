@@ -71,7 +71,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
-- EC-FR, EC-NL-CROP: HCAT codes for iris, Jerusalem artichoke and parsley now match the taxonomy.
+- EC-FR, EC-NL-CROP: HCAT mappings for iris, Jerusalem artichoke and parsley now match the taxonomy.
 - EuroCrops converters whose source already carries HCAT (such as EC-FR and EC-SI) now apply their supplements too.
 - Declared the `beautifulsoup4` dependency used by ES-PV and ES-VC.
 - REST converters:
