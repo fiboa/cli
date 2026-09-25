@@ -273,7 +273,7 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code,HCAT2_name,HCA
 0272,"sinerõigas, harilik",Common oil radish,radish,3301290600,radish,3301290600
 0273,"harilik sibul ""Jõgeva 3""","Onion ""Jõgeva 3""",onions,3301220400,onions,3301220400
 0274,"põldhernes ""Kirke"" tugikultuuriga (vähemalt 70% põldhernest ""Kirke"")","Field pea ""Kirke"" with support crop (at least 70%)",peas,3301020600,peas,3301020600
-0275,maguslupiin,Sweet lupin,lupins,3301020300,legumes_dried_pulses_protein_crops,3301020000
+0275,maguslupiin,Sweet lupin,sweet_lupins,3301020700,legumes_dried_pulses_protein_crops,3301020000
 0276,muu söödapeet,Other fodder beet,mangelwurzel_fodder_beet,3301290400,mangelwurzel_fodder_beet,3301290400
 0277,"suvitritikale allakülviga, v.a liblikõieliste allakülviga",Spring triticale undersown (excl. legumes),spring_triticale,3301010802,spring_triticale,3301010802
 0278,punane peakapsas,Red head cabbage,brassica_oleracea_cabbage,3301210200,brassica_oleracea_cabbage,3301210200
@@ -282,14 +282,14 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code,HCAT2_name,HCA
 0281,"mädarõigas, aed-",Garden horseradish,horseradish,3301210400,horseradish,3301210400
 0282,lehtpeet,Leaf beet (chard),beetroot_beets,3301290200,beetroot_beets,3301290200
 0283,"kartul ""Väike verev""","Potato ""Väike verev""",potatoes,3301030000,potatoes,3301030000
-0284,kiulina,Fibre flax,flax_fibre,3301060701,flax_fibre,3301060701
+0284,kiulina,Fibre flax,flax_linen,3301060701,flax_linen,3301060701
 0285,toompihlakas,Serviceberry (Amelanchier),berries_berry_species,3303020000,berries_berry_species,3303020000
 0286,"kanep, Bialobrzeskie",Hemp Bialobrzeskie,hemp_cannabis,3301061000,hemp_cannabis,3301061000
 0287,"nõges, kõrve-",Stinging nettle,other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
 0288,"münt, vääris-",Apple mint,mints_peppermint,3301061222,mints_peppermint,3301061222
 0289,"monarda, sidrun-",Lemon beebalm,other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
 0290,"münt, rohe-",Spearmint,mints_peppermint,3301061222,mints_peppermint,3301061222
-0291,sojauba,Soybean,soybeans,3301020700,legumes_dried_pulses_protein_crops,3301020000
+0291,sojauba,Soybean,soy_soybeans,3301160000,legumes_dried_pulses_protein_crops,3301020000
 0292,"harakputk, aed-",Garden chervil,chervil,3301061214,chervil,3301061214
 0293,harilik lutsern (100% lutsern),Alfalfa (100% alfalfa),alfalfa_lucerne,3301090301,alfalfa_lucerne,3301090301
 0294,"harilik nõiahammas (vähemalt 80% nõiahammast, kuni 20% heintaimi)",Birdsfoot trefoil (at least 80%),lotus,3301082600,lotus,3301082600

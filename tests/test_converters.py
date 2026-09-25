@@ -501,6 +501,34 @@ def test_ie_lpis_keeps_one_row_per_parcel(tmp_folder, tmp_parquet_file):
     assert collection["determination:datetime"] == "2025-01-01T00:00:00Z"
 
 
+def test_supplement_corrects_hcat_the_source_resolved(monkeypatch):
+    """EuroCrops ships HCAT in the shapefile; a supplement still wins for its codes."""
+    supplement = [
+        {
+            "original_code": "704",
+            "translated_name": "Vine nurseries",
+            "HCAT3_name": "nurseries_nursery",
+            "HCAT3_code": "3303070000",
+        }
+    ]
+    monkeypatch.setattr(
+        "fiboa_cli.datasets.commons.hcat.load_hcat_mapping", lambda *a, **kw: supplement
+    )
+    gdf = gpd.GeoDataFrame(
+        {
+            "SIFRA_KMRS": ["704", "001"],
+            "EC_trans_n": ["Vineyards", "Maize"],
+            "EC_hcat_n": ["vineyards_wine_vine_rebland_grapes", "grain_maize_corn_popcorn"],
+            "EC_hcat_c": ["3303070000", "3301010699"],
+        },
+        geometry=[Point(0, 0), Point(1, 1)],
+    )
+    out = Converters().load("ec_si").correct_resolved_hcat(gdf)
+    assert out["EC_trans_n"].tolist() == ["Vine nurseries", "Maize"]
+    assert out["EC_hcat_n"].tolist() == ["nurseries_nursery", "grain_maize_corn_popcorn"]
+    assert out["EC_hcat_c"].tolist() == ["3303070000", "3301010699"]
+
+
 def test_ch_canton_table_fills_the_converter():
     """A canton file only names its canton; the base fills the rest from CANTONS."""
     ag = Converters().load("ch_ag")

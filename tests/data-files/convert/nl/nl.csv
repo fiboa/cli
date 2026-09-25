@@ -83,8 +83,8 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code
 968,"Gladiool, droogbloemen",Gladiolus dried flowers,gladiolus_gladioli,3301082100
 970,"Hyacint, overige bloemkwekerijgewassen",Hyacinth other flower nursery crops,other_flowers_ornamental_plants,3301089900
 971,"Hyacint, droogbloemen",Hyacinth dried flowers,other_flowers_ornamental_plants,3301089900
-973,"Iris, overige bloemkwekerijgewassen",Iris other flower nursery crops,iris,3301082200
-974,"Iris, droogbloemen",Iris dried flowers,iris,3301082200
+973,"Iris, overige bloemkwekerijgewassen",Iris other flower nursery crops,iris,3301082300
+974,"Iris, droogbloemen",Iris dried flowers,iris,3301082300
 976,"Krokus, overige bloemkwekerijgewassen",Crocus other flower nursery crops,saffron_crocus_sativus,3301061232
 979,"Lelie, overige bloemkwekerijgewassen",Lily other flower nursery crops,lilies,3301082500
 982,"Narcis, overige bloemkwekerijgewassen",Narcissus other flower nursery crops,narcissus_daffodil,3301083300
@@ -123,8 +123,8 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code
 1033,Igniscum Candy,Igniscum Candy,igniscum_candy,3304020100
 1034,Kanariezaad,canary seed,canary_seed_canaryseed,3301011400
 1035,Naaldaar (Setaria),Needle (Setaria),setaria,3301090206
-1036,Wortelpeterselie,parsley root,parsley,3301061227
-1037,"Peterselie, productie",Parsley production,parsley,3301061227
+1036,Wortelpeterselie,parsley root,parsly,3301061227
+1037,"Peterselie, productie",Parsley production,parsly,3301061227
 1039,"Chrysant, overige bloemkwekerijgewassen",Chrysanthemum other flower nursery crops,chrysanthemum,3301080900
 1042,"Angelica, productie",Angelica production,angelica,3301061204
 1044,Papaver,Poppy,poppy,3301060600
@@ -133,8 +133,8 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code
 1047,Cranberry,cranberry,cranberry,3303020500
 1048,"Echinacea (zonnehoed), productie",Echinacea (coneflower) production,echinacea_sun_hat,3301081500
 1050,Leeuwenbekjes,Snapdragons,snapdragons,3301084500
-1051,"Iris, Bolvormend",Iris Spherical,iris,3301082200
-1052,"Iris, Rhizoomvormend",Iris Rhizomatous,iris,3301082200
+1051,"Iris, Bolvormend",Iris Spherical,iris,3301082300
+1052,"Iris, Rhizoomvormend",Iris Rhizomatous,iris,3301082300
 1053,"Palmen, pot- en containervelden",Palms pot and container fields,other_tree_wood_forest,3306990000
 1054,"Pioenroos, vermeerdering",Peony propagation,peony_peonies,3301083400
 1067,"Bos- en haagplanten, open grond,",Forest and hedge plants open ground,tree_wood_forest,3306000000
@@ -188,7 +188,7 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code
 1935,Maiskolvesilage,Corn silage,green_silo_maize,3301090400
 1936,"Bos, blijvend, met herplantplicht",Forest permanent with replanting obligation,tree_wood_forest,3306000000
 1940,Voedselbos,food forest,tree_wood_forest,3306000000
-1949,Aardperen,Topinambur,topinambur_jerusalem_artichoke,3301290900
+1949,Aardperen,Topinambur,topinambur_jerusalem_artichoke,3301180000
 2014,"Aardappelen, consumptie",Potatoes consumption,potatoes,3301030000
 2015,"Aardappelen, poot NAK",Potatoes leg NAK,potatoes,3301030000
 2016,"Aardappelen, poot TBM",Potatoes leg TBM,potatoes,3301030000
@@ -397,11 +397,11 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code
 6803,"Sneeuwklokje, bloembollen en -knollen",Snowdrop flower bulbs and tubers,other_flowers_ornamental_plants,3301089900
 6746,"Beemdlangbloem, graszaad",Meadow foxtail grass seed,pasture_meadow_grassland_grass,3302000000
 6798,Perceel bedekt met gewasresten (mulching),Plot covered with crop residues (mulching),fallow_land_not_crop,3301110000
-1038,"Peterselie, zaden en opkweekmateriaal",Parsley seeds and propagation material,parsley,3301061227
+1038,"Peterselie, zaden en opkweekmateriaal",Parsley seeds and propagation material,parsly,3301061227
 6757,"Klaver, Alexandrijnse, klaverzaad",Alexandrian clover seed,clover,3301090303
 983,"Narcis, droogbloemen",Daffodil dried flowers,narcissus_daffodil,3301083300
 6786,"Timothee, graszaad",Timothy grass seed,timothy,3301090209
-6749,Bieslook,Chives,parsley,3301061227
+6749,Bieslook,Chives,chives,3301220100
 6753,"Festulolium, groenbemesting, vanggewas",Festulolium green manure catch crop,festulolium,3301090204
 2730,"Komkommer, zaden en opkweekmateriaal",Cucumber seeds and propagation material,cucumber_pickle,3301140100
 2733,"Meloen, productie",Melon production,fresh_vegetables,3301070000
@@ -413,3 +413,14 @@ original_code,original_name,translated_name,HCAT3_name,HCAT3_code
 986,"Tulp, droogbloemen",Tulip dried flowers,tulips,3301084900
 2740,"Koolrabi, zaden en opkweekmateriaal",Kohlrabi seeds and propagation material,kohlrabi,3301210209
 6761,"Klaver, Perzische, klaverzaad",Persian clover seed,clover,3301090303
+669,Zwaardherik (aaltjesvanggewas),Rocket (nematode catch crop),rocket_arugula,3301310600
+1011,"Sierui, droogbloemen",Ornamental onions dried flowers,other_flowers_ornamental_plants,3301089900
+1055,"Chrysant, vermeerdering",Chrysanthemum propagation,chrysanthemum,3301080900
+2738,"Koolraap, zaden en opkweekmateriaal",Rutabaga seeds and propagation material,swede_rutabaga,3301210500
+7136,Anna paulowna,Paulownia,other_tree_wood_forest,3306990000
+7139,"Notenbomen, hazelnoot",Nut trees hazelnut,hazelnuts_hazel,3303030200
+7193,"Notenbomen, walnoot",Nut trees walnut,walnuts,3303030600
+7194,"Notenbomen, overig",Nut trees other,nuts,3303030000
+7195,Bosui,Bunching onion,scallion,3301220500
+7196,Lente-ui,Spring onion,scallion,3301220500
+7197,Bamboe,Bamboo,poaceae_grasses,3301090200

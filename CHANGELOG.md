@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
+- Added `pixi run check-hcat`, which compares the HCAT mapping tables the converters read online with the taxonomy.
 - Added `FiboaDuckDBBaseConverter` for SQL-based conversion of large Parquet sources.
 - Added `PerFileBaseConverter` to process multi-file sources incrementally.
 - Added support for supplementary HCAT/crop mappings via `hcat_mapping_supplements`.
@@ -83,6 +84,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
+- EC-FR, EC-NL-CROP: HCAT mappings for iris, Jerusalem artichoke and parsley now match the taxonomy.
+- EuroCrops converters whose source already carries HCAT (such as EC-FR and EC-SI) now apply their supplements too.
 - Declared the `beautifulsoup4` dependency used by ES-PV and ES-VC.
 - REST converters:
   - Downloaded data cached for one dataset, edition or service is no longer served for another. Previously cached downloads are fetched again once.

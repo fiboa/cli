@@ -124,7 +124,7 @@ original_code,original_name,latin_name,translated_name,HCAT3_name,HCAT3_code
 699,mešane sadne vrste,Mixed fruit plants,Mixed fruit plants,orchards_fruits,3303010000
 702,drevesnice,Nurseries,Nurseries,nurseries_nursery,3303070000
 703,šparglji,Asparagus officinalis,Garden asparagus,asparagus,3301200000
-704,trsnice,Vine nurseries,Vine nurseries,vineyards_wine_vine_rebland_grapes,3303070000
+704,trsnice,Vine nurseries,Vine nurseries,nurseries_nursery,3303070000
 705,"mešane trajne rastline pod 0,1 ha","Mixed permanent crops on field under 0,1 ha size","Mixed permanent crops on field under 0,1 ha size",permanent_crops_perennial,3303000000
 706,"trta za drugo rabo, ki ni vino ali namizno grozdje",Vines for other uses than for wine or fruits,Vines for other uses than for wine or fruits,vineyards_wine_vine_rebland_grapes,3303060000
 707,matičnjak,Root-stock nursery,Root-stock nursery,nurseries_nursery,3303070000
@@ -171,10 +171,10 @@ original_code,original_name,latin_name,translated_name,HCAT3_name,HCAT3_code
 399,"čičerika od 0,1 ha","Cicer arietinum (from 0.1 ha size)",Chickpeas (from 0.1 ha),chickpeas,3301020200
 723,tobakovec,Nicotiana tabacum L.,Tobacco,other_arable_land_crops,3301990000
 810,grašica (ozimna),Vicia villosa R.,Winter vetch,peas,3301020600
-635,pistacija,Pistacia vera,Pistachio,pistachios,3303030400
+635,pistacija,Pistacia vera,Pistachio,pistachio,3303030400
 023,kvinoja,Chenopodium quinoa,Quinoa,other_cereals,3301019900
 395,"bob od 0,1 ha","Vicia faba (from 0,1 ha size)",Field bean (from 0.1 ha),beans,3301020100
 220,aleksandrijska detelja,Trifolium alexandrinum L,Egyptian clover,clover,3301090303
 396,"grah od 0,1 ha","Pisum sativum (from 0,1 ha size)",Pea (from 0.1 ha),peas,3301020600
-398,"leča od 0,1 ha","Lens culinaris (from 0,1 ha size)",Lentils (from 0.1 ha),lentils,3301020300
+398,"leča od 0,1 ha","Lens culinaris (from 0,1 ha size)",Lentils (from 0.1 ha),lentils,3301020500
 021,soržica (jara),Meslin,Meslin (spring),spring_meslin,3301011102

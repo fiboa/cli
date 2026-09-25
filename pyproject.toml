@@ -90,6 +90,8 @@ test = "pytest --cov=fiboa_cli --cov-report=term-missing --cov-report=html --cov
 lint = "ruff check --fix"
 format = "ruff format"
 check = {depends-on = ["lint", "format", "test"]}
+# Compare the HCAT mapping tables the converters read online with the taxonomy
+check-hcat = "python scripts/check_hcat.py"
 build = "python -m build"
 
 # Pre-commit tasks
