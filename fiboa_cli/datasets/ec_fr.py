@@ -32,11 +32,5 @@ with its HCAT columns already resolved.
     column_migrations = {
         "CODE_GROUP": lambda col: col.astype("string").str.strip(),
     }
-
-    def migrate(self, gdf):
-        # SURF_PARC is rounded to 0.01 ha, so a parcel under 50 m2 reads as zero
-        zero = gdf["SURF_PARC"] <= 0
-        if zero.any():
-            self.info(f"Computing the area of {zero.sum():,} parcel(s) rounded down to zero")
-            gdf.loc[zero, "SURF_PARC"] = gdf.loc[zero, "geometry"].area / 10_000
-        return super().migrate(gdf)
+    # SURF_PARC is rounded to 0.01 ha, so a parcel under 50 m2 reads as zero and is
+    # measured from the geometry (area_calculate_missing)

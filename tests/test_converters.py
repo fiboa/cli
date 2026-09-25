@@ -58,16 +58,19 @@ def test_rest_query_params(monkeypatch, tmp_folder):
         def __init__(self, payload):
             self._payload = payload
 
+        def raise_for_status(self):
+            pass
+
         def json(self):
             return self._payload
 
-    def fake_get(url, params=None):
+    def fake_get(url, params=None, **kwargs):
         params = params or {}
         if params.get("f") == "pjson":
+            if url.endswith("/0"):
+                return Response({"fields": [{"name": "OBJECTID"}]})
             # maxRecordCount above the page length below, so paging stops after one page
             return Response({"layers": [{"id": 0}], "maxRecordCount": 1000})
-        if params.get("outFields") == "*":  # probe for the real key field
-            return Response({"features": [{"attributes": {"OBJECTID": 1}}]})
         # the two id bounds the window paging starts from
         bound = 1000 if params["orderByFields"].endswith("DESC") else 1
         return Response({"features": [{"attributes": {"OBJECTID": bound}}]})
@@ -220,6 +223,49 @@ def test_multipart_features_keep_their_row_and_metrics(tmp_parquet_file):
     assert result.geometry.geom_type.tolist() == ["MultiPolygon", "Polygon"]
     assert result["metrics:area"].tolist() == [400.0, 200.0]
     assert result["metrics:perimeter"].tolist() == [120.0, 60.0]
+
+
+def test_a_crop_column_chosen_in_get_columns_is_mapped_to_hcat(tmp_folder, tmp_parquet_file):
+    from shapely.geometry import box
+
+    from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+    from fiboa_cli.datasets.commons.hcat import AddHCATMixin
+
+    mapping = tmp_folder / "mapping.csv"
+    mapping.write_text(
+        "original_code,translated_name,HCAT3_name,HCAT3_code\n"
+        "W,Wheat,common_soft_winter_wheat,3301011101\n",
+        encoding="utf-8",
+    )
+
+    class Converter(AddHCATMixin, FiboaBaseConverter):
+        id = "hcat"
+        short_name = "HCAT"
+        title = "HCAT"
+        description = "HCAT"
+        license = "CC0-1.0"
+        columns = {"geometry": "geometry", "id": "id", "CROP": ["crop:code", "crop:name"]}
+
+        def get_columns(self, gdf):
+            columns = super().get_columns(gdf)
+            if "CROP" not in gdf.columns:
+                columns["CROP_OLD"] = columns.pop("CROP")
+            return columns
+
+    gdf = gpd.GeoDataFrame(
+        {"id": ["a"], "CROP_OLD": ["W"]}, geometry=[box(0, 0, 100, 100)], crs="EPSG:25832"
+    )
+    src = tmp_parquet_file.parent / "source.parquet"
+    gdf.to_parquet(src)
+
+    Converter().convert(
+        tmp_parquet_file, input_files={str(src): "source.parquet"}, mapping_file=str(mapping)
+    )
+
+    result = gpd.read_parquet(tmp_parquet_file)
+    assert result["crop:code"].tolist() == ["W"]
+    assert result["crop:name"].tolist() == ["W"]
+    assert result["hcat:code"].tolist() == [3301011101]
 
 
 def _determination_converter(**attrs):
@@ -481,3 +527,88 @@ def test_supplement_corrects_hcat_the_source_resolved(monkeypatch):
     assert out["EC_trans_n"].tolist() == ["Vine nurseries", "Maize"]
     assert out["EC_hcat_n"].tolist() == ["nurseries_nursery", "grain_maize_corn_popcorn"]
     assert out["EC_hcat_c"].tolist() == ["3303070000", "3301010699"]
+
+
+def test_ch_canton_table_fills_the_converter():
+    """A canton file only names its canton; the base fills the rest from CANTONS."""
+    ag = Converters().load("ch_ag")
+    assert ag.id == "ch_ag" and ag.short_name == "Switzerland, Aargau"
+    assert ag.license == "CC-BY-4.0" and ag.attribution.startswith("Daten des Kantons Aargau")
+    assert ag.data_access == ""
+    assert "fiboa convert ch_ne -i" in Converters().load("ch_ne").data_access
+    assert Converters().load("ch_gr").license.startswith("Nutzungsbestimmungen")
+
+
+def test_ch_own_layer_is_brought_into_the_model():
+    """Zürich's layer has its own column names, a zero-padded code and the area in ares."""
+    converter = Converters().load("ch_zh")
+    converter.select_variant("2025")
+    gdf = gpd.GeoDataFrame(
+        {
+            "gis_nr": ["1", "2"],
+            "blw_nr": ["0613", "0399"],
+            "blw_name": ["a", "b"],
+            "flaeche": [22.0, 0.5],
+        },
+        geometry=[Point(0, 0), Point(1, 1)],
+        crs="EPSG:2056",
+    )
+    out = converter.file_migration(gdf, "ch_zh_2025_0.gml", "https://example.test")
+    assert out["lnf_code"].tolist() == [613, 399]
+    assert out["flaeche_m2"].tolist() == [2200.0, 50.0]
+    assert out["kanton"].tolist() == ["ZH", "ZH"] and out["bezugsjahr"].tolist() == [2025, 2025]
+    assert not out["ist_ueberlagernd"].any() and "nutzungsidentifikator" in out.columns
+
+
+def test_ch_ge_keeps_its_year_and_the_rows_with_a_code():
+    """Geneva publishes every year since 2017 in one file, and a few rows carry no code."""
+    converter = Converters().load("ch_ge")
+    converter.select_variant("2024")
+    gdf = gpd.GeoDataFrame(
+        {
+            "ID": ["a", "b", "c"],
+            "CODE_FED": [513.0, 513.0, None],
+            "TYPE": ["x", "x", None],
+            "SHAPE_AREA": [1.0, 1.0, 1.0],
+            "EXERCICE": [2024.0, 2025.0, 2024.0],
+        },
+        geometry=[Point(0, 0)] * 3,
+        crs="EPSG:2056",
+    )
+    out = converter.filter_rows(converter.file_migration(gdf, "x.zip", "https://example.test"))
+    assert out["nutzungsidentifikator"].tolist() == ["a"]
+
+
+def test_ch_geodienste_file_must_hold_the_variant_year():
+    """A None variant reads the current geodienste.ch file, which must not be relabelled once
+    the canton moves on to the next year."""
+    converter = Converters().load("ch_sz")
+    converter.select_variant("2025")
+    gdf = gpd.GeoDataFrame(
+        {"nutzungsidentifikator": ["SZ.KUL.1"], "bezugsjahr": [2026]},
+        geometry=[Point(0, 0)],
+        crs="EPSG:2056",
+    )
+    with pytest.raises(ValueError, match="2026"):
+        converter.file_migration(gdf, "x.gpkg", "https://example.test")
+
+
+def test_ch_rejects_an_unknown_year():
+    with pytest.raises(ValueError, match="Unknown variant"):
+        Converters().load("ch_zh").select_variant("2016")
+
+
+def test_no_converter_declares_both_sources_and_variants():
+    c = Converters()
+    for _id in c.list_ids():
+        c.load(_id)._require_one_source_of_urls()
+
+
+def test_no_converter_uses_the_old_hcat_attribute_names():
+    # renamed in #320; a converter still setting ec_mapping* is silently ignored
+    c = Converters()
+    old = {
+        _id: [a for a in dir(type(c.load(_id))) if a.startswith("ec_mapping")]
+        for _id in c.list_ids()
+    }
+    assert not {k: v for k, v in old.items() if v}

@@ -48,6 +48,7 @@ https://doi.org/10.18167/DVN1/P7OLAP, CIRAD Dataverse, V4
     column_additions = {
         "crop:code_list": CODE_LIST,
     }
+    column_migrations = {"Irrigated": lambda col: col.astype(bool)}
     extensions = {ADMIN_DIVISION, CROP_EXTENSION}
     missing_schemas = {
         "properties": {
@@ -71,7 +72,4 @@ https://doi.org/10.18167/DVN1/P7OLAP, CIRAD Dataverse, V4
         # but it should be reconsidered in the future
         # (i.e. the removal of .fillna("").astype(str) )
         gdf["crop:code"] = gdf["CropType1"].map(mapping).fillna("").astype(str)
-
-        gdf.loc[gdf["Area_ha"] == 0, "Area_ha"] = None
-        gdf["Irrigated"] = gdf["Irrigated"].astype(bool)
         return gdf

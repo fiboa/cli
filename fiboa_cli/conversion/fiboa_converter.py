@@ -48,14 +48,15 @@ class FiboaBaseConverter(BaseConverter):
                 return source
         return None
 
+    # Also called after the migrations (post_migrate, add_hcat): overrides must be side-effect free
     def get_columns(self, gdf):
         columns = super().get_columns(gdf)
-        self._area_column = self._source_column(AREA_KEY, columns)
-        self._area_in_ha = self.area_is_in_ha
-        if self._area_column is None and self.area_calculate_missing:
+        self._area_added = (
+            self._source_column(AREA_KEY, columns) is None and self.area_calculate_missing
+        )
+        if self._area_added:
             # post_migrate() measures it; the mapping keeps the column in the output
-            columns[AREA_KEY] = self._area_column = AREA_KEY
-            self._area_in_ha = False
+            columns[AREA_KEY] = AREA_KEY
         return columns
 
     def _variants_are_years(self):
@@ -159,9 +160,9 @@ class FiboaBaseConverter(BaseConverter):
         gdf = super().post_migrate(gdf)
         gdf = self._traditional_axis_order(gdf)
 
-        # get_columns() runs first and resolves both; the fallback is for direct callers
-        area_key = getattr(self, "_area_column", None) or self._source_column(AREA_KEY)
-        in_ha = getattr(self, "_area_in_ha", self.area_is_in_ha)
+        # the final mapping, with what an override changes after this class's get_columns()
+        area_key = self._source_column(AREA_KEY, self.get_columns(gdf))
+        in_ha = self.area_is_in_ha and not self._area_added
         if area_key is None:
             return gdf
 

@@ -30,7 +30,10 @@ created in 2017. The current update has incorporated data from the 2019 – 2020
         "yearmapped": "determination:datetime",
         "Region": "admin:subdivision_code",
     }
-    column_migrations = {"yearmapped": lambda col: pd.to_datetime(col, format="%Y")}
+    column_migrations = {
+        "yearmapped": lambda col: pd.to_datetime(col, format="%Y"),
+        "Region": lambda col: col.map(region_codes()),
+    }
     column_additions = {
         "admin:country_code": "NZ",
     }
@@ -42,9 +45,8 @@ created in 2017. The current update has incorporated data from the 2019 – 2020
         }
     }
 
-    def migrate(self, gdf):
-        # MAP back; https://www.iso.org/obp/ui/#iso:code:3166:NZ
-        rows = read_data_csv("nz_region_codes.csv")
-        mapping = {row["Subdivision name"]: row["3166-2 code"][len("NZ-") :] for row in rows}
-        gdf["Region"] = gdf["Region"].map(mapping)
-        return super().migrate(gdf)
+
+def region_codes():
+    # MAP back; https://www.iso.org/obp/ui/#iso:code:3166:NZ
+    rows = read_data_csv("nz_region_codes.csv")
+    return {row["Subdivision name"]: row["3166-2 code"][len("NZ-") :] for row in rows}

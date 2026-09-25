@@ -1,7 +1,5 @@
 import re
 
-import requests
-
 from fiboa_cli.conversion.converter_rest import EsriRESTConverterMixin
 from fiboa_cli.datasets.es_base import ESBaseConverter
 
@@ -44,7 +42,7 @@ the identification basis for any type of aid related to the surface area.
     def get_urls(self):
         # Always use the year-named service: the unnamed "Recintos_sigpac" service is
         # whatever year is current (2025 in August 2026) and keys on OBJECTID instead.
-        services = requests.get(self.rest_base_url, {"f": "pjson"}).json()["services"]
+        services = self._rest_json(self.rest_base_url, {"f": "pjson"})["services"]
         layer = next(
             s["name"]
             for s in services

@@ -4,9 +4,10 @@ import requests
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.hcat import AddHCATMixin
 
 
-class Converter(FiboaBaseConverter):
+class Converter(AddHCATMixin, FiboaBaseConverter):
     id = "es"
     short_name = "Spain"
     title = "Spain Declared Crops (Cultivos Declarados SIGPAC)"
@@ -25,9 +26,11 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
 
     variants = {"2025": "2025"}
 
+    # FEGA declared-crop codes (PARC_PRODUCTO) to HCAT; the mixin also publishes it as crop:code_list
+    hcat_mapping_csv = "https://fiboa.org/code/es/es.csv"
+
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "provincia": "admin_province_code",
         "municipio": "admin_municipality_code",
         "dn_surface": "metrics:area",
@@ -35,6 +38,19 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
         "parc_sistexp": "irrigation_system",
         "parc_supcult": "cultivation_surface",
     }
+
+    # The source has no globally unique row identifier: the SIGPAC cadastral key
+    # plus the declaration-line index is unique per record
+    id_columns = (
+        "provincia",
+        "municipio",
+        "agregado",
+        "zona",
+        "poligono",
+        "parcela",
+        "recinto",
+        "ld_recinto",
+    )
 
     area_is_in_ha = False
 
@@ -45,14 +61,11 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
 
     column_additions = {
         "admin:country_code": "ES",
-        # FEGA declared-crop codelist (PARC_PRODUCTO) — separate from the SIGPAC land-use list.
-        # Reference list shipped inside each provincial GPKG as the `cod_producto` layer.
-        "crop:code_list": "https://fiboa.org/code/es/cultivos_declarados/parc_producto.csv",
     }
 
     column_migrations = {
-        # crop:code must be a string per the crop extension; parc_producto is an integer.
-        "parc_producto": lambda col: col.astype("Int64").astype(str),
+        # crop:code must be a string per the crop extension; 0 is "unknown product" in the code list
+        "parc_producto": lambda col: col.astype("Int64").fillna(0).astype(str),
         # admin_*_code are strings; zero-pad province to 2 digits (INE convention).
         "provincia": lambda col: col.astype("Int64").astype(str).str.zfill(2),
         "municipio": lambda col: col.astype("Int64").astype(str),
@@ -70,31 +83,6 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
     def layer_filter(self, layer: str, uri: str) -> bool:
         # GPKG contains the data layer plus several codelist tables (cod_*) — only read the data.
         return layer == "cultivo_declarado"
-
-    def migrate(self, gdf):
-        # The source has no globally unique row identifier. Build one from the SIGPAC cadastral key
-        # plus the declaration-line index, which is unique per record.
-        def part(col):
-            return gdf[col].astype("Int64").astype(str)
-
-        gdf["id"] = (
-            part("provincia").str.zfill(2)
-            + "-"
-            + part("municipio")
-            + "-"
-            + part("agregado")
-            + "-"
-            + part("zona")
-            + "-"
-            + part("poligono")
-            + "-"
-            + part("parcela")
-            + "-"
-            + part("recinto")
-            + "-"
-            + part("ld_recinto")
-        )
-        return super().migrate(gdf)
 
     def get_urls(self):
         if self.variant not in self.variants:

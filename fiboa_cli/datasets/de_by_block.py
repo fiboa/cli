@@ -44,10 +44,14 @@ year for the application procedure.
     columns = {
         "geometry": "geometry",
         "flik": ("flik", "id"),  # derived in migrate(); unique, unlike in Baden-Württemberg
-        "agricultural_area_type": "crop:code",  # added in file_migration(), trimmed in migrate()
+        "agricultural_area_type": "crop:code",  # added in file_migration()
         "validFrom": "determination:datetime",
     }
-    column_migrations = {"validFrom": lambda col: pd.to_datetime(col)}
+    column_migrations = {
+        "validFrom": lambda col: pd.to_datetime(col),
+        # …/codelist/de.iacs/AgriculturalAreaTypeValue/AL -> AL
+        "agricultural_area_type": lambda col: col.str.rsplit("/", n=1).str[-1],
+    }
 
     def file_migration(self, gdf, path, uri, layer=None):
         # The land cover class is carried as an xlink attribute, which the GML driver does not
@@ -70,6 +74,4 @@ year for the application procedure.
         # The FLIK is the last dot-separated segment of the identifier URI, e.g.
         # https://registry.gdi-de.org/id/de.by.inspire.invekos.lpis.aa.DEBYLI9412000570
         gdf["flik"] = gdf["id"].str.rsplit(".", n=1).str[-1]
-        # …/codelist/de.iacs/AgriculturalAreaTypeValue/AL -> AL
-        gdf["agricultural_area_type"] = gdf["agricultural_area_type"].str.rsplit("/", n=1).str[-1]
         return super().migrate(gdf)
