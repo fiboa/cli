@@ -2,7 +2,7 @@ from pathlib import Path
 
 from vecorel_cli.vecorel.util import load_file
 
-from fiboa_cli.create_stac import CreateStacCollection
+from fiboa_cli.create_stac import DESCRIPTIONS, CreateStacCollection
 from fiboa_cli.registry import Registry
 
 
@@ -44,3 +44,16 @@ def test_create_stac_collection(tmp_folder: Path):
     expected["vecorel_extensions"]["de_nrw"].sort()
 
     assert created_file == expected
+
+
+def test_fiboa_columns_are_described(tmp_folder: Path):
+    from fiboa_cli.create_geoparquet import CreateGeoParquet
+
+    parquet = tmp_folder / "fiboa.parquet"
+    CreateGeoParquet().create([Path("tests/data-files/fiboa-example.json")], parquet)
+    out_file = tmp_folder / "collection.json"
+    CreateStacCollection().create_cli(parquet, out_file)
+
+    columns = {c["name"]: c for c in load_file(out_file)["assets"]["data"]["table:columns"]}
+    assert columns["metrics:area"]["description"] == "Field area in square meters"
+    assert all("description" not in c for n, c in columns.items() if n not in DESCRIPTIONS)

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
+- `fiboa create-stac-collection` describes the fiboa properties in `table:columns`.
 - Added `pixi run check-hcat`, which compares the HCAT mapping tables the converters read online with the taxonomy.
 - Added `FiboaDuckDBBaseConverter` for SQL-based conversion of large Parquet sources.
 - Added `PerFileBaseConverter` to process multi-file sources incrementally.
@@ -80,6 +81,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - US-CSB: Editions now cover 2017-2024.
 
 ### Removed
+- Removed `fiboa publish`. Datasets are published as a Portolan catalog; the README describes the steps.
 - CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
 
 ### Fixed

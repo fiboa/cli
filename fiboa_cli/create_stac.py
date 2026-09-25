@@ -7,6 +7,25 @@ from vecorel_cli.vecorel.collection import Collection
 
 from fiboa_cli.fiboa.version import get_versions
 
+# The fiboa properties mean the same in every dataset; a converter's own columns are described per dataset
+DESCRIPTIONS = {
+    "id": "Unique identifier",
+    "collection": "The collection identifier",
+    "inspire:id": "The INSPIRE identifier",
+    "determination:datetime": "Timestamp of the determination of the field boundary",
+    "metrics:area": "Field area in square meters",
+    "metrics:perimeter": "Field perimeter in meters",
+    "crop:code_list": "A link to the code list",
+    "crop:code": "The crop code",
+    "crop:name": "Crop name in the original language",
+    "crop:name_en": "Crop name in English",
+    "hcat:name": "The machine-readable HCAT name of the crop",
+    "hcat:code": "The 10-digit HCAT code indicating the hierarchy of the crop",
+    "hcat:name_en": "The HCAT crop name translated into English",
+    "admin:country_code": "ISO 3166-1 alpha-2 country code",
+    "admin:subdivision_code": "ISO 3166-2 principal subdivision code (e.g. province or state)",
+}
+
 
 class CreateStacCollection(Base):
     temporal_property = "determination:datetime"
@@ -45,3 +64,10 @@ class CreateStacCollection(Base):
         data.setdefault("vecorel_extensions", {k: list(v) for k, v in schemas.items()})
 
         return data
+
+    def create_from_file(self, *args, **kwargs) -> dict:
+        stac = super().create_from_file(*args, **kwargs)
+        for column in stac["assets"]["data"].get("table:columns", []):
+            if column["name"] in DESCRIPTIONS:
+                column.setdefault("description", DESCRIPTIONS[column["name"]])
+        return stac
