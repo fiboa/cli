@@ -32,3 +32,5 @@ htmlcov/
 /tests/data-files/convert/*/extracted.*/
 /tests/data-files/convert/**/*.gfs
 *.tmp
+
+build/
