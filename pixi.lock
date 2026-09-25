@@ -4765,7 +4765,7 @@ packages:
 - pypi: ./
   name: fiboa-cli
   version: 0.21.0
-  sha256: 7d441cb26cb40458ac074fa3f25321db25b084cdea4041d0e4001c081bdda972
+  sha256: 457f46e194da69d7719d0ee520772d8a8a8a43c7a982a68fc2a09ce85cbc03cd
   requires_dist:
   - vecorel-cli==0.3.1
   - beautifulsoup4>=4.12
