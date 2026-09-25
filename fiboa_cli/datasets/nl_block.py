@@ -32,12 +32,11 @@ For crop data, look at BasisRegistratie gewasPercelen (BRP)
     # Both http://creativecommons.org/publicdomain/zero/1.0/deed.nl and http://creativecommons.org/publicdomain/mark/1.0/
     license = "CC0-1.0"
     column_additions = {"determination:datetime": "2023-06-15T00:00:00Z"}
-    columns = {"geometry": "geometry", "area": "metrics:area", "versiebron": "source"}
+    columns = {"geometry": "geometry", "versiebron": "source"}
     column_filters = {
         # type = "Hout" | "Landbouwgrond" | "Overig" | "Water"
         "type": lambda col: col == "Landbouwgrond"
     }
-    area_calculate_missing = True
     missing_schemas = {
         "properties": {
             "source": {"type": "string"},

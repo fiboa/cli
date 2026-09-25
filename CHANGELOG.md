@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - REST converters download much faster from large layers and retry when a service answers with intermittent errors.
 - Converters no longer split multi-part geometries into one row per polygon: fields keep the geometry modeling of the source (Polygon or MultiPolygon), the source-published area and perimeter, and one id per source feature. Use `fiboa improve --explode-geometries` when single polygons are needed.
 - Converters whose variants are years (1900-2100) now fill `determination:datetime` from the selected year unless they provide a determination date themselves.
+- Converters now publish `metrics:area` by default (`area_calculate_missing = True`, #277): measured from the geometry for every row if the source has no area, and for the rows where it is empty or 0 otherwise. Set `area_calculate_missing = False` to opt out.
 - Renamed the HCAT mapping attributes of `AddHCATMixin`, as they work with any HCAT mapping, not only EuroCrops: the `ec_mapping*` attributes use the `hcat_mapping*` prefix now. The helpers `load_ec_mapping()` and `ec_url()` are now `load_hcat_mapping()` and `hcat_mapping_url()` in `fiboa_cli.datasets.commons.hcat`; the copies in `fiboa_cli.datasets.commons.ec` were removed.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
 - CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
@@ -80,6 +81,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Error responses and interrupted downloads are no longer cached.
   - Layers that join several tables (some ES-CB and ES-IB editions) are now filtered and paged correctly, and their column names no longer carry table prefixes.
 - Fixed `use_variant_as_determination` so determination dates are retained.
+- `metrics:area` measured from the geometry is now correct in CRSs that are in metres but not equal-area, such as Web Mercator: they are reprojected to an equal-area CRS first. Source areas in hectares are converted to m² also where missing values are filled in, and empty values are filled in, not only 0. Invalid geometries are repaired before they are measured, as they are for the output, so that e.g. a self-intersecting polygon no longer gets an area of 0.
 - Converters no longer publish duplicate `id`s (#282): row-numbered ids count over all source files instead of restarting per file, and ids the source repeats get a `~<n>` suffix.
 - Rows missing `crop:code` are now dropped with a warning (and an error threshold), instead of failing whole conversions.
 - DE-BB:

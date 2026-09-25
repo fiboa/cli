@@ -129,7 +129,6 @@ class CHBaseConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "lnf_code": lambda col: col.notna(),  # crop:code is required
     }
     area_is_in_ha = False
-    area_calculate_missing = True
     column_migrations = {
         "bezugsjahr": lambda col: pd.to_datetime(col.astype(int), format="%Y"),
         # crop:code is a string

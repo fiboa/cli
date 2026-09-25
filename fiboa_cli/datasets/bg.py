@@ -34,8 +34,8 @@ and classified by its use. The register has been produced from field checks and 
 These layers hold the blocks used agriculturally — arable land, greenhouses, rice fields and courtyards —
 where the Physical_Blocks layers of the same service also carry forest, urban and transport land.
     """
-    # The layer carries no area column; the blocks are in UTM 35N metres.
-    area_calculate_missing = True
+    # 2021 and 2022 publish AREA in m²; the other editions measure it from the geometry.
+    area_is_in_ha = False
     # PHBIDENT identifies the block, and a block is listed once per usage — and
     # sometimes twice for the same usage (42 blocks of the 226,592 in 2025, 40
     # of them with the same code), so the row position identifies the polygon.

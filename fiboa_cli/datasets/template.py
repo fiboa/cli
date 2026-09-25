@@ -79,6 +79,13 @@ but ensure it is _not_ indented within the triple quotes.
         "geom": "geometry",
     }
 
+    # The unit of the column mapped to metrics:area: True for hectares (the default),
+    # False for m². fiboa publishes m², so hectares are converted.
+    area_is_in_ha = True
+    # metrics:area is measured from the geometry for every row if no column maps to it,
+    # and otherwise for the rows where the source value is empty or 0. Set False to opt out.
+    # area_calculate_missing = True
+
     # Add columns with constant values.
     # The key is the column name, the value is a constant value that's used for all rows.
     column_additions = {}
@@ -87,10 +94,10 @@ but ensure it is _not_ indented within the triple quotes.
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
 
     # Functions to migrate data in columns to match the fiboa specification.
-    # Example: You have a column area_m in square meters and want to convert
-    # to hectares as required for the area field in fiboa.
+    # Example: You have a column size_km2 in square kilometres and want it in
+    # hectares, as area_is_in_ha expects.
     # requires: func(column: pd.Series) -> pd.Series
-    column_migrations = {"area_m": lambda column: column * 10_000}
+    column_migrations = {"size_km2": lambda column: column * 100}
 
     # Filter columns to only include the ones that are relevant for the collection,
     # e.g. only rows that contain the word "agriculture" but not "forest" in the column "land_cover_type".

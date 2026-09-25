@@ -402,7 +402,10 @@ def test_ie_lpis_keeps_one_row_per_parcel(tmp_folder, tmp_parquet_file):
     from fiboa_cli.datasets.ie_lpis import Converter
 
     def square(x, side):
-        return box(x, 0, x + side, side)
+        # from the ITM false origin, in Ireland: far from it the CRS distorts the area too
+        # much to be measured in place, and the measured area would no longer be side²
+        x0, y0 = 600_000 + x, 750_000
+        return box(x0, y0, x0 + side, y0 + side)
 
     rows = [  # (par_lab, crop, digitised, eh_area, claim_area, commonage_ind, geometry), 2025 names
         ("A", "Permanent Pasture", 7.0, 6.5, 2.0, "N", square(0, 100)),
