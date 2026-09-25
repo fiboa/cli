@@ -20,8 +20,11 @@ _tables = {}
 
 def fetch(url):
     if url not in _tables:
-        response = requests.get(url, timeout=60)
-        if response.status_code != 200:
+        try:
+            response = requests.get(url, timeout=60)
+        except requests.RequestException:
+            response = None
+        if response is None or response.status_code != 200:
             _tables[url] = None
         else:
             try:
@@ -37,6 +40,9 @@ def row_key(row):
 
 
 def main():
+    if fetch(TAXONOMY) is None:
+        print(f"unreachable: {TAXONOMY}")
+        return 1
     taxonomy = {r["HCAT3_name"].strip(): r["HCAT3_code"].strip() for r in fetch(TAXONOMY)}
     problems = defaultdict(set)
     unreachable = defaultdict(set)
