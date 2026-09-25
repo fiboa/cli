@@ -455,6 +455,75 @@ def test_ie_lpis_keeps_one_row_per_parcel(tmp_folder, tmp_parquet_file):
     assert collection["determination:datetime"] == "2025-01-01T00:00:00Z"
 
 
+def test_ch_canton_table_fills_the_converter():
+    """A canton file only names its canton; the base fills the rest from CANTONS."""
+    ag = Converters().load("ch_ag")
+    assert ag.id == "ch_ag" and ag.short_name == "Switzerland, Aargau"
+    assert ag.license == "CC-BY-4.0" and ag.attribution.startswith("Daten des Kantons Aargau")
+    assert ag.data_access == ""
+    assert "fiboa convert ch_ne -i" in Converters().load("ch_ne").data_access
+    assert Converters().load("ch_gr").license.startswith("Nutzungsbestimmungen")
+
+
+def test_ch_own_layer_is_brought_into_the_model():
+    """Zürich's layer has its own column names, a zero-padded code and the area in ares."""
+    converter = Converters().load("ch_zh")
+    converter.select_variant("2025")
+    gdf = gpd.GeoDataFrame(
+        {
+            "gis_nr": ["1", "2"],
+            "blw_nr": ["0613", "0399"],
+            "blw_name": ["a", "b"],
+            "flaeche": [22.0, 0.5],
+        },
+        geometry=[Point(0, 0), Point(1, 1)],
+        crs="EPSG:2056",
+    )
+    out = converter.file_migration(gdf, "ch_zh_2025_0.gml", "https://example.test")
+    assert out["lnf_code"].tolist() == [613, 399]
+    assert out["flaeche_m2"].tolist() == [2200.0, 50.0]
+    assert out["kanton"].tolist() == ["ZH", "ZH"] and out["bezugsjahr"].tolist() == [2025, 2025]
+    assert not out["ist_ueberlagernd"].any() and "nutzungsidentifikator" in out.columns
+
+
+def test_ch_ge_keeps_its_year_and_the_rows_with_a_code():
+    """Geneva publishes every year since 2017 in one file, and a few rows carry no code."""
+    converter = Converters().load("ch_ge")
+    converter.select_variant("2024")
+    gdf = gpd.GeoDataFrame(
+        {
+            "ID": ["a", "b", "c"],
+            "CODE_FED": [513.0, 513.0, None],
+            "TYPE": ["x", "x", None],
+            "SHAPE_AREA": [1.0, 1.0, 1.0],
+            "EXERCICE": [2024.0, 2025.0, 2024.0],
+        },
+        geometry=[Point(0, 0)] * 3,
+        crs="EPSG:2056",
+    )
+    out = converter.filter_rows(converter.file_migration(gdf, "x.zip", "https://example.test"))
+    assert out["nutzungsidentifikator"].tolist() == ["a"]
+
+
+def test_ch_geodienste_file_must_hold_the_variant_year():
+    """A None variant reads the current geodienste.ch file, which must not be relabelled once
+    the canton moves on to the next year."""
+    converter = Converters().load("ch_sz")
+    converter.select_variant("2025")
+    gdf = gpd.GeoDataFrame(
+        {"nutzungsidentifikator": ["SZ.KUL.1"], "bezugsjahr": [2026]},
+        geometry=[Point(0, 0)],
+        crs="EPSG:2056",
+    )
+    with pytest.raises(ValueError, match="2026"):
+        converter.file_migration(gdf, "x.gpkg", "https://example.test")
+
+
+def test_ch_rejects_an_unknown_year():
+    with pytest.raises(ValueError, match="Unknown variant"):
+        Converters().load("ch_zh").select_variant("2016")
+
+
 def test_no_converter_declares_both_sources_and_variants():
     c = Converters()
     for _id in c.list_ids():

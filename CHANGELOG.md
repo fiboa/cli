@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added a test guard that rejects fixture files larger than 5 MB.
 - Added ML variants of converters (`ai4sf_ml`, `de_fusion_ml`, `india_10k_ml`, `rw_rwanda_ml`, `za_fusion_ml`) that publish each field's train/val/test split.
 - AT: Added support for 2018 by extracting archives before reading.
+- CH:
+  - Added converters for every canton with standalone data (`ch_<canton>`) on a shared `CHBaseConverter`, each with the canton's own licence and attribution; Basel-Stadt is represented by the Basel-Landschaft data.
+  - `ch_zh` (2017–2025), `ch_ge` (2017–2026) and `ch_sz` (2022–2025) read the cantons' own archives; the cantons that require registration or approval convert an exported file with `-i`.
+  - The federal usage code (`lnf_code`) is published as `crop:code`, and HCAT is mapped by it (`code/ch/lnf_code.csv`).
 - DE-BW: Added Baden-Württemberg reference parcels converter.
 - DE-BY-BLOCK: Added Bavaria field-block converter.
 - DE-FUSION: Added Brandenburg converter based on the ESA Fusion Competition dataset.
@@ -72,6 +76,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - SI: Extended editions back to 2019.
 - US-CSB: Editions now cover 2017-2024.
 
+### Removed
+- CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
+
 ### Fixed
 - Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
 - Declared the `beautifulsoup4` dependency used by ES-PV and ES-VC.
@@ -83,10 +90,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `metrics:area` measured from the geometry is now correct in CRSs that are in metres but not equal-area, such as Web Mercator: they are reprojected to an equal-area CRS first. Source areas in hectares are converted to m² also where missing values are filled in, and empty values are filled in, not only 0. Invalid geometries are repaired before they are measured, as they are for the output, so that e.g. a self-intersecting polygon no longer gets an area of 0.
 - Converters no longer publish duplicate `id`s (#282): row-numbered ids count over all source files instead of restarting per file, and ids the source repeats get a `~<n>` suffix.
 - Rows missing `crop:code` are now dropped with a warning (and an error threshold), instead of failing whole conversions.
-- CH:
-  - CH now uses geodienste.ch STAC canton downloads.
-  - `lnf_code` is now published as `crop:code`.
-  - IDs are now derived from stable source identifiers instead of row order.
 - DE-BB:
   - Excluded NBF ineligible patches with empty crop code.
   - Fixed source encoding and FLIK handling.

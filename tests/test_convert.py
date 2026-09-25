@@ -57,7 +57,12 @@ tests = [
     "se",
     "ee",
     "ai4sf",
-    "ch",
+    "ch_ai",
+    "ch_ge",
+    "ch_ge#2024",
+    "ch_sz",
+    "ch_sz#2025",
+    "ch_zh",
     "cz",
     "cz#2019",
     "cz#2020",
@@ -126,7 +131,37 @@ extra_convert_parameters = {
     # the older layers publish no land cover class and no declared area
     "de_he#2023": {"variant": "2023", **_input_files("de_he", "de_he_2023.json")},
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
-    "ch": _input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
+    "ch_ai": {
+        **_input_files("ch_ai", "lwb_nutzungsflaechen_v3_0_AI_2056.gpkg"),
+        "mapping_file": f"{test_path}/ch/lnf_code.csv",
+    },
+    # one file holds every year; the two editions must each keep only their year
+    "ch_ge": {
+        "variant": "2025",
+        **_input_files("ch_ge", "AGR_SURFACE_AGRICOLE_RECENSEE-SHP.zip"),
+        "mapping_file": f"{test_path}/ch/lnf_code.csv",
+    },
+    "ch_ge#2024": {
+        "variant": "2024",
+        **_input_files("ch_ge", "AGR_SURFACE_AGRICOLE_RECENSEE-SHP.zip"),
+        "mapping_file": f"{test_path}/ch/lnf_code.csv",
+    },
+    # the canton's own WFS layer (GML) and its geodienste.ch file
+    "ch_sz": {
+        "variant": "2024",
+        **_input_files("ch_sz", "ch_sz_2024.gml"),
+        "mapping_file": f"{test_path}/ch/lnf_code.csv",
+    },
+    "ch_sz#2025": {
+        "variant": "2025",
+        **_input_files("ch_sz", "lwb_nutzungsflaechen_v3_0_SZ_2056.gpkg"),
+        "mapping_file": f"{test_path}/ch/lnf_code.csv",
+    },
+    "ch_zh": {
+        "variant": "2025",
+        **_input_files("ch_zh", "ch_zh_2025.gml"),
+        "mapping_file": f"{test_path}/ch/lnf_code.csv",
+    },
     "es_cl": {
         "variant": "2025",
         "input_files": {f"{test_path}/es_cl/AVILA.zip": ["replaceme.zip"]},
@@ -205,6 +240,13 @@ extra_convert_parameters = {
 #
 # Keyed like extra_convert_parameters, so "<id>#<label>" can state a different
 # expectation per edition where the editions genuinely differ.
+SWISS_COLUMNS = (
+    "determination:datetime",
+    "metrics:area",
+    "admin:subdivision_code",
+    "crop:code",
+    "id",
+)
 expected_columns = {
     "de_sh": ("determination:datetime", "metrics:area", "flik", "hbn", "id"),
     # the determination date comes from the year variant
@@ -217,6 +259,13 @@ expected_columns = {
     "ie_lpis#2025": ("determination:datetime", "metrics:area", "crop:code", "id"),
     # derived from the archive date in file_migration()
     "pl_block": ("determination:datetime",),
+    # the cantons' own layers are renamed to the model's columns through a table
+    "ch_ai": SWISS_COLUMNS,
+    "ch_ge": SWISS_COLUMNS,
+    "ch_ge#2024": SWISS_COLUMNS,
+    "ch_sz": SWISS_COLUMNS,
+    "ch_sz#2025": SWISS_COLUMNS,
+    "ch_zh": SWISS_COLUMNS,
     # only 2017-2019 and 2023 publish a crop name
     "pt": (*PT_COLUMNS, "crop:name"),
     **{
