@@ -1,0 +1,60 @@
+original_name,original_code,color,translated_name,HCAT3_name,HCAT3_code
+"****",****,#44aae6,"****",not_known_and_other,3399000000
+"Citrus and Subtropical - No Subclass",C,#cb1469,"Citrus and Subtropical - No Subclass",citrus_plantations,3303040000
+"Eucalyptus",C10,#410cc9,"Eucalyptus",eucalyptus,3306050000
+"Dates",C4,#43ce34,"Dates",orchards_fruits,3303010000
+"Avocados",C5,#86cb3c,"Avocados",avocado,3303100000
+"Olives",C6,#d84d72,"Olives",olive_plantations,3303050000
+"Subtropical Fruits Misc.",C7,#5eda3f,"Subtropical Fruits Misc.",unspecified_orchards_fruits,3303019800
+"Kiwis",C8,#d18274,"Kiwis",kiwi,3303010700
+"Apples",D1,#d4886f,"Apples",apples,3303010200
+"Deciduous - Misc.",D10,#9f54d1,"Deciduous - Misc.",unspecified_orchards_fruits,3303019800
+"Almonds",D12,#dfad84,"Almonds",almond,3303030100
+"Walnuts",D13,#665aea,"Walnuts",walnuts,3303030600
+"Pistachios",D14,#b063d1,"Pistachios",pistachio,3303030400
+"Pomegranates",D15,#cf8429,"Pomegranates",pomegranate,3303011400
+"Pecans",D17,#0fe769,"Pecans",pecan,3303030300
+"Apricots",D2,#1546e7,"Apricots",apricots,3303010300
+"Cherries",D3,#31e4a2,"Cherries",cherry_cherries,3303010400
+"Peaches and Nectarines",D5,#b5db77,"Peaches and Nectarines",unspecified_orchards_fruits,3303019800
+"Pears",D6,#ba84ef,"Pears",pears,3303011200
+"Plums",D7,#ebe41d,"Plums",plums,3303011300
+"Prunes",D8,#6649e9,"Prunes",plums,3303011300
+"Cotton",F1,#6ee185,"Cotton",cotton,3301060300
+"Beans (dry)",F10,#e4777e,"Beans (dry)",beans,3301020100
+"Field Misc.",F11,#dcea13,"Field Misc.",other_arable_land_crops,3301990000
+"Sunflowers",F12,#86d3ec,"Sunflowers",sunflower,3301060500
+"Corn, Sorghum or Sudan (grouped for remote sensing classification only)",F16,#0e55e3,"Corn, Sorghum or Sudan (grouped for remote sensing classification only)",cereal,3301010000
+"Safflower",F2,#26cd5b,"Safflower",safflower,3301083900
+"Sugar beets",F5,#b5d32f,"Sugar beets",sugar_beet,3301290700
+"Wheat",G2,#7ad3cf,"Wheat",common_soft_wheat,3301010100
+"Grain and Hay - Misc.",G6,#69cdbe,"Grain and Hay - Misc.",other_arable_land_crops,3301990000
+"Idle - Land not cropped in current or prior year, but within last 3 yrs.",I1,#1e38e1,"Idle - Land not cropped in current or prior year, but within last 3 yrs.",fallow_land_not_crop,3301110000
+"Idle - Long Term - land consistently idle for four or more years",I4,#6aade8,"Idle - Long Term - land consistently idle for four or more years",unmaintained,3308000000
+"Alfalfa and alfalfa mixtures",P1,#e1b96a,"Alfalfa and alfalfa mixtures",alfalfa_lucerne,3301090301
+"Pasture - Mixed",P3,#7a3cde,"Pasture - Mixed",pasture_meadow_grassland_grass,3302000000
+"Pasture - Native Improved",P4,#de3853,"Pasture - Native Improved",pasture_meadow_grassland_grass,3302000000
+"Pasture - Induced High Water",P5,#ed2d26,"Pasture - Induced High Water",pasture_meadow_grassland_grass,3302000000
+"Pasture - Miscellaneous Grasses",P6,#61eb26,"Pasture - Miscellaneous Grasses",pasture_meadow_grassland_grass,3302000000
+"Pasture - Turf Farms",P7,#5b99e9,"Pasture - Turf Farms",sod_turf,3301090207
+"Rice",R1,#c872b5,"Rice",rice,3301010700
+"Rice - Wild",R2,#f035a2,"Rice - Wild",rice,3301010700
+"Onions and Garlic",T10,#4eec5e,"Onions and Garlic",alliums,3301220000
+"Potatoes",T12,#e7da85,"Potatoes",potatoes,3301030000
+"Sweet Potatoes",T13,#ef6ec6,"Sweet Potatoes",sweet_potatoes,3301040000
+"Flowers, nursery and Christmas Tree Farms",T16,#6264e5,"Flowers, nursery and Christmas Tree Farms",flowers_ornamental_plants,3301080000
+"Truck Crops - Misc.",T18,#e95ad8,"Truck Crops - Misc.",fresh_vegetables,3301070000
+"Bushberries",T19,#96d26c,"Bushberries",unspecified_berries_berry_species,3303029800
+"Strawberries",T20,#d116e6,"Strawberries",strawberries,3301130000
+"Peppers (Chili, Bell, etc.)",T21,#73cbda,"Peppers (Chili, Bell, etc.)",capsicum,3301300000
+"Greenhouse",T27,#ab1ccf,"Greenhouse",greenhouse_foil_film,3305000000
+"Lettuce or Leafy Greens (grouped for remote sensing classification only)",T30,#47d047,"Lettuce or Leafy Greens (grouped for remote sensing classification only)",salads_lettuce_leaf_vegetables,3301310000
+"Tomatoes (all)",T32,#de4980,"Tomatoes (all)",tomato,3301280000
+"Cole crops (mixture of T22-T25)",T4,#31db89,"Cole crops (mixture of T22-T25)",brassicaceae_cruciferae,3301210000
+"Carrots",T6,#cb19c8,"Carrots",carrots_daucus,3301290300
+"Melons, Squash, and Cucumbers",T9,#bdd879,"Melons, Squash, and Cucumbers",cucurbits,3301140000
+"Vineyards - No Subclass",V,#ebcc65,"Vineyards - No Subclass",vineyards_wine_vine_rebland_grapes,3303060000
+"Not cropped, or unclassified at the time of remote-sensing analysis. Idle status not determined",X,#4debc1,"Not cropped, or unclassified at the time of remote-sensing analysis. Idle status not determined",not_known_and_other,3399000000
+"Young Perennial (grouped for remote sensing or when CLASS C, D or V is not determined)",YP,#ef8c57,"Young Perennial (grouped for remote sensing or when CLASS C, D or V is not determined)",permanent_crops_perennial,3303000000
+"Unclassified",U,#4debc1,"Unclassified",not_known_and_other,3399000000
+"Urban Landscape",UL2,#4debc1,"Urban Landscape",not_known_and_other,3399000000
