@@ -34,9 +34,7 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
     wfs_extension = "json"
 
     # 2023 and 2024 publish no area, and the declaredArea 2025 does publish is the area of
-    # the polygon to three decimals, so every edition measures it: EPSG:25832, already m2.
-    area_is_in_ha = False
-    area_calculate_missing = True
+    # the polygon to three decimals, so every edition measures metrics:area from the geometry.
 
     columns = {
         "geometry": "geometry",

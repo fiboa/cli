@@ -8,6 +8,14 @@ from ..fiboa.version import get_fiboa_uri
 
 AREA_KEY = "metrics:area"
 DETERMINATION_KEY = "determination:datetime"
+# Equal-area (WGS 84 / NSIDC EASE-Grid 2.0 Global): the area of a geometry reprojected
+# to it matches the geodesic area to ~1e-9, at any latitude. Equal Earth (EPSG:8857)
+# would serve as well.
+EQUAL_AREA_CRS = "EPSG:6933"
+# The largest areal distortion of the source CRS across the data that is still measured
+# in place: UTM/TM grids stay within it (EPSG:25832 is 0.28% off at 15°E), Web Mercator
+# does not (+140% at 50°N).
+AREA_DISTORTION_TOLERANCE = 0.005
 
 
 def _swap_xy(coords):
@@ -18,8 +26,11 @@ def _swap_xy(coords):
 
 
 class FiboaBaseConverter(BaseConverter):
+    # The unit of the source column mapped to metrics:area; fiboa publishes m².
     area_is_in_ha = True
-    area_calculate_missing = False
+    # Measure metrics:area from the geometry where the source has none: for every row
+    # if no column maps to it, otherwise for the rows that are empty or 0. See #277.
+    area_calculate_missing = True
     # None (the default) resolves per edition: a converter whose variants are years
     # and that maps no determination:datetime of its own takes the variant year as
     # the determination date. Set True/False to force it on or off. See #284.
@@ -29,12 +40,23 @@ class FiboaBaseConverter(BaseConverter):
         super().__init__(*args, **kwargs)
         self.extensions.add(get_fiboa_uri())
 
-    def _source_column(self, target):
-        """The source column that `columns` maps to `target`; the rename comes later."""
-        for source, mapped in self.columns.items():
+    def _source_column(self, target, columns=None):
+        """The source column that `columns` (default: the declared ones) maps to
+        `target`; the rename comes later."""
+        for source, mapped in (self.columns if columns is None else columns).items():
             if target == mapped or (isinstance(mapped, (list, tuple)) and target in mapped):
                 return source
         return None
+
+    def get_columns(self, gdf):
+        columns = super().get_columns(gdf)
+        self._area_column = self._source_column(AREA_KEY, columns)
+        self._area_in_ha = self.area_is_in_ha
+        if self._area_column is None and self.area_calculate_missing:
+            # post_migrate() measures it; the mapping keeps the column in the output
+            columns[AREA_KEY] = self._area_column = AREA_KEY
+            self._area_in_ha = False
+        return columns
 
     def _variants_are_years(self):
         """Whether every declared variant is a year in the range 1900–2100."""
@@ -95,35 +117,70 @@ class FiboaBaseConverter(BaseConverter):
         return gdf
 
     @staticmethod
-    def _crs_in_meters(gdf):
-        return bool(
-            gdf.crs
-            and gdf.crs.axis_info
-            and gdf.crs.axis_info[0].unit_name in ("m", "metre", "meter")
-        )
+    def _crs_measures_area(geometry):
+        """Whether the planar area in the CRS of `geometry` is the area in m²: a projected
+        CRS in metres whose areal distortion across the data is within the tolerance.
+        Anything that cannot be checked counts as not, so that it is reprojected."""
+        crs = geometry.crs
+        if not (
+            crs.is_projected
+            and crs.axis_info
+            and all(axis.unit_name in ("m", "metre", "meter") for axis in crs.axis_info[:2])
+        ):
+            return False
+        try:
+            minx, miny, maxx, maxy = geometry.total_bounds
+            # the corners and the centre of the data, as lon/lat of the CRS's own datum
+            to_lonlat = pyproj.Transformer.from_crs(crs, crs.geodetic_crs, always_xy=True)
+            lon, lat = to_lonlat.transform(
+                [minx, maxx, minx, maxx, (minx + maxx) / 2],
+                [miny, miny, maxy, maxy, (miny + maxy) / 2],
+            )
+            scale = pyproj.Proj(crs).get_factors(lon, lat, errcheck=True).areal_scale
+            return max(abs(s - 1) for s in scale) <= AREA_DISTORTION_TOLERANCE
+        except Exception:
+            return False
+
+    def _measure_area(self, geometry):
+        """The area of each geometry in m². Reprojecting is costly, so it is done only
+        for the geometries passed and only if their CRS does not measure area in place."""
+        # The base converter repairs the geometries only after post_migrate(), and the
+        # area of an invalid one is wrong (0 for a figure-8), so repair them for the area:
+        # make_valid() is what the published geometry gets too.
+        invalid = ~geometry.is_valid & geometry.notna()
+        if invalid.any():
+            geometry = geometry.copy()
+            geometry[invalid] = geometry[invalid].make_valid()
+        if not self._crs_measures_area(geometry):
+            geometry = geometry.to_crs(EQUAL_AREA_CRS)
+        return geometry.area
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
         gdf = self._traditional_axis_order(gdf)
 
-        area_key = self._source_column(AREA_KEY)
-        crs_is_in_meters = self._crs_in_meters(gdf)
+        # get_columns() runs first and resolves both; the fallback is for direct callers
+        area_key = getattr(self, "_area_column", None) or self._source_column(AREA_KEY)
+        in_ha = getattr(self, "_area_in_ha", self.area_is_in_ha)
+        if area_key is None:
+            return gdf
 
-        def in_metres(geometry):
-            # Reprojecting is costly, so only the geometries whose area is computed are,
-            # and only when the CRS is not in metres: to an equal-area projection.
-            return geometry if crs_is_in_meters else geometry.to_crs("EPSG:6933")
+        if area_key in gdf.columns:
+            gdf[area_key] = gdf[area_key].astype(float)
+            if in_ha:
+                gdf[area_key] *= 10_000
+            missing = (gdf[area_key].isna() | (gdf[area_key] <= 0)).to_numpy()
+        else:
+            missing = None  # no area in this source (edition) at all
 
-        if self.area_calculate_missing:
-            if area_key in gdf.columns:
-                factor = 10_000 if self.area_is_in_ha else 1
-                missing = (gdf[area_key] == 0).to_numpy()
-                if missing.any():
-                    gdf.loc[missing, area_key] = in_metres(gdf.geometry[missing]).area * factor
-            else:
-                gdf[area_key] = in_metres(gdf.geometry).area
-        elif self.area_is_in_ha and area_key in gdf.columns:
-            # convert area in ha to meters
-            gdf[area_key] = gdf[area_key].astype(float) * 10_000
+        if not self.area_calculate_missing or (missing is not None and not missing.any()):
+            return gdf
+        if gdf.crs is None:
+            self.warning(f"No CRS, so {AREA_KEY} can't be measured from the geometries")
+            return gdf
 
+        if missing is None:
+            gdf[area_key] = self._measure_area(gdf.geometry)
+        else:
+            gdf.loc[missing, area_key] = self._measure_area(gdf.geometry[missing])
         return gdf

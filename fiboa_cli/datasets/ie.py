@@ -34,10 +34,7 @@ class IEConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "gml_id": "id",
         "localId": "parcel_id",
         "observationDate": "determination:datetime",
-        # the GML publishes no area; the parcels are in EPSG:4258
-        "metrics:area": "metrics:area",
     }
-    area_calculate_missing = True
     # localId is the LPIS parcel reference and repeats where a parcel is
     # declared more than once — 214 of the 1,027,438 rows of 2022, one of them
     # four times — so the feature id, which the GML guarantees unique, is the id.

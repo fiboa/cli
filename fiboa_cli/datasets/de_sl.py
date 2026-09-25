@@ -29,16 +29,12 @@ class Converter(AdminConverterMixin, WFSConverterMixin, FiboaBaseConverter):
     # The WFS accepts larger pages, but 2500 keeps each response around 8 MB.
     wfs_page_size = 2500
 
-    # The service publishes no area attribute, so it is derived from the geometry. The data is in
-    # degrees, so post_migrate reprojects to an equal-area CRS and the result is already in m².
-    area_is_in_ha = False
-    area_calculate_missing = True
+    # The service publishes no area attribute, so metrics:area is measured from the geometry.
 
     columns = {
         "geometry": "geometry",
         "identifier": "id",
         "flik": "flik",  # derived in migrate(); NOT the id, one field block can hold several parcels
-        "area": "metrics:area",  # not in the source; created by area_calculate_missing
         "name": "name",
     }
     missing_schemas = {"properties": {"name": {"type": "string"}}}

@@ -72,7 +72,6 @@ Each edition is the campaign the Rural Support Service published it for, taken f
     }
     # The files are in LKS-92 / Latvia TM, so shape_area is already in square metres.
     area_is_in_ha = False
-    area_calculate_missing = True
 
     def get_urls(self):
         response = requests.get(CKAN, params={"q": f'"{SEARCH}"', "rows": 100}, timeout=60)

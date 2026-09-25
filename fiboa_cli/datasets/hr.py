@@ -94,7 +94,6 @@ and supporting sustainable land use practices.
     }
 
     area_is_in_ha = False
-    area_calculate_missing = True
 
     ARCHIVE_CRS = "EPSG:3765"
 
