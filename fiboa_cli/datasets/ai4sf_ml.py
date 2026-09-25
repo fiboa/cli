@@ -3,7 +3,6 @@ from .commons.ml_splits import MlSplitsMixin
 
 
 class Ai4SfMlConverter(MlSplitsMixin, Ai4SfConverter):
-
     def migrate(self, gdf):
         # Download file with splits
         urls = {

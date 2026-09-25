@@ -80,7 +80,7 @@ class ImproveData(Base):
         # Simplest way to reuse functionality from AddHCATMixin
         class HCAT(AddHCATMixin, FiboaBaseConverter):
             columns = {"crop:code": "crop:code"}
-            ec_mapping_csv = None if is_url else _mapping_file
+            hcat_mapping_csv = None if is_url else _mapping_file
             mapping_file = _mapping_file if is_url else None
 
         for schemas in collection["schemas"].values():

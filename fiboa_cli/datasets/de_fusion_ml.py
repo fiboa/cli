@@ -1,9 +1,8 @@
-from .de_fusion import DeFusionConverter
 from .commons.ml_splits import MlSplitsMixin
+from .de_fusion import DeFusionConverter
 
 
 class DeFusionMlConverter(MlSplitsMixin, DeFusionConverter):
-
     def file_migration(self, gdf, path, uri, layer=None):
         # Train file contains "2018", test file contains "2019".
         gdf["split"] = "train" if "2018" in path else "test"

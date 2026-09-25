@@ -39,7 +39,7 @@ class IEConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # declared more than once — 214 of the 1,027,438 rows of 2022, one of them
     # four times — so the feature id, which the GML guarantees unique, is the id.
     missing_schemas = {"properties": {"parcel_id": {"type": "string"}}}
-    ec_mapping_csv = "https://fiboa.org/code/ie/ie.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/ie/ie.csv"
 
     column_migrations = {
         "observationDate": lambda col: col.str.replace("+01:00", "T00:00:00Z"),

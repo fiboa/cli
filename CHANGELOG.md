@@ -10,8 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Added `FiboaDuckDBBaseConverter` for SQL-based conversion of large Parquet sources.
 - Added `PerFileBaseConverter` to process multi-file sources incrementally.
-- Added support for supplementary HCAT/crop mappings via `ec_mapping_supplements`.
+- Added support for supplementary HCAT/crop mappings via `hcat_mapping_supplements`.
 - Added support for Esri JSON output and server-side filters in REST converters.
+- Added `WFSConverterMixin` for paged downloads from WFS layers.
 - Added a test guard that rejects fixture files larger than 5 MB.
 - Added ML variants of converters (`ai4sf_ml`, `de_fusion_ml`, `india_10k_ml`, `rw_rwanda_ml`, `za_fusion_ml`) that publish each field's train/val/test split.
 - AT: Added support for 2018 by extracting archives before reading.
@@ -41,6 +42,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Converters no longer split multi-part geometries into one row per polygon: fields keep the geometry modeling of the source (Polygon or MultiPolygon), the source-published area and perimeter, and one id per source feature. Use `fiboa improve --explode-geometries` when single polygons are needed.
 - Converters whose variants are years (1900-2100) now fill `determination:datetime` from the selected year unless they provide a determination date themselves.
 - Converters now publish `metrics:area` by default (`area_calculate_missing = True`, #277): measured from the geometry for every row if the source has no area, and for the rows where it is empty or 0 otherwise. Set `area_calculate_missing = False` to opt out.
+- Renamed the HCAT mapping attributes of `AddHCATMixin`, as they work with any HCAT mapping, not only EuroCrops: the `ec_mapping*` attributes use the `hcat_mapping*` prefix now. The helpers `load_ec_mapping()` and `ec_url()` are now `load_hcat_mapping()` and `hcat_mapping_url()` in `fiboa_cli.datasets.commons.hcat`; the copies in `fiboa_cli.datasets.commons.ec` were removed.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.

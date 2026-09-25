@@ -3,8 +3,7 @@ from loguru import logger
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import load_ec_mapping
-from .commons.hcat import AddHCATMixin
+from .commons.hcat import AddHCATMixin, load_hcat_mapping
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
@@ -49,7 +48,7 @@ CSB represents non-confidential single crop field boundaries over a set time fra
             "administrative_area_level_2_code": {"type": "string"},
         }
     }
-    ec_mapping_csv = "https://fiboa.org/code/us/usda/cropland.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/us/usda/cropland.csv"
 
     def migrate(self, gdf):
         """
@@ -77,10 +76,10 @@ CSB represents non-confidential single crop field boundaries over a set time fra
             gdfs.append(df)
         gdf = pd.concat(gdfs)
         del gdfs
-        if self.ec_mapping is None:
-            self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+        if self.hcat_mapping is None:
+            self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
         original_name_mapping = {
-            int(e["original_code"]): e["original_name"] for e in self.ec_mapping
+            int(e["original_code"]): e["original_name"] for e in self.hcat_mapping
         }
         gdf["crop:name"] = gdf[crop_key].map(original_name_mapping)
 

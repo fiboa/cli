@@ -2,6 +2,7 @@ import json
 import re
 import sys
 from csv import DictReader
+from os.path import exists
 from unittest.mock import patch
 
 import pyarrow.parquet as pq
@@ -9,6 +10,7 @@ from loguru import logger
 from pytest import mark
 
 from fiboa_cli.convert import ConvertData
+from fiboa_cli.datasets.commons.hcat import load_hcat_mapping
 from fiboa_cli.validate import ValidateData
 
 """
@@ -205,20 +207,22 @@ expected_columns = {
 
 
 @mark.parametrize("converter", tests)
-@patch("fiboa_cli.datasets.commons.ec.load_ec_mapping")
-def test_converter(load_ec_mock, capsys, tmp_parquet_file, converter):
+@patch("fiboa_cli.datasets.commons.hcat.load_hcat_mapping")
+def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
     from fiboa_cli import Registry  # noqa
 
     # "<id>#<label>" runs a second edition of <id>, from the same folder of input files
     converter_id = converter.split("#")[0]
 
-    def load_ec(csv_file=None, url=None):
-        if csv_file and "://" in csv_file:
-            csv_file = csv_file.split("/")[-1]
-        path = url if url and "://" not in url else f"{test_path}/{converter_id}/{csv_file}"
+    def load_mapping(csv_file=None, url=None):
+        file_name = csv_file.split("/")[-1] if csv_file else None
+        path = url if url and "://" not in url else f"{test_path}/{converter_id}/{file_name}"
+        if not exists(path):
+            # no fixture for this mapping (yet), so load the published one
+            return load_hcat_mapping(csv_file, url=url)
         return list(DictReader(open(path, "r", encoding="utf-8")))
 
-    load_ec_mock.side_effect = load_ec
+    load_mapping_mock.side_effect = load_mapping
     logger.remove()
     logger.add(sys.stdout, format="{message}", level="DEBUG", colorize=False)
 

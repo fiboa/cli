@@ -44,7 +44,7 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
     license = "The Open Information Use License - Catalonia <https://administraciodigital.gencat.cat/ca/dades/dades-obertes/informacio-practica/llicencies/>"
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     # the same table as the bundled es_cat.csv, with HCAT; the mixin publishes it as crop:code_list
-    ec_mapping_csv = "https://fiboa.org/code/es/cat/crop.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/es/cat/crop.csv"
     columns = {
         "geometry": "geometry",
         "campanya": "determination:datetime",
@@ -57,7 +57,6 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
     column_migrations = {
         "campanya": lambda col: pd.to_datetime(col, format="%Y"),
     }
-
 
     def layer_filter(self, layer, uri):
         return "cultius" in layer.lower()

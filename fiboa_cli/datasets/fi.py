@@ -44,7 +44,7 @@ A set called "Agricultural land: arable land, permanent grassland or permanent c
     id_columns = ("PERUSLOHKOTUNNUS", "LOHKONUMERO")
     id_separator = ":"
 
-    ec_mapping_csv = "https://fiboa.org/code/fi/fi_2023.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/fi/fi_2023.csv"
 
     area_is_in_ha = False
 

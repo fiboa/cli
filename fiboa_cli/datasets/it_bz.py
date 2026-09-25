@@ -1,19 +1,13 @@
-import re
-from urllib.parse import urlencode
-
 import pandas as pd
-import requests
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
+from ..conversion.converter_wfs import WFSConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 
 BASE_URL = "https://geoservices6.civis.bz.it/geoserver/p_bz-Agriculture/ows"
-LAYER = "p_bz-Agriculture:Fields-Used"
-# The service caps a response at 110000 features; 50000 stays well inside that.
-PAGE_SIZE = 50_000
 
 
-class ITBZConverter(AdminConverterMixin, FiboaBaseConverter):
+class ITBZConverter(AdminConverterMixin, WFSConverterMixin, FiboaBaseConverter):
     id = "it_bz"
     admin_subdivision_code = "BZ"
     short_name = "Italy, South Tyrol"
@@ -32,6 +26,12 @@ type rather than one farmer's application parcel. The source carries no farm or 
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     column_additions = {"crop:code_list": "https://fiboa.org/code/it/bz/crop.csv"}
 
+    wfs_url = BASE_URL
+    wfs_params = {"typeNames": "p_bz-Agriculture:Fields-Used", "outputFormat": "application/json"}
+    # The service caps a response at 110000 features; 50000 stays well inside that.
+    wfs_page_size = 50_000
+    wfs_extension = "json"
+
     columns = {
         "geometry": "geometry",
         "ID": "id",
@@ -46,26 +46,6 @@ type rather than one farmer's application parcel. The source carries no farm or 
     column_migrations = {
         "BEGIN_DATE": lambda col: pd.to_datetime(col, format="%Y-%m-%dZ", utc=True),
     }
-
-    def get_urls(self):
-        params = {
-            "service": "WFS",
-            "version": "2.0.0",
-            "request": "GetFeature",
-            "typeNames": LAYER,
-            "outputFormat": "application/json",
-        }
-        # Derive the page count from the server instead of hardcoding it, so a changed layer
-        # neither drops the tail nor requests empty pages.
-        hits = requests.get(BASE_URL, params={**params, "resultType": "hits"})
-        hits.raise_for_status()
-        total = int(re.search(r'numberMatched="(\d+)"', hits.text).group(1))
-
-        query = urlencode({**params, "count": PAGE_SIZE})
-        return {
-            f"{BASE_URL}?{query}&startIndex={start}": f"it_bz_{start}.json"
-            for start in range(0, total, PAGE_SIZE)
-        }
 
     def file_migration(self, gdf, path, uri, layer=None):
         # read_geojson hardcodes crs="EPSG:4326"; the service delivers EPSG:25832.
