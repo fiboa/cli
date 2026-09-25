@@ -17,6 +17,17 @@ Create input files with: `ogr2ogr output.gpkg -limit 100 input.gpkg`
 Optionally use `-lco ENCODING=UTF-8` if you have character encoding issues.
 """
 
+# PT editions besides the default one, 2023
+PT_EDITIONS = ("2025", "2022", "2021", "2020", "2019", "2018", "2017")
+PT_COLUMNS = (
+    "determination:datetime",
+    "metrics:area",
+    "metrics:perimeter",
+    "crop:code",
+    "block_id",
+    "id",
+)
+
 tests = [
     "at",
     "at_block",
@@ -37,13 +48,7 @@ tests = [
     "nl",
     "nl_block",
     "pt",
-    "pt#2025",
-    "pt#2022",
-    "pt#2021",
-    "pt#2020",
-    "pt#2019",
-    "pt#2018",
-    "pt#2017",
+    *(f"pt#{year}" for year in PT_EDITIONS),
     "dk",
     "dk#2008",
     "be_wal",
@@ -107,13 +112,7 @@ extra_convert_parameters = {
     "nl": {"variant": "2023"},
     "dk#2008": {"variant": "2008"},
     "pt": {"variant": "2023"},
-    "pt#2025": {"variant": "2025"},
-    "pt#2022": {"variant": "2022"},
-    "pt#2019": {"variant": "2019"},
-    "pt#2018": {"variant": "2018"},
-    "pt#2017": {"variant": "2017"},
-    "pt#2021": {"variant": "2021"},
-    "pt#2020": {"variant": "2020"},
+    **{f"pt#{year}": {"variant": year} for year in PT_EDITIONS},
     # the fixture archive holds the 2024 edition only; the published one holds both
     "lt": {"variant": "2024"},
     # the fixture is the 2023 file; the converter's default is the newest edition
@@ -217,74 +216,11 @@ expected_columns = {
     # derived from the archive date in file_migration()
     "pl_block": ("determination:datetime",),
     # only 2017-2019 and 2023 publish a crop name
-    "pt": (
-        "determination:datetime",
-        "metrics:area",
-        "metrics:perimeter",
-        "crop:code",
-        "crop:name",
-        "block_id",
-        "id",
-    ),
-    "pt#2025": (
-        "determination:datetime",
-        "metrics:area",
-        "metrics:perimeter",
-        "crop:code",
-        "block_id",
-        "id",
-    ),
-    "pt#2022": (
-        "determination:datetime",
-        "metrics:area",
-        "metrics:perimeter",
-        "crop:code",
-        "block_id",
-        "id",
-    ),
-    "pt#2021": (
-        "determination:datetime",
-        "metrics:area",
-        "metrics:perimeter",
-        "crop:code",
-        "block_id",
-        "id",
-    ),
-    "pt#2020": (
-        "determination:datetime",
-        "metrics:area",
-        "metrics:perimeter",
-        "crop:code",
-        "block_id",
-        "id",
-    ),
-    "pt#2019": (
-        "determination:datetime",
-        "metrics:area",
-        "metrics:perimeter",
-        "crop:code",
-        "crop:name",
-        "block_id",
-        "id",
-    ),
-    "pt#2018": (
-        "determination:datetime",
-        "metrics:area",
-        "metrics:perimeter",
-        "crop:code",
-        "crop:name",
-        "block_id",
-        "id",
-    ),
-    "pt#2017": (
-        "determination:datetime",
-        "metrics:area",
-        "metrics:perimeter",
-        "crop:code",
-        "crop:name",
-        "block_id",
-        "id",
-    ),
+    "pt": (*PT_COLUMNS, "crop:name"),
+    **{
+        f"pt#{year}": (*PT_COLUMNS, "crop:name") if year <= "2019" else PT_COLUMNS
+        for year in PT_EDITIONS
+    },
 }
 
 # Mapping loaders to patch besides commons.ec, e.g. where a converter imports one by name
