@@ -76,7 +76,7 @@ Lupina biela,White lupine,sweet_lupins,3301020700,sweet_lupins,3301020700
 Repa obyčajná cviklová (Cvikla),Beetroot (Beetroot),beetroot_beets,3301290200,beetroot_beets,3301290200
 Ďatelina hybridná,Hybrid clover,clover,3301090303,clover,3301090303
 Rajčiak jedlý,Edible tomato,tomato,3301280000,tomato,3301280000
-Petržlen záhradný,Garden parsley,parsley,3301061227,parsley,3301061227
+Petržlen záhradný,Garden parsley,parsly,3301061227,parsly,3301061227
 Čerešňa vtáčia,Bird cherry,cherry_cherries,3303010400,cherry_cherries,3303010400
 Cibuľa (zimná),Scallion,scallion,3301220500,onions,3301220400
 Repa kŕmna,Fodder beet,mangelwurzel_fodder_beet,3301290400,mangelwurzel_fodder_beet,3301290400
@@ -202,7 +202,7 @@ Vinohrad v reštrukturalizácii,Vineyard under restructuring,vineyards_wine_vine
 Ostatná manipulačná plocha,Other handling area,not_known_and_other,3399000000,not_known_and_other,3399000000
 Strukovinovo-obilná miešanka,Legume-cereal mixture,other_arable_land_crops,3301990000,other_arable_land_crops,3301990000
 Olejninovo-obilná miešanka,Oilseed-cereal mixture,other_arable_land_crops,3301990000,other_arable_land_crops,3301990000
-Cuketa,Zucchini,zucchini_courgette,3301140200,zucchini_courgette,3301140200
+Cuketa,Zucchini,zucchini_courgette,3301140600,zucchini_courgette,3301140600
 Cirok s podsevom,Sorghum with undersowing,millet_sorghum,3301010900,millet_sorghum,3301010900
 Pamajorán obyčajný (oregano),Oregano,aromatic_medicinal_culinary_plants_spices_herbs,3301061200,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
 Šalvia muškátová,Clary sage,aromatic_medicinal_culinary_plants_spices_herbs,3301061200,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
@@ -306,8 +306,8 @@ Bedrovník anízový,Anise,anise_aniseed,3301061205,anise_aniseed,3301061205
 Šalvia,Sage,sage_chia,3301190000,sage_chia,3301190000
 Borák lekársky,Borage,borage,3301061209,borage,3301061209
 Yzop lekársky,Hyssop,other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299,other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299
-Petržlen,Parsley,parsley,3301061227,parsley,3301061227
-Petržlen vňaťový kučeravý,Curly leaf parsley,parsley,3301061227,parsley,3301061227
+Petržlen,Parsley,parsly,3301061227,parsly,3301061227
+Petržlen vňaťový kučeravý,Curly leaf parsley,parsly,3301061227,parsly,3301061227
 Kapucínka väčšia,Garden nasturtium,nasturtiums,3301061224,nasturtiums,3301061224
 Chren dedinský,Horseradish,horseradish,3301210400,horseradish,3301210400
 Povojník purpurový (batát),Sweet potato,sweet_potatoes,3301040000,sweet_potatoes,3301040000
