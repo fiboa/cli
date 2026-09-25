@@ -86,6 +86,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Downloaded data cached for one dataset, edition or service is no longer served for another. Previously cached downloads are fetched again once.
   - Error responses and interrupted downloads are no longer cached.
   - Layers that join several tables (some ES-CB and ES-IB editions) are now filtered and paged correctly, and their column names no longer carry table prefixes.
+  - Service metadata and every page are now retried when the service fails (a 5xx error, a timeout or a dropped connection), instead of one failure ending the run. Requests the service rejects (4xx) are not retried.
+  - Requests time out after 3 minutes, so a hung connection is retried instead of blocking the run.
+  - A cached page that cannot be read is fetched again instead of ending the run.
+  - The key field of a joined layer is read from the layer's metadata, which ES-IB answers where it refuses a query.
 - Fixed `use_variant_as_determination` so determination dates are retained.
 - `metrics:area` measured from the geometry is now correct in CRSs that are in metres but not equal-area, such as Web Mercator: they are reprojected to an equal-area CRS first. Source areas in hectares are converted to m² also where missing values are filled in, and empty values are filled in, not only 0. Invalid geometries are repaired before they are measured, as they are for the output, so that e.g. a self-intersecting polygon no longer gets an area of 0.
 - Converters no longer publish duplicate `id`s (#282): row-numbered ids count over all source files instead of restarting per file, and ids the source repeats get a `~<n>` suffix.
