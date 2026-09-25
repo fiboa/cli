@@ -3,7 +3,7 @@ import re
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin, load_hcat_mapping
+from .commons.hcat import AddHCATMixin
 
 BASE = "https://data.slovensko.sk/download?id={}&blocksize=0"
 # "Hranice užívania <year> shp" on data.slovensko.sk; 2016 and 2017 are 7-Zip archives.
@@ -50,6 +50,10 @@ Dataset Hranice užívania contains the use declared by applicants for direct su
     }
     # 2018 names the block and area columns differently; up to 2021 and in 2025 the crop is PLODINA_NA.
     OLD_SCHEMA = {"KDIEL": "KODKD", "VYMERA_KD": "VYMERA", "PLODINA_NA": "PLODINA"}
+    column_migrations = {
+        # The register writes a no-break space in the grassland names, the crop table does not.
+        "PLODINA": lambda col: col.map(normalize),
+    }
     missing_schemas = {
         "properties": {
             "block_id": {"type": "string"},
@@ -59,17 +63,16 @@ Dataset Hranice užívania contains the use declared by applicants for direct su
     }
 
     def migrate(self, gdf):
-        gdf = gdf.rename(columns={k: v for k, v in self.OLD_SCHEMA.items() if k in gdf.columns})
-        if self.hcat_mapping is None:
-            self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
-            for row in self.hcat_mapping:
-                row["original_name"] = self._normalize(row["original_name"])
-        # The register writes a no-break space in the grassland names, the crop table does not.
-        gdf["PLODINA"] = gdf["PLODINA"].map(self._normalize)
-        return super().migrate(gdf)
+        return super().migrate(gdf.rename(columns=self.OLD_SCHEMA))
 
-    @staticmethod
-    def _normalize(value: object) -> object:
-        if not isinstance(value, str):
-            return value
-        return re.sub(r"\s+", " ", value.replace("\xa0", " ")).strip()
+    def get_hcat_mapping(self):
+        mapping = super().get_hcat_mapping()
+        for row in mapping:
+            row["original_name"] = normalize(row["original_name"])
+        return mapping
+
+
+def normalize(value: object) -> object:
+    if not isinstance(value, str):
+        return value
+    return re.sub(r"\s+", " ", value.replace("\xa0", " ")).strip()
