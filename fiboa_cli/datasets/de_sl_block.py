@@ -53,8 +53,12 @@ published separately.
         "geometry": "geometry",
         "flik": "flik",  # derived in migrate(); the block reference
         "id": "id",  # the flik, plus a part number where a block is several polygons
-        "area_type": "crop:code",  # added in file_migration(), trimmed in migrate()
+        "area_type": "crop:code",  # added in file_migration()
         "area": "metrics:area",  # derived in migrate(); in hectares
+    }
+    column_migrations = {
+        # …/codelist/de.iacs/AgriculturalAreaTypeValue/GL -> GL
+        "area_type": lambda col: col.str.rsplit("/", n=1).str[-1],
     }
 
     def file_migration(self, gdf, path, uri, layer=None):
@@ -77,8 +81,6 @@ published separately.
         # "Size in ha: 0.11206, flik: DESLLI0000248744"
         gdf["flik"] = gdf["description"].apply(parse_flik)
         gdf["area"] = gdf["description"].apply(parse_size)
-        # …/codelist/de.iacs/AgriculturalAreaTypeValue/GL -> GL
-        gdf["area_type"] = gdf["area_type"].str.rsplit("/", n=1).str[-1]
 
         # the source publishes several land cover records for one block, each with its own
         # polygon, so the flik alone does not identify a row; the base numbers the repeats

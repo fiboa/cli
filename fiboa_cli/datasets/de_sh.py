@@ -57,10 +57,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     }
 
     def migrate(self, gdf):
-        renames = {old: new for old, new in self.COLUMN_RENAMES.items() if old in gdf.columns}
-        if renames:
-            gdf = gdf.rename(columns=renames)
-        return super().migrate(gdf)
+        return super().migrate(gdf.rename(columns=self.COLUMN_RENAMES))
 
     columns = {
         "geometry": "geometry",

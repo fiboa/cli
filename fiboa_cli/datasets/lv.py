@@ -110,7 +110,7 @@ Each edition is the campaign the Rural Support Service published it for, taken f
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
         # The files carry the code without a name; the code list has it.
-        names = {row["original_code"].strip(): row["original_name"] for row in self.hcat_mapping}
+        names = self.hcat_lookup("original_code", "original_name", strip=True)
         gdf["crop:name"] = self.get_code_column(gdf).str.strip().map(names)
         return gdf
 

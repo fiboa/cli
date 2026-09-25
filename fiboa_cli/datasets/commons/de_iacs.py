@@ -32,9 +32,10 @@ class DEIACSMixin:
 
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
-        # Look up the source attribute that the converter mapped to crop:code, the same way
-        # AddHCATMixin.get_code_column does. Columns are still source-named at this point.
-        attribute = next(k for k, v in self.columns.items() if v == "crop:code")
+        # Columns are still source-named at this point
+        attribute = self._source_column("crop:code", self.get_columns(gdf))
+        if attribute is None:
+            return gdf
         rows = read_data_csv(CODE_LIST_FILE)
         codes = gdf[attribute]
         gdf["crop:name"] = codes.map({r["original_code"]: r["original_name"] for r in rows})

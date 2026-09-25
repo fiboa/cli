@@ -2,7 +2,7 @@ import geopandas as gpd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin, load_hcat_mapping
+from .commons.hcat import AddHCATMixin
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
@@ -33,9 +33,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
 
     def migrate(self, gdf: gpd.GeoDataFrame):
         gdf = super().migrate(gdf)
-        self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
-        gdf = gdf[gdf["bewirtschaftung"].isin([row["original_code"] for row in self.hcat_mapping])]
-
-        mapping_crop = {row["original_code"]: row["original_name"] for row in self.hcat_mapping}
-        gdf["crop:name"] = gdf["bewirtschaftung"].map(mapping_crop)
+        names = self.hcat_lookup("original_code", "original_name")
+        gdf = gdf[gdf["bewirtschaftung"].isin(names)]
+        gdf["crop:name"] = gdf["bewirtschaftung"].map(names)
         return gdf

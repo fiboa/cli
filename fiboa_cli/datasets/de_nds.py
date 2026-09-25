@@ -52,14 +52,12 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     }
     column_migrations = {"ANTRAGSJAH": lambda col: pd.to_datetime(col, format="%Y")}
 
-    def migrate(self, gdf):
+    def get_columns(self, gdf):
+        columns = super().get_columns(gdf)
+        # older editions name the crop code and the area differently
         if "NC_FESTG" not in gdf.columns:
-            code = {"KULTURARTF", "KULTURCODE", "KC_FESTG"} & set(gdf.columns)
-            del self.columns["NC_FESTG"]
-            self.columns[code.pop()] = "crop:code"
-
+            code = next(c for c in ("KULTURARTF", "KULTURCODE", "KC_FESTG") if c in gdf.columns)
+            columns[code] = columns.pop("NC_FESTG")
         if "AKTUELLEFL" not in gdf.columns:
-            del self.columns["AKTUELLEFL"]
-            self.columns["AKT_FL"] = "metrics:area"
-
-        return super().migrate(gdf)
+            columns["AKT_FL"] = columns.pop("AKTUELLEFL")
+        return columns

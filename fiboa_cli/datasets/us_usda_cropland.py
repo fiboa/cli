@@ -3,7 +3,7 @@ from loguru import logger
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin, load_hcat_mapping
+from .commons.hcat import AddHCATMixin
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
@@ -37,7 +37,7 @@ CSB represents non-confidential single crop field boundaries over a set time fra
     # so it does hold for every field the group produces.
     columns = {
         "geometry": "geometry",
-        # "CDL2023": "crop:code", will be added in migrate
+        # "CDL<variant>": "crop:code", added in get_columns()
         "crop:name": "crop:name",
         "CNTY": "administrative_area_level_2",
         "CNTYFIPS": "administrative_area_level_2_code",
@@ -59,10 +59,7 @@ CSB represents non-confidential single crop field boundaries over a set time fra
         geodataframe.Dissolve(method="unary") is **slow** for large datasets
         So we're handling this huge dataset in blocks, states are a natural grouping-method
         """
-        assert self.variant, "Variant must be set"
-        crop_key = f"CDL{self.variant}"
-        self.columns[crop_key] = "crop:code"
-
+        crop_key = self.crop_key()
         gdf = super().migrate(gdf)
         states = list(gdf["STATEFIPS"].unique())
         gdfs = []
@@ -76,12 +73,15 @@ CSB represents non-confidential single crop field boundaries over a set time fra
             gdfs.append(df)
         gdf = pd.concat(gdfs)
         del gdfs
-        if self.hcat_mapping is None:
-            self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
-        original_name_mapping = {
-            int(e["original_code"]): e["original_name"] for e in self.hcat_mapping
-        }
-        gdf["crop:name"] = gdf[crop_key].map(original_name_mapping)
+        names = self.hcat_lookup("original_code", "original_name")
+        gdf["crop:name"] = gdf[crop_key].map({int(k): v for k, v in names.items()})
 
         # nothing from the source identifies the dissolved fields; the base numbers them
         return gdf
+
+    def crop_key(self):
+        assert self.variant, "Variant must be set"
+        return f"CDL{self.variant}"
+
+    def get_columns(self, gdf):
+        return super().get_columns(gdf) | {self.crop_key(): "crop:code"}

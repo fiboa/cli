@@ -62,12 +62,8 @@ To produce the DGK-Lw, (official) orthophotos from the Thuringian Land Registry 
             {"Geaendert": True, "Unveraendert": False, "Neu": None}
         ),
         "FBI_VJ": lambda column: column.str.split(Converter.delim, regex=True),
+        "GEO_UPDAT": lambda column: pd.to_datetime(column, format="%d.%m.%Y", utc=True),
     }
-
-    def migrate(self, gdf):
-        col = "GEO_UPDAT"
-        gdf[col] = pd.to_datetime(gdf[col], format="%d.%m.%Y", utc=True)
-        return super().migrate(gdf)
 
     column_filters = {"LF": lambda col: col == "LF"}
 

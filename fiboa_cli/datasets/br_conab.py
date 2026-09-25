@@ -1,7 +1,6 @@
 import math
 from pathlib import Path
 
-import numpy as np
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
@@ -89,8 +88,7 @@ Further information or suggestions can be sent to the email address conab.geote@
 
     def migrate(self, gdf):
         gdf = gdf.reset_index(drop=True)
-        gdf["area_ha"].combine_first(gdf["Hectares"]).replace(np.nan, None, inplace=True)
-        gdf.loc[gdf["area_ha"] == 0, "area_ha"] = None
+        gdf["area_ha"] = gdf["area_ha"].combine_first(gdf["Hectares"])
         gdf["cd_mun"] = gdf["cd_mun"].combine_first(gdf["CD_MUN"]).apply(fformat)
         gdf["nm_mun"] = gdf["nm_mun"].combine_first(gdf["NM_MUN"]).combine_first(gdf["NM_MUNIC"])
         return super().migrate(gdf)
