@@ -98,6 +98,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - DK:
   - IDs are now derived from `Journalnr` and `Marknr` together (or the row number in editions without either), because `Marknr` alone repeats across holdings.
   - Missing crop codes are kept empty instead of being filled with the undefined code 0.
+- EC-BE-VLG: Converting no longer fails on the variants inherited from BE-VLG.
 - EC-EE: Fixed shapefile naming and year-column migration.
 - EC-FR: Added the missing 2018 RPG campaign from EuroCrops.
 - EC-LT:
@@ -107,6 +108,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - EC-SI: Relaxed requirements to match fields present in source data.
 - EE: Published valid crop code, land-use class and stable parcel identifier; cache files are now campaign-specific.
 - ES:
+  - ES now maps crops to HCAT, and `crop:code_list` points to a code list that exists.
   - ES-AN now uses the correct land-use column and campaign-based determination date.
   - ES-CAT and ES-CN now map crop codes to HCAT with the extended mapping table.
   - ES-CB now derives determination date from the campaign.
@@ -122,6 +124,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Crop codes introduced after the 2018 EuroCrops table (for example JAC, the most common code of 2024) now map to HCAT; 7.50% of the 2024 fields were unmapped before.
   - `id` is the RPG parcel id plus a part number where it repeats (multipart splits, reissued ids); the source value is kept as `parcel_id`.
 - IE: Uses stable feature IDs and publishes computed `metrics:area` when missing from source.
+- IE-LPIS: The HCAT mapping is read again; it still used the attribute name from before the rename.
 - JP: Uses campaign-specific determination dates and DuckDB conversion path.
 - LT: Updated to Europe-LAND v1.3 with 2025 coverage.
 - SK: Fixed edition selection, crop-name matching and block/id handling across campaigns.

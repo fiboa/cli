@@ -4,9 +4,10 @@ import requests
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.hcat import AddHCATMixin
 
 
-class Converter(FiboaBaseConverter):
+class Converter(AddHCATMixin, FiboaBaseConverter):
     id = "es"
     short_name = "Spain"
     title = "Spain Declared Crops (Cultivos Declarados SIGPAC)"
@@ -24,6 +25,9 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
     license = "CC-BY-4.0"
 
     variants = {"2025": "2025"}
+
+    # FEGA declared-crop codes (PARC_PRODUCTO) to HCAT; the mixin also publishes it as crop:code_list
+    hcat_mapping_csv = "https://fiboa.org/code/es/es.csv"
 
     columns = {
         "geometry": "geometry",
@@ -45,14 +49,11 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
 
     column_additions = {
         "admin:country_code": "ES",
-        # FEGA declared-crop codelist (PARC_PRODUCTO) — separate from the SIGPAC land-use list.
-        # Reference list shipped inside each provincial GPKG as the `cod_producto` layer.
-        "crop:code_list": "https://fiboa.org/code/es/cultivos_declarados/parc_producto.csv",
     }
 
     column_migrations = {
-        # crop:code must be a string per the crop extension; parc_producto is an integer.
-        "parc_producto": lambda col: col.astype("Int64").astype(str),
+        # crop:code must be a string per the crop extension; 0 is "unknown product" in the code list
+        "parc_producto": lambda col: col.astype("Int64").fillna(0).astype(str),
         # admin_*_code are strings; zero-pad province to 2 digits (INE convention).
         "provincia": lambda col: col.astype("Int64").astype(str).str.zfill(2),
         "municipio": lambda col: col.astype("Int64").astype(str),
