@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added `PerFileBaseConverter` to process multi-file sources incrementally.
 - Added support for supplementary HCAT/crop mappings via `hcat_mapping_supplements`.
 - Added support for Esri JSON output and server-side filters in REST converters.
+- Added `WFSConverterMixin` for paged downloads from WFS layers.
 - Added a test guard that rejects fixture files larger than 5 MB.
 - Added ML variants of converters (`ai4sf_ml`, `de_fusion_ml`, `india_10k_ml`, `rw_rwanda_ml`, `za_fusion_ml`) that publish each field's train/val/test split.
 - AT: Added support for 2018 by extracting archives before reading.
@@ -22,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - DE-SL-BLOCK: Added Saarland field-block converter.
 - DE-ST: Added Saxony-Anhalt field-block converter.
 - ES: Added Spain-wide converter based on FEGA 2025+.
+- IE: Added `ie_lpis` with DAFM's Anonymous LPIS parcels for 2017-2022 and 2025
 - IT-1: Added Tuscany converter based on EuroCrops v2.
 - IT-BZ: Added South Tyrol converter.
 - LT-KZS: Added Lithuania KŽS reference parcels converter.

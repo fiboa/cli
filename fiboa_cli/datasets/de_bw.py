@@ -1,10 +1,7 @@
-import re
-from urllib.parse import urlencode
-
 import pandas as pd
-import requests
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
+from ..conversion.converter_wfs import WFSConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.de_iacs import DEIACSMixin
 
@@ -17,7 +14,7 @@ FARMLAND = "Bodenbedeckung IN ('Ackerland','Grünland','Dauerkultur')"
 AREA_TYPES = {"Ackerland": "AL", "Grünland": "GL", "Dauerkultur": "DK"}
 
 
-class DEBWConverter(AdminConverterMixin, DEIACSMixin, FiboaBaseConverter):
+class DEBWConverter(AdminConverterMixin, DEIACSMixin, WFSConverterMixin, FiboaBaseConverter):
     id = "de_bw"
     admin_subdivision_code = "BW"
     short_name = "Germany, Baden-Württemberg"
@@ -41,7 +38,9 @@ geometric area of the polygon.
     # One variant per published year, newest first -> 2022 is the default.
     variants = {str(year): str(year) for year in range(2022, 2017, -1)}
 
-    page_size = 50_000
+    wfs_url = BASE_URL
+    wfs_page_size = 50_000
+    wfs_extension = "json"
 
     columns = {
         "geometry": "geometry",
@@ -53,27 +52,13 @@ geometric area of the polygon.
     }
     column_migrations = {"Antragsjahr": lambda col: pd.to_datetime(col, format="%Y")}
 
-    def get_urls(self):
-        params = {
-            "service": "WFS",
-            "version": "2.0.0",
-            "request": "GetFeature",
+    def get_wfs_params(self):
+        return {
             "typeNames": f"lw:v_gisela_landw_parzellen_{self.variant}",
             "outputFormat": "application/json",
             "cql_filter": FARMLAND,
             # NO srsName: the server rounds to 4 decimals in the output CRS, so asking
             # for degrees would quantise coordinates to ~10 m. Fetch native, relabel below.
-        }
-
-        # One cheap request so the page list is derived from the server, not hardcoded.
-        hits = requests.get(BASE_URL, params={**params, "resultType": "hits"})
-        hits.raise_for_status()
-        total = int(re.search(r'numberMatched="(\d+)"', hits.text).group(1))
-
-        query = urlencode({**params, "count": self.page_size})
-        return {
-            f"{BASE_URL}?{query}&startIndex={start}": f"de_bw_{self.variant}_{start}.json"
-            for start in range(0, total, self.page_size)
         }
 
     def file_migration(self, gdf, path, uri, layer=None):

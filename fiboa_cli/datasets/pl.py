@@ -1,27 +1,18 @@
 import re
-from urllib.parse import urlencode
 
 import requests
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
+from ..conversion.converter_wfs import WFSConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
 # The workspace endpoint serves every layer; the per-layer endpoints of the large crop layers
 # refuse connections. WFS 2.0 counts the whole layer on every request and times out, 1.1.0 does not.
 WFS = "https://geoportal-w2.arimr.gov.pl/geoserver/gsa_public/wfs"
-PAGE = 50_000  # the server's maximum
-PARAMS = {
-    "service": "WFS",
-    "version": "1.1.0",
-    "request": "GetFeature",
-    "srsName": "EPSG:2180",
-    "outputFormat": "SHAPE-ZIP",
-    "format_options": "CHARSET:UTF-8",  # the default DBF charset loses the Polish letters
-}
 
 
-class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+class Converter(AdminConverterMixin, AddHCATMixin, WFSConverterMixin, FiboaBaseConverter):
     variants = {"2026": "uprawy_rolne_2026", "2025": "uprawy_rolne_2025"}
     id = "pl"
     short_name = "Poland"
@@ -38,6 +29,9 @@ position in the download, since the source carries no parcel identifier.
     # The portal tags the data "Publiczne dane ARIMR" but states no licence
     license = "Publiczne dane ARiMR, no licence stated <https://geoportal.arimr.gov.pl/mapy/apps/sites/#/portal>"
     hcat_mapping_csv = "https://fiboa.org/code/pl/pl.csv"
+    wfs_url = WFS
+    wfs_version = "1.1.0"
+    wfs_page_size = 50_000  # the server's maximum
     open_options = dict(encoding="UTF-8")  # GDAL does not read the .cst GeoServer writes
     columns = {
         "geometry": "geometry",
@@ -56,27 +50,32 @@ position in the download, since the source carries no parcel identifier.
         }
     }
 
-    def get_urls(self):
-        layer = f"gsa_public:{self.variants[self.variant]}"
+    def get_wfs_params(self):
+        return {
+            "typeName": f"gsa_public:{self.variants[self.variant]}",
+            "srsName": "EPSG:2180",
+            "outputFormat": "SHAPE-ZIP",
+            "format_options": "CHARSET:UTF-8",  # the default DBF charset loses the Polish letters
+        }
+
+    def get_wfs_total(self, params):
         # Any GeoJSON response carries the total; a hits request is capped at the page size
         first = requests.get(
-            WFS,
+            self.wfs_url,
             params={
-                **PARAMS,
-                "typeName": layer,
+                **params,
                 "maxFeatures": 1,
                 "propertyName": "pow",
                 "outputFormat": "application/json",
             },
-            timeout=120,
+            timeout=self.wfs_timeout,
         )
         first.raise_for_status()
-        total = first.json()["totalFeatures"]
-        query = urlencode({**PARAMS, "typeName": layer, "maxFeatures": PAGE})
-        return {
-            f"{WFS}?{query}&startIndex={start}": f"pl_{self.variant}_{start:08d}.zip"
-            for start in range(0, total, PAGE)
-        }
+        return first.json()["totalFeatures"]
+
+    def get_wfs_file_name(self, start):
+        # zero-padded, so caches filled before the WFS mixin are still found
+        return f"pl_{self.variant}_{start:08d}.zip"
 
     def file_migration(self, gdf, path, uri, layer=None):
         # The shapefile has no feature id; the pages are contiguous, so number the rows

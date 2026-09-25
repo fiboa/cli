@@ -1,28 +1,15 @@
-import re
-from urllib.parse import urlencode
-
 import pandas as pd
-import requests
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.convert_gml import gml_assure_columns
+from ..conversion.converter_wfs import WFSConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.de_iacs import DEIACSMixin
 
 BASE_URL = "https://gdiserv.bayern.de/srv66381/services/invekos_lpis-wfs"
-PARAMS = {
-    "service": "WFS",
-    "version": "2.0.0",
-    "request": "GetFeature",
-    "typeNames": "lpis:AgriculturalArea",
-    # Without a sort the server pages in an unstable order: pages overlap and others are skipped.
-    "sortBy": "lpis:id",
-}
-# Server-enforced maximum. Larger values are silently capped, so paging must use this number.
-PAGE_SIZE = 10_000
 
 
-class DEBYBlockConverter(AdminConverterMixin, DEIACSMixin, FiboaBaseConverter):
+class DEBYBlockConverter(AdminConverterMixin, DEIACSMixin, WFSConverterMixin, FiboaBaseConverter):
     id = "de_by_block"
     admin_subdivision_code = "BY"
     short_name = "Germany, Bavaria (blocks)"
@@ -43,6 +30,15 @@ year for the application procedure.
 
     extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
 
+    wfs_url = BASE_URL
+    wfs_params = {
+        "typeNames": "lpis:AgriculturalArea",
+        # Without a sort the server pages in an unstable order: pages overlap and others are skipped.
+        "sortBy": "lpis:id",
+    }
+    # Server-enforced maximum. Larger values are silently capped, so paging must use this number.
+    wfs_page_size = 10_000
+
     # The service publishes no area attribute, so it is derived from the geometry. The data is in
     # EPSG:25832, so the result is already in m² and must not be scaled.
     area_is_in_ha = False
@@ -56,19 +52,6 @@ year for the application procedure.
         "area": "metrics:area",  # not in the source; created by area_calculate_missing
     }
     column_migrations = {"validFrom": lambda col: pd.to_datetime(col)}
-
-    def get_urls(self):
-        # numberReturned is always reported as 0 by this server, so the page count has to come
-        # from a hits request rather than from the responses themselves.
-        hits = requests.get(BASE_URL, params={**PARAMS, "resultType": "hits"})
-        hits.raise_for_status()
-        total = int(re.search(r'numberMatched="(\d+)"', hits.text).group(1))
-
-        query = urlencode({**PARAMS, "count": PAGE_SIZE})
-        return {
-            f"{BASE_URL}?{query}&startIndex={start}": f"de_by_block_{start}.gml"
-            for start in range(0, total, PAGE_SIZE)
-        }
 
     def file_migration(self, gdf, path, uri, layer=None):
         # The land cover class is carried as an xlink attribute, which the GML driver does not
