@@ -207,20 +207,39 @@ Inside a Portolan catalog (`portolan init`), for dataset `<id>` and edition `<va
    fiboa convert <id> --variant <variant> -c <cache> -o <id>/<id>-<variant>.parquet
    fiboa validate <id>/<id>-<variant>.parquet
    ```
-2. Seed the collection metadata from the converter (title, description, providers, license, fiboa version),
-   without assets, which Portolan adds itself. Only for a new collection; Portolan keeps these fields afterwards.
+2. Seed the collection metadata from the converter: title, description, providers, license, fiboa version, and the
+   columns with a description for every fiboa property. The columns move to the collection; the assets go, as
+   Portolan adds its own. Only for a new collection; Portolan keeps these fields afterwards.
    ```bash
    fiboa create-stac-collection <id>/<id>-<variant>.parquet -o <id>/stac.json
-   jq 'del(.assets)' <id>/stac.json > <id>/collection.json && rm <id>/stac.json
+   jq '."table:columns" = .assets.data."table:columns" | del(.assets)' <id>/stac.json > <id>/collection.json
+   rm <id>/stac.json
    ```
 3. Add the file with its campaign date, and generate the PMTiles (requires
    [tippecanoe](https://github.com/felt/tippecanoe)):
    ```bash
    portolan add <id> --datetime <variant>-01-01 --pmtiles
    ```
-4. Complete what Portolan asks for, until `portolan check` passes: the provider with the `host` role, a thumbnail
-   (skill `portolan-thumbnails`), and the metadata and README (`portolan metadata init`, `portolan readme`).
-5. Upload: `portolan push <remote> --collection <id>` (skill `sourcecoop` for Source Cooperative).
+4. Describe the dataset from its [data survey](https://github.com/fiboa/data-survey/tree/main/data): usually
+   `<ID>.md` with the id upper-cased and `_` as `-` (`de_nrw` is `DE-NRW.md`), otherwise the country's file
+   (`nl_block` is in `NL.md`).
+   - Run `portolan metadata init <id>` and fill `<id>/.portolan/metadata.yaml`:
+
+     | data survey | metadata.yaml |
+     |---|---|
+     | Data Provider (Legal Entity) | `providers`, role `producer` (and `licensor`) |
+     | Homepage, Data URL | `source_url` |
+     | License | `license`, `license_url` |
+     | Overview and the dataset's section | `description` |
+     | Caveats in the text (coverage, preliminary editions) | `known_issues` |
+     | the fiboa project, publishing this copy | `contact`, and `providers` with role `host` |
+
+   - Describe the dataset's own columns in `<id>/collection.json` (`table:columns[].description`) from the
+     survey's Properties table; the converter's `columns` show which source column each one comes from.
+   - Run `portolan readme <id>`.
+5. Complete what else Portolan asks for until `portolan check` passes, such as a thumbnail (skill
+   `portolan-thumbnails`).
+6. Upload: `portolan push <remote> --collection <id>` (skill `sourcecoop` for Source Cooperative).
 
 ## Development
 
