@@ -1,6 +1,5 @@
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 
-
 CROP_EXTENSION = "https://fiboa.org/crop-extension/v0.2.0/schema.yaml"
 
 
@@ -17,7 +16,9 @@ Field boundaries for Germany from the ESA Fusion Competition dataset.
 Contains crop field polygons labeled with crop type information,
 covering two tiles in the Brandenburg region of Germany.
     """
-    provider = "ESA Fusion Competition via Source Cooperative <https://source.coop/esa/fusion-competition>"
+    provider = (
+        "ESA Fusion Competition via Source Cooperative <https://source.coop/esa/fusion-competition>"
+    )
     attribution = "https://data.source.coop/esa/fusion-competition"
     license = "CC-BY-4.0"
     extensions = {CROP_EXTENSION}

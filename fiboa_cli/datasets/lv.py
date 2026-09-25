@@ -63,7 +63,7 @@ Each edition is the campaign the Rural Support Service published it for, taken f
         }
     }
     # EuroCrops' lv_2021.csv plus the 34 codes the register added since
-    ec_mapping_csv = "https://fiboa.org/code/lv/lv.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/lv/lv.csv"
     column_migrations = {
         "product_code": lambda col: col.astype("string").str.strip(),
         "period_code": lambda col: pd.to_datetime(
@@ -72,7 +72,6 @@ Each edition is the campaign the Rural Support Service published it for, taken f
     }
     # The files are in LKS-92 / Latvia TM, so shape_area is already in square metres.
     area_is_in_ha = False
-    area_calculate_missing = True
 
     def get_urls(self):
         response = requests.get(CKAN, params={"q": f'"{SEARCH}"', "rows": 100}, timeout=60)
@@ -111,7 +110,7 @@ Each edition is the campaign the Rural Support Service published it for, taken f
     def post_migrate(self, gdf):
         gdf = super().post_migrate(gdf)
         # The files carry the code without a name; the code list has it.
-        names = {row["original_code"].strip(): row["original_name"] for row in self.ec_mapping}
+        names = {row["original_code"].strip(): row["original_name"] for row in self.hcat_mapping}
         gdf["crop:name"] = self.get_code_column(gdf).str.strip().map(names)
         return gdf
 

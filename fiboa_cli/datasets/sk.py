@@ -1,7 +1,7 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin, load_ec_mapping
+from .commons.hcat import AddHCATMixin, load_hcat_mapping
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
@@ -26,7 +26,7 @@ Dataset Hranice užívania contains the use declared by applicants for direct su
     """
     provider = "Pôdohospodárska platobná agentúra <https://www.apa.sk>"
     license = "CC0-1.0"  # "Open Data"
-    ec_mapping_csv = "https://fiboa.org/code/sk/sk.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/sk/sk.csv"
     # KODKD is the LPIS block code, shared by several fields and sometimes empty;
     # the row index is the field id and the code is kept as block_id.
     columns = {
@@ -46,8 +46,8 @@ Dataset Hranice užívania contains the use declared by applicants for direct su
     }
 
     def migrate(self, gdf):
-        if self.ec_mapping is None:
-            self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
-        mapping = {row["original_name"]: index + 1 for index, row in enumerate(self.ec_mapping)}
+        if self.hcat_mapping is None:
+            self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
+        mapping = {row["original_name"]: index + 1 for index, row in enumerate(self.hcat_mapping)}
         gdf["crop:code"] = gdf["PLODINA"].map(mapping)
         return super().migrate(gdf)

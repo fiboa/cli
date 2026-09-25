@@ -30,14 +30,13 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "ist_ueberlagernd": lambda col: col == False,  # noqa: E712
     }
     area_is_in_ha = False
-    area_calculate_missing = True
     column_migrations = {
         "bezugsjahr": lambda col: pd.to_datetime(col, format="%Y"),
         # crop:code must be a string per the crop extension; lnf_code is an integer.
         "lnf_code": lambda col: col.astype(str),
         "flaeche_m2": lambda col: col.astype(float),
     }
-    ec_mapping_csv = "https://fiboa.org/code/ch/ch.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/ch/ch.csv"
 
     def get_urls(self):
         # Look up each open canton's GeoPackage; the link embeds the model version (v2_0/v3_0).

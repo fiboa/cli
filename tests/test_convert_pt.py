@@ -22,7 +22,7 @@ FIXTURE_ROWS = {"2017": 480, "2018": 385, "2019": 360}
 DUPLICATED_IN_2018 = 30
 
 
-def _load_ec(csv_file=None, url=None):
+def _load_mapping(csv_file=None, url=None):
     if csv_file and "://" in csv_file:
         csv_file = csv_file.split("/")[-1]
     path = url if url and "://" not in url else f"{PT}/{csv_file}"
@@ -33,10 +33,10 @@ def _convert(target, variant, converter=None, **kwargs):
     # loguru sinks are global, so the sink must not outlive the call
     sink = logger.add(sys.stdout, format="{message}", level="DEBUG", colorize=False)
     try:
-        # pt.py imports load_ec_mapping by name, so it is patched in both modules
+        # pt.py imports load_hcat_mapping by name, so it is patched in both modules
         with (
-            patch("fiboa_cli.datasets.commons.hcat.load_ec_mapping", side_effect=_load_ec),
-            patch("fiboa_cli.datasets.pt.load_ec_mapping", side_effect=_load_ec),
+            patch("fiboa_cli.datasets.commons.hcat.load_hcat_mapping", side_effect=_load_mapping),
+            patch("fiboa_cli.datasets.pt.load_hcat_mapping", side_effect=_load_mapping),
         ):
             kwargs.setdefault("cache", PT)
             if converter is None:
@@ -140,7 +140,7 @@ def test_projected_members_still_get_an_area(converted, variant, member):
 def test_unresolved_question_mark_raises():
     converter = pt.PTConverter()
     converter.variant = "2018"
-    converter.ec_mapping = _load_ec("pt.csv")
+    converter.hcat_mapping = _load_mapping("pt.csv")
     with raises(AssertionError, match=r"unknown '\?'"):
         converter._crop_codes(pd.Series(["BATATA", "COURG?TTE"]))
 

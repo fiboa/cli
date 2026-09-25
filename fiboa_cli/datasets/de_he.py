@@ -1,18 +1,14 @@
-import re
-from urllib.parse import urlencode
-
 import pandas as pd
-import requests
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
+from ..conversion.converter_wfs import WFSConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.de_iacs import DEIACSMixin
 
 BASE_URL = "https://inspire-geo.ibykus.net/geoserver/lawi/wfs"
-PAGE_SIZE = 25_000
 
 
-class DEHEConverter(AdminConverterMixin, DEIACSMixin, FiboaBaseConverter):
+class DEHEConverter(AdminConverterMixin, DEIACSMixin, WFSConverterMixin, FiboaBaseConverter):
     id = "de_he"
     admin_subdivision_code = "HE"
     short_name = "Germany, Hesse"
@@ -33,10 +29,12 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
 
     variants = {str(year): str(year) for year in range(2025, 2022, -1)}
 
+    wfs_url = BASE_URL
+    wfs_page_size = 25_000
+    wfs_extension = "json"
+
     # 2023 and 2024 publish no area, and the declaredArea 2025 does publish is the area of
-    # the polygon to three decimals, so every edition measures it: EPSG:25832, already m2.
-    area_is_in_ha = False
-    area_calculate_missing = True
+    # the polygon to three decimals, so every edition measures metrics:area from the geometry.
 
     columns = {
         "geometry": "geometry",
@@ -47,24 +45,10 @@ Control System (IACS) under Article 68 of Regulation (EC) No 1306/2013.
     }
     column_migrations = {"validFrom": lambda col: pd.to_datetime(col, format="%d.%m.%Y")}
 
-    def get_urls(self):
-        params = {
-            "service": "WFS",
-            "version": "2.0.0",
-            "request": "GetFeature",
+    def get_wfs_params(self):
+        return {
             "typeNames": f"lawi:LPIS-Referenzparzellen {self.variant}",
             "outputFormat": "application/json",
-        }
-        # Derive the page count from the server instead of hardcoding it, so a changed layer
-        # neither drops the tail nor requests empty pages.
-        hits = requests.get(BASE_URL, params={**params, "resultType": "hits"})
-        hits.raise_for_status()
-        total = int(re.search(r'numberMatched="(\d+)"', hits.text).group(1))
-
-        query = urlencode({**params, "count": PAGE_SIZE})
-        return {
-            f"{BASE_URL}?{query}&startIndex={start}": f"de_he_{self.variant}_{start}.json"
-            for start in range(0, total, PAGE_SIZE)
         }
 
     def file_migration(self, gdf, path, uri, layer=None):

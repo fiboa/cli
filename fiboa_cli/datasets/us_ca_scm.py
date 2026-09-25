@@ -3,8 +3,7 @@ from os.path import dirname, join
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import load_ec_mapping
-from .commons.hcat import AddHCATMixin
+from .commons.hcat import AddHCATMixin, load_hcat_mapping
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
@@ -44,7 +43,7 @@ urban and economic development, and other issues.
     column_additions = {
         "determination:datetime": "2023-05-01T00:00:00Z",
     }
-    ec_mapping_csv = "https://fiboa.org/code/us/ca/scm.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/us/ca/scm.csv"
     missing_schemas = {
         "properties": {
             "admin_level_2": {"type": "string"},
@@ -56,7 +55,7 @@ urban and economic development, and other issues.
         Perform migration on the GeoDataFrame to map crop names using a provided mapping file.
         """
         gdf = super().migrate(gdf)
-        mapping = load_ec_mapping(url=join(dirname(__file__), "data-files", "us_ca_scm.csv"))
+        mapping = load_hcat_mapping(url=join(dirname(__file__), "data-files", "us_ca_scm.csv"))
         original_name_mapping = {e["original_code"]: e["original_name"] for e in mapping}
         gdf["crop:name"] = gdf["MAIN_CROP"].map(original_name_mapping)
         return gdf

@@ -77,9 +77,9 @@ From 2023, the downloadable dataset of agricultural use plots will also include 
         "GWSCOD_H": "crop:code",
         "GWSNAM_H": "crop:name",
     }
-    ec_mapping_csv = "be_vlg_2021.csv"
+    hcat_mapping_csv = "be_vlg_2021.csv"
     # the codes that table has no row for, mapped from its own siblings
-    ec_mapping_supplements = ["https://fiboa.org/code/be/vlg_supplement.csv"]
+    hcat_mapping_supplements = ["https://fiboa.org/code/be/vlg_supplement.csv"]
 
     missing_schemas = {
         "properties": {

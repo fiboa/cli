@@ -62,7 +62,7 @@ and supporting sustainable land use practices.
         "jpaid": "jpaid",
     }
 
-    ec_mapping_csv = "hr_2020.csv"
+    hcat_mapping_csv = "hr_2020.csv"
 
     missing_schemas = {
         # The editions carry different subsets
@@ -94,7 +94,6 @@ and supporting sustainable land use practices.
     }
 
     area_is_in_ha = False
-    area_calculate_missing = True
 
     ARCHIVE_CRS = "EPSG:3765"
 

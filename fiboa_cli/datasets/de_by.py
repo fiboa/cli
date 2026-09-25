@@ -2,7 +2,7 @@ import geopandas as gpd
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin, load_ec_mapping
+from .commons.hcat import AddHCATMixin, load_hcat_mapping
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
@@ -18,7 +18,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     attribution = "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de"
     provider = "Bayerische Vermessungsverwaltung <https://www.ldbv.bayern.de>"
     mapping_file = "https://fiboa.org/code/de/de_by.csv"
-    ec_mapping_csv = "https://fiboa.org/code/de/de_by.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/de/de_by.csv"
 
     columns = {
         "geometry": "geometry",
@@ -33,9 +33,9 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
 
     def migrate(self, gdf: gpd.GeoDataFrame):
         gdf = super().migrate(gdf)
-        self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
-        gdf = gdf[gdf["bewirtschaftung"].isin([row["original_code"] for row in self.ec_mapping])]
+        self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
+        gdf = gdf[gdf["bewirtschaftung"].isin([row["original_code"] for row in self.hcat_mapping])]
 
-        mapping_crop = {row["original_code"]: row["original_name"] for row in self.ec_mapping}
+        mapping_crop = {row["original_code"]: row["original_name"] for row in self.hcat_mapping}
         gdf["crop:name"] = gdf["bewirtschaftung"].map(mapping_crop)
         return gdf

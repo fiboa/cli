@@ -3,7 +3,7 @@ from .commons.ec import EuroCropsConverterMixin
 
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
-    ec_mapping_csv = "fr_2018.csv"
+    hcat_mapping_csv = "fr_2018.csv"
     ec_year = 2018
     sources = {
         "https://zenodo.org/records/14094196/files/FR_2018.zip": ["FR_2018/FR_2018_EC21.shp"]

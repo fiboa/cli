@@ -34,17 +34,14 @@ the geometry.
     # One variant per snapshot, mapped to the ID_VERSIONID that selects it, newest first.
     variants = {str(year): f"{year}.1" for year in range(2023, 2020, -1)}
 
-    # SHAPE.AREA is in square degrees, so the area is derived from the geometry instead. The result
-    # is in m² and must not be scaled.
-    area_is_in_ha = False
-    area_calculate_missing = True
+    # SHAPE.AREA is in square degrees, so it is left unmapped and metrics:area is measured from
+    # the geometry instead.
 
     columns = {
         "geometry": "geometry",
         "flik": ("flik", "id"),  # derived in migrate(); unique, unlike in Baden-Württemberg
         "CLASS_CODE": "crop:code",  # already the bare de.iacs code
         "BEGINLIFESPANVERSION": "determination:datetime",
-        "area": "metrics:area",  # not in the source; created by area_calculate_missing
     }
     column_migrations = {"BEGINLIFESPANVERSION": lambda col: pd.to_datetime(col, unit="ms")}
 

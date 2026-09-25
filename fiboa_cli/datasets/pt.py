@@ -9,7 +9,7 @@ import pyogrio
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin, load_ec_mapping
+from .commons.hcat import AddHCATMixin, load_hcat_mapping
 
 # Up to 2023 the country is split into "Culturas_<district>" layers, from 2025 into
 # "T<NUTS 3 code>" layers. Both files carry other layers too (parcel blocks, land cover,
@@ -200,9 +200,8 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "Shape_Length": "metrics:perimeter",
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    ec_mapping_csv = "https://fiboa.org/code/pt/pt.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/pt/pt.csv"
     area_is_in_ha = False
-    area_calculate_missing = True
     missing_schemas = {
         "properties": {
             "block_id": {"type": "int64"},
@@ -313,10 +312,10 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
 
     def _crop_name_lookup(self):
         # shared with AddHCATMixin, which then does not load it again
-        if self.ec_mapping is None:
-            self.ec_mapping = load_ec_mapping(self.ec_mapping_csv, url=self.mapping_file)
+        if self.hcat_mapping is None:
+            self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
         lookup = {}
-        for entry in self.ec_mapping:
+        for entry in self.hcat_mapping:
             key = normalise_crop_name(entry["original_name"])
             code = entry["original_code"]
             # POUSIO is 089 and 89: the padded code wins

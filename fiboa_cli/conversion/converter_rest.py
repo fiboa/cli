@@ -135,9 +135,7 @@ class EsriRESTConverterMixin:
                 get_dict["where"] = f"{clause} AND ({base_where})" if base_where else clause
                 url = f"{layer_url}?{urlencode(get_dict)}"
                 if cache_fs is not None:
-                    cache_file = os.path.join(
-                        cache_folder, f"{prefix}{lo}-{hi}.{self.rest_format}"
-                    )
+                    cache_file = os.path.join(cache_folder, f"{prefix}{lo}-{hi}.{self.rest_format}")
                     try:
                         with cache_fs.open(cache_file, mode="wb") as file:
                             stream_file(source_fs, url, file)
@@ -154,9 +152,7 @@ class EsriRESTConverterMixin:
                 # An error response from the server must not survive as a cached page
                 if cache_fs is not None and cache_fs.exists(url):
                     cache_fs.rm(url)
-                raise RuntimeError(
-                    f"Could not read ids ({lo} ... {hi}] of {layer_url}: {e}"
-                ) from e
+                raise RuntimeError(f"Could not read ids ({lo} ... {hi}] of {layer_url}: {e}") from e
 
             if len(data) == 0 and not cached:
                 # An id gap wider than a page: ask once where the ids resume, and
@@ -164,7 +160,9 @@ class EsriRESTConverterMixin:
                 # paging through a span that may hold millions of absent ids.
                 resume = self._rest_id_bound(layer_url, attribute, base_where, "ASC", floor=lo)
                 if resume - 1 > hi and cache_fs is not None:
-                    gap = os.path.join(cache_folder, f"{prefix}{lo}-{resume - 1}.{self.rest_format}")
+                    gap = os.path.join(
+                        cache_folder, f"{prefix}{lo}-{resume - 1}.{self.rest_format}"
+                    )
                     cache_fs.mv(url, gap)
                 hi = max(hi, resume - 1)
 
