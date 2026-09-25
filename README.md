@@ -62,7 +62,7 @@ fiboa CLI supports various commands to work with the files:
     - [Improve a fiboa Parquet file](#improve-a-fiboa-parquet-file)
     - [Update an extension template with new names](#update-an-extension-template-with-new-names)
     - [Converter for existing datasets](#converter-for-existing-datasets)
-    - [Publish datasets to source coop or your own s3 repository](#publish-datasets-to-source-coop-or-your-own-s3-repository)
+    - [Publishing with Portolan](#publishing-with-portolan)
   - [Development](#development)
     - [Implement a converter](#implement-a-converter)
   - [Run in Docker](#run-in-docker)
@@ -193,48 +193,34 @@ Use any of the IDs from the list to convert an existing dataset to fiboa:
 
 See [Implement a converter](#implement-a-converter) for details about how to
 
-### Publish datasets to source coop or your own s3 repository
+### Publishing with Portolan
 
-`fiboa publish <dataset> -o <target>`
+fiboa datasets are published as a [Portolan](https://github.com/portolan-sdi/portolan-cli) catalog. The fiboa CLI
+converts and validates; Portolan writes the STAC metadata, the PMTiles, the checksums and the README, and uploads.
+The steps below are written so that an agent can follow them; the
+[Portolan skills](https://github.com/portolan-sdi/portolan-skills) cover the Portolan side in more depth.
 
-The publish converts and publishes a fiboa dataset to source coop or your own s3 repository. The target directory 
-will be filled with the following files:
+Inside a Portolan catalog (`portolan init`), for dataset `<id>` and edition `<variant>`:
 
-```
-<target>/
-  <dataset>.parquet
-  <dataset>.pmtiles      # requires working ogr2ogr and tippecanoe
-  stac/collection.json
-  README.md              # generated if --generate-meta/-gm flag is present
-  LICENSE.txt            # generated if --generate-meta/-gm flag is present
-```
-
-This directory is synchronized to the s3 repository (default source.coop/fiboa/data).
-
-**Requirements**: Requires the [aws CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) to be installed, 
-and `AWS_ACCESS_KEY_ID` with `AWS_SECRET_ACCESS_KEY` environment variables. Also, for generating the pmtiles file, 
-it requires [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) and [tippecanoe](https://github.com/mapbox/tippecanoe).
-
-The command executes the following steps:
-
-- `fiboa convert` to generate a fiboa parquet dataset. All convert parameters are passed to the converter.
-- `fiboa validate` to validate the fiboa dataset
-- creates a <dataset>.pmtiles from the parquet file. Uses ogr2ogr and tippecanoe
-- `fiboa create-stac-collection` to create a STAC collection
-- `fiboa publish` to publish the fiboa dataset to a source coop or your own s3 repository
-
-Examples:
-
-- `fiboa publish at_crop -o data/at_crop`
-- `fiboa publish -c /tmp/cache -gm br_conab -o data/br_conab`
-
-Relevant parameters:
-
-- `--generate-meta/-gm` Generatse the README.md and LICENSE.txt files if absent, based on data-survey and converter properties.
-- `--data-url` The URL to the data repository, used when generating the README
-- `--s3-upload-path` The `aws s3 sync` target. Defaults to `s3://source.coop/fiboa/data` . Uploading requires the `aws` CLI, and `AWS_ACCESS_KEY_ID` with `AWS_SECRET_ACCESS_KEY` environment variables.
-
-Check `fiboa publish --help` for more details.
+1. Convert and validate. Name the file after the edition, so each edition is its own asset:
+   ```bash
+   fiboa convert <id> --variant <variant> -c <cache> -o <id>/<id>-<variant>.parquet
+   fiboa validate <id>/<id>-<variant>.parquet
+   ```
+2. Seed the collection metadata from the converter (title, description, providers, license, fiboa version),
+   without assets, which Portolan adds itself. Only for a new collection; Portolan keeps these fields afterwards.
+   ```bash
+   fiboa create-stac-collection <id>/<id>-<variant>.parquet -o <id>/stac.json
+   jq 'del(.assets)' <id>/stac.json > <id>/collection.json && rm <id>/stac.json
+   ```
+3. Add the file with its campaign date, and generate the PMTiles (requires
+   [tippecanoe](https://github.com/felt/tippecanoe)):
+   ```bash
+   portolan add <id> --datetime <variant>-01-01 --pmtiles
+   ```
+4. Complete what Portolan asks for, until `portolan check` passes: the provider with the `host` role, a thumbnail
+   (skill `portolan-thumbnails`), and the metadata and README (`portolan metadata init`, `portolan readme`).
+5. Upload: `portolan push <remote> --collection <id>` (skill `sourcecoop` for Source Cooperative).
 
 ## Development
 

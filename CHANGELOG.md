@@ -80,6 +80,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - US-CSB: Editions now cover 2017-2024.
 
 ### Removed
+- Removed `fiboa publish`. Datasets are published as a Portolan catalog; the README describes the steps.
 - CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
 
 ### Fixed

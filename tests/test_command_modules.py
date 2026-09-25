@@ -29,4 +29,5 @@ def test_registry_registers_fiboa_commands():
 
     R.instance.register_commands()
     names = {getattr(c, "__name__", str(c)) for c in R.instance.commands}
-    assert {"publish", "improve", "create-stac-collection", "merge"} <= names
+    assert {"improve", "create-stac-collection", "merge"} <= names
+    assert "publish" not in names  # replaced by Portolan, see the README
