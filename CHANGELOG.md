@@ -48,7 +48,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Converters now publish `metrics:area` by default (`area_calculate_missing = True`, #277): measured from the geometry for every row if the source has no area, and for the rows where it is empty or 0 otherwise. Set `area_calculate_missing = False` to opt out.
 - Renamed the HCAT mapping attributes of `AddHCATMixin`, as they work with any HCAT mapping, not only EuroCrops: the `ec_mapping*` attributes use the `hcat_mapping*` prefix now. The helpers `load_ec_mapping()` and `ec_url()` are now `load_hcat_mapping()` and `hcat_mapping_url()` in `fiboa_cli.datasets.commons.hcat`; the copies in `fiboa_cli.datasets.commons.ec` were removed.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
-- CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
 - DK: Editions now cover 2008-2026. The 2008 and 2009 editions are published without the crop and HCAT extensions because the source has no crop columns.
@@ -76,6 +75,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - SE: Editions now cover 2015-2025 from the yearly WFS filter.
 - SI: Extended editions back to 2019.
 - US-CSB: Editions now cover 2017-2024.
+
+### Removed
+- CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
 
 ### Fixed
 - Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
