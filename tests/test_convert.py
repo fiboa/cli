@@ -43,7 +43,6 @@ tests = [
     "se",
     "ee",
     "ai4sf",
-    "ch",
     "ch_ai",
     "ch_ge",
     "ch_ge#2024",
@@ -116,10 +115,6 @@ extra_convert_parameters = {
     # the older layers publish no land cover class and no declared area
     "de_he#2023": {"variant": "2023", **_input_files("de_he", "de_he_2023.json")},
     "br_ba_lem": _input_files("br_ba_lem", "LEM_dataset.zip"),
-    "ch": {
-        **_input_files("ch", "lwb_nutzungsflaechen_v2_0_lv95.gpkg"),
-        "mapping_file": f"{test_path}/ch/lnf_code.csv",
-    },
     "ch_ai": {
         **_input_files("ch_ai", "lwb_nutzungsflaechen_v3_0_AI_2056.gpkg"),
         "mapping_file": f"{test_path}/ch/lnf_code.csv",

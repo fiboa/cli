@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - CH:
   - Added converters for every canton with standalone data (`ch_<canton>`) on a shared `CHBaseConverter`, each with the canton's own licence and attribution; Basel-Stadt is represented by the Basel-Landschaft data.
   - `ch_zh` (2017–2025), `ch_ge` (2017–2026) and `ch_sz` (2022–2025) read the cantons' own archives; the cantons that require registration or approval convert an exported file with `-i`.
+  - The federal usage code (`lnf_code`) is published as `crop:code`, and HCAT is mapped by it (`code/ch/lnf_code.csv`).
 - DE-BW: Added Baden-Württemberg reference parcels converter.
 - DE-BY-BLOCK: Added Bavaria field-block converter.
 - DE-FUSION: Added Brandenburg converter based on the ESA Fusion Competition dataset.
@@ -45,6 +46,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Converters no longer split multi-part geometries into one row per polygon: fields keep the geometry modeling of the source (Polygon or MultiPolygon), the source-published area and perimeter, and one id per source feature. Use `fiboa improve --explode-geometries` when single polygons are needed.
 - Converters whose variants are years (1900-2100) now fill `determination:datetime` from the selected year unless they provide a determination date themselves.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
+- CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
 - DK: Editions now cover 2008-2026. The 2008 and 2009 editions are published without the crop and HCAT extensions because the source has no crop columns.
@@ -79,11 +81,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed `use_variant_as_determination` so determination dates are retained.
 - Converters no longer publish duplicate `id`s (#282): row-numbered ids count over all source files instead of restarting per file, and ids the source repeats get a `~<n>` suffix.
 - Rows missing `crop:code` are now dropped with a warning (and an error threshold), instead of failing whole conversions.
-- CH:
-  - CH now uses geodienste.ch STAC canton downloads.
-  - `lnf_code` is now published as `crop:code`.
-  - IDs are now derived from stable source identifiers instead of row order.
-  - `ch` reads through `CHBaseConverter`, and HCAT is mapped by the federal LNF code (`code/ch/lnf_code.csv`) for every Swiss converter.
 - DE-BB:
   - Excluded NBF ineligible patches with empty crop code.
   - Fixed source encoding and FLIK handling.
