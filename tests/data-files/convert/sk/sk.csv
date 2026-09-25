@@ -76,7 +76,7 @@ Lupina biela,White lupine,sweet_lupins,3301020700,sweet_lupins,3301020700
 Repa obyčajná cviklová (Cvikla),Beetroot (Beetroot),beetroot_beets,3301290200,beetroot_beets,3301290200
 Ďatelina hybridná,Hybrid clover,clover,3301090303,clover,3301090303
 Rajčiak jedlý,Edible tomato,tomato,3301280000,tomato,3301280000
-Petržlen záhradný,Garden parsley,parsley,3301061227,parsley,3301061227
+Petržlen záhradný,Garden parsley,parsly,3301061227,parsly,3301061227
 Čerešňa vtáčia,Bird cherry,cherry_cherries,3303010400,cherry_cherries,3303010400
 Cibuľa (zimná),Scallion,scallion,3301220500,onions,3301220400
 Repa kŕmna,Fodder beet,mangelwurzel_fodder_beet,3301290400,mangelwurzel_fodder_beet,3301290400
@@ -202,7 +202,7 @@ Vinohrad v reštrukturalizácii,Vineyard under restructuring,vineyards_wine_vine
 Ostatná manipulačná plocha,Other handling area,not_known_and_other,3399000000,not_known_and_other,3399000000
 Strukovinovo-obilná miešanka,Legume-cereal mixture,other_arable_land_crops,3301990000,other_arable_land_crops,3301990000
 Olejninovo-obilná miešanka,Oilseed-cereal mixture,other_arable_land_crops,3301990000,other_arable_land_crops,3301990000
-Cuketa,Zucchini,zucchini_courgette,3301140200,zucchini_courgette,3301140200
+Cuketa,Zucchini,zucchini_courgette,3301140600,zucchini_courgette,3301140600
 Cirok s podsevom,Sorghum with undersowing,millet_sorghum,3301010900,millet_sorghum,3301010900
 Pamajorán obyčajný (oregano),Oregano,aromatic_medicinal_culinary_plants_spices_herbs,3301061200,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
 Šalvia muškátová,Clary sage,aromatic_medicinal_culinary_plants_spices_herbs,3301061200,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
@@ -243,3 +243,78 @@ Echinacea purpurová,Purple coneflower,echinacea_sun_hat,3301081500,echinacea_su
 Kapusta repková kvaková (kvaka),Swede (rutabaga),swede_rutabaga,3301210500,swede_rutabaga,3301210500
 Šalotka (jarná),Shallot (spring),onions,3301220400,onions,3301220400
 Kapusta hlávková s podsevom,Head cabbage with undersowing,white_cabbage,3301210212,white_cabbage,3301210212
+Tritikale ozimné,Winter triticale,winter_triticale,3301010801,winter_triticale,3301010801
+Tritikale jarné,Spring triticale,spring_triticale,3301010802,spring_triticale,3301010802
+Zemiaky,Potatoes,potatoes,3301030000,potatoes,3301030000
+Zemiaky konzumné,Ware potatoes,potatoes,3301030000,potatoes,3301030000
+Ostrov biodiverzity,Biodiversity island,not_known_and_other,3399000000,not_known_and_other,3399000000
+Ostrov biodiverzity medonosný,Melliferous biodiversity island,not_known_and_other,3399000000,not_known_and_other,3399000000
+Biopás pre medonosné plodiny kosený po 31. júli,Melliferous field strip mown after 31 July,not_known_and_other,3399000000,not_known_and_other,3399000000
+Pôda ležiaca úhorom s produkciou s hnojením,Fallow with production and fertilisation,fallow_land_not_crop,3301110000,fallow_land_not_crop,3301110000
+Pôda ležiaca úhorom s produkciou bez hnojenia,Fallow with production without fertilisation,fallow_land_not_crop,3301110000,fallow_land_not_crop,3301110000
+Tekvica,Pumpkin,pumpkin_squash_gourd,3301140400,pumpkin_squash_gourd,3301140400
+Patizón,Pattypan squash,pumpkin_squash_gourd,3301140400,pumpkin_squash_gourd,3301140400
+Kapusta,Cabbage,brassica_oleracea_cabbage,3301210200,brassica_oleracea_cabbage,3301210200
+Kel,Savoy cabbage,savoy_cabbage,3301210211,savoy_cabbage,3301210211
+Kel hlávkový s podsevom,Savoy cabbage undersown,savoy_cabbage,3301210211,savoy_cabbage,3301210211
+Kapusta pekinská,Chinese cabbage,chinese_cabbage,3301210205,chinese_cabbage,3301210205
+Kapusta čínska,Chinese cabbage,chinese_cabbage,3301210205,chinese_cabbage,3301210205
+Kaleráb,Kohlrabi,kohlrabi,3301210209,kohlrabi,3301210209
+Brokolica,Broccoli,broccoli,3301210202,broccoli,3301210202
+Reďkev,Radish,radish,3301290600,radish,3301290600
+Reďkev siata (čierna a reďkovka),Radish (black and small),radish,3301290600,radish,3301290600
+Reďkovka,Small radish,radish,3301290600,radish,3301290600
+Paprika,Pepper,bell_pepper_paprika,3301300100,bell_pepper_paprika,3301300100
+Cibuľa,Onion,onions,3301220400,onions,3301220400
+Cesnak,Garlic,garlic,3301220200,garlic,3301220200
+Pór,Leek,leek,3301220300,leek,3301220300
+Repa obyčajná cviklová (cvikla),Beetroot,beetroot_beets,3301290200,beetroot_beets,3301290200
+Repa obyčajná (mangold),Chard,chard,3301310100,chard,3301310100
+Čučoriedka,Blueberry,blueberry,3303020400,blueberry,3303020400
+Mrkva,Carrot,carrots_daucus,3301290300,carrots_daucus,3301290300
+Paštrnák,Parsnip,parsnips,3301290500,parsnips,3301290500
+Zeler,Celery,celery,3301250000,celery,3301250000
+Rajčiaky,Tomato,tomato,3301280000,tomato,3301280000
+Baklažán,Aubergine,aubergine_eggplant,3301260000,aubergine_eggplant,3301260000
+Špenát,Spinach,spinach,3301310800,spinach,3301310800
+Šalát,Lettuce,salads_lettuce_leaf_vegetables,3301310000,salads_lettuce_leaf_vegetables,3301310000
+Štiavec,Sorrel,sorrel,3301310700,sorrel,3301310700
+Čakanka obyčajná,Chicory,chicory_chicories,3301310200,chicory_chicories,3301310200
+Melóny,Melons,melon,3301140300,melon,3301140300
+Dyňa,Watermelon,watermelon,3301140500,watermelon,3301140500
+Vinohrad so zlatým žltnutím,Vineyard with flavescence dorée,vineyards_wine_vine_rebland_grapes,3303060000,vineyards_wine_vine_rebland_grapes,3303060000
+Kukurica cukrová s podsevom,Sweet maize undersown,grain_maize_corn_popcorn,3301010600,grain_maize_corn_popcorn,3301010600
+Kukurica pukancová s podsevom,Popcorn maize undersown,grain_maize_corn_popcorn,3301010600,grain_maize_corn_popcorn,3301010600
+Senovka grécka,Fenugreek,fenugreek,3301020400,fenugreek,3301020400
+Cícer,Chickpea,chickpeas,3301020200,chickpeas,3301020200
+Fazuľa obyčajná,Common bean,beans,3301020100,beans,3301020100
+Fazuľa ostrolistá,Tepary bean,beans,3301020100,beans,3301020100
+Fazuľa šarlátová,Runner bean,beans,3301020100,beans,3301020100
+Fazuľa mesiacovitá,Lima bean,beans,3301020100,beans,3301020100
+Láskavec,Amaranth,amaranth,3301150100,amaranth,3301150100
+Komonica lekárska,Ribbed melilot,melilot,3301090304,melilot,3301090304
+Komonica biela,White melilot,melilot,3301090304,melilot,3301090304
+Jastrabina východná,Eastern galega,galega,3301081900,galega,3301081900
+Vtákonoha siata,Serradella,serradella,3301084200,serradella,3301084200
+Slez kŕmny,Fodder mallow,malva,3301082800,malva,3301082800
+Slez maurský,Moorish mallow,malva,3301082800,malva,3301082800
+Koriander siaty,Coriander,coriander,3301061215,coriander,3301061215
+Mäta,Mint,mints_peppermint,3301061222,mints_peppermint,3301061222
+Medovka,Lemon balm,lemon_balm_melissa,3301061220,lemon_balm_melissa,3301061220
+Ligurček lekársky,Lovage,lovage_maggiplant,3301061221,lovage_maggiplant,3301061221
+Bedrovník anízový,Anise,anise_aniseed,3301061205,anise_aniseed,3301061205
+Šalvia,Sage,sage_chia,3301190000,sage_chia,3301190000
+Borák lekársky,Borage,borage,3301061209,borage,3301061209
+Yzop lekársky,Hyssop,other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299,other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299
+Petržlen,Parsley,parsly,3301061227,parsly,3301061227
+Petržlen vňaťový kučeravý,Curly leaf parsley,parsly,3301061227,parsly,3301061227
+Kapucínka väčšia,Garden nasturtium,nasturtiums,3301061224,nasturtiums,3301061224
+Chren dedinský,Horseradish,horseradish,3301210400,horseradish,3301210400
+Povojník purpurový (batát),Sweet potato,sweet_potatoes,3301040000,sweet_potatoes,3301040000
+Povojník batátový,Sweet potato,sweet_potatoes,3301040000,sweet_potatoes,3301040000
+Slivka čerešňoplodá (myrobalán),Cherry plum,plums,3303011300,plums,3303011300
+Jarabina oskorušová,Service tree,rowan_rowanberries,3303021300,rowan_rowanberries,3303021300
+Topoľ chlpatoplodý,Poplar,populus,3306070000,populus,3306070000
+Topoľ simonov,Simon's poplar,populus,3306070000,populus,3306070000
+Vŕba rakytová,Goat willow,willows_osiers,3306080000,willows_osiers,3306080000
+Zalesnená orná pôda,Afforested arable land,afforestation_reforestation,3306010000,afforestation_reforestation,3306010000

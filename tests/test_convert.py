@@ -88,6 +88,7 @@ tests = [
     "lt",
     "si",
     "sk",
+    "sk#2018",
     "jecam",
     "ec_ro",
     "india_10k",
