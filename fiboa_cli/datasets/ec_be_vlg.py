@@ -9,6 +9,8 @@ class ECConverter(EuroCropsConverterMixin, BEVLGBaseConverter):
             "BE_VLG_2021/BE_VLG_2021_EC21.shp"
         ]
     }
+    # the single EuroCrops 2021 release, not the parent's yearly editions
+    variants = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

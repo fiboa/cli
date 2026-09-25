@@ -77,7 +77,7 @@ digitised and eligible area and the area claimed by all applicants together. Unc
     provider = "Department of Agriculture, Food and the Marine <https://data.gov.ie/organization/department-of-agriculture-food-and-the-marine>"
     attribution = "Ireland Department of Agriculture, Food and the Marine"
     license = "CC-BY-4.0"
-    ec_mapping_csv = (
+    hcat_mapping_csv = (
         "https://fiboa.org/code/ie/ie.csv"  # the GSAA list, extended by the LPIS-only names
     )
     area_is_in_ha = False

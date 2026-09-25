@@ -522,3 +522,19 @@ def test_ch_geodienste_file_must_hold_the_variant_year():
 def test_ch_rejects_an_unknown_year():
     with pytest.raises(ValueError, match="Unknown variant"):
         Converters().load("ch_zh").select_variant("2016")
+
+
+def test_no_converter_declares_both_sources_and_variants():
+    c = Converters()
+    for _id in c.list_ids():
+        c.load(_id)._require_one_source_of_urls()
+
+
+def test_no_converter_uses_the_old_hcat_attribute_names():
+    # renamed in #320; a converter still setting ec_mapping* is silently ignored
+    c = Converters()
+    old = {
+        _id: [a for a in dir(type(c.load(_id))) if a.startswith("ec_mapping")]
+        for _id in c.list_ids()
+    }
+    assert not {k: v for k, v in old.items() if v}
