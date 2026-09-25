@@ -45,4 +45,4 @@ Art. 94 of Regulation (EU) No. 1306/2013 and is digitized in the GIS as a polygo
         "SL_FLAECHE_BRUTTO_HA": "metrics:area",
         "GEOM_DATE_CREATED": "determination:datetime",
     }
-    ec_mapping_csv = "https://fiboa.org/code/at/at.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/at/at.csv"

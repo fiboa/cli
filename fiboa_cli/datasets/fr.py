@@ -66,7 +66,7 @@ The anonymized version is distributed as part of the public service for making r
     license = "Licence Ouverte / Open Licence <https://etalab.gouv.fr/licence-ouverte-open-licence>"
     # One merged list for all editions: EuroCrops splits France over two tables
     # and misses eleven newer codes (e.g. JAC, the most common code of 2024)
-    ec_mapping_csv = "https://fiboa.org/code/fr/fr.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/fr/fr.csv"
 
     columns = {
         "geometry": "geometry",

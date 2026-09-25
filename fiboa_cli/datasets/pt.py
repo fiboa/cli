@@ -54,7 +54,7 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "Shape_Length": "metrics:perimeter",
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
-    ec_mapping_csv = "https://fiboa.org/code/pt/pt.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/pt/pt.csv"
     area_is_in_ha = False
     missing_schemas = {
         "properties": {

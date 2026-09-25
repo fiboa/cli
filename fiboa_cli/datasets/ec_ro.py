@@ -1,10 +1,11 @@
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.ec import EuroCropsConverterMixin, ec_url
+from .commons.ec import EuroCropsConverterMixin
+from .commons.hcat import hcat_mapping_url
 
 
 class Convert(EuroCropsConverterMixin, FiboaBaseConverter):
     # See https://data.europa.eu/data/datasets/092425a1-90c6-4461-b1a6-6f5b0f72748f?locale=ro
-    ec_mapping_csv = "ro_no_year.csv"
+    hcat_mapping_csv = "ro_no_year.csv"
     sources = {"https://zenodo.org/records/14094196/files/RO_ny.zip?download=1": ["RO/*.shp"]}
     id = "ec_ro"
     short_name = "Romania"
@@ -22,7 +23,7 @@ The dataset is in line with the conceptual framework described in the Land Cover
     license = "CC0-1.0"
     column_additions = {
         "determination:datetime": "2017-01-01T00:00:00Z",
-        "crop:code_list": ec_url("ro_no_year.csv"),
+        "crop:code_list": hcat_mapping_url("ro_no_year.csv"),
     }
     columns = {
         "geometry": "geometry",

@@ -4,12 +4,11 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Point
 
-from .india_10k import IndiaConverter
 from .commons.ml_splits import MlSplitsMixin
+from .india_10k import IndiaConverter
 
 
 class India10kMlConverter(MlSplitsMixin, IndiaConverter):
-
     def migrate(self, gdf):
         # Load splits CSV and keep only train/val/test entries
         csv_path = join(dirname(__file__), "data-files", "india_splits_grid20x20_v2.csv")
@@ -46,4 +45,3 @@ class India10kMlConverter(MlSplitsMixin, IndiaConverter):
         gdf["split"] = joined["fold"].values
 
         return super().migrate(gdf)
-

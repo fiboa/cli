@@ -50,7 +50,7 @@ of the Ministry of Agriculture, Livestock and Fisheries.
         "admin:subdivision_code": "CN",
     }
     # crop codes of the crop map with HCAT; the mixin publishes it as crop:code_list
-    ec_mapping_csv = "https://fiboa.org/code/es/cn/crop.csv"
+    hcat_mapping_csv = "https://fiboa.org/code/es/cn/crop.csv"
     missing_schemas = {
         "properties": {
             "admin_island": {"type": "string"},
