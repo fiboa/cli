@@ -167,7 +167,7 @@ class CHBaseConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             if info.get("access") and not self.data_access:
                 self.data_access = (
                     f"{ACCESS[info['access']]}: apply at {SERVICE_PAGE}, export the GeoPackage "
-                    f"and convert it with `fiboa convert {self.id} -i <zip>|geopackage/*.gpkg`."
+                    f"and convert it with `fiboa convert {self.id} -i '<zip>|geopackage/*.gpkg'`."
                 )
         super().__init__(*args, **kwargs)
         assert not self.canton or self.id == f"ch_{self.canton.lower()}", "id must be ch_<canton>"

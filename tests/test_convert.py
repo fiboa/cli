@@ -226,6 +226,13 @@ extra_convert_parameters = {
 #
 # Keyed like extra_convert_parameters, so "<id>#<label>" can state a different
 # expectation per edition where the editions genuinely differ.
+SWISS_COLUMNS = (
+    "determination:datetime",
+    "metrics:area",
+    "admin:subdivision_code",
+    "crop:code",
+    "id",
+)
 expected_columns = {
     "de_sh": ("determination:datetime", "metrics:area", "flik", "hbn", "id"),
     # the determination date comes from the year variant
@@ -238,6 +245,13 @@ expected_columns = {
     "ie_lpis#2025": ("determination:datetime", "metrics:area", "crop:code", "id"),
     # derived from the archive date in file_migration()
     "pl_block": ("determination:datetime",),
+    # the cantons' own layers are renamed to the model's columns through a table
+    "ch_ai": SWISS_COLUMNS,
+    "ch_ge": SWISS_COLUMNS,
+    "ch_ge#2024": SWISS_COLUMNS,
+    "ch_sz": SWISS_COLUMNS,
+    "ch_sz#2025": SWISS_COLUMNS,
+    "ch_zh": SWISS_COLUMNS,
 }
 
 
