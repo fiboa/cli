@@ -12,9 +12,10 @@ import re
 
 import geopandas as gpd
 import pytest
+import requests
 from shapely.geometry import Point
 
-from fiboa_cli.conversion.converter_rest import EsriRESTConverterMixin
+from fiboa_cli.conversion.converter_rest import REST_BACKOFF, EsriRESTConverterMixin, RESTError
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 
 BASE_URL = "https://example.test/arcgis/rest/services/SIXPAC_2024/MapServer"
@@ -43,6 +44,19 @@ def _collection(oids, key="OBJECTID"):
     return {"type": "FeatureCollection", "features": [_feature(o, key) for o in oids]}
 
 
+class Response:
+    status_code = 200
+
+    def __init__(self, payload):
+        self._payload = payload
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return self._payload
+
+
 class FakeService:
     """Answers the three metadata calls and records every page request."""
 
@@ -51,17 +65,11 @@ class FakeService:
         self.ids = ids
         self.page_size = page_size
         self.pages = []  # the `where` of every page the mixin downloaded
+        self.timeouts = []
 
     def get(self, url, params=None, **kwargs):
         params = params or {}
-
-        class Response:
-            def __init__(self, payload):
-                self._payload = payload
-
-            def json(self):
-                return self._payload
-
+        self.timeouts.append(kwargs.get("timeout"))
         if params.get("f") == "pjson":
             if url.endswith(f"/{LAYER_ID}"):  # the layer's fields name the real key
                 return Response({"fields": [{"name": self.key}, {"name": "USO_SIGPAC"}]})
@@ -113,6 +121,12 @@ def service(monkeypatch):
 def _read(converter, cache, service=None):
     converter.cache_folder = str(cache)
     return list(converter.get_data([BASE_URL]))
+
+
+def test_runs_without_a_cache_folder(service):
+    pages = list(RESTConverter().get_data([BASE_URL]))
+
+    assert [len(data) for data, *_ in pages] == [2, 2, 1]
 
 
 def test_pages_by_id_window_and_caches_per_service(service, tmp_path):
@@ -203,6 +217,51 @@ def test_broken_download_is_not_kept_as_a_page(service, tmp_path, monkeypatch):
     assert os.listdir(tmp_path) == []
 
 
+def test_a_rejected_page_is_not_asked_for_again(service, tmp_path, monkeypatch):
+    attempts = []
+
+    def rejected(_source_fs, url, file):
+        attempts.append(url)
+        file.write(b'{"error":{"code":400,"message":"Invalid query","details":[]}}')
+
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.stream_file", rejected)
+
+    with pytest.raises(RuntimeError, match=r"Invalid query \(code 400\)"):
+        _read(RESTConverter(), tmp_path)
+    assert len(attempts) == 1
+    assert os.listdir(tmp_path) == []
+
+
+def test_an_error_page_is_asked_for_again(service, tmp_path, monkeypatch):
+    attempts = []
+    real = service.stream
+
+    def tired(source_fs, url, file):
+        attempts.append(url)
+        if len(attempts) == 1:
+            file.write(b'{"error":{"code":500,"message":"Error performing query"}}')
+            return
+        return real(source_fs, url, file)
+
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.stream_file", tired)
+
+    pages = _read(RESTConverter(), tmp_path)
+
+    assert [len(data) for data, *_ in pages] == [2, 2, 1]
+    assert len(attempts) == 4  # three pages, the first of them twice
+
+
+def test_an_unreadable_cached_page_is_fetched_again(service, tmp_path):
+    broken = tmp_path / f"test_rest_{SERVICE}_{LAYER_ID}_r0-2.geojson"
+    broken.write_text('{"type":"FeatureColl')
+
+    pages = _read(RESTConverter(), tmp_path)
+
+    assert [len(data) for data, *_ in pages] == [2, 2, 1]
+    assert len(service.pages) == 3
+    assert json.loads(broken.read_text())["features"]
+
+
 def test_a_page_is_asked_for_again(service, tmp_path, monkeypatch):
     """Hundreds of pages per edition: one refusal is normal, not fatal."""
     attempts = []
@@ -230,8 +289,7 @@ def test_service_metadata_is_asked_for_again(service, tmp_path, monkeypatch):
 
     def tired(url, params=None, **kwargs):
         if answers:
-            payload = answers.pop(0)
-            return type("Response", (), {"json": lambda self: payload})()
+            return Response(answers.pop(0))
         return real(url, params, **kwargs)
 
     monkeypatch.setattr("fiboa_cli.conversion.converter_rest.requests.get", tired)
@@ -240,6 +298,26 @@ def test_service_metadata_is_asked_for_again(service, tmp_path, monkeypatch):
 
     assert [len(data) for data, *_ in pages] == [2, 2, 1]
     assert answers == []
+
+
+def test_rejected_service_metadata_is_not_asked_for_again(service, tmp_path, monkeypatch):
+    calls = []
+
+    def rejected(url, params=None, **kwargs):
+        calls.append(url)
+        return Response({"error": {"code": 499, "message": "Token Required"}})
+
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.requests.get", rejected)
+
+    with pytest.raises(RESTError, match="Token Required"):
+        _read(RESTConverter(), tmp_path)
+    assert len(calls) == 1
+
+
+def test_every_request_has_a_timeout(service, tmp_path):
+    _read(RESTConverter(), tmp_path)
+
+    assert service.timeouts and all(service.timeouts)
 
 
 def test_pages_cached_under_the_old_sorted_scheme_are_not_reused(service, tmp_path):
@@ -347,11 +425,18 @@ def test_a_variant_that_is_not_a_url_leaves_the_base_url_alone():
 def test_id_bound_is_retried(monkeypatch):
     """The one sorted query left is the one a tired server gives up on."""
 
-    class Answer:
-        def json(self):
-            return {"features": [{"attributes": {"OBJECTID": 7}}]}
+    class BadGateway(Response):
+        status_code = 502
 
-    answers = [RuntimeError("502"), Answer()]
+        def raise_for_status(self):
+            raise requests.HTTPError("502 Bad Gateway", response=self)
+
+    answers = [
+        requests.ConnectionError("connection reset"),
+        requests.exceptions.ChunkedEncodingError("connection broken"),
+        BadGateway(None),
+        Response({"features": [{"attributes": {"OBJECTID": 7}}]}),
+    ]
 
     def get(url, params=None, **kwargs):
         answer = answers.pop(0)
@@ -363,6 +448,20 @@ def test_id_bound_is_retried(monkeypatch):
 
     assert RESTConverter()._rest_id_bound("url", "OBJECTID", None, "ASC") == 7
     assert answers == []
+
+
+def test_retries_are_given_up_after_the_backoff(monkeypatch):
+    calls = []
+
+    def get(url, params=None, **kwargs):
+        calls.append(url)
+        raise requests.Timeout("read timed out")
+
+    monkeypatch.setattr("fiboa_cli.conversion.converter_rest.requests.get", get)
+
+    with pytest.raises(requests.Timeout):
+        RESTConverter()._rest_id_bound("url", "OBJECTID", None, "ASC")
+    assert len(calls) == len(REST_BACKOFF) + 1
 
 
 def test_download_files_passes_the_rest_url_through(tmp_path):
