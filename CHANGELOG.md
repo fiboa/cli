@@ -41,7 +41,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
-- Updated vecorel-cli to 0.3.0, including improved validation defaults, latest-variant selection when `--variant` is not provided, multi-volume 7z download support, and more.
+- Updated vecorel-cli to 0.3.1, including improved validation defaults, latest-variant selection when `--variant` is not provided, multi-volume 7z download support, Deflate64 ZIP extraction, and more.
 - REST converters download much faster from large layers and retry when a service answers with intermittent errors.
 - Converters no longer split multi-part geometries into one row per polygon: fields keep the geometry modeling of the source (Polygon or MultiPolygon), the source-published area and perimeter, and one id per source feature. Use `fiboa improve --explode-geometries` when single polygons are needed.
 - Converters whose variants are years (1900-2100) now fill `determination:datetime` from the selected year unless they provide a determination date themselves.
@@ -69,6 +69,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - URL discovery now requires all nine regional GeoPackages to avoid partial campaign publication.
 - NL: Extended BRP coverage to 2009-2026 and moved to the newer PDOK source.
 - PT: Updated for the 2025 edition and its schema/unit changes.
+- PT: Editions now cover 2017-2025.
+  - 2020-2022 merge the regional files, which come in four projections; 2020 and 2021 join the crop code from a separate table.
+  - 2017-2019 publish the crop as a Portuguese name, which is resolved to a code through pt.csv and kept as `crop:name`.
+  - Perimeters are measured in each feature's UTM zone.
 - SE: Editions now cover 2015-2025 from the yearly WFS filter.
 - SI: Extended editions back to 2019.
 - US-CSB: Editions now cover 2017-2024.
