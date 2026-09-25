@@ -1,6 +1,7 @@
 import json
 import re
 import sys
+from contextlib import ExitStack
 from csv import DictReader
 from os.path import exists
 from unittest.mock import patch
@@ -17,6 +18,17 @@ from fiboa_cli.validate import ValidateData
 Create input files with: `ogr2ogr output.gpkg -limit 100 input.gpkg`
 Optionally use `-lco ENCODING=UTF-8` if you have character encoding issues.
 """
+
+# PT editions besides the default one, 2023
+PT_EDITIONS = ("2025", "2022", "2021", "2020", "2019", "2018", "2017")
+PT_COLUMNS = (
+    "determination:datetime",
+    "metrics:area",
+    "metrics:perimeter",
+    "crop:code",
+    "block_id",
+    "id",
+)
 
 tests = [
     "at",
@@ -38,7 +50,7 @@ tests = [
     "nl",
     "nl_block",
     "pt",
-    "pt#2025",
+    *(f"pt#{year}" for year in PT_EDITIONS),
     "dk",
     "dk#2008",
     "be_wal",
@@ -101,6 +113,8 @@ extra_convert_parameters = {
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
     "dk#2008": {"variant": "2008"},
+    "pt": {"variant": "2023"},
+    **{f"pt#{year}": {"variant": year} for year in PT_EDITIONS},
     # the fixture archive holds the 2024 edition only; the published one holds both
     "lt": {"variant": "2024"},
     # the fixture is the 2023 file; the converter's default is the newest edition
@@ -203,6 +217,17 @@ expected_columns = {
     "ie_lpis#2025": ("determination:datetime", "metrics:area", "crop:code", "id"),
     # derived from the archive date in file_migration()
     "pl_block": ("determination:datetime",),
+    # only 2017-2019 and 2023 publish a crop name
+    "pt": (*PT_COLUMNS, "crop:name"),
+    **{
+        f"pt#{year}": (*PT_COLUMNS, "crop:name") if year <= "2019" else PT_COLUMNS
+        for year in PT_EDITIONS
+    },
+}
+
+# Mapping loaders to patch besides commons.hcat, e.g. where a converter imports one by name
+mapping_lookups = {
+    "pt": ("fiboa_cli.datasets.pt.load_hcat_mapping",),
 }
 
 
@@ -229,7 +254,10 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
     path = f"tests/data-files/convert/{converter_id}"
     kwargs = extra_convert_parameters.get(converter, {})
 
-    ConvertData(converter_id).convert(target=tmp_parquet_file, cache=path, **kwargs)
+    with ExitStack() as stack:
+        for target in mapping_lookups.get(converter_id, ()):
+            stack.enter_context(patch(target, side_effect=load_mapping))
+        ConvertData(converter_id).convert(target=tmp_parquet_file, cache=path, **kwargs)
     out, err = capsys.readouterr()
     output = out + err
 
@@ -251,6 +279,14 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
         assert not missing, (
             f"{converter} dropped {missing}: absent from the schema and from the "
             f"collection metadata. Produced columns: {sorted(df.columns)}"
+        )
+
+    # a float id stringifies as "2315738.0": unique, valid and wrong
+    if required and "id" in df.columns:
+        floaty = df["id"].astype("string").str.fullmatch(r"-?\d+\.0*").fillna(False)
+        assert not floaty.any(), (
+            f"{converter}: {int(floaty.sum()):,} id(s) are stringified floats, "
+            f"e.g. {df.loc[floaty, 'id'].head(3).tolist()}"
         )
 
     if "metrics:area" in df.columns and converter not in ("de_bb",):
