@@ -2,34 +2,18 @@
 
 A wrong code is invisible: the file validates, and a crop query quietly returns
 another crop. `tests/data-files/hcat3.csv` is the taxonomy, copied from
-https://fiboa.org/code/hcat3.csv.
+https://fiboa.org/code/hcat3.csv. `pixi run check-hcat` runs the same check
+against the tables online.
 """
 
 import csv
+import os
 from pathlib import Path
 
-DATA = Path(__file__).parent / "data-files"
+from fiboa_cli.converters import Converters
+from fiboa_cli.datasets.commons.hcat import AddHCATMixin
 
-# Rows that are wrong today, recorded so a new mistake still fails. Each is
-# tracked in https://github.com/fiboa/cli/issues/304; remove an entry when the
-# table it comes from is fixed. Keyed by (name, code) because the same bad pair
-# was copied into several tables.
-KNOWN_BAD = {
-    # the typo is in the taxonomy, which spells it "parsly"; the tables are right
-    ("parsley", "3301061227"),
-    ("aspargus", "3301200000"),  # taxonomy: asparagus
-    ("pistachios", "3303030400"),  # taxonomy: pistachio
-    ("flax_fibre", "3301060701"),  # taxonomy: flax_linen
-    # name and code are different crops: the codes belong to esparsette and sweet lupins
-    ("lupins", "3301020300"),
-    ("soybeans", "3301020700"),
-    # right name, wrong code
-    ("vineyards_wine_vine_rebland_grapes", "3303070000"),  # 3303060000
-    ("topinambur_jerusalem_artichoke", "3301290900"),  # 3301180000
-    ("iris", "3301082200"),  # 3301082300
-    ("lentils", "3301020300"),  # 3301020500
-    ("zucchini_courgette", "3301140200"),  # 3301140600, already fixed upstream
-}
+DATA = Path(__file__).parent / "data-files"
 
 
 def read_rows(path):
@@ -42,21 +26,52 @@ def read_rows(path):
     return []
 
 
+def row_key(row):
+    return (row.get("original_code") or "").strip() or (row.get("original_name") or "").strip()
+
+
+def applied_tables():
+    """Per fixture table a converter reads: the rows it applies, supplements winning by code."""
+    converters = Converters()
+    tables, missing = {}, []
+    for _id in converters.list_ids():
+        converter = converters.load(_id)
+        if not isinstance(converter, AddHCATMixin) or not converter.hcat_mapping_csv:
+            continue
+        folder = DATA / "convert" / _id
+        main = folder / os.path.basename(converter.hcat_mapping_csv)
+        if not main.exists():
+            continue
+        rows = {row_key(r): r for r in read_rows(main)}
+        for url in converter.hcat_mapping_supplements:
+            supplement = folder / os.path.basename(url)
+            if not supplement.exists():
+                missing.append(str(supplement.relative_to(DATA)))
+                continue
+            rows |= {row_key(r): r for r in read_rows(supplement)}
+        tables[main] = list(rows.values())
+    return tables, missing
+
+
 def test_mapping_tables_agree_with_the_taxonomy():
     taxonomy = {r["HCAT3_name"]: r["HCAT3_code"] for r in read_rows(DATA / "hcat3.csv")}
     assert len(taxonomy) > 300, "the taxonomy fixture looks truncated"
+
+    applied, missing = applied_tables()
+    assert not missing, "supplements without a fixture: " + ", ".join(missing)
 
     wrong = []
     for path in sorted(DATA.glob("**/*.csv")):
         if path.name == "hcat3.csv":
             continue
-        rows = read_rows(path)
+        # a table a converter reads is checked as corrected by its supplements
+        rows = applied.get(path) or read_rows(path)
         if not rows or "HCAT3_name" not in rows[0] or "HCAT3_code" not in rows[0]:
             continue
         for row in rows:
             name = (row.get("HCAT3_name") or "").strip()
             code = (row.get("HCAT3_code") or "").strip()
-            if (not name and not code) or (name, code) in KNOWN_BAD:
+            if not name and not code:
                 continue
             where = f"{path.relative_to(DATA)} {row.get('original_code')}"
             if name not in taxonomy:

@@ -1,0 +1,35 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+47,Goudsbloem,Marigold,calendula_marigold,3301061210
+48,Deder/huttentut,Camelina,camelina,3301061500
+391,Mengteelt andere wintergranen en winterteelt vlinderbloemige,Intercropping other winter cereals and winter legume,unspecified_cereals,3301011500
+392,Mengteelt zomergranen en zomerteelt vlinderbloemige,Intercropping spring cereals and spring legume,unspecified_cereals,3301011500
+395,Mengteelt wintertarwe of triticale en winterteelt vlinderbloemige,Intercropping winter wheat or triticale and winter legume,winter_common_soft_wheat,3301010101
+451,Wintervlas (olieproductie),Winter flax (oil production),flax_linseed_oil,3301060702
+511,Voedererwten (winterteelt) - niet menselijke consumptie,Fodder peas (winter) - not for human consumption,peas,3301020600
+512,Voedererwten (zomerteelt) - niet menselijke consumptie,Fodder peas (spring) - not for human consumption,peas,3301020600
+513,Drooggeoogste erwten (voor menselijke consumptie),Dry harvested peas (for human consumption),peas,3301020600
+521,Winterveldbonen - niet menselijke consumptie,Winter field beans - not for human consumption,beans,3301020100
+522,Zomerveldbonen - niet menselijke consumptie,Spring field beans - not for human consumption,beans,3301020100
+523,Drooggeoogste Vicia bonen (voor menselijke consumptie),Dry harvested Vicia beans (for human consumption),beans,3301020100
+524,Drooggeoogste Phaseolus bonen (voor menselijke consumptie),Dry harvested Phaseolus beans (for human consumption),beans,3301020100
+634,Mengsel met overwegend Japanse haver en vlinderbloemigen,Mixture predominantly Japanese oats with legumes,oats,3301010500
+635,Mengsel met overwegend Japanse haver zonder vlinderbloemigen,Mixture predominantly Japanese oats without legumes,oats,3301010500
+655,Sareptamosterd,Brown mustard,mustard,3301210100
+749,Mengsel met 1 of meerdere vlinderbloemigen,Mixture with one or more legumes,legumes_dried_pulses_protein_crops,3301020000
+858,Andere meerjarige kruiden - industrie,Other perennial herbs - industry,unspecified_aromatic_medicinal_culinary_plants_spices_herbs,3301061298
+881,Engelwortel - vers,Angelica - fresh,angelica,3301061204
+899,Rotatieteelt van groentegewassen (vb pluktuin),Rotational cultivation of vegetable crops,fresh_vegetables,3301070000
+907,Aardappelen (gecertificeerd pootgoed),Potatoes (certified seed),potatoes,3301030000
+908,Aardappelen (hoevepootgoed),Potatoes (farm-saved seed),potatoes,3301030000
+923,Wintervlas (vezelproductie en industriële toepassingen),Winter flax (fibre production and industrial use),flax_linen,3301060701
+933,Kikkererwten,Chickpeas,chickpeas,3301020200
+934,Linzen,Lentils,lentils,3301020500
+6041,Zaaizaad wintervlas,Seed of winter flax,flax_linen,3301060701
+8526,Chinese kool - industrie,Chinese cabbage - industry,chinese_cabbage,3301210205
+8531,Radijs - industrie,Radish - industry,radish,3301290600
+8532,Rode biet - industrie,Beetroot - industry,beetroot_beets,3301290200
+8545,Raketsla - Rucola - industrie,Rocket - industry,rocket_arugula,3301310600
+8552,Tomaten - industrie,Tomatoes - industry,tomato,3301280000
+8553,Paprika - industrie,Bell pepper - industry,bell_pepper_paprika,3301300100
+8581,Andere meerjarige kruiden - vers,Other perennial herbs - fresh,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+9571,Begonia voor de knol,Begonia for the tuber,begonias,3301080400

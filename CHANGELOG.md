@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
+- Added `pixi run check-hcat`, which compares the HCAT mapping tables the converters read online with the taxonomy.
 - Added `FiboaDuckDBBaseConverter` for SQL-based conversion of large Parquet sources.
 - Added `PerFileBaseConverter` to process multi-file sources incrementally.
 - Added support for supplementary HCAT/crop mappings via `hcat_mapping_supplements`.

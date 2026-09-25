@@ -1,0 +1,32 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+19,Majs til modenhed med græsudlæg,Maize for maturity with grass undersowing,grain_maize_corn_popcorn,3301010600
+26,Linser,Lentils,lentils,3301020500
+41,Spindhør,Fibre flax,flax_linen,3301060701
+70,"Vårbyg, efterårssået","Spring barley, autumn sown",spring_barley,3301010402
+71,"Vårhvede, efterårssået","Spring wheat, autumn sown",spring_common_soft_wheat,3301010102
+72,"Vårhavre, efterårssået","Spring oats, autumn sown",spring_oats,3301010502
+127,Lucernefrø,Alfalfa seed,alfalfa_lucerne,3301090301
+154,"Kartofler, spise- (proces, skrællet kogte)","Potatoes, table (processed, peeled boiled)",potatoes,3301030000
+155,"Kartofler, pulver/granules-","Potatoes, powder/granules",potatoes,3301030000
+156,"Kartofler, friteret/chips/pommes frites","Potatoes, fried/chips",potatoes,3301030000
+157,"Kartofler, spise- tidligt høstede med efterafgrøder","Potatoes, table, early harvested with catch crops",potatoes,3301030000
+218,Majshelsæd med græsudlæg,Maize wholecrop with grass undersowing,green_silo_maize,3301090400
+224,"Blandkorn, efterårssået helsæd","Meslin, autumn sown wholecrop",winter_meslin,3301011101
+236,"Græs med kløver/lucerne, under 50 % bælgpl. (omdrift) efterårsudlagt i vinterkorn til grønkorn","Grass with clover/alfalfa, under 50% legume (rotation), autumn sown in winter cereal for green fodder",plants_harvested_green,3301090000
+237,"Græs med kløver/lucerne, over 50 % bælgpl. (omdrift) efterårsudlagt i vinterkorn til grønkorn","Grass with clover/alfalfa, over 50% legume (rotation), autumn sown in winter cereal for green fodder",clover,3301090303
+345,"Brak langs vandløb og søer, slåning (alternativ til efterafgrøder)","Fallow along watercourses and lakes, mown",fallow_land_not_crop,3301110000
+425,Sukkermajs med græsudlæg,Sweetcorn with grass undersowing,grain_maize_corn_popcorn,3301010600
+426,"Bønner, andre","Beans, other",beans,3301020100
+427,Babyleaves,Baby leaves,salads_lettuce_leaf_vegetables,3301310000
+428,Spidskål,Pointed cabbage,savoy_cabbage,3301210211
+482,Skovlandbrug med permanent græs,Agroforestry with permanent grass,tree_wood_forest,3306000000
+483,Skovlandbrug med græs i omdrift,Agroforestry with grass in rotation,tree_wood_forest,3306000000
+484,Skovlandbrug med omdriftsafgrøder,Agroforestry with rotational crops,tree_wood_forest,3306000000
+485,Skovlandbrug med permanente afgrøder,Agroforestry with permanent crops,tree_wood_forest,3306000000
+490,"Hassel, træ (Corylus avellana)","Hazel, tree (Corylus avellana)",hazelnuts_hazel,3303030200
+491,Storfrugtet tranebær,Large cranberry,cranberry,3303020500
+496,"Medicinpl., vedplanter","Medicinal plants, woody",aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+535,Bærmispel,Juneberry,amelanchier_serviceberry,3303010100
+565,"Skovrejsning, direktivimplementerende uden tilsagn","Afforestation, directive-implementing without commitment",afforestation_reforestation,3306010000
+566,"Klimaskovrejsning, national ordning","Climate afforestation, national scheme",afforestation_reforestation,3306010000
+575,Skovrejsning (privat) - kulstofbinding og grundvandsbeskyttelse,Afforestation (private) - carbon capture and groundwater protection,afforestation_reforestation,3306010000
