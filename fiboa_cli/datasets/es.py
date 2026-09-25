@@ -31,7 +31,6 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
 
     columns = {
         "geometry": "geometry",
-        "id": "id",
         "provincia": "admin_province_code",
         "municipio": "admin_municipality_code",
         "dn_surface": "metrics:area",
@@ -39,6 +38,19 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
         "parc_sistexp": "irrigation_system",
         "parc_supcult": "cultivation_surface",
     }
+
+    # The source has no globally unique row identifier: the SIGPAC cadastral key
+    # plus the declaration-line index is unique per record
+    id_columns = (
+        "provincia",
+        "municipio",
+        "agregado",
+        "zona",
+        "poligono",
+        "parcela",
+        "recinto",
+        "ld_recinto",
+    )
 
     area_is_in_ha = False
 
@@ -71,31 +83,6 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
     def layer_filter(self, layer: str, uri: str) -> bool:
         # GPKG contains the data layer plus several codelist tables (cod_*) — only read the data.
         return layer == "cultivo_declarado"
-
-    def migrate(self, gdf):
-        # The source has no globally unique row identifier. Build one from the SIGPAC cadastral key
-        # plus the declaration-line index, which is unique per record.
-        def part(col):
-            return gdf[col].astype("Int64").astype(str)
-
-        gdf["id"] = (
-            part("provincia").str.zfill(2)
-            + "-"
-            + part("municipio")
-            + "-"
-            + part("agregado")
-            + "-"
-            + part("zona")
-            + "-"
-            + part("poligono")
-            + "-"
-            + part("parcela")
-            + "-"
-            + part("recinto")
-            + "-"
-            + part("ld_recinto")
-        )
-        return super().migrate(gdf)
 
     def get_urls(self):
         if self.variant not in self.variants:

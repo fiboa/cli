@@ -225,6 +225,49 @@ def test_multipart_features_keep_their_row_and_metrics(tmp_parquet_file):
     assert result["metrics:perimeter"].tolist() == [120.0, 60.0]
 
 
+def test_a_crop_column_chosen_in_get_columns_is_mapped_to_hcat(tmp_folder, tmp_parquet_file):
+    from shapely.geometry import box
+
+    from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+    from fiboa_cli.datasets.commons.hcat import AddHCATMixin
+
+    mapping = tmp_folder / "mapping.csv"
+    mapping.write_text(
+        "original_code,translated_name,HCAT3_name,HCAT3_code\n"
+        "W,Wheat,common_soft_winter_wheat,3301011101\n",
+        encoding="utf-8",
+    )
+
+    class Converter(AddHCATMixin, FiboaBaseConverter):
+        id = "hcat"
+        short_name = "HCAT"
+        title = "HCAT"
+        description = "HCAT"
+        license = "CC0-1.0"
+        columns = {"geometry": "geometry", "id": "id", "CROP": ["crop:code", "crop:name"]}
+
+        def get_columns(self, gdf):
+            columns = super().get_columns(gdf)
+            if "CROP" not in gdf.columns:
+                columns["CROP_OLD"] = columns.pop("CROP")
+            return columns
+
+    gdf = gpd.GeoDataFrame(
+        {"id": ["a"], "CROP_OLD": ["W"]}, geometry=[box(0, 0, 100, 100)], crs="EPSG:25832"
+    )
+    src = tmp_parquet_file.parent / "source.parquet"
+    gdf.to_parquet(src)
+
+    Converter().convert(
+        tmp_parquet_file, input_files={str(src): "source.parquet"}, mapping_file=str(mapping)
+    )
+
+    result = gpd.read_parquet(tmp_parquet_file)
+    assert result["crop:code"].tolist() == ["W"]
+    assert result["crop:name"].tolist() == ["W"]
+    assert result["hcat:code"].tolist() == [3301011101]
+
+
 def _determination_converter(**attrs):
     from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 

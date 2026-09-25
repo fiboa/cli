@@ -118,6 +118,24 @@ def test_the_area_of_an_invalid_geometry_is_that_of_the_published_one(tmp_parque
     assert result["metrics:area"].tolist() == pytest.approx(published.tolist(), rel=5e-3)
 
 
+def test_an_area_column_chosen_in_get_columns_is_taken_for_hectares(tmp_parquet_file):
+    def get_columns(self, gdf):
+        columns = FiboaBaseConverter.get_columns(self, gdf)
+        if "AKTUELLEFL" not in gdf.columns:
+            columns["AKT_FL"] = columns.pop("AKTUELLEFL")
+        return columns
+
+    result = _convert(
+        tmp_parquet_file,
+        "EPSG:25832",
+        data={"AKT_FL": [1.5, 2.5]},
+        columns={"AKTUELLEFL": "metrics:area"},
+        get_columns=get_columns,
+    )
+
+    assert result["metrics:area"].tolist() == [15_000, 25_000]
+
+
 def test_opting_out_publishes_no_area(tmp_parquet_file):
     result = _convert(tmp_parquet_file, area_calculate_missing=False)
 

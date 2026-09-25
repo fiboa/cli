@@ -70,10 +70,24 @@ class AddHCATMixin:
             )
         return super().convert(*args, **kwargs)
 
-    def get_code_column(self, gdf, code="crop:code"):
-        try:
-            attribute = next(k for k, v in self.columns.items() if v == code)
-        except StopIteration:
+    def get_hcat_mapping(self) -> list[dict]:
+        if self.hcat_mapping is None:
+            self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
+            for supplement in self.hcat_mapping_supplements:
+                self.hcat_mapping = self.hcat_mapping + load_hcat_mapping(supplement)
+        return self.hcat_mapping
+
+    def hcat_lookup(self, key: str, value: str, strip: bool = False) -> dict:
+        """Maps one column of the HCAT mapping to another, e.g. original_code to original_name"""
+        return {
+            (row[key].strip() if strip else row[key]): row[value] for row in self.get_hcat_mapping()
+        }
+
+    def get_code_column(self, gdf, code="crop:code", columns=None):
+        if columns is None:
+            columns = self.get_columns(gdf)
+        attribute = self._source_column(code, columns)
+        if attribute is None:
             raise Exception(f"Misssing {code} column in converter {self.__class__.__name__}")
         col = gdf[attribute]
         # Should be corrected in original parser
@@ -89,25 +103,22 @@ class AddHCATMixin:
             # Add HCAT columns based on crop-columns
             # Map to HCAT categories by using the mapping from the csv file
 
-            if self.hcat_mapping is None:
-                self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
-                for supplement in self.hcat_mapping_supplements:
-                    self.hcat_mapping = self.hcat_mapping + load_hcat_mapping(supplement)
-
+            columns = self.get_columns(gdf)
+            self.get_hcat_mapping()
             from_code = "original_code"
             if from_code not in self.hcat_mapping[0]:
                 # Some code lists have no code, only a crop_name
                 from_code = "original_name"
-                crop_code_col = self.get_code_column(gdf, "crop:name")
+                crop_code_col = self.get_code_column(gdf, "crop:name", columns)
             else:
-                crop_code_col = self.get_code_column(gdf)
+                crop_code_col = self.get_code_column(gdf, columns=columns)
 
             def map_to(attribute):
                 return {e[from_code]: e[attribute] or None for e in self.hcat_mapping}
 
             name_col = None
             if self.hcat_mapping_name_fallback and from_code == "original_code":
-                name_col = self.get_code_column(gdf, "crop:name")
+                name_col = self.get_code_column(gdf, "crop:name", columns)
 
             def map_by_name(attribute):
                 # Three Walloon crops carry a trailing space in the table.
@@ -130,7 +141,9 @@ class AddHCATMixin:
 
             if col is not None and col.isna().any():
                 index = [
-                    k for k, v in self.columns.items() if v.startswith("crop:") and k in gdf.columns
+                    k
+                    for k, v in columns.items()
+                    if k in gdf.columns and any(t.startswith("crop:") for t in np.atleast_1d(v))
                 ]
                 missing = gdf[col.isna()][index].drop_duplicates()
                 missing.reset_index(drop=True, inplace=True)

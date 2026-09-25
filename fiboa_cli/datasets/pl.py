@@ -36,8 +36,7 @@ position in the download, since the source carries no parcel identifier.
     columns = {
         "geometry": "geometry",
         "id": "id",  # derived in file_migration()
-        "roslina": "crop:name",
-        "crop:code": "crop:code",  # the name, copied in migrate()
+        "roslina": ["crop:name", "crop:code"],
         "grupa_rosl": "crop_group",
         "gr_upraw": "support_schemes",
         "pow": "metrics:area",
@@ -83,7 +82,3 @@ position in the download, since the source carries no parcel identifier.
         start = int(match.group(1)) if match else 0
         gdf["id"] = [f"{self.variant}-{start + i + 1}" for i in range(len(gdf))]
         return gdf
-
-    def migrate(self, gdf):
-        gdf["crop:code"] = gdf["roslina"]
-        return super().migrate(gdf)

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added `FiboaDuckDBBaseConverter` for SQL-based conversion of large Parquet sources.
 - Added `PerFileBaseConverter` to process multi-file sources incrementally.
 - Added support for supplementary HCAT/crop mappings via `hcat_mapping_supplements`.
+- Added `get_hcat_mapping()` and `hcat_lookup()` to `AddHCATMixin` to load the HCAT mapping once and look up codes or names in it.
 - Added support for Esri JSON output and server-side filters in REST converters.
 - Added `WFSConverterMixin` for paged downloads from WFS layers.
 - Added a test guard that rejects fixture files larger than 5 MB.
@@ -94,6 +95,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `metrics:area` measured from the geometry is now correct in CRSs that are in metres but not equal-area, such as Web Mercator: they are reprojected to an equal-area CRS first. Source areas in hectares are converted to m² also where missing values are filled in, and empty values are filled in, not only 0. Invalid geometries are repaired before they are measured, as they are for the output, so that e.g. a self-intersecting polygon no longer gets an area of 0.
 - Converters no longer publish duplicate `id`s (#282): row-numbered ids count over all source files instead of restarting per file, and ids the source repeats get a `~<n>` suffix.
 - Rows missing `crop:code` are now dropped with a warning (and an error threshold), instead of failing whole conversions.
+- The HCAT mapping, the German IACS crop names and `metrics:area` now use the columns returned by an overridden `get_columns()` instead of the declared `columns`.
+- BR-CONAB: `metrics:area` falls back to the `Hectares` column where `area_ha` is empty.
 - DE-BB:
   - Excluded NBF ineligible patches with empty crop code.
   - Fixed source encoding and FLIK handling.

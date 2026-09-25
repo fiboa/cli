@@ -1,7 +1,7 @@
 import pandas as pd
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import AddHCATMixin, load_hcat_mapping
+from .commons.hcat import AddHCATMixin
 
 COLUMNS = {
     "geometry": "geometry",
@@ -48,9 +48,7 @@ The data comes from ARIB's database of agricultural parcels.
 
     def migrate(self, gdf):
         # do a reverse mapping (from name to crop:code)
-        if self.hcat_mapping is None:
-            self.hcat_mapping = load_hcat_mapping(self.hcat_mapping_csv, url=self.mapping_file)
-        codes = {row["original_name"].strip(): row["original_code"] for row in self.hcat_mapping}
+        codes = self.hcat_lookup("original_name", "original_code", strip=True)
         gdf["crop:code"] = gdf["taotletud_kultuur"].str.strip().map(codes)
         return super().migrate(gdf)
 
