@@ -106,6 +106,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Fixed source encoding and FLIK handling.
 - DE-NDS: Added stable collection IDs where missing.
 - DE-SAX: Updated to current available archive campaign.
+- DE-SAX: The title says it holds field blocks.
 - DE-SL:
   - Fixed parser issues with scientific notation in area values.
   - Restored full paging coverage and area derivation for complete output.

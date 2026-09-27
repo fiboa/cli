@@ -15,7 +15,7 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
     id = "de_sax"
     admin_subdivision_code = "SN"
     short_name = "Germany, Saxony"
-    title = "Field boundaries for Saxony, Germany"
+    title = "Field blocks for Saxony, Germany"
     description = "Feldblöcke und förderfähige Elemente in Sachsen 2026"
     provider = "Sächsisches Landesamt für Umwelt, Landwirtschaft und Geologie <https://geoportal.sachsen.de>"
     attribution = "Sächsisches Landesamt für Umwelt, Landwirtschaft und Geologie"
