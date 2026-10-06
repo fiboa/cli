@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
+- Added `PerFileConverterMixin`, which converts each source file on its own and merges the parts; ES uses it, as its 50 provinces do not fit in memory together.
 - Added `pixi run check-hcat`, which compares the HCAT mapping tables the converters read online with the taxonomy.
 - Added `FiboaDuckDBBaseConverter` for SQL-based conversion of large Parquet sources.
 - Added `PerFileBaseConverter` to process multi-file sources incrementally.
