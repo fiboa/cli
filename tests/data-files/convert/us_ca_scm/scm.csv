@@ -56,5 +56,26 @@ original_name,original_code,color,translated_name,HCAT3_name,HCAT3_code
 "Vineyards - No Subclass",V,#ebcc65,"Vineyards - No Subclass",vineyards_wine_vine_rebland_grapes,3303060000
 "Not cropped, or unclassified at the time of remote-sensing analysis. Idle status not determined",X,#4debc1,"Not cropped, or unclassified at the time of remote-sensing analysis. Idle status not determined",not_known_and_other,3399000000
 "Young Perennial (grouped for remote sensing or when CLASS C, D or V is not determined)",YP,#ef8c57,"Young Perennial (grouped for remote sensing or when CLASS C, D or V is not determined)",permanent_crops_perennial,3303000000
-"Unclassified",U,#4debc1,"Unclassified",not_known_and_other,3399000000
+"Urban",U,#4debc1,"Urban",not_known_and_other,3399000000
 "Urban Landscape",UL2,#4debc1,"Urban Landscape",not_known_and_other,3399000000
+"Citrus - Lemons",C2,#f1a543,"Citrus - Lemons",citrus_plantations,3303040000
+"Citrus - Oranges",C3,#3abe12,"Citrus - Oranges",citrus_plantations,3303040000
+"Deciduous Fruits and Nuts - No Subclass",D,#f623e7,"Deciduous Fruits and Nuts - No Subclass",permanent_crops_perennial,3303000000
+"Deciduous - Mixed",D11,#c0e3be,"Deciduous - Mixed",unspecified_orchards_fruits,3303019800
+"Plums, Prunes and Apricots (grouped for remote sensing classification only)",D16,#6fd9ec,"Plums, Prunes and Apricots (grouped for remote sensing classification only)",orchards_fruits,3303010000
+"Field Crops - No Subclass",F,#800618,"Field Crops - No Subclass",other_arable_land_crops,3301990000
+"Corn (field and sweet)",F6,#1faf42,"Corn (field and sweet)",grain_maize_corn_popcorn,3301010600
+"Grain and Hay - No Subclass",G,#dfcf28,"Grain and Hay - No Subclass",cereal,3301010000
+"Grain and Hay - Mixed",G7,#bf9175,"Grain and Hay - Mixed",other_arable_land_crops,3301990000
+"Idle - New lands being prepared for crop production",I2,#8213a4,"Idle - New lands being prepared for crop production",fallow_land_not_crop,3301110000
+"Riparian Vegetation",NR,#c3938d,"Riparian Vegetation",not_known_and_other,3399000000
+"Pasture - No Subclass",P,#44c29e,"Pasture - No Subclass",pasture_meadow_grassland_grass,3302000000
+"Pasture - Clover",P2,#589059,"Pasture - Clover",clover,3301090303
+"Rice - No Subclass",R,#e1e1d3,"Rice - No Subclass",rice,3301010700
+"Truck, Nursery and Berry Crops - No Subclass",T,#b9ece1,"Truck, Nursery and Berry Crops - No Subclass",fresh_vegetables,3301070000
+"Artichokes",T1,#ce499d,"Artichokes",artichoke,3301270000
+"Tomatoes (processing)",T15,#b6520b,"Tomatoes (processing)",tomato,3301280000
+"Truck Crops - Mixed (four or more)",T17,#cc75c1,"Truck Crops - Mixed (four or more)",fresh_vegetables,3301070000
+"Potato and Sweet Potato (grouped for remote sensing classification only)",T31,#25ddda,"Potato and Sweet Potato (grouped for remote sensing classification only)",potatoes,3301030000
+"Lettuce (all types)",T8,#001cf4,"Lettuce (all types)",salads_lettuce_leaf_vegetables,3301310000
+"Vineyards - Wine Grapes",V2,#ec765f,"Vineyards - Wine Grapes",vineyards_wine_vine_rebland_grapes,3303060000
