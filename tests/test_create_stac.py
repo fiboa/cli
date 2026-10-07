@@ -3,7 +3,7 @@ from pathlib import Path
 from vecorel_cli.vecorel.util import load_file
 
 from fiboa_cli.create_stac import DESCRIPTIONS, CreateStacCollection
-from fiboa_cli.registry import Registry
+from fiboa_cli.registry import FiboaRegistry, Registry
 
 
 def test_create_stac_collection(tmp_folder: Path):
@@ -57,3 +57,8 @@ def test_fiboa_columns_are_described(tmp_folder: Path):
     columns = {c["name"]: c for c in load_file(out_file)["assets"]["data"]["table:columns"]}
     assert columns["metrics:area"]["description"] == "Field area in square meters"
     assert all("description" not in c for n, c in columns.items() if n not in DESCRIPTIONS)
+
+
+def test_every_core_property_has_a_description():
+    undescribed = set(FiboaRegistry.core_properties) - {"geometry"} - DESCRIPTIONS.keys()
+    assert not undescribed, f"core properties without a description: {sorted(undescribed)}"
