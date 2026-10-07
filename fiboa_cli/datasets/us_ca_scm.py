@@ -56,6 +56,10 @@ CROP_CODE_BY_NAME = {
     "Young Perennials": "YP",
 }
 
+# DWR maps the whole state; these classes are its urban mask (county-sized polygons,
+# "****" in 2020-2022), urban landscape and riparian vegetation, not fields
+NON_AGRICULTURAL = {"U", "****", "UL2", "NR"}
+
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
@@ -125,6 +129,9 @@ crop maps are made from remote sensing by Land IQ under contract to DWR. 2024 is
         "crop:name": "crop:name",
         "COUNTY": "admin_level_2",
         "determination:datetime": "determination:datetime",
+    }
+    column_filters = {
+        "crop_code": lambda col: (col.isin(NON_AGRICULTURAL), True),
     }
     hcat_mapping_csv = "https://fiboa.org/code/us/ca/scm.csv"
     missing_schemas = {

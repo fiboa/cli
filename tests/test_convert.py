@@ -281,6 +281,13 @@ expected_columns = {
     },
 }
 
+# Classes a converter filters out, and that the fixture does contain
+filtered_codes = {
+    # DWR maps the whole state: the urban mask is county-sized polygons, not fields
+    "us_ca_scm#2018": ("U",),
+    "us_ca_scm#2014": ("U",),
+}
+
 # Mapping loaders to patch besides commons.hcat, e.g. where a converter imports one by name
 mapping_lookups = {
     "pt": ("fiboa_cli.datasets.pt.load_hcat_mapping",),
@@ -344,6 +351,9 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
             f"{converter}: {int(floaty.sum()):,} id(s) are stringified floats, "
             f"e.g. {df.loc[floaty, 'id'].head(3).tolist()}"
         )
+
+    dropped = [c for c in filtered_codes.get(converter, ()) if c in set(df["crop:code"])]
+    assert not dropped, f"{converter} kept rows it should filter out: crop:code {dropped}"
 
     if "metrics:area" in df.columns and converter not in ("de_bb",):
         # Check for accidental hectare conversion; fields should be more than 10 square meters
