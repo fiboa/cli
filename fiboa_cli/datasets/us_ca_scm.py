@@ -1,60 +1,13 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
+from .commons.data import read_data_csv
 from .commons.hcat import AddHCATMixin
 
 BASE = "https://data.cnra.ca.gov/dataset/6c3d65e3-35bb-49e1-a51e-49d5a2cf09a9/resource"
 
-# 2014 names its crops only; each name has one dominant code in 2016, which has both
-CROP_CODE_BY_NAME = {
-    "Alfalfa and Alfalfa Mixtures": "P1",
-    "Almonds": "D12",
-    "Apples": "D1",
-    "Avocados": "C5",
-    "Beans (Dry)": "F10",
-    "Bush Berries": "T19",
-    "Carrots": "T6",
-    "Cherries": "D3",
-    "Citrus": "C",
-    "Cole Crops": "T4",
-    "Corn, Sorghum and Sudan": "F16",
-    "Cotton": "F1",
-    "Dates": "C4",
-    "Flowers, Nursery and Christmas Tree Farms": "T16",
-    "Grapes": "V",
-    "Greenhouse": "T27",
-    "Idle": "X",
-    "Kiwis": "C8",
-    "Lettuce/Leafy Greens": "T8",
-    "Managed Wetland": "NR",
-    "Melons, Squash and Cucumbers": "T9",
-    "Miscellaneous Deciduous": "D10",
-    "Miscellaneous Field Crops": "F11",
-    "Miscellaneous Grain and Hay": "G6",
-    "Miscellaneous Grasses": "P6",
-    "Miscellaneous Subtropical Fruits": "C7",
-    "Miscellaneous Truck Crops": "T18",
-    "Mixed Pasture": "P3",
-    "Olives": "C6",
-    "Onions and Garlic": "T10",
-    "Peaches/Nectarines": "D5",
-    "Pears": "D6",
-    "Peppers": "T21",
-    "Pistachios": "D14",
-    "Plums, Prunes and Apricots": "D16",
-    "Pomegranates": "D15",
-    "Potatoes and Sweet Potatoes": "T31",
-    "Rice": "R1",
-    "Safflower": "F2",
-    "Strawberries": "T20",
-    "Sunflowers": "F12",
-    "Tomatoes": "T15",
-    "Urban": "U",
-    "Walnuts": "D13",
-    "Wheat": "G2",
-    "Wild Rice": "R2",
-    "Young Perennials": "YP",
-}
+# 2014 names its crops only; the codes are the names' dominant codes in 2016, which has both
+CODES_2014_FILE = "us_ca_scm_2014.csv"
 
 # DWR maps the whole state; these classes are its urban mask (county-sized polygons,
 # "****" in 2020-2022), urban landscape and riparian vegetation, not fields
@@ -148,7 +101,8 @@ crop maps are made from remote sensing by Land IQ under contract to DWR. 2024 is
         elif "CROPTYP2" in gdf.columns:
             gdf["crop_code"] = gdf["CROPTYP2"]
         else:
-            gdf["crop_code"] = gdf[f"Crop{self.variant}"].map(CROP_CODE_BY_NAME)
+            codes = {r["original_name"]: r["original_code"] for r in read_data_csv(CODES_2014_FILE)}
+            gdf["crop_code"] = gdf[f"Crop{self.variant}"].map(codes)
         gdf["crop:name"] = gdf["crop_code"].map(self.hcat_lookup("original_code", "original_name"))
         if "County" in gdf.columns:
             gdf = gdf.rename(columns={"County": "COUNTY"})

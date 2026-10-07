@@ -78,6 +78,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - SI: Extended editions back to 2019.
 - SK: Editions now cover 2018-2026 from the per-campaign datasets on data.slovensko.sk.
 - US-CSB: Editions now cover 2017-2024.
+- US-CA SCM:
+  - Editions now cover 2014, 2016 and 2018-2024 (2024 provisional), from the current portal URLs.
+  - The crop is `MAIN_CROP` from 2019, the main-season `CROPTYP2` in 2016 and 2018, and in 2014 a name mapped to its code through `us_ca_scm_2014.csv`.
+  - The urban mask (`U`, `****`), urban landscape (`UL2`) and riparian vegetation (`NR`) are left out: they are not fields.
+  - The provider is the California Department of Water Resources; `determination:datetime` is 1 July of the edition year.
 
 ### Removed
 - CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
