@@ -70,6 +70,7 @@ tests = [
     "us_ca_scm",
     "us_ca_scm#2018",
     "us_ca_scm#2014",
+    "br_conab",
     "jp",
     "lv",
     "ie",
@@ -164,6 +165,13 @@ extra_convert_parameters = {
         "variant": "2025",
         **_input_files("ch_zh", "ch_zh_2025.gml"),
         "mapping_file": f"{test_path}/ch/lnf_code.csv",
+    },
+    # SC names its columns Hectares/NM_MUNIC and is in UTM 22S, RJ uses area_ha/cd_mun in SIRGAS 2000
+    "br_conab": {
+        "input_files": {
+            f"{test_path}/br_conab/1784841407_arroz-sc-safra-2018-2019.zip": ["*.shp"],
+            f"{test_path}/br_conab/1785251708_cafe-rj-21.zip": ["*.shp"],
+        }
     },
     "es_cl": {
         "variant": "2025",
@@ -288,6 +296,11 @@ filtered_codes = {
     "us_ca_scm#2014": ("U",),
 }
 
+# The smallest field (m²) a converter keeps, where the fixture holds a smaller sliver
+minimum_area = {
+    "br_conab": 100,
+}
+
 # Mapping loaders to patch besides commons.hcat, e.g. where a converter imports one by name
 mapping_lookups = {
     "pt": ("fiboa_cli.datasets.pt.load_hcat_mapping",),
@@ -351,6 +364,10 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
             f"{converter}: {int(floaty.sum()):,} id(s) are stringified floats, "
             f"e.g. {df.loc[floaty, 'id'].head(3).tolist()}"
         )
+
+    if converter in minimum_area:
+        smallest = df["metrics:area"].min()
+        assert smallest >= minimum_area[converter], f"{converter} kept a {smallest:.1f} m² sliver"
 
     dropped = [c for c in filtered_codes.get(converter, ()) if c in set(df["crop:code"])]
     assert not dropped, f"{converter} kept rows it should filter out: crop:code {dropped}"

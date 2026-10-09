@@ -54,6 +54,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Converters now publish `metrics:area` by default (`area_calculate_missing = True`, #277): measured from the geometry for every row if the source has no area, and for the rows where it is empty or 0 otherwise. Set `area_calculate_missing = False` to opt out.
 - Renamed the HCAT mapping attributes of `AddHCATMixin`, as they work with any HCAT mapping, not only EuroCrops: the `ec_mapping*` attributes use the `hcat_mapping*` prefix now. The helpers `load_ec_mapping()` and `ec_url()` are now `load_hcat_mapping()` and `hcat_mapping_url()` in `fiboa_cli.datasets.commons.hcat`; the copies in `fiboa_cli.datasets.commons.ec` were removed.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
+- BR-CONAB: Reads the 29 mappings from the portal's new download URLs; ids no longer carry the file's upload timestamp, and polygons under 100 m² (digitising slivers, a fifth of Minas Gerais coffee) are left out.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
 - DK: Editions now cover 2008-2026. The 2008 and 2009 editions are published without the crop and HCAT extensions because the source has no crop columns.
