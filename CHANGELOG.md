@@ -68,6 +68,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - FI: Editions are now available by year (2020-2025).
 - FR: Editions now cover 2017-2024, mapped through one shared crop code list (https://fiboa.org/code/fr/fr.csv).
 - HR: Editions now cover 2011-2024.
+- IT-1: Reads the JRC's newest EuroCrops V2 release (`gpqtv202`).
 - LV:
   - Editions now cover 2015-2025 from yearly data.gov.lv releases.
   - `block_id` is published from the field-block identifier and `crop:name` comes from the official code list.
