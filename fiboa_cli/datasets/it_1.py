@@ -2,7 +2,7 @@
 
 Single-region Italian converter using the harmonised, multi-year GeoParquet
 release published by the JRC at
-``https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/DRLL/EuroCropsV2/gpqtv201/``.
+``https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/DRLL/EuroCropsV2/gpqtv202/``.
 
 EuroCropsV2 itself is a separate dataset from the original (TUM) EuroCrops; it
 covers Italy via Tuscany only at the moment (NUTS-2 ``ITI1``). HCAT3 names
@@ -17,7 +17,7 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
-JRC_BASE = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/DRLL/EuroCropsV2/gpqtv201"
+JRC_BASE = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/DRLL/EuroCropsV2/gpqtv202"
 NUTS = "iti1"
 
 
