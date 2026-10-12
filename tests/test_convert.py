@@ -96,6 +96,13 @@ tests = [
     "ec_ro",
     "india_10k",
     "it_1",
+    "ec_de_bb",
+    "ec_be_vlg",
+    "ec_be_wal",
+    "ec_de_nrw",
+    "ec_at",
+    "ec_es",
+    "ec_ee",
     "de_bw",
     "lt_kzs",
     "de_by_block",
@@ -238,6 +245,15 @@ extra_convert_parameters = {
         "za_fusion", "za_train_258N.geojson", "za_train_259N.geojson", "za_test_2017.geojson"
     ),
     "rw_rwanda_ml": _input_files("rw_rwanda", "rw_rwanda_2021.geojson"),
+    # EuroCrops V2: the fixture is one year's file, named as the JRC names it
+    "ec_de_bb": {"variant": "2020"},
+    "ec_be_vlg": {"variant": "2010"},
+    "ec_be_wal": {"variant": "2019"},
+    "ec_de_nrw": {"variant": "2021"},
+    "ec_at": {"variant": "2016"},
+    "ec_es": {"variant": "2023"},
+    "ec_fr": {"variant": "2016"},
+    "ec_ee": {"variant": "2015"},
 }
 
 
@@ -294,6 +310,9 @@ filtered_codes = {
     # DWR maps the whole state: the urban mask is county-sized polygons, not fields
     "us_ca_scm#2018": ("U",),
     "us_ca_scm#2014": ("U",),
+    # landscape elements and buildings, mapped as polygons of their own
+    "ec_de_bb": ("1", "2", "3", "10011"),
+    "ec_be_vlg": ("1", "2"),
 }
 
 # The smallest field (m²) a converter keeps, where the fixture holds a smaller sliver
@@ -372,6 +391,6 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
     dropped = [c for c in filtered_codes.get(converter, ()) if c in set(df["crop:code"])]
     assert not dropped, f"{converter} kept rows it should filter out: crop:code {dropped}"
 
-    if "metrics:area" in df.columns and converter not in ("de_bb",):
+    if "metrics:area" in df.columns and converter not in ("de_bb", "ec_de_bb"):
         # Check for accidental hectare conversion; fields should be more than 10 square meters
         assert (df["metrics:area"] > 10).all()
