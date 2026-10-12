@@ -37,6 +37,8 @@ free-licensed version for this converter.
         "determination:datetime": "determination:datetime",
     }
     hcat_mapping_csv = "be_wal_all_years.csv"
+    # codes after 2017, cut from the JRC's EuroCrops V2 table
+    hcat_mapping_supplements = ["https://fiboa.org/code/be/wal_supplement.csv"]
     # 208 of that table's 298 rows carry no code, only the crop name, so every
     # crop whose coded row is missing went unmapped: 23,216 fields over 59 codes.
     hcat_mapping_name_fallback = True

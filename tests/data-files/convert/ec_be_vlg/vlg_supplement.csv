@@ -1,0 +1,86 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+47,Goudsbloem,Marigold,calendula_marigold,3301061210
+48,Deder/huttentut,Camelina,camelina,3301061500
+391,Mengteelt andere wintergranen en winterteelt vlinderbloemige,Intercropping other winter cereals and winter legume,unspecified_cereals,3301011500
+392,Mengteelt zomergranen en zomerteelt vlinderbloemige,Intercropping spring cereals and spring legume,unspecified_cereals,3301011500
+395,Mengteelt wintertarwe of triticale en winterteelt vlinderbloemige,Intercropping winter wheat or triticale and winter legume,winter_common_soft_wheat,3301010101
+451,Wintervlas (olieproductie),Winter flax (oil production),flax_linseed_oil,3301060702
+511,Voedererwten (winterteelt) - niet menselijke consumptie,Fodder peas (winter) - not for human consumption,peas,3301020600
+512,Voedererwten (zomerteelt) - niet menselijke consumptie,Fodder peas (spring) - not for human consumption,peas,3301020600
+513,Drooggeoogste erwten (voor menselijke consumptie),Dry harvested peas (for human consumption),peas,3301020600
+521,Winterveldbonen - niet menselijke consumptie,Winter field beans - not for human consumption,beans,3301020100
+522,Zomerveldbonen - niet menselijke consumptie,Spring field beans - not for human consumption,beans,3301020100
+523,Drooggeoogste Vicia bonen (voor menselijke consumptie),Dry harvested Vicia beans (for human consumption),beans,3301020100
+524,Drooggeoogste Phaseolus bonen (voor menselijke consumptie),Dry harvested Phaseolus beans (for human consumption),beans,3301020100
+634,Mengsel met overwegend Japanse haver en vlinderbloemigen,Mixture predominantly Japanese oats with legumes,oats,3301010500
+635,Mengsel met overwegend Japanse haver zonder vlinderbloemigen,Mixture predominantly Japanese oats without legumes,oats,3301010500
+655,Sareptamosterd,Brown mustard,mustard,3301210100
+749,Mengsel met 1 of meerdere vlinderbloemigen,Mixture with one or more legumes,legumes_dried_pulses_protein_crops,3301020000
+858,Andere meerjarige kruiden - industrie,Other perennial herbs - industry,unspecified_aromatic_medicinal_culinary_plants_spices_herbs,3301061298
+881,Engelwortel - vers,Angelica - fresh,angelica,3301061204
+899,Rotatieteelt van groentegewassen (vb pluktuin),Rotational cultivation of vegetable crops,fresh_vegetables,3301070000
+907,Aardappelen (gecertificeerd pootgoed),Potatoes (certified seed),potatoes,3301030000
+908,Aardappelen (hoevepootgoed),Potatoes (farm-saved seed),potatoes,3301030000
+923,Wintervlas (vezelproductie en industriële toepassingen),Winter flax (fibre production and industrial use),flax_linen,3301060701
+933,Kikkererwten,Chickpeas,chickpeas,3301020200
+934,Linzen,Lentils,lentils,3301020500
+6041,Zaaizaad wintervlas,Seed of winter flax,flax_linen,3301060701
+8526,Chinese kool - industrie,Chinese cabbage - industry,chinese_cabbage,3301210205
+8531,Radijs - industrie,Radish - industry,radish,3301290600
+8532,Rode biet - industrie,Beetroot - industry,beetroot_beets,3301290200
+8545,Raketsla - Rucola - industrie,Rocket - industry,rocket_arugula,3301310600
+8552,Tomaten - industrie,Tomatoes - industry,tomato,3301280000
+8553,Paprika - industrie,Bell pepper - industry,bell_pepper_paprika,3301300100
+8581,Andere meerjarige kruiden - vers,Other perennial herbs - fresh,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+9571,Begonia voor de knol,Begonia for the tuber,begonias,3301080400
+5,Tuin met hoogstam,High-stem garden,orchards_fruits,3303010000
+7,Niet-begraasde natuurgrond,Non-grazed natural land,pasture_meadow_grassland_grass,3302000000
+38,"Gierst, sorghum, kanariezaad of harde tarwe","Millet, sorghum, canary seed or durum wheat",cereal,3301010000
+61,Blijvend grasland,Permanent grassland,pasture_meadow_grassland_grass,3302000000
+62,Tijdelijk grasland,Temporary grassland,temporary_grass,3301090100
+88,niet-landbouwkundig gebruik (bv. grondopslag),"non-agricultural use (e.g., ground storage)",not_known_and_other,3399000000
+99,Teelt niet vast te stellen,Not easily determined,not_known_and_other,3399000000
+100,Niet ingezaaid akkerland,Unplanted arable land,fallow_land_not_crop,3301110000
+630,Alexandrijnse klaver,Alexandrian clover,clover,3301090303
+631,Witte of rode klaver,White or red clover,clover,3301090303
+632,Andere klavers,Other clovers,clover,3301090303
+633,Wikken,Vetch,vetches,3301090305
+636,Engels raaigras,perennial ryegrass,lolium_ryegrass,3301090205
+637,Hybride raaigras,Hybrid ryegrass,lolium_ryegrass,3301090205
+642,Bladrammenas,Oil radish,radish,3301290600
+644,Lupinen,Lupins,sweet_lupins,3301020700
+657,Gras in onderzaai,Grass in under-sowing,temporary_grass,3301090100
+658,Mengsel met 1 of meer vlinderbloemige groenbedekkers,Mixture with 1 or more leguminous cover crops.,legumes_harvested_green,3301090300
+659,Mengsel van niet-vlinderbloemige groenbedekkers,Mixture of non-legume cover crops.,other_arable_land_crops,3301990000
+701,Eenjarige grasklaver,Annual clover grass,clover,3301090303
+702,Meerjarige grasklaver,Perennial grass clover,clover,3301090303
+882,"Olifantegras, mariadistel","Miscanthus x giganteus, Milk thistle",miscanthus_silvergrass,3301083000
+891,Bebossing,Afforestation,afforestation_reforestation,3306010000
+892,Bebossing op blijvend grasland in 2003,Afforestation on permanent grassland in 2003,pasture_meadow_grassland_grass,3302000000
+905,"Aardappelen (primeur, rooi voor 20/6)","Potatoes (early, red before 20/6)",potatoes,3301030000
+953,Meerjarige kruiden (meer dan 5 jaar),Perennial herbs (more than 5 years),aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+954,Andere niet-houtachtige sierplanten,Other non-woody ornamental plants,flowers_ornamental_plants,3301080000
+958,Kruiden,Herbs,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+974,"Meerjarige fruitteelten (andere dan appel, peer)","Perennial fruit crops (other than apple, pear)",orchards_fruits,3303010000
+982,Andere,Other,not_known_and_other,3399000000
+4112,Winterraapzaad,Winter rape seed,winter_rapeseed_rape,3301060401
+6490,"Mengsel groenbedekkers, > 50 % grassen","Mixture of cover crops, > 50% grasses.",temporary_grass,3301090100
+6491,"Mengsel groenbedekkers, > 50 % vlinderbloemigen","Mixture of green manures, > 50% legumes.",legumes_harvested_green,3301090300
+6492,"Mengsel groenbedekkers, > 50 % andere","Mixture of cover crops, > 50% other.",other_arable_land_crops,3301990000
+8554,Komkommers - industrie,Cucumbers - industry,cucumber_pickle,3301140100
+8558,Vroege bladgroenten - industrie,Early leafy vegetables - industry.,salads_lettuce_leaf_vegetables,3301310000
+8561,Witloof (voor de wortel) - industrie,Chicory (for the root) - industry,endive,3301310300
+8913,Bebossing naaldbomen-economisch,Afforestation of conifers - economic,afforestation_reforestation,3306010000
+8914,Bebossing populieren-ecologisch,Afforestation poplar ecological,populus,3306070000
+9520,Boomkweek,arboriculture,nurseries_nursery,3303070000
+9521,Sierplanten in volle grond (containers en potten zijn uitgesloten) (minder dan vijf jaar),Ornamental plants in full ground (containers and pots are excluded) (less than five years),flowers_ornamental_plants,3301080000
+9522,Meerjarige sierplanten,Perennial ornamental plants,flowers_ornamental_plants,3301080000
+9558,Vroege bladgroenten - vers,Early leafy greens - fresh.,salads_lettuce_leaf_vegetables,3301310000
+9559,Groentezaden,Vegetable seeds,arable_land_seed_seedlings,3301100000
+9567,Groentezaden niet-vlinderbloemigen,Vegetable seeds non-leguminous,arable_land_seed_seedlings,3301100000
+9584,Winterharde sierplanten,Winter-hardy ornamental plants,flowers_ornamental_plants,3301080000
+9603,Boomkweek - sierplanten,Tree cultivation - ornamental plants,nurseries_nursery,3303070000
+9604,Boomkweek - andere,arboriculture other,nurseries_nursery,3303070000
+9712,Meerjarige fruitteelten (kers),Multi-year fruit trees (cherries),cherry_cherries,3303010400
+9824,Grassen in natuurbeheer,Grasses in nature management,pasture_meadow_grassland_grass,3302000000
+10001,Unknown,unknown,not_known_and_other,3399000000

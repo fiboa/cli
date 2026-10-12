@@ -1,0 +1,68 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+6,Festwiese,Permanent meadow,pasture_meadow_grassland_grass,3302000000
+7,Parkplatz,parking space,not_known_and_other,3399000000
+8,Spargel unter Folie,Asparagus under cover,asparagus,3301200000
+9,EUGAL-Bautätigkeiten,EUGAL construction activities,not_known_and_other,3399000000
+10,Einjährige Blühstreifen AUKM,Annual flower strips AUKM,flowers_ornamental_plants,3301080000
+11,Mehrjährige Blühstreifen AUKM,Perennial flower strips AUKM,flowers_ornamental_plants,3301080000
+12,Ackerrandstreifen AUKM,Field margin AUKM (Agrarumwelt- und Klimamaßnahmen),not_known_and_other,3399000000
+13,Feldraine,Field margins,not_known_and_other,3399000000
+14,Gewässerschutz-/Uferrandstreifen AUKM,Water protection/riparian strips AUKM,not_known_and_other,3399000000
+83,Agroforststreifen ohne ÖR,Agroforestry strips without ÖR,tree_wood_forest,3306000000
+88,ÖR 1a ohne Produktion (Selbst-/Begrünung),ÖR 1a without production (self-greening/greening),fallow_land_not_crop,3301110000
+89,ÖR 1b Blühstreifen auf AL,ÖR 1b Flower strips on AL,flowers_ornamental_plants,3301080000
+90,ÖR 1b Blühfläche auf AL,ÖR 1b Flowering area on AL,flowers_ornamental_plants,3301080000
+91,ÖR 1c Blühstreifen auf DK,ÖR 1c Flowering strips on DK,flowers_ornamental_plants,3301080000
+92,ÖR 1c Blühfläche auf DK,ÖR 1c Flowering area on DK,flowers_ornamental_plants,3301080000
+93,ÖR 1d Altgrasstreifen / -flächen,ÖR 1d Old grass strips / areas,pasture_meadow_grassland_grass,3302000000
+94,ÖR 3 Agroforststreifen,ÖR 3 Agroforestry strips,tree_wood_forest,3306000000
+140,,unknown,not_known_and_other,3399000000
+150,Gemenge Getreide/Leguminose (Getreide überwiegt),Mixture cereals/legumes,cereal,3301010000
+155,,unknown,not_known_and_other,3399000000
+174,Zuckermais,Sweet corn,grain_maize_corn_popcorn,3301010600
+175,Mischanbau Mais/Sonnenblumen,Mixed cultivation of corn/sunflowers,grain_maize_corn_popcorn,3301010600
+176,Mais mit Bejagungsschneise in gutem landwirtschaftlichen und ökologischen Zustand**,Corn with hunting strip in good agricultural and ecological condition.,grain_maize_corn_popcorn,3301010600
+177,Mais mit Bejagungsschneise (Kulturpflanze),Corn with hunting strip (cultivated plant),grain_maize_corn_popcorn,3301010600
+291,Wicken (auch Saatwicken),Vetch (also known as seed vetch),vetches,3301090305
+342,Faserflachs,Flax/Flax (flax linseed),flax_linseed,3301060700
+412,"Futterhackfrüchte (ohne Runkelfutterrüben, Kohlsteckrüben und Kartoffeln)","Fodder beet crops (excluding mangels, kohlrabi, and potatoes)",root_vegetables,3301290000
+434,Gras-Leguminosen Gemisch (Leguminosen überwiegt),Grass-legume mixture,temporary_grass,3301090100
+612,"Gemüserübsen (Stoppelrübe, Weiße Rübe, Bayerische Rübe, Mairübe, Chinakohl, Pak-Choi, Teltower Rü","Vegetable turnip (stubble turnip, white turnip, Bavarian turnip, spring turnip, Chinese cabbage, Pak-Choi, Teltow turnip)",fresh_vegetables,3301070000
+711,Frisch-/Speiseerbsen Freiland,Fresh/Edible Peas Outdoor,peas,3301020600
+712,Blumenkohl Freiland,Cauliflower open field,cauliflower,3301210204
+713,Tomaten Freiland,Outdoor tomatoes,tomato,3301280000
+812,"Streuobst (ohne Wiesennutzung),",Orchards (without meadow use),orchards_fruits,3303010000
+814,"Sonst. Obstanlagen in Vollanbau (ohne Äpfel, Birnen, Pfirsiche)",otherwise. Fully cultivated orchards (without apples,orchards_fruits,3303010000
+817,"Beerenobst, z.B. Johannis-, Stachelbeeren","Berries, e.g. raspberries, gooseberries.",berries_berry_species,3303020000
+819,Sonstige Obstanlagen,Other orchards,orchards_fruits,3303010000
+891,Pappeln,Poplars,populus,3306070000
+896,Chinaschilf (Miscanth.),Chinese Silvergrass (Miscanthus),miscanthus_silvergrass,3301083000
+913,Klee- oder Luzernesamenvermehrung,Clover or alfalfa seed multiplication,arable_land_seed_seedlings,3301100000
+917,Mischkulturen,mixed crops,arable_crops,3301000000
+10001,Genehmigungspflichtige Baumaßnahmen,Approval-required construction measures,not_known_and_other,3399000000
+10004,"Nicht genehmigungspflichtiger Lagerplatz (Stroh, Futter, Silage)","Storage area not subject to approval (straw, fodder, silage)",not_known_and_other,3399000000
+10005,Keine Nutzung,not used,not_known_and_other,3399000000
+10006,Pflanzkartoffeln,Seed potatoes,potatoes,3301030000
+10013,Feldvogelinseln AUKM,Field bird islands AUKM,not_known_and_other,3399000000
+10113,Sommerhartweizen/Durum,Summer durum wheat / durum,spring_durum_hard_wheat,3301010202
+10114,Winter-Dinkel,Winter spelt,winter_spelt,3301011001
+10171,Körnermais,GRAIN CORN,grain_maize_corn_popcorn,3301010600
+10172,Mais (Biogas),Corn (biogas),grain_maize_corn_popcorn,3301010600
+10190,"Getreide einer Gattung/Art, die in der aktuellen Liste nicht aufgeführt ist",Cereals of a genus/species not included in the current list,other_cereals,3301019900
+10210,Erbsen zur Körnergewinnung,Peas for grain production,peas,3301020600
+10429,Alle anderen Futterpflanzen,All other fodder plants,other_arable_land_crops,3301990000
+10430,Serradella,serradella,serradella,3301084200
+10492,Beweidung von Dauergrünland unter etablierten lokalen Praktiken (z. B. Trockenrasen),"Grazing of permanent grassland under established local practices (e.g., dry grasslands)",pasture_meadow_grassland_grass,3302000000
+10611,Frühkartoffeln,EARLY POTATOES,potatoes,3301030000
+10612,Sonstige Speisekartoffeln,Other table potatoes,potatoes,3301030000
+10613,Industriekartoffeln (außer Stärke),Industrial potatoes (excluding starch),potatoes,3301030000
+10614,Futterkartoffeln,FEED POTATOES,potatoes,3301030000
+10619,Sonstige Kartoffeln,Other potatoes,potatoes,3301030000
+10710,Gemüse Freiland,Vegetables (Open Field),fresh_vegetables,3301070000
+10827,Äpfel in Vollanbau (Ertragsanlagen),Apples in full cultivation (yield plants),apples,3303010200
+10828,"Sonst. Steinobst (ohne Kirschen, Pflaumen)",otherwise stone fruit (without cherries,orchards_fruits,3303010000
+10837,"sonst. Steinobst (Nektarinen, Aprikosen)","Stone fruit (nectarines, apricots)",orchards_fruits,3303010000
+11171,Körnermais und CCM,Grain corn and CCM (Corn Cob Mix),grain_maize_corn_popcorn,3301010600
+11429,"Futterpflanze einer Gattung/Art, die in der aktuellen Liste nicht aufgeführt ist",Forage plant of a genus/species not listed in the current list.,arable_crops,3301000000
+12170,Unknown,unknown,not_known_and_other,3399000000
+12171,Mais (ohne Silomais NC 411),Corn without silage maize,grain_maize_corn_popcorn,3301010600
