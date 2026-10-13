@@ -23,6 +23,7 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     columns = {
         "geometry": "geometry",
         "ID": "id",
+        "INSPIRE_ID": "inspire:id",
         "FLIK": "flik",
         "BEGINLIFES": "determination:datetime",
         "CODE": "crop:code",

@@ -120,8 +120,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Excluded NBF ineligible patches with empty crop code.
   - Fixed source encoding and FLIK handling.
 - DE-NDS: Added stable collection IDs where missing.
+- DE-NRW: The INSPIRE id is now read from the source, as the declared INSPIRE extension requires.
 - DE-SAX: Updated to current available archive campaign.
 - DE-SAX: The title says it holds field blocks.
+- EE: Parcels that declare no crop are left out.
 - DE-SL:
   - Fixed parser issues with scientific notation in area values.
   - Restored full paging coverage and area derivation for complete output.
