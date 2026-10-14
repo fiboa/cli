@@ -121,6 +121,7 @@ extra_convert_parameters = {
     "es_nc": {"variant": "2025", **_input_files("es_nc", "es_nc.gpkg")},
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
+    "jp": {"variant": "2026", **_input_files("jp", "jp_fude_2026_13.zip")},
     "dk#2008": {"variant": "2008"},
     "pt": {"variant": "2023"},
     **{f"pt#{year}": {"variant": year} for year in PT_EDITIONS},
