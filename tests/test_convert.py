@@ -278,6 +278,7 @@ SWISS_COLUMNS = (
     "crop:code",
     "id",
 )
+EC_V2_COLUMNS = ("determination:datetime", "metrics:area", "crop:code", "hcat:code", "id")
 expected_columns = {
     "de_sh": ("determination:datetime", "metrics:area", "flik", "hbn", "id"),
     # the determination date comes from the year variant
@@ -303,6 +304,26 @@ expected_columns = {
         f"pt#{year}": (*PT_COLUMNS, "crop:name") if year <= "2019" else PT_COLUMNS
         for year in PT_EDITIONS
     },
+    # EuroCrops V2 backfills deliver what the national collection carries
+    "ec_at": (*EC_V2_COLUMNS, "crop:name", "admin:country_code"),
+    "ec_be_vlg": (*EC_V2_COLUMNS, "crop:name", "admin:country_code", "admin:subdivision_code"),
+    "ec_be_wal": (*EC_V2_COLUMNS, "crop:name", "admin:country_code"),
+    "ec_de_bb": (*EC_V2_COLUMNS, "crop:name", "admin:country_code", "admin:subdivision_code"),
+    "ec_de_nrw": (*EC_V2_COLUMNS, "crop:name", "admin:country_code", "admin:subdivision_code"),
+    "ec_ee": (*EC_V2_COLUMNS, "crop:name"),
+    "ec_es": (*EC_V2_COLUMNS, "admin:country_code"),
+    "ec_fr": (*EC_V2_COLUMNS, "admin:country_code"),
+}
+
+# Values a converter writes, as a column or as a constant in the collection metadata
+expected_values = {
+    "ec_at": {"admin:country_code": "AT"},
+    "ec_be_vlg": {"admin:country_code": "BE", "admin:subdivision_code": "VLG"},
+    "ec_be_wal": {"admin:country_code": "BE"},
+    "ec_de_bb": {"admin:country_code": "DE", "admin:subdivision_code": "BB"},
+    "ec_de_nrw": {"admin:country_code": "DE", "admin:subdivision_code": "NW"},
+    "ec_es": {"admin:country_code": "ES"},
+    "ec_fr": {"admin:country_code": "FR"},
 }
 
 # Classes a converter filters out, and that the fixture does contain
@@ -364,12 +385,15 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
 
     df = pq.read_table(tmp_parquet_file).to_pandas()
 
+    metadata = pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata or {}
+    constants = json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+
+    for column, value in expected_values.get(converter, {}).items():
+        found = set(df[column]) if column in df.columns else {constants.get(column)}
+        assert found == {value}, f"{converter}: {column} is {sorted(map(str, found))}, not {value}"
+
     required = expected_columns.get(converter)
     if required:
-        metadata = pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata or {}
-        constants = (
-            json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
-        )
         missing = [c for c in required if c not in df.columns and constants.get(c) is None]
         assert not missing, (
             f"{converter} dropped {missing}: absent from the schema and from the "

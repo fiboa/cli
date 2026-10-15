@@ -76,11 +76,14 @@ and year in EPSG:3035. The crop codes are the national ones, mapped to HCAT with
             "hcat_mapping_csv",
             "hcat_mapping_supplements",
             "hcat_mapping_name_fallback",
-            "admin_country_code",
             "admin_subdivision_code",
         ):
             if hasattr(national, attr):
                 setattr(cls, attr, getattr(national, attr))
+        # AdminConverterMixin would otherwise read the country from this class's id, "ec_..."
+        cls.admin_country_code = (
+            getattr(national, "admin_country_code", None) or national.id.split("_")[0].upper()
+        )
 
         cls.columns = {
             "geometry": "geometry",
