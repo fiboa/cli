@@ -83,7 +83,7 @@ current conditions. Fude Polygons are created for the purpose of roughly indicat
         missing = [
             uri
             for uri, name in uris.items()
-            if "://" in uri and not cache_fs.exists(os.path.join(cache_folder, name))
+            if uri.startswith(BASE) and not cache_fs.exists(os.path.join(cache_folder, name))
         ]
         signed = self.sign(missing)
         uris = {signed.get(uri, uri): name for uri, name in uris.items()}
