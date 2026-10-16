@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES: Added Spain-wide converter based on FEGA 2025+.
 - IE: Added `ie_lpis` with DAFM's Anonymous LPIS parcels for 2017-2022 and 2025
 - IT-1: Added Tuscany converter based on EuroCrops v2.
+- Added `EuroCropsV2Mixin` and the converters `ec_at`, `ec_be_wal`, `ec_de_bb`, `ec_de_nrw` and `ec_es` for the editions of a national dataset that only the JRC's EuroCrops V2 still offers. They take the national converter's crop table and admin codes, so their output fits the national collection.
 - IT-BZ: Added South Tyrol converter.
 - LT-KZS: Added Lithuania KŽS reference parcels converter.
 - PL:
@@ -41,6 +42,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ZA-FUSION: Added South Africa converter based on the ESA Fusion Competition dataset.
 
 ### Changed
+- EC-FR: Reads 2015, 2016 and 2018 from EuroCrops V2 (CC-BY-4.0) instead of only 2018 from EuroCrops V1.
+- EC-EE: Reads 2015 from EuroCrops V2 instead of 2021 from EuroCrops V1, which the national `ee` covers.
+- EC-BE-VLG: Reads the Flemish editions 2008-2017 from EuroCrops V2 instead of the 2021 EuroCrops V1 file, which the national `be_vlg` covers; buildings are left out.
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
@@ -117,8 +121,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Excluded NBF ineligible patches with empty crop code.
   - Fixed source encoding and FLIK handling.
 - DE-NDS: Added stable collection IDs where missing.
+- DE-NRW: The INSPIRE id is now read from the source, as the declared INSPIRE extension requires.
 - DE-SAX: Updated to current available archive campaign.
 - DE-SAX: The title says it holds field blocks.
+- EE: Parcels that declare no crop are left out.
 - DE-SL:
   - Fixed parser issues with scientific notation in area values.
   - Restored full paging coverage and area derivation for complete output.
