@@ -70,7 +70,6 @@ def setup(monkeypatch, tmp_path):
 
     converter = jp.JPConverter()
     converter.select_variant("2026")
-    converter._parquet_dir = str(tmp_path)
     return converter, api, downloads, tmp_path / "cache"
 
 
@@ -92,12 +91,12 @@ def test_signs_the_missing_files_only(setup):
     assert body["pref_cd"] == ["13"]
     assert body["pref_name"] == ["東京都"]
     assert headers == jp.HEADERS
-    forwarded, kwargs = downloads[0]
+    forwarded, _ = downloads[0]
     assert forwarded == {
         maff("01"): "jp_fude_2026_01.zip",
         f"{maff('13')}?sig=x": "jp_fude_2026_13.zip",
     }
-    assert kwargs["client_kwargs"] == {"headers": jp.HEADERS}
+    assert converter.request_headers == jp.HEADERS
     assert [p.split("/")[-1] for p in paths] == [
         "jp_fude_2026_01.parquet",
         "jp_fude_2026_13.parquet",

@@ -1,6 +1,4 @@
 import os
-import shutil
-import tempfile
 import zipfile
 
 import geopandas as gpd
@@ -42,6 +40,7 @@ current conditions. Fude Polygons are created for the purpose of roughly indicat
     provider = "Japanese Ministry of Agriculture, Forestry and Fisheries (MAFF, 農林水産省) <https://download.fude.maff.go.jp/>"
     attribution = "出典：「筆ポリゴンデータ」（農林水産省）を加工して作成"
     license = "CC-BY-4.0"
+    request_headers = HEADERS
 
     columns = {
         "geometry": "geometry",
@@ -69,15 +68,6 @@ current conditions. Fude Polygons are created for the purpose of roughly indicat
             f"出典：「筆ポリゴンデータ（{self.variant}年度公開）」（農林水産省）を加工して作成"
         )
 
-    def convert(self, output_file, cache=None, **kwargs):
-        self._parquet_dir = tempfile.mkdtemp(prefix="jp_fude_")
-        try:
-            # the zips must go through download_files, which DuckDBBaseConverter skips without a cache
-            cache = cache or self._parquet_dir
-            return super().convert(output_file, cache=cache, **kwargs)
-        finally:
-            shutil.rmtree(self._parquet_dir, ignore_errors=True)
-
     def download_files(self, uris, cache_folder=None, **kwargs):
         cache_fs, cache_folder = self.get_cache(cache_folder)
         missing = [
@@ -87,9 +77,11 @@ current conditions. Fude Polygons are created for the purpose of roughly indicat
         ]
         signed = self.sign(missing)
         uris = {signed.get(uri, uri): name for uri, name in uris.items()}
-        kwargs["client_kwargs"] = {"headers": HEADERS}
         zips = super().download_files(uris, cache_folder, **kwargs)
-        return [self.to_parquet(path[0] if isinstance(path, tuple) else path) for path in zips]
+        return [
+            self.to_parquet(path[0] if isinstance(path, tuple) else path, cache_folder)
+            for path in zips
+        ]
 
     def sign(self, uris):
         """The download URLs of the API, signed for 30 minutes, for the given unsigned URLs."""
@@ -117,11 +109,13 @@ current conditions. Fude Polygons are created for the purpose of roughly indicat
         names = {p["pref_cd"]: p["pref_name"] for p in response.json()[0]}
         return [names[code] for code in codes]
 
-    def to_parquet(self, zip_path):
-        """One GeoParquet file of all municipality GeoJSONs in a prefecture zip."""
-        target = os.path.join(
-            self._parquet_dir, os.path.basename(zip_path).replace(".zip", ".parquet")
-        )
+    def to_parquet(self, zip_path, cache_folder):
+        """One GeoParquet file of all municipality GeoJSONs in a prefecture zip, kept in the cache."""
+        stem = os.path.splitext(os.path.basename(zip_path))[0]
+        target = os.path.join(cache_folder, f"extracted.{stem}", f"{stem}.parquet")
+        if os.path.exists(target):
+            return target
+        os.makedirs(os.path.dirname(target), exist_ok=True)
         with zipfile.ZipFile(zip_path) as archive:
             members = sorted(n for n in archive.namelist() if n.endswith(".json"))
         frames = [pyogrio.read_dataframe(f"/vsizip/{zip_path}/{member}") for member in members]
