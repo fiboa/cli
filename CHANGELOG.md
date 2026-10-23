@@ -74,6 +74,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - FR: Editions now cover 2017-2024, mapped through one shared crop code list (https://fiboa.org/code/fr/fr.csv).
 - HR: Editions now cover 2011-2024.
 - IT-1: Reads the JRC's newest EuroCrops V2 release (`gpqtv202`).
+- JP: Reads MAFF's own Fude Polygon downloads instead of Pacific Spatial's copy, which adds the 2025 and 2026 editions.
 - LV:
   - Editions now cover 2015-2025 from yearly data.gov.lv releases.
   - `block_id` is published from the field-block identifier and `crop:name` comes from the official code list.
