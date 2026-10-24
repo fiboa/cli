@@ -5,6 +5,7 @@ that are not cached yet. These tests answer the API with a fake service and reco
 what reaches the regular download.
 """
 
+import os
 import shutil
 
 import pytest
@@ -97,7 +98,7 @@ def test_signs_the_missing_files_only(setup):
         f"{maff('13')}?sig=x": "jp_fude_2026_13.zip",
     }
     assert converter.request_headers == jp.HEADERS
-    assert [p.split("/")[-1] for p in paths] == [
+    assert [os.path.basename(p) for p in paths] == [
         "jp_fude_2026_01.parquet",
         "jp_fude_2026_13.parquet",
     ]
