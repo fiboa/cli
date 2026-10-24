@@ -1,0 +1,25 @@
+original_code,original_name,HCAT3_name,HCAT3_code
+200,Permanent grassland,pasture_meadow_grassland_grass,3302000000
+1101,Winter wheat,winter_common_soft_wheat,3301010101
+1102,Winter barley,winter_barley,3301010401
+1103,Winter rye,winter_rye,3301010301
+1201,Spring barley,spring_barley,3301010402
+1202,Spring oat,spring_oats,3301010502
+1300,Maize,grain_maize_corn_popcorn,3301010600
+1401,Potato,potatoes,3301030000
+1402,Sugar beet,sugar_beet,3301290700
+1501,Winter rapeseed,winter_rapeseed_rape,3301060401
+1502,Sunflower,sunflower,3301060500
+1602,Cultivated grassland,temporary_grass,3301090100
+1603,Vegetables,fresh_vegetables,3301070000
+1611,Peas,peas,3301020600
+1612,Broad bean,beans,3301020100
+1613,Lupin,sweet_lupins,3301020700
+1614,Soy,soy_soybeans,3301160000
+3001,Small woody features,tree_wood_forest,3306000000
+3002,Other agricultural areas,not_known_and_other,3399000000
+3003,Fallow land,fallow_land_not_crop,3301110000
+3004,Other areas,not_known_and_other,3399000000
+4001,Grapevine,vineyards_wine_vine_rebland_grapes,3303060000
+4002,Hops,hops,3301060200
+4003,Orchard,orchards_fruits,3303010000

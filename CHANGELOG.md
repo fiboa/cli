@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added ML variants of converters (`ai4sf_ml`, `de_fusion_ml`, `india_10k_ml`, `rw_rwanda_ml`, `za_fusion_ml`) that publish each field's train/val/test split.
 - AT: Added support for 2018 by extracting archives before reading.
 - CA-PRAIRIES: Added the field boundaries the University of Saskatchewan derived for Alberta, Saskatchewan and Manitoba from Sentinel-2 imagery of 2021-2024.
+- DE-THUENEN: Added the Thünen Institute's crop type maps of Germany, 2017-2021, with field boundaries inferred from Sentinel-1, Sentinel-2 and Landsat imagery.
 - CH:
   - Added converters for every canton with standalone data (`ch_<canton>`) on a shared `CHBaseConverter`, each with the canton's own licence and attribution; Basel-Stadt is represented by the Basel-Landschaft data.
   - `ch_zh` (2017–2025), `ch_ge` (2017–2026) and `ch_sz` (2022–2025) read the cantons' own archives; the cantons that require registration or approval convert an exported file with `-i`.

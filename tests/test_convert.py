@@ -73,6 +73,7 @@ tests = [
     "br_conab",
     "jp",
     "ca_prairies",
+    "de_thuenen",
     "lv",
     "ie",
     "ie_lpis",
@@ -132,6 +133,7 @@ extra_convert_parameters = {
         "Boundary_SK_BIG_RIVER_555_intersect_cropland.geoparquet",
         "Boundary_MB_ALEXANDER_600_intersect_cropland.geoparquet",
     ),
+    "de_thuenen": {"variant": "2021", **_input_files("de_thuenen", "CTM_GER_2021_seg_v201.fgb")},
     "es_nc": {"variant": "2025", **_input_files("es_nc", "es_nc.gpkg")},
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
@@ -296,6 +298,14 @@ expected_columns = {
         "admin:subdivision_code",
         "admin_local_code",
     ),
+    "de_thuenen": (
+        "id",
+        "metrics:area",
+        "crop:code",
+        "crop:name",
+        "hcat:code",
+        "determination:datetime",
+    ),
     "de_sh": ("determination:datetime", "metrics:area", "flik", "hbn", "id"),
     # the determination date comes from the year variant
     "dk": ("determination:datetime",),
@@ -350,6 +360,8 @@ filtered_codes = {
     # landscape elements and buildings, mapped as polygons of their own
     "ec_de_bb": ("1", "2", "3", "10011"),
     "ec_be_vlg": ("1", "2"),
+    # small woody features and other areas that are no field
+    "de_thuenen": ("3001", "3004"),
 }
 
 # The smallest field (m²) a converter keeps, where the fixture holds a smaller sliver
