@@ -72,6 +72,7 @@ tests = [
     "us_ca_scm#2014",
     "br_conab",
     "jp",
+    "ca_prairies",
     "de_thuenen",
     "lv",
     "ie",
@@ -126,6 +127,12 @@ def _input_files(converter, *names):
 
 
 extra_convert_parameters = {
+    "ca_prairies": _input_files(
+        "ca_prairies",
+        "Boundary_AB_Brazeau_County_0383_intersect_cropland.geoparquet",
+        "Boundary_SK_BIG_RIVER_555_intersect_cropland.geoparquet",
+        "Boundary_MB_ALEXANDER_600_intersect_cropland.geoparquet",
+    ),
     "de_thuenen": {"variant": "2021", **_input_files("de_thuenen", "CTM_GER_2021_seg_v201.fgb")},
     "es_nc": {"variant": "2025", **_input_files("es_nc", "es_nc.gpkg")},
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
@@ -282,6 +289,15 @@ SWISS_COLUMNS = (
 )
 EC_V2_COLUMNS = ("determination:datetime", "metrics:area", "crop:code", "hcat:code", "id")
 expected_columns = {
+    # the province comes from the file name, the id from the row in each RM's file
+    "ca_prairies": (
+        "id",
+        "metrics:area",
+        "metrics:perimeter",
+        "admin:country_code",
+        "admin:subdivision_code",
+        "admin_local_code",
+    ),
     "de_thuenen": (
         "id",
         "metrics:area",
