@@ -34,7 +34,6 @@ class FiboaRegistry(VecorelRegistry):
         from .describe import DescribeFile
         from .improve import ImproveData
         from .merge import MergeDatasets
-        from .publish import Publish
         from .rename_extension import RenameExtension
         from .validate import ValidateData
         from .validate_schema import ValidateSchema
@@ -49,7 +48,6 @@ class FiboaRegistry(VecorelRegistry):
             DescribeFile,
             ImproveData,
             MergeDatasets,
-            Publish,
             RenameExtension,
             ValidateData,
             ValidateSchema,

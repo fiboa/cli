@@ -38,6 +38,8 @@ The data comes from ARIB's database of agricultural parcels.
     attribution = "© Põllumajanduse Registrite ja Informatsiooni Amet"
     license = "CC-BY-SA-3.0"
     columns = COLUMNS
+    # a few parcels declare no crop
+    column_filters = {"taotletud_kultuur": lambda col: col.str.strip().fillna("") != ""}
     column_migrations = {"taotlusaasta": lambda col: pd.to_datetime(col, format="%Y")}
     missing_schemas = {
         "properties": {

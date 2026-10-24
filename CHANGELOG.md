@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Added `PerFileConverterMixin`, which converts each source file on its own and merges the parts; ES uses it, as its 50 provinces do not fit in memory together.
+- `fiboa create-stac-collection` describes the fiboa properties in `table:columns`.
 - Added `pixi run check-hcat`, which compares the HCAT mapping tables the converters read online with the taxonomy.
 - Added `FiboaDuckDBBaseConverter` for SQL-based conversion of large Parquet sources.
 - Added `PerFileBaseConverter` to process multi-file sources incrementally.
@@ -19,6 +20,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added a test guard that rejects fixture files larger than 5 MB.
 - Added ML variants of converters (`ai4sf_ml`, `de_fusion_ml`, `india_10k_ml`, `rw_rwanda_ml`, `za_fusion_ml`) that publish each field's train/val/test split.
 - AT: Added support for 2018 by extracting archives before reading.
+- CA-PRAIRIES: Added the field boundaries the University of Saskatchewan derived for Alberta, Saskatchewan and Manitoba from Sentinel-2 imagery of 2021-2024.
+- DE-THUENEN: Added the Thünen Institute's crop type maps of Germany, 2017-2021, with field boundaries inferred from Sentinel-1, Sentinel-2 and Landsat imagery.
 - CH:
   - Added converters for every canton with standalone data (`ch_<canton>`) on a shared `CHBaseConverter`, each with the canton's own licence and attribution; Basel-Stadt is represented by the Basel-Landschaft data.
   - `ch_zh` (2017–2025), `ch_ge` (2017–2026) and `ch_sz` (2022–2025) read the cantons' own archives; the cantons that require registration or approval convert an exported file with `-i`.
@@ -32,6 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES: Added Spain-wide converter based on FEGA 2025+.
 - IE: Added `ie_lpis` with DAFM's Anonymous LPIS parcels for 2017-2022 and 2025
 - IT-1: Added Tuscany converter based on EuroCrops v2.
+- Added `EuroCropsV2Mixin` and the converters `ec_at`, `ec_be_wal`, `ec_de_bb`, `ec_de_nrw` and `ec_es` for the editions of a national dataset that only the JRC's EuroCrops V2 still offers. They take the national converter's crop table and admin codes, so their output fits the national collection.
 - IT-BZ: Added South Tyrol converter.
 - LT-KZS: Added Lithuania KŽS reference parcels converter.
 - PL:
@@ -41,16 +45,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ZA-FUSION: Added South Africa converter based on the ESA Fusion Competition dataset.
 
 ### Changed
+- EC-FR: Reads 2015, 2016 and 2018 from EuroCrops V2 (CC-BY-4.0) instead of only 2018 from EuroCrops V1.
+- EC-EE: Reads 2015 from EuroCrops V2 instead of 2021 from EuroCrops V1, which the national `ee` covers.
+- EC-BE-VLG: Reads the Flemish editions 2008-2017 from EuroCrops V2 instead of the 2021 EuroCrops V1 file, which the national `be_vlg` covers; buildings are left out.
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
-- Updated vecorel-cli to 0.3.1, including improved validation defaults, latest-variant selection when `--variant` is not provided, multi-volume 7z download support, Deflate64 ZIP extraction, and more.
+- Updated vecorel-cli to 0.4.0:
+  - GeoParquet files under 250,000 rows get at least ten row groups, so a reader can skip by area.
+  - `create-stac-collection` takes the bbox from the geometries, in EPSG:4326.
+  - **Breaking:** `fiboa merge` keeps all properties by default (`--include`/`--exclude` restrict them), fails if the merged file would be invalid (`--no-strict` warns instead), and refuses datasets with different specification or extension versions.
 - REST converters download much faster from large layers and retry when a service answers with intermittent errors.
 - Converters no longer split multi-part geometries into one row per polygon: fields keep the geometry modeling of the source (Polygon or MultiPolygon), the source-published area and perimeter, and one id per source feature. Use `fiboa improve --explode-geometries` when single polygons are needed.
 - Converters whose variants are years (1900-2100) now fill `determination:datetime` from the selected year unless they provide a determination date themselves.
 - Converters now publish `metrics:area` by default (`area_calculate_missing = True`, #277): measured from the geometry for every row if the source has no area, and for the rows where it is empty or 0 otherwise. Set `area_calculate_missing = False` to opt out.
 - Renamed the HCAT mapping attributes of `AddHCATMixin`, as they work with any HCAT mapping, not only EuroCrops: the `ec_mapping*` attributes use the `hcat_mapping*` prefix now. The helpers `load_ec_mapping()` and `ec_url()` are now `load_hcat_mapping()` and `hcat_mapping_url()` in `fiboa_cli.datasets.commons.hcat`; the copies in `fiboa_cli.datasets.commons.ec` were removed.
 - BE-VLG: Extended editions to 2018-2026 and aligned determination dates with the selected campaign year.
+- BR-CONAB: Reads the 29 mappings from the portal's new download URLs; ids no longer carry the file's upload timestamp, and polygons under 100 m² (digitising slivers, a fifth of Minas Gerais coffee) are left out.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
 - DK: Editions now cover 2008-2026. The 2008 and 2009 editions are published without the crop and HCAT extensions because the source has no crop columns.
@@ -64,6 +75,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - FI: Editions are now available by year (2020-2025).
 - FR: Editions now cover 2017-2024, mapped through one shared crop code list (https://fiboa.org/code/fr/fr.csv).
 - HR: Editions now cover 2011-2024.
+- IT-1: Reads the JRC's newest EuroCrops V2 release (`gpqtv202`).
 - LV:
   - Editions now cover 2015-2025 from yearly data.gov.lv releases.
   - `block_id` is published from the field-block identifier and `crop:name` comes from the official code list.
@@ -79,8 +91,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - SI: Extended editions back to 2019.
 - SK: Editions now cover 2018-2026 from the per-campaign datasets on data.slovensko.sk.
 - US-CSB: Editions now cover 2017-2024.
+- US-CA SCM:
+  - Editions now cover 2014, 2016 and 2018-2024 (2024 provisional), from the current portal URLs.
+  - The crop is `MAIN_CROP` from 2019, the main-season `CROPTYP2` in 2016 and 2018, and in 2014 a name mapped to its code through `us_ca_scm_2014.csv`.
+  - The urban mask (`U`, `****`), urban landscape (`UL2`) and riparian vegetation (`NR`) are left out: they are not fields.
+  - The provider is the California Department of Water Resources; `determination:datetime` is 1 July of the edition year.
 
 ### Removed
+- Removed `fiboa publish`. Datasets are published as a Portolan catalog; the README describes the steps.
 - CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
 
 ### Fixed
@@ -106,7 +124,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Excluded NBF ineligible patches with empty crop code.
   - Fixed source encoding and FLIK handling.
 - DE-NDS: Added stable collection IDs where missing.
+- DE-NRW: The INSPIRE id is now read from the source, as the declared INSPIRE extension requires.
 - DE-SAX: Updated to current available archive campaign.
+- DE-SAX: The title says it holds field blocks.
+- EE: Parcels that declare no crop are left out.
 - DE-SL:
   - Fixed parser issues with scientific notation in area values.
   - Restored full paging coverage and area derivation for complete output.
