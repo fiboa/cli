@@ -92,7 +92,7 @@ def test_signs_the_missing_files_only(setup):
     assert body["pref_cd"] == ["13"]
     assert body["pref_name"] == ["東京都"]
     assert headers == jp.HEADERS
-    forwarded, _ = downloads[0]
+    forwarded = {uri: name for batch, _ in downloads for uri, name in batch.items()}
     assert forwarded == {
         maff("01"): "jp_fude_2026_01.zip",
         f"{maff('13')}?sig=x": "jp_fude_2026_13.zip",
@@ -110,9 +110,13 @@ def test_signs_everything_when_nothing_is_cached(setup):
 
     converter.download_files(uris, str(cache))
 
-    assert api.posts[0][1]["pref_cd"] == ["01", "13"]
-    assert api.posts[0][1]["pref_name"] == ["北海道", "東京都"]
-    assert all("?sig=x" in uri for uri in downloads[0][0])
+    # each file is signed just before its download, as a signature lasts 30 minutes
+    assert [body["pref_cd"] for _, body, _ in api.posts] == [["01"], ["13"]]
+    assert [body["pref_name"] for _, body, _ in api.posts] == [["北海道"], ["東京都"]]
+    assert [list(batch) for batch, _ in downloads] == [
+        [f"{maff('01')}?sig=x"],
+        [f"{maff('13')}?sig=x"],
+    ]
 
 
 def test_a_complete_cache_needs_no_api(setup):
