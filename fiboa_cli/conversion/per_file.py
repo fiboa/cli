@@ -10,7 +10,7 @@ class PerFileConverterMixin:
     def convert(self, output_file, cache=None, input_files=None, variant=None, **kwargs) -> str:
         self.select_variant(variant)
         urls = input_files or self.get_urls()
-        if not urls or len(urls) == 1:
+        if not urls or isinstance(urls, str) or len(urls) == 1:
             return super().convert(
                 output_file, cache=cache, input_files=input_files, variant=variant, **kwargs
             )
