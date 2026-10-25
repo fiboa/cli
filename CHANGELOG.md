@@ -50,7 +50,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
-- Updated vecorel-cli to 0.4.0:
+- Updated vecorel-cli to 0.4.1:
+  - A converter can set `request_headers` for its downloads, e.g. a browser User-Agent.
+  - The DuckDB converter downloads archives and other sources it cannot read in place also without a cache, and no longer turns `key=value` folders in a path into columns.
   - GeoParquet files under 250,000 rows get at least ten row groups, so a reader can skip by area.
   - `create-stac-collection` takes the bbox from the geometries, in EPSG:4326.
   - **Breaking:** `fiboa merge` keeps all properties by default (`--include`/`--exclude` restrict them), fails if the merged file would be invalid (`--no-strict` warns instead), and refuses datasets with different specification or extension versions.
@@ -75,6 +77,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - FR: Editions now cover 2017-2024, mapped through one shared crop code list (https://fiboa.org/code/fr/fr.csv).
 - HR: Editions now cover 2011-2024.
 - IT-1: Reads the JRC's newest EuroCrops V2 release (`gpqtv202`).
+- JP: Reads MAFF's own Fude Polygon downloads instead of Pacific Spatial's copy, which adds the 2025 and 2026 editions.
 - LV:
   - Editions now cover 2015-2025 from yearly data.gov.lv releases.
   - `block_id` is published from the field-block identifier and `crop:name` comes from the official code list.
