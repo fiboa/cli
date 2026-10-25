@@ -72,6 +72,8 @@ tests = [
     "us_ca_scm#2014",
     "br_conab",
     "jp",
+    "ca_prairies",
+    "de_thuenen",
     "lv",
     "ie",
     "ie_lpis",
@@ -96,6 +98,13 @@ tests = [
     "ec_ro",
     "india_10k",
     "it_1",
+    "ec_de_bb",
+    "ec_be_vlg",
+    "ec_be_wal",
+    "ec_de_nrw",
+    "ec_at",
+    "ec_es",
+    "ec_ee",
     "de_bw",
     "lt_kzs",
     "de_by_block",
@@ -118,6 +127,13 @@ def _input_files(converter, *names):
 
 
 extra_convert_parameters = {
+    "ca_prairies": _input_files(
+        "ca_prairies",
+        "Boundary_AB_Brazeau_County_0383_intersect_cropland.geoparquet",
+        "Boundary_SK_BIG_RIVER_555_intersect_cropland.geoparquet",
+        "Boundary_MB_ALEXANDER_600_intersect_cropland.geoparquet",
+    ),
+    "de_thuenen": {"variant": "2021", **_input_files("de_thuenen", "CTM_GER_2021_seg_v201.fgb")},
     "es_nc": {"variant": "2025", **_input_files("es_nc", "es_nc.gpkg")},
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
@@ -239,6 +255,15 @@ extra_convert_parameters = {
         "za_fusion", "za_train_258N.geojson", "za_train_259N.geojson", "za_test_2017.geojson"
     ),
     "rw_rwanda_ml": _input_files("rw_rwanda", "rw_rwanda_2021.geojson"),
+    # EuroCrops V2: the fixture is one year's file, named as the JRC names it
+    "ec_de_bb": {"variant": "2020"},
+    "ec_be_vlg": {"variant": "2010"},
+    "ec_be_wal": {"variant": "2019"},
+    "ec_de_nrw": {"variant": "2021"},
+    "ec_at": {"variant": "2016"},
+    "ec_es": {"variant": "2023"},
+    "ec_fr": {"variant": "2016"},
+    "ec_ee": {"variant": "2015"},
 }
 
 
@@ -263,7 +288,25 @@ SWISS_COLUMNS = (
     "crop:code",
     "id",
 )
+EC_V2_COLUMNS = ("determination:datetime", "metrics:area", "crop:code", "hcat:code", "id")
 expected_columns = {
+    # the province comes from the file name, the id from the row in each RM's file
+    "ca_prairies": (
+        "id",
+        "metrics:area",
+        "metrics:perimeter",
+        "admin:country_code",
+        "admin:subdivision_code",
+        "admin_local_code",
+    ),
+    "de_thuenen": (
+        "id",
+        "metrics:area",
+        "crop:code",
+        "crop:name",
+        "hcat:code",
+        "determination:datetime",
+    ),
     "de_sh": ("determination:datetime", "metrics:area", "flik", "hbn", "id"),
     # the determination date comes from the year variant
     "dk": ("determination:datetime",),
@@ -288,6 +331,26 @@ expected_columns = {
         f"pt#{year}": (*PT_COLUMNS, "crop:name") if year <= "2019" else PT_COLUMNS
         for year in PT_EDITIONS
     },
+    # EuroCrops V2 backfills deliver what the national collection carries
+    "ec_at": (*EC_V2_COLUMNS, "crop:name", "admin:country_code"),
+    "ec_be_vlg": (*EC_V2_COLUMNS, "crop:name", "admin:country_code", "admin:subdivision_code"),
+    "ec_be_wal": (*EC_V2_COLUMNS, "crop:name", "admin:country_code"),
+    "ec_de_bb": (*EC_V2_COLUMNS, "crop:name", "admin:country_code", "admin:subdivision_code"),
+    "ec_de_nrw": (*EC_V2_COLUMNS, "crop:name", "admin:country_code", "admin:subdivision_code"),
+    "ec_ee": (*EC_V2_COLUMNS, "crop:name"),
+    "ec_es": (*EC_V2_COLUMNS, "admin:country_code"),
+    "ec_fr": (*EC_V2_COLUMNS, "admin:country_code"),
+}
+
+# Values a converter writes, as a column or as a constant in the collection metadata
+expected_values = {
+    "ec_at": {"admin:country_code": "AT"},
+    "ec_be_vlg": {"admin:country_code": "BE", "admin:subdivision_code": "VLG"},
+    "ec_be_wal": {"admin:country_code": "BE"},
+    "ec_de_bb": {"admin:country_code": "DE", "admin:subdivision_code": "BB"},
+    "ec_de_nrw": {"admin:country_code": "DE", "admin:subdivision_code": "NW"},
+    "ec_es": {"admin:country_code": "ES"},
+    "ec_fr": {"admin:country_code": "FR"},
 }
 
 # Classes a converter filters out, and that the fixture does contain
@@ -295,6 +358,11 @@ filtered_codes = {
     # DWR maps the whole state: the urban mask is county-sized polygons, not fields
     "us_ca_scm#2018": ("U",),
     "us_ca_scm#2014": ("U",),
+    # landscape elements and buildings, mapped as polygons of their own
+    "ec_de_bb": ("1", "2", "3", "10011"),
+    "ec_be_vlg": ("1", "2"),
+    # small woody features and other areas that are no field
+    "de_thuenen": ("3001", "3004"),
 }
 
 # The smallest field (m²) a converter keeps, where the fixture holds a smaller sliver
@@ -346,12 +414,15 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
 
     df = pq.read_table(tmp_parquet_file).to_pandas()
 
+    metadata = pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata or {}
+    constants = json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
+
+    for column, value in expected_values.get(converter, {}).items():
+        found = set(df[column]) if column in df.columns else {constants.get(column)}
+        assert found == {value}, f"{converter}: {column} is {sorted(map(str, found))}, not {value}"
+
     required = expected_columns.get(converter)
     if required:
-        metadata = pq.ParquetFile(tmp_parquet_file).schema_arrow.metadata or {}
-        constants = (
-            json.loads(metadata[b"collection"].decode()) if b"collection" in metadata else {}
-        )
         missing = [c for c in required if c not in df.columns and constants.get(c) is None]
         assert not missing, (
             f"{converter} dropped {missing}: absent from the schema and from the "
@@ -373,6 +444,6 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
     dropped = [c for c in filtered_codes.get(converter, ()) if c in set(df["crop:code"])]
     assert not dropped, f"{converter} kept rows it should filter out: crop:code {dropped}"
 
-    if "metrics:area" in df.columns and converter not in ("de_bb",):
+    if "metrics:area" in df.columns and converter not in ("de_bb", "ec_de_bb"):
         # Check for accidental hectare conversion; fields should be more than 10 square meters
         assert (df["metrics:area"] > 10).all()

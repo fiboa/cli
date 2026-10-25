@@ -1,17 +1,14 @@
-from .be_vlg import Converter as BEVLGBaseConverter
-from .commons.ec import EuroCropsConverterMixin
+from vecorel_cli.conversion.admin import AdminConverterMixin
+
+from ..conversion.fiboa_converter import FiboaBaseConverter
+from .be_vlg import Converter as BEVLGConverter
+from .commons.ec import EuroCropsV2Mixin
+from .commons.hcat import AddHCATMixin
 
 
-class ECConverter(EuroCropsConverterMixin, BEVLGBaseConverter):
-    id = "ec_be_vlg"
-    sources = {
-        "https://zenodo.org/records/10118572/files/BE_VLG_2021.zip?download=1": [
-            "BE_VLG_2021/BE_VLG_2021_EC21.shp"
-        ]
-    }
-    # the single EuroCrops 2021 release, not the parent's yearly editions
-    variants = {}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        del self.columns["BT_OMSCH"]
+class Converter(EuroCropsV2Mixin, AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
+    national = BEVLGConverter
+    nuts = "be2"
+    years = range(2008, 2018)
+    # buildings: "Hoofdgebouwen", "Andere gebouwen"
+    drop_codes = {"1", "2"}

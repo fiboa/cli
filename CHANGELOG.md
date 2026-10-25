@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added a test guard that rejects fixture files larger than 5 MB.
 - Added ML variants of converters (`ai4sf_ml`, `de_fusion_ml`, `india_10k_ml`, `rw_rwanda_ml`, `za_fusion_ml`) that publish each field's train/val/test split.
 - AT: Added support for 2018 by extracting archives before reading.
+- CA-PRAIRIES: Added the field boundaries the University of Saskatchewan derived for Alberta, Saskatchewan and Manitoba from Sentinel-2 imagery of 2021-2024.
+- DE-THUENEN: Added the Thünen Institute's crop type maps of Germany, 2017-2021, with field boundaries inferred from Sentinel-1, Sentinel-2 and Landsat imagery.
 - CH:
   - Added converters for every canton with standalone data (`ch_<canton>`) on a shared `CHBaseConverter`, each with the canton's own licence and attribution; Basel-Stadt is represented by the Basel-Landschaft data.
   - `ch_zh` (2017–2025), `ch_ge` (2017–2026) and `ch_sz` (2022–2025) read the cantons' own archives; the cantons that require registration or approval convert an exported file with `-i`.
@@ -32,6 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ES: Added Spain-wide converter based on FEGA 2025+.
 - IE: Added `ie_lpis` with DAFM's Anonymous LPIS parcels for 2017-2022 and 2025
 - IT-1: Added Tuscany converter based on EuroCrops v2.
+- Added `EuroCropsV2Mixin` and the converters `ec_at`, `ec_be_wal`, `ec_de_bb`, `ec_de_nrw` and `ec_es` for the editions of a national dataset that only the JRC's EuroCrops V2 still offers. They take the national converter's crop table and admin codes, so their output fits the national collection.
 - IT-BZ: Added South Tyrol converter.
 - LT-KZS: Added Lithuania KŽS reference parcels converter.
 - PL:
@@ -41,6 +44,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ZA-FUSION: Added South Africa converter based on the ESA Fusion Competition dataset.
 
 ### Changed
+- EC-FR: Reads 2015, 2016 and 2018 from EuroCrops V2 (CC-BY-4.0) instead of only 2018 from EuroCrops V1.
+- EC-EE: Reads 2015 from EuroCrops V2 instead of 2021 from EuroCrops V1, which the national `ee` covers.
+- EC-BE-VLG: Reads the Flemish editions 2008-2017 from EuroCrops V2 instead of the 2021 EuroCrops V1 file, which the national `be_vlg` covers; buildings are left out.
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
@@ -118,8 +124,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Excluded NBF ineligible patches with empty crop code.
   - Fixed source encoding and FLIK handling.
 - DE-NDS: Added stable collection IDs where missing.
+- DE-NRW: The INSPIRE id is now read from the source, as the declared INSPIRE extension requires.
 - DE-SAX: Updated to current available archive campaign.
 - DE-SAX: The title says it holds field blocks.
+- EE: Parcels that declare no crop are left out.
 - DE-SL:
   - Fixed parser issues with scientific notation in area values.
   - Restored full paging coverage and area derivation for complete output.

@@ -1,0 +1,44 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+54,Streifen am Waldrand ÖVF,Stripes at the edge of the forest,not_known_and_other,3399000000
+62,Kond.-Brache (Selbstbegrünung,Condensed fallow (self-greening),fallow_land_not_crop,3301110000
+66,Kond.-Brache (aktive Begrünun,Fallow land (active greening),fallow_land_not_crop,3301110000
+81,Agroforstsystem (Streifen),Agroforestry system (strips),not_known_and_other,3399000000
+88,ÖR 1a Freiwillige Stilllegung,ÖR 1a Voluntary set-aside,fallow_land_not_crop,3301110000
+89,ÖR 1b Blühstreifen auf AL,ÖR 1b Flower strips on AL,flowers_ornamental_plants,3301080000
+90,ÖR 1b Blühfläche auf AL,ÖR 1b Flowering area on AL,flowers_ornamental_plants,3301080000
+92,ÖR 1c Blühfläche auf DK,ÖR 1c Flowering area on DK,flowers_ornamental_plants,3301080000
+93,ÖR 1d Altgrasstreifen DGL,ÖR 1d Old grass strips DGL,pasture_meadow_grassland_grass,3302000000
+150,Gemenge Getr./Leg.(mehr Getr.),Mixtures of cereals/legumes (more cereals),cereal,3301010000
+186,"Amarant, (Fuchsschwanz)",amaranth,amaranth,3301150100
+188,Reis im Trockenanbau,Dry-farmed rice,rice,3301010700
+434,Gras-Leguminosen  (mehr Leg.),Grass-legumes (more legumes),temporary_grass,3301090100
+511,Streptocarpus/Drehfrucht,Streptocarpus/Twist fruit,other_flowers_ornamental_plants,3301089900
+512,Iberischer Drachenkopf,dragonhead,other_flowers_ornamental_plants,3301089900
+513,Braunellen,prunella vulgaris,other_flowers_ornamental_plants,3301089900
+514,Hauswurz,Houseleek Sempervivum,other_flowers_ornamental_plants,3301089900
+516,Knöterich (Persicaria),Knotweed (Persicaria),other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299
+519,Köcherblümchen,Cuphea,other_flowers_ornamental_plants,3301089900
+560,Brache (im Rahmen VNS),Fallow land (within the scope of SSF),fallow_land_not_crop,3301110000
+610,beetweiser Anbau von Gemüse,Cultivation of vegetables in beds,fresh_vegetables,3301070000
+612,Schwarzer Senf,Black mustard,mustard,3301210100
+650,beetweise Anbau Kräuter/Gewü,Cultivation of herbs/seasoning in beds,aromatic_medicinal_culinary_plants_spices_herbs,3301061200
+679,Baldriane (Echter Baldrian),Valerian (true valerian),valerian,3301061238
+683,Galega (Geißraute),Goat's Rue,galega,3301081900
+684,Löwenzahn,dandelion,dandelions,3301081400
+687,echte Arnika (Arnica montana),real arnica (Arnica montana),other_aromatic_medicinal_culinary_plants_spices_herbs,3301061299
+705,Virginischer Tabak,Virginian tobacco,tobacco,3301060100
+720,beetweise Anbau Zierpflanzen,Cultivation of ornamental plants in beds,flowers_ornamental_plants,3301080000
+740,Wucherblumen (Mutterkraut),tansies,other_flowers_ornamental_plants,3301089900
+741,Strandflieder (Geflügelter S.,Sea lavender (feathered S.) Limonium sinuatum,other_flowers_ornamental_plants,3301089900
+755,Wolfsmilch (Weißrand),Euphorbia marginata,other_flowers_ornamental_plants,3301089900
+759,Gipskräuter (Schleierkraut),Gypsophila (gypsophila),other_flowers_ornamental_plants,3301089900
+760,Amerikanisches Pampasgras,American Pampas Grass,poaceae_grasses,3301090200
+788,Geranien,geraniums,other_flowers_ornamental_plants,3301089900
+792,Kornrade,corncockle,other_flowers_ornamental_plants,3301089900
+806,Rutenhirse/Switchgras,Switchgrass / switchgrass,switchgrass,3301090208
+866,Pflanzenmischung mit Hanf,Plant mixture with hemp,hemp_cannabis,3301061000
+871,Wildpflanzenmischung (AUM),Wild plant mixture (AUM),arable_crops,3301000000
+913,Wildsamenvermehrung,Wild seed propagation,arable_land_seed_seedlings,3301100000
+915,Randstreifen (Acker/DK),Marginal strips (arable land/DK),not_known_and_other,3399000000
+918,Mehrjährige Buntbrachen (AUM),Perennial mixed fallow (AUM),fallow_land_not_crop,3301110000
+10222,Dicke Bohne,Broad bean,beans,3301020100
