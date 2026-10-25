@@ -70,18 +70,15 @@ current conditions. Fude Polygons are created for the purpose of roughly indicat
 
     def download_files(self, uris, cache_folder=None, **kwargs):
         cache_fs, cache_folder = self.get_cache(cache_folder)
-        missing = [
-            uri
-            for uri, name in uris.items()
-            if uri.startswith(BASE) and not cache_fs.exists(os.path.join(cache_folder, name))
-        ]
-        signed = self.sign(missing)
-        uris = {signed.get(uri, uri): name for uri, name in uris.items()}
-        zips = super().download_files(uris, cache_folder, **kwargs)
-        return [
-            self.to_parquet(path[0] if isinstance(path, tuple) else path, cache_folder)
-            for path in zips
-        ]
+        paths = []
+        for uri, name in uris.items():
+            if uri.startswith(BASE) and not cache_fs.exists(os.path.join(cache_folder, name)):
+                uri = self.sign([uri])[uri]
+            for path in super().download_files({uri: name}, cache_folder, **kwargs):
+                paths.append(
+                    self.to_parquet(path[0] if isinstance(path, tuple) else path, cache_folder)
+                )
+        return paths
 
     def sign(self, uris):
         """The download URLs of the API, signed for 30 minutes, for the given unsigned URLs."""
@@ -122,5 +119,7 @@ current conditions. Fude Polygons are created for the purpose of roughly indicat
         gdf = gpd.GeoDataFrame(pd.concat(frames, ignore_index=True), crs=frames[0].crs)
         # each geometry declares JGD2011, which GDAL ignores
         gdf = gdf.set_crs(6668, allow_override=True)
-        gdf.drop(columns=["history"]).to_parquet(target)
+        temporary_target = target + ".part"
+        gdf.drop(columns=["history"]).to_parquet(temporary_target)
+        os.replace(temporary_target, target)
         return target
