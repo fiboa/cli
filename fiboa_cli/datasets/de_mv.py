@@ -11,6 +11,11 @@ class Converter(WFSConverterMixin, AdminConverterMixin, FiboaBaseConverter):
     wfs_params = {"typeNames": "mv:feldbloecke", "outputFormat": "shape-zip", "sortBy": "fbid"}
     wfs_page_size = 20_000
     wfs_extension = "zip"
+
+    def get_wfs_total(self, params):
+        # the service answers a hits request that names an output format with an error
+        return super().get_wfs_total({k: v for k, v in params.items() if k != "outputFormat"})
+
     id = "de_mv"
     admin_subdivision_code = "MV"
     short_name = "Germany, Mecklenburg-Western Pomerania"

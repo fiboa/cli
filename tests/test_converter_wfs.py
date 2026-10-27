@@ -162,4 +162,5 @@ def test_de_mv_reads_every_page(monkeypatch):
     assert query["count"] == ["20000"]
     assert query["sortBy"] == ["fbid"]
     assert query["outputFormat"] == ["shape-zip"]
-    assert service.requests
+    # a hits request with an output format makes the service fail
+    assert "outputFormat" not in service.requests[0]
