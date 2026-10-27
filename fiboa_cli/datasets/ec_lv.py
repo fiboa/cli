@@ -2,6 +2,7 @@ import pandas as pd
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.ec import EuroCropsConverterMixin
+from .commons.hcat import hcat_mapping_url
 
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
@@ -54,5 +55,6 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     }
 
     def add_hcat(self, gdf):
-        # skip adding hcat
+        # the source carries HCAT already; only the code list is added
+        gdf["crop:code_list"] = hcat_mapping_url(self.hcat_mapping_csv)
         return gdf

@@ -26,7 +26,7 @@ The download service is a set of personalized spatial data of agricultural land 
 
     columns = {
         "NMA_ID": "claimant_id",
-        "GRUPE": "crop:name",
+        "GRUPE": ["crop:name", "crop:code"],  # the code list is keyed on the name
         "Shape_Leng": "metrics:perimeter",
         "Shape_Area": "metrics:area",
         "geometry": "geometry",
