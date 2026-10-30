@@ -104,6 +104,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
 
 ### Fixed
+- DE-MV: The field block WFS is read in pages, so all field blocks are converted instead of the first 20,000.
+- DE-TH: A field block without an area last year has an empty `area_last_year` instead of 0, which the schema rejects.
+- EC-LT, EC-LV, EC-SI: `crop:code` and `crop:code_list`, which the crop extension requires, are now written; EC-SI leaves out the parcels without a crop.
 - DE-BB: Landscape elements (hedges, tree rows, copses, wetlands) are left out, and codes under 100, such as the eco-scheme areas, now map to HCAT; they come zero-padded in the source.
 - Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
 - EC-FR, EC-NL-CROP: HCAT mappings for iris, Jerusalem artichoke and parsley now match the taxonomy.

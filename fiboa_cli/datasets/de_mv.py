@@ -1,13 +1,21 @@
 from vecorel_cli.conversion.admin import AdminConverterMixin
 
+from ..conversion.converter_wfs import WFSConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import CROP_EXTENSION
 
 
-class Converter(AdminConverterMixin, FiboaBaseConverter):
-    sources = {
-        "https://www.geodaten-mv.de/dienste/gdimv_feldblock_wfs?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&TYPENAME=mv:feldbloecke&OUTPUTFORMAT=shape-zip": "gdimv_feldblock_wfs.zip"
-    }
+class Converter(WFSConverterMixin, AdminConverterMixin, FiboaBaseConverter):
+    # The service returns at most 20,000 features per request, so the layer is read in pages
+    wfs_url = "https://www.geodaten-mv.de/dienste/gdimv_feldblock_wfs"
+    wfs_params = {"typeNames": "mv:feldbloecke", "outputFormat": "shape-zip", "sortBy": "fbid"}
+    wfs_page_size = 20_000
+    wfs_extension = "zip"
+
+    def get_wfs_total(self, params):
+        # the service answers a hits request that names an output format with an error
+        return super().get_wfs_total({k: v for k, v in params.items() if k != "outputFormat"})
+
     id = "de_mv"
     admin_subdivision_code = "MV"
     short_name = "Germany, Mecklenburg-Western Pomerania"

@@ -290,6 +290,10 @@ SWISS_COLUMNS = (
 )
 EC_V2_COLUMNS = ("determination:datetime", "metrics:area", "crop:code", "hcat:code", "id")
 expected_columns = {
+    # the crop extension requires both
+    "ec_lt": ("crop:code", "crop:code_list"),
+    "ec_lv": ("crop:code", "crop:code_list"),
+    "ec_si": ("crop:code", "crop:code_list"),
     # the province comes from the file name, the id from the row in each RM's file
     "ca_prairies": (
         "id",
