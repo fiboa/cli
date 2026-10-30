@@ -1,10 +1,10 @@
 import re
 
 import requests
+from vecorel_cli.conversion.per_file import PerFileConverterMixin
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from ..conversion.per_file import PerFileConverterMixin
 from .commons.hcat import AddHCATMixin
 
 
