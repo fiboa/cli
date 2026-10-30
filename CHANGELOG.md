@@ -9,31 +9,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - `fiboa create-stac-collection` describes the fiboa properties in `table:columns`.
-- Added `pixi run check-hcat`, which compares the HCAT mapping tables the converters read online with the taxonomy.
 - Added `FiboaDuckDBBaseConverter` for SQL-based conversion of large Parquet sources.
 - Added support for supplementary HCAT/crop mappings via `hcat_mapping_supplements`.
 - Added `get_hcat_mapping()` and `hcat_lookup()` to `AddHCATMixin` to load the HCAT mapping once and look up codes or names in it.
 - Added support for Esri JSON output and server-side filters in REST converters.
 - Added `WFSConverterMixin` for paged downloads from WFS layers.
-- Added a test guard that rejects fixture files larger than 5 MB.
 - Added ML variants of converters (`ai4sf_ml`, `de_fusion_ml`, `india_10k_ml`, `rw_rwanda_ml`, `za_fusion_ml`) that publish each field's train/val/test split.
+- Added `EuroCropsV2Mixin` and the converters `ec_at`, `ec_be_wal`, `ec_de_bb`, `ec_de_nrw` and `ec_es` for the editions of a national dataset that only the JRC's EuroCrops V2 still offers. They take the national converter's crop table and admin codes, so their output fits the national collection.
 - AT: Added support for 2018 by extracting archives before reading.
 - CA-PRAIRIES: Added the field boundaries the University of Saskatchewan derived for Alberta, Saskatchewan and Manitoba from Sentinel-2 imagery of 2021-2024.
-- DE-THUENEN: Added the Thünen Institute's crop type maps of Germany, 2017-2021, with field boundaries inferred from Sentinel-1, Sentinel-2 and Landsat imagery.
 - CH:
   - Added converters for every canton with standalone data (`ch_<canton>`) on a shared `CHBaseConverter`, each with the canton's own licence and attribution; Basel-Stadt is represented by the Basel-Landschaft data.
   - `ch_zh` (2017–2025), `ch_ge` (2017–2026) and `ch_sz` (2022–2025) read the cantons' own archives; the cantons that require registration or approval convert an exported file with `-i`.
   - The federal usage code (`lnf_code`) is published as `crop:code`, and HCAT is mapped by it (`code/ch/lnf_code.csv`).
 - DE-BW: Added Baden-Württemberg reference parcels converter.
+- DE-BY: Added Bavaria field boundaries converter.
 - DE-BY-BLOCK: Added Bavaria field-block converter.
 - DE-FUSION: Added Brandenburg converter based on the ESA Fusion Competition dataset.
 - DE-HE: Added Hesse reference parcels converter.
 - DE-SL-BLOCK: Added Saarland field-block converter.
 - DE-ST: Added Saxony-Anhalt field-block converter.
+- DE-THUENEN: Added the Thünen Institute's crop type maps of Germany, 2017-2021, with field boundaries inferred from Sentinel-1, Sentinel-2 and Landsat imagery.
+- EC-FR: Added the French editions 2015, 2016 and 2018 from EuroCrops V2 (CC-BY-4.0).
 - ES: Added Spain-wide converter based on FEGA 2025+.
-- IE: Added `ie_lpis` with DAFM's Anonymous LPIS parcels for 2017-2022 and 2025
+- IE-LPIS: Added DAFM's Anonymous LPIS parcels for 2017-2022 and 2025.
 - IT-1: Added Tuscany converter based on EuroCrops v2.
-- Added `EuroCropsV2Mixin` and the converters `ec_at`, `ec_be_wal`, `ec_de_bb`, `ec_de_nrw` and `ec_es` for the editions of a national dataset that only the JRC's EuroCrops V2 still offers. They take the national converter's crop table and admin codes, so their output fits the national collection.
 - IT-BZ: Added South Tyrol converter.
 - LT-KZS: Added Lithuania KŽS reference parcels converter.
 - PL:
@@ -43,21 +43,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ZA-FUSION: Added South Africa converter based on the ESA Fusion Competition dataset.
 
 ### Changed
-- EC-FR: Reads 2015, 2016 and 2018 from EuroCrops V2 (CC-BY-4.0) instead of only 2018 from EuroCrops V1.
-- EC-EE: Reads 2015 from EuroCrops V2 instead of 2021 from EuroCrops V1, which the national `ee` covers.
-- EC-BE-VLG: Reads the Flemish editions 2008-2017 from EuroCrops V2 instead of the 2021 EuroCrops V1 file, which the national `be_vlg` covers; buildings are left out.
-- `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
-- Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
+- Improved geometry axis handling so generated bounding boxes keep x/y order consistent in output.
 - Updated vecorel-cli to 0.4.2:
+  - **Breaking:** `fiboa merge` keeps all properties by default (`--include`/`--exclude` restrict them), fails if the merged file would be invalid (`--no-strict` warns instead), and refuses datasets with different specification or extension versions.
   - A converter can set `request_headers` for its downloads, e.g. a browser User-Agent.
   - A converter can convert each source on its own and merge the parts (`PerFileConverterMixin`), for sources that do not fit into memory together.
-  - HTTP downloads no longer fail after 5 minutes.
-  - `--compression none` no longer fails in DuckDB-based conversions and merges.
   - The DuckDB converter downloads archives and other sources it cannot read in place also without a cache, and no longer turns `key=value` folders in a path into columns.
   - GeoParquet files under 250,000 rows get at least ten row groups, so a reader can skip by area.
   - `create-stac-collection` takes the bbox from the geometries, in EPSG:4326.
-  - **Breaking:** `fiboa merge` keeps all properties by default (`--include`/`--exclude` restrict them), fails if the merged file would be invalid (`--no-strict` warns instead), and refuses datasets with different specification or extension versions.
+  - HTTP downloads no longer fail after 5 minutes.
+  - `--compression none` no longer fails in DuckDB-based conversions and merges.
 - REST converters download much faster from large layers and retry when a service answers with intermittent errors.
 - Converters no longer split multi-part geometries into one row per polygon: fields keep the geometry modeling of the source (Polygon or MultiPolygon), the source-published area and perimeter, and one id per source feature. Use `fiboa improve --explode-geometries` when single polygons are needed.
 - Converters whose variants are years (1900-2100) now fill `determination:datetime` from the selected year unless they provide a determination date themselves.
@@ -68,6 +64,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - CZ: Extended year coverage, including GPZ_DP editions (2019-2022), and added 2026 nested-archive support.
 - DE-SH: Extended support to editions 2023, 2025 and 2026.
 - DK: Editions now cover 2008-2026. The 2008 and 2009 editions are published without the crop and HCAT extensions because the source has no crop columns.
+- EC-BE-VLG: Reads the Flemish editions 2008-2017 from EuroCrops V2 instead of the 2021 EuroCrops V1 file, which the national `be_vlg` covers; buildings are left out.
+- EC-EE: Reads 2015 from EuroCrops V2 instead of 2021 from EuroCrops V1, which the national `ee` covers.
 - ES:
   - ES regions based on SIGPAC now publish `hcat:code` from land-use mapping.
   - ES-AR now reads municipality SIGPAC sources listed by IDEAragon.
@@ -86,33 +84,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - The merged code list at https://fiboa.org/code/lv/lv.csv now includes the 34 post-2021 added codes.
   - URL discovery now requires all nine regional GeoPackages to avoid partial campaign publication.
 - NL: Extended BRP coverage to 2009-2026 and moved to the newer PDOK source.
-- PT: Updated for the 2025 edition and its schema/unit changes.
 - PT: Editions now cover 2017-2025.
+  - 2025 follows the edition's schema and unit changes.
   - 2020-2022 merge the regional files, which come in four projections; 2020 and 2021 join the crop code from a separate table.
   - 2017-2019 publish the crop as a Portuguese name, which is resolved to a code through pt.csv and kept as `crop:name`.
   - Perimeters are measured in each feature's UTM zone.
 - SE: Editions now cover 2015-2025 from the yearly WFS filter.
 - SI: Extended editions back to 2019.
 - SK: Editions now cover 2018-2026 from the per-campaign datasets on data.slovensko.sk.
-- US-CSB: Editions now cover 2017-2024.
 - US-CA SCM:
   - Editions now cover 2014, 2016 and 2018-2024 (2024 provisional), from the current portal URLs.
   - The crop is `MAIN_CROP` from 2019, the main-season `CROPTYP2` in 2016 and 2018, and in 2014 a name mapped to its code through `us_ca_scm_2014.csv`.
   - The urban mask (`U`, `****`), urban landscape (`UL2`) and riparian vegetation (`NR`) are left out: they are not fields.
   - The provider is the California Department of Water Resources; `determination:datetime` is 1 July of the edition year.
+- US-CSB: Editions now cover 2017-2024.
 
 ### Removed
 - Removed `fiboa publish`. Datasets are published as a Portolan catalog; the README describes the steps.
 - CH: Removed the national `ch` converter, whose single licence could not cover the cantons' differing terms; the canton converters replace it, and a Swiss file is `fiboa merge` of their outputs.
 
 ### Fixed
-- DE-MV: The field block WFS is read in pages, so all field blocks are converted instead of the first 20,000.
-- DE-TH: A field block without an area last year has an empty `area_last_year` instead of 0, which the schema rejects.
-- EC-LT, EC-LV, EC-SI: `crop:code` and `crop:code_list`, which the crop extension requires, are now written; EC-SI leaves out the parcels without a crop.
-- DE-BB: Landscape elements (hedges, tree rows, copses, wetlands) are left out, and codes under 100, such as the eco-scheme areas, now map to HCAT; they come zero-padded in the source.
-- Added HCAT spelling fixes via `csv_supplements` for DE-BB, DE-NDS and EC-SI.
-- EC-FR, EC-NL-CROP: HCAT mappings for iris, Jerusalem artichoke and parsley now match the taxonomy.
-- EuroCrops converters whose source already carries HCAT (such as EC-FR and EC-SI) now apply their supplements too.
+- Added HCAT spelling fixes via `hcat_mapping_supplements` for DE-BB, DE-NDS and EC-SI.
 - Declared the `beautifulsoup4` dependency used by ES-PV and ES-VC.
 - REST converters:
   - Downloaded data cached for one dataset, edition or service is no longer served for another. Previously cached downloads are fetched again once.
@@ -122,7 +114,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Requests time out after 3 minutes, so a hung connection is retried instead of blocking the run.
   - A cached page that cannot be read is fetched again instead of ending the run.
   - The key field of a joined layer is read from the layer's metadata, which ES-IB answers where it refuses a query.
-- Fixed `use_variant_as_determination` so determination dates are retained.
 - `metrics:area` measured from the geometry is now correct in CRSs that are in metres but not equal-area, such as Web Mercator: they are reprojected to an equal-area CRS first. Source areas in hectares are converted to m² also where missing values are filled in, and empty values are filled in, not only 0. Invalid geometries are repaired before they are measured, as they are for the output, so that e.g. a self-intersecting polygon no longer gets an area of 0.
 - Converters no longer publish duplicate `id`s (#282): row-numbered ids count over all source files instead of restarting per file, and ids the source repeats get a `~<n>` suffix.
 - Rows missing `crop:code` are now dropped with a warning (and an error threshold), instead of failing whole conversions.
@@ -131,28 +122,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - DE-BB:
   - Excluded NBF ineligible patches with empty crop code.
   - Fixed source encoding and FLIK handling.
+  - Landscape elements (hedges, tree rows, copses, wetlands) are left out, and codes under 100, such as the eco-scheme areas, now map to HCAT; they come zero-padded in the source.
+- DE-MV: The field block WFS is read in pages, so all field blocks are converted instead of the first 20,000.
 - DE-NDS: Added stable collection IDs where missing.
 - DE-NRW: The INSPIRE id is now read from the source, as the declared INSPIRE extension requires.
-- DE-SAX: Updated to current available archive campaign.
-- DE-SAX: The title says it holds field blocks.
-- EE: Parcels that declare no crop are left out.
+- DE-SAX:
+  - Updated to current available archive campaign.
+  - The title says it holds field blocks.
 - DE-SL:
   - Fixed parser issues with scientific notation in area values.
   - Restored full paging coverage and area derivation for complete output.
+- DE-TH: A field block without an area last year has an empty `area_last_year` instead of 0, which the schema rejects.
 - DK:
   - IDs are now derived from `Journalnr` and `Marknr` together (or the row number in editions without either), because `Marknr` alone repeats across holdings.
   - Missing crop codes are kept empty instead of being filled with the undefined code 0.
-- EC-BE-VLG: Converting no longer fails on the variants inherited from BE-VLG.
-- EC-EE: Fixed shapefile naming and year-column migration.
-- EC-FR: Added the missing 2018 RPG campaign from EuroCrops.
+- EC-LT, EC-LV, EC-SI: `crop:code` and `crop:code_list`, which the crop extension requires, are now written; EC-SI leaves out the parcels without a crop.
 - EC-LT:
   - Fixed Lithuanian crop-name decoding and parcel identifier handling.
   - `determination:datetime` is now published; it was declared under a name the converter does not read.
 - EC-LV: Relaxed requirements to match fields present in source data.
+- EC-NL-CROP: HCAT mappings for iris, Jerusalem artichoke and parsley now match the taxonomy.
 - EC-SI: Relaxed requirements to match fields present in source data.
-- EE: Published valid crop code, land-use class and stable parcel identifier; cache files are now campaign-specific.
+- EE:
+  - Published valid crop code, land-use class and stable parcel identifier; cache files are now campaign-specific.
+  - Parcels that declare no crop are left out.
 - ES:
-  - ES now maps crops to HCAT, and `crop:code_list` points to a code list that exists.
   - ES-AN now uses the correct land-use column and campaign-based determination date.
   - ES-CAT and ES-CN now map crop codes to HCAT with the extended mapping table.
   - ES-CB now derives determination date from the campaign.
@@ -168,8 +162,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Crop codes introduced after the 2018 EuroCrops table (for example JAC, the most common code of 2024) now map to HCAT; 7.50% of the 2024 fields were unmapped before.
   - `id` is the RPG parcel id plus a part number where it repeats (multipart splits, reissued ids); the source value is kept as `parcel_id`.
 - IE: Uses stable feature IDs and publishes computed `metrics:area` when missing from source.
-- IE-LPIS: The HCAT mapping is read again; it still used the attribute name from before the rename.
-- JP: Uses campaign-specific determination dates and DuckDB conversion path.
+- JP: Uses campaign-specific determination dates.
 - LT: Updated to Europe-LAND v1.3 with 2025 coverage.
 - SK: Fixed edition selection, crop-name matching and block/id handling across campaigns.
 
