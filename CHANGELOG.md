@@ -49,8 +49,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
-- Updated vecorel-cli to 0.4.1:
+- Updated vecorel-cli to 0.4.2:
   - A converter can set `request_headers` for its downloads, e.g. a browser User-Agent.
+  - A converter can convert each source on its own and merge the parts (`PerFileConverterMixin`), for sources that do not fit into memory together.
+  - HTTP downloads no longer fail after 5 minutes.
+  - `--compression none` no longer fails in DuckDB-based conversions and merges.
   - The DuckDB converter downloads archives and other sources it cannot read in place also without a cache, and no longer turns `key=value` folders in a path into columns.
   - GeoParquet files under 250,000 rows get at least ten row groups, so a reader can skip by area.
   - `create-stac-collection` takes the bbox from the geometries, in EPSG:4326.
