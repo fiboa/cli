@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `fiboa create-stac-collection` describes the fiboa properties in `table:columns`.
 - Added `pixi run check-hcat`, which compares the HCAT mapping tables the converters read online with the taxonomy.
 - Added `FiboaDuckDBBaseConverter` for SQL-based conversion of large Parquet sources.
-- Added `PerFileBaseConverter` to process multi-file sources incrementally.
 - Added support for supplementary HCAT/crop mappings via `hcat_mapping_supplements`.
 - Added `get_hcat_mapping()` and `hcat_lookup()` to `AddHCATMixin` to load the HCAT mapping once and look up codes or names in it.
 - Added support for Esri JSON output and server-side filters in REST converters.
@@ -50,8 +49,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `fiboa publish` no longer uploads to S3 or generates README/LICENSE files. It now creates GeoParquet, PMTiles and a STAC Collection with relative links, checksums and web-map-links.
 - Updated `aiohttp` to support Zenodo responses that include both returned `Content-Type` headers.
 - Improved geometry axis handling so generated tiles and bounding boxes keep x/y order consistent in output.
-- Updated vecorel-cli to 0.4.1:
+- Updated vecorel-cli to 0.4.2:
   - A converter can set `request_headers` for its downloads, e.g. a browser User-Agent.
+  - A converter can convert each source on its own and merge the parts (`PerFileConverterMixin`), for sources that do not fit into memory together.
+  - HTTP downloads no longer fail after 5 minutes.
+  - `--compression none` no longer fails in DuckDB-based conversions and merges.
   - The DuckDB converter downloads archives and other sources it cannot read in place also without a cache, and no longer turns `key=value` folders in a path into columns.
   - GeoParquet files under 250,000 rows get at least ten row groups, so a reader can skip by area.
   - `create-stac-collection` takes the bbox from the geometries, in EPSG:4326.

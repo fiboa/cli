@@ -1,13 +1,15 @@
 import re
 
 import requests
+from vecorel_cli.conversion.per_file import PerFileConverterMixin
 from vecorel_cli.vecorel.extensions import ADMIN_DIVISION
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import AddHCATMixin
 
 
-class Converter(AddHCATMixin, FiboaBaseConverter):
+# 50 provincial GeoPackages that do not fit in memory together
+class Converter(PerFileConverterMixin, AddHCATMixin, FiboaBaseConverter):
     id = "es"
     short_name = "Spain"
     title = "Spain Declared Crops (Cultivos Declarados SIGPAC)"
