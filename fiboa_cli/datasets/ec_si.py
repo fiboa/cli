@@ -1,5 +1,6 @@
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.ec import EuroCropsConverterMixin
+from .commons.hcat import hcat_mapping_url
 
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
@@ -25,7 +26,7 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
         "ID": "id",
         "AREA": "metrics:area",
         "GERK_PID": "gerk_pid",
-        "SIFRA_KMRS": "crop_type_class",
+        "SIFRA_KMRS": ["crop_type_class", "crop:code"],
         "RASTLINA": "rastlina",
         "CROP_LAT_E": "crop_lat_e",
         "COLOR": "color",
@@ -48,6 +49,12 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
         },
     }
 
+    # four parcels carry no crop at all
+    column_filters = {
+        "SIFRA_KMRS": lambda col: col.notna() & (col.astype("string").str.strip() != "")
+    }
+
     def add_hcat(self, gdf):
-        # the source carries HCAT and has no crop:code; only apply the supplement
+        # the source carries HCAT already; only apply the supplement and add the code list
+        gdf["crop:code_list"] = hcat_mapping_url(self.hcat_mapping_csv)
         return self.correct_resolved_hcat(gdf)

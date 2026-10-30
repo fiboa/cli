@@ -147,3 +147,20 @@ def test_unknown_total_fails(monkeypatch):
     _serve(monkeypatch, _hits("unknown"))
     with pytest.raises(ValueError, match="get_wfs_total"):
         WFSConverter().get_urls()
+
+
+def test_de_mv_reads_every_page(monkeypatch):
+    from fiboa_cli.datasets.de_mv import Converter as DEMVConverter
+
+    service = _serve(monkeypatch, _hits(71_537))
+    urls = DEMVConverter().get_urls()
+
+    # the service caps a request at 20,000 features
+    assert len(urls) == 4
+    query = parse_qs(urlsplit(list(urls)[-1]).query)
+    assert query["startIndex"] == ["60000"]
+    assert query["count"] == ["20000"]
+    assert query["sortBy"] == ["fbid"]
+    assert query["outputFormat"] == ["shape-zip"]
+    # a hits request with an output format makes the service fail
+    assert "outputFormat" not in service.requests[0]

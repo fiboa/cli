@@ -137,6 +137,7 @@ extra_convert_parameters = {
     "es_nc": {"variant": "2025", **_input_files("es_nc", "es_nc.gpkg")},
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
     "nl": {"variant": "2023"},
+    "jp": {"variant": "2026", **_input_files("jp", "jp_fude_2026_13.zip")},
     "dk#2008": {"variant": "2008"},
     "pt": {"variant": "2023"},
     **{f"pt#{year}": {"variant": year} for year in PT_EDITIONS},
@@ -289,6 +290,10 @@ SWISS_COLUMNS = (
 )
 EC_V2_COLUMNS = ("determination:datetime", "metrics:area", "crop:code", "hcat:code", "id")
 expected_columns = {
+    # the crop extension requires both
+    "ec_lt": ("crop:code", "crop:code_list"),
+    "ec_lv": ("crop:code", "crop:code_list"),
+    "ec_si": ("crop:code", "crop:code_list"),
     # the province comes from the file name, the id from the row in each RM's file
     "ca_prairies": (
         "id",
@@ -362,7 +367,12 @@ filtered_codes = {
     "ec_be_vlg": ("1", "2"),
     # small woody features and other areas that are no field
     "de_thuenen": ("3001", "3004"),
+    # landscape elements (tf_typ LE); in the fixture these codes name nothing else
+    "de_bb": ("1", "3", "4", "11", "13", "001", "003", "004", "011", "013"),
 }
+
+# Converters whose fixture maps every row to HCAT
+fully_mapped = {"de_bb"}
 
 # The smallest field (m²) a converter keeps, where the fixture holds a smaller sliver
 minimum_area = {
@@ -442,6 +452,10 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
 
     dropped = [c for c in filtered_codes.get(converter, ()) if c in set(df["crop:code"])]
     assert not dropped, f"{converter} kept rows it should filter out: crop:code {dropped}"
+
+    if converter in fully_mapped:
+        unmapped = sorted(set(df.loc[df["hcat:code"].isna(), "crop:code"]))
+        assert not unmapped, f"{converter}: crop:code {unmapped} has no HCAT code"
 
     if "metrics:area" in df.columns and converter not in ("de_bb", "ec_de_bb"):
         # Check for accidental hectare conversion; fields should be more than 10 square meters

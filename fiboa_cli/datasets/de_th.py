@@ -63,6 +63,8 @@ To produce the DGK-Lw, (official) orthophotos from the Thuringian Land Registry 
         ),
         "FBI_VJ": lambda column: column.str.split(Converter.delim, regex=True),
         "GEO_UPDAT": lambda column: pd.to_datetime(column, format="%d.%m.%Y", utc=True),
+        # a field block that is new this year had no area last year, which the source writes as 0
+        "FB_FL_VJ": lambda column: column.where(column > 0),
     }
 
     column_filters = {"LF": lambda col: col == "LF"}
@@ -70,7 +72,7 @@ To produce the DGK-Lw, (official) orthophotos from the Thuringian Land Registry 
     # Schemas for the fields that are not defined in fiboa
     # Keys must be the values from the COLUMNS dict, not the keys
     missing_schemas = {
-        "required": ["valid_year", "area_last_year", "tk10", "bnk"],
+        "required": ["valid_year", "tk10", "bnk"],
         "properties": {
             "valid_year": {
                 # could also be uint16 or string

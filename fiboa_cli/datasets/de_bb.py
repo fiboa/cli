@@ -37,4 +37,8 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "code": "crop:code",
     }
     # NBF: areas in a field block the cadastre marks as not usable for agriculture (pylons, ditches, woods); no crop code
-    column_filters = {"tf_typ": lambda col: col != "NBF"}
+    # LE: landscape elements (hedges, tree rows, copses, wetlands), which are no fields; their
+    # codes 001-013 also name non-crop uses, so only the type tells them apart
+    column_filters = {"tf_typ": lambda col: ~col.isin(["NBF", "LE"])}
+    # codes under 100 come zero-padded (088), the code lists write them without (88)
+    column_migrations = {"code": lambda col: col.str.replace(r"^0+(?=\d)", "", regex=True)}
