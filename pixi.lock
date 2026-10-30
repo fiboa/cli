@@ -4764,8 +4764,8 @@ packages:
   timestamp: 1763918099466
 - pypi: ./
   name: fiboa-cli
-  version: 0.21.0
-  sha256: 9db0cd7abe351cfb29587fd239a6f831829f4cf6d143121c973cfb51a9b04931
+  version: 0.30.0
+  sha256: 5724a7712e0103f0f4cd422af1e75764c80646f4c5d5217c825ef78f0f63fd54
   requires_dist:
   - vecorel-cli==0.4.2
   - beautifulsoup4>=4.12
