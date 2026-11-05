@@ -1,4 +1,5 @@
 import csv
+import re
 from io import StringIO
 from typing import Optional
 
@@ -36,6 +37,17 @@ class AddHCATMixin:
     # column missing anywhere else still fails loudly.
     variants_without_crops: set[str] = set()
 
+    # Fill crop:name with the table's original_name where the source carries no crop
+    # name (no column, a column some editions lack, or empty values), so the source's own
+    # names stay in the data next to HCAT. hcat:name_en already holds the table's
+    # translated_name, the English of the source name.
+    crop_names_from_table = True
+    # A table that repairs names of the HCAT table that lost letters to "?" (EuroCrops
+    # si_2021.csv): its name for the code is taken where it matches letter for letter
+    crop_names_repair_csv: Optional[str] = None
+    # Names that are wrong in the table, by code; they win over the table and the repair
+    crop_name_corrections: dict[str, str] = {}
+
     hcat_columns = {
         "hcat:name_en": "hcat:name_en",
         "hcat:name": "hcat:name",
@@ -46,6 +58,11 @@ class AddHCATMixin:
         super().__init__(*args, **kwargs)
         self.columns |= self.hcat_columns | {"crop:code_list": "crop:code_list"}
         self.extensions = getattr(self, "extensions", set()) | {CROP_EXTENSION, HCAT_EXTENSION}
+        # a converter that maps no crop name gets one from the table (add_crop_names)
+        self._crop_name_entry = {}
+        if self.crop_names_from_table and self._source_column("crop:name") is None:
+            self._crop_name_entry = {"crop:name": "crop:name"}
+            self.columns |= self._crop_name_entry
 
     def has_no_crops(self) -> bool:
         """Whether the selected variant has no crop columns; override when no edition has any."""
@@ -55,7 +72,9 @@ class AddHCATMixin:
         # __init__ ran before the variant was known, so align the extensions and
         # columns with the chosen variant (in both directions)
         super().select_variant(variant)
-        crop_entries = self.hcat_columns | {"crop:code_list": "crop:code_list"}
+        crop_entries = (
+            self.hcat_columns | {"crop:code_list": "crop:code_list"} | self._crop_name_entry
+        )
         if self.has_no_crops():
             self.extensions -= {CROP_EXTENSION, HCAT_EXTENSION}
             removed = set(crop_entries.values())
@@ -167,6 +186,33 @@ class AddHCATMixin:
                 if self.hcat_mapping_csv
                 else self.mapping_file
             )
+        return self.add_crop_names(gdf)
+
+    def add_crop_names(self, gdf):
+        """Fill the crop name with the table's original_name where the source has none."""
+        if not self.crop_names_from_table or self.has_no_crops():
+            return gdf
+        columns = self.get_columns(gdf)
+        source = self._source_column("crop:name", columns)
+        if source is None:
+            return gdf
+        rows = self.get_hcat_mapping()
+        if not rows or "original_code" not in rows[0] or "original_name" not in rows[0]:
+            return gdf  # a table keyed on names: the source carries the names itself
+        names = {
+            (row["original_code"] or "").strip(): (row["original_name"] or "").strip() or None
+            for row in rows
+            if (row["original_code"] or "").strip()
+        }
+        if self.crop_names_repair_csv:
+            names = repair_names(names, load_hcat_mapping(self.crop_names_repair_csv))
+        names |= self.crop_name_corrections
+        found = self.get_code_column(gdf, columns=columns).astype("string").str.strip().map(names)
+        if source in gdf.columns:
+            current = gdf[source].astype("string")
+            gdf[source] = current.where(current.str.strip().fillna("") != "", found)
+        else:
+            gdf[source] = found.astype("string")
         return gdf
 
     def correct_resolved_hcat(self, gdf):
@@ -187,6 +233,20 @@ class AddHCATMixin:
     def post_migrate(self, gdf) -> gpd.GeoDataFrame:
         gdf = super().post_migrate(gdf)
         return self.add_hcat(gdf)
+
+
+def repair_names(names: dict, rows: list[dict]) -> dict:
+    """Replace each name with a "?" for a lost letter by the other table's name for the
+    same code, where that name matches it letter for letter, "?" standing for any letter."""
+    other = {(r["original_code"] or "").strip(): (r["original_name"] or "").strip() for r in rows}
+    repaired = dict(names)
+    for code, name in names.items():
+        candidate = other.get(code, "")
+        if name and "?" in name and candidate:
+            pattern = re.escape(name).replace(r"\?", ".")
+            if re.fullmatch(pattern, candidate):
+                repaired[code] = candidate
+    return repaired
 
 
 def hcat_mapping_url(csv_file):

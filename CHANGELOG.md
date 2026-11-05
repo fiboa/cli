@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+- Converters that map crop codes to HCAT publish the source's own crop name in `crop:name` where the source carries codes only, from the `original_name` of the mapping table (`AddHCATMixin.crop_names_from_table`, on by default; `crop_name_corrections` fixes a table's wrong names by code, `crop_names_repair_csv` restores letters a table lost to `?`). This adds the original names to DE-NDS, EC-LV, EC-SI, ES, FR, HR, IT-1, PT (2025), SE and others; `hcat:name_en` keeps the English translation.
+- DE-MV: `crop:name` and `crop:name_en` from the land use code list, matched regardless of case (the service writes `WA`, the list `Wa`).
+- EC-SI: EuroCrops' Slovenian table lost š, č and ž to `?`; the names are restored from the ministry's table where it spells the code alike, and four by hand.
+- HR: code 200 is named `Oranica` (arable land): EuroCrops' table gives it the name of 210, greenhouses on arable land.
+- IT-1: code 619's name has its apostrophe back (`D'ACQUA`).
+- PT: 2018's crop names that lost their accented letters to `?` (`AGRI?O`) take the crop list's spelling (`AGRIÃO`).
+
 ## [v0.30.0] - 2026-10-30
 
 ### Added

@@ -63,6 +63,9 @@ and supporting sustainable land use practices.
     }
 
     hcat_mapping_csv = "hr_2020.csv"
+    # EuroCrops gives 200 the name of 210 (greenhouses on arable land); its English,
+    # "Arable land", is the ARKOD land use 200, Oranica
+    crop_name_corrections = {"200": "Oranica"}
 
     missing_schemas = {
         # The editions carry different subsets
