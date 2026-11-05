@@ -34,11 +34,13 @@ def test_changed_properties():
 
 
 def test_valid_license():
+    # SPDX identifiers are case-insensitive; the list keys them as written, e.g. GPL-2.0-or-later
+    licenses = {key.upper() for key in spdx_license_list.LICENSES}
     c = Converters()
     for _id in Converters().list_ids():
         converter = c.load(_id)
         if converter.license and "<" not in converter.license:
-            assert converter.license.upper() in spdx_license_list.LICENSES, (
+            assert converter.license.upper() in licenses, (
                 f"Converter {_id} has invalid license {converter.license}"
             )
         assert getattr(converter, "license") is None or isinstance(converter.license, str)

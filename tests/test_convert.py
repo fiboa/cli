@@ -118,6 +118,10 @@ tests = [
     "de_fusion_ml",
     "za_fusion_ml",
     "rw_rwanda_ml",
+    "ke_ecaas",
+    "zm_ecaas",
+    "glocab",
+    "glocab#2016",
 ]
 test_path = "tests/data-files/convert"
 
@@ -251,10 +255,18 @@ extra_convert_parameters = {
     "it_bz": _input_files("it_bz", "it_bz.json"),
     "de_sax": {"input_files": {f"{test_path}/de_sax/gesamt_2026_RE.zip": ["2026_RE_FB_33.shp"]}},
     "de_fusion_ml": _input_files("de_fusion", "de_test_2019.geojson", "de_train_2018.geojson"),
-    "za_fusion_ml": _input_files(
-        "za_fusion", "za_train_258N.geojson", "za_train_259N.geojson", "za_test_2017.geojson"
-    ),
+    "za_fusion_ml": {
+        **_input_files(
+            "za_fusion", "za_train_258N.geojson", "za_train_259N.geojson", "za_test_2017.geojson"
+        ),
+        "mapping_file": f"{test_path}/za_fusion/crop.csv",
+    },
     "rw_rwanda_ml": _input_files("rw_rwanda", "rw_rwanda_2021.geojson"),
+    "ke_ecaas": _input_files("ke_ecaas", "ecaas_geojson_kenya.geojson"),
+    "zm_ecaas": _input_files("zm_ecaas", "ecaas_zambia_geojson.geojson"),
+    # one archive for every edition; the edition keeps the regions digitised in its year
+    "glocab": {"variant": "2017", **_input_files("glocab", "glocab.gpkg")},
+    "glocab#2016": {"variant": "2016", **_input_files("glocab", "glocab.gpkg")},
     # EuroCrops V2: the fixture is one year's file, named as the JRC names it
     "ec_de_bb": {"variant": "2020"},
     "ec_be_vlg": {"variant": "2010"},
@@ -289,7 +301,25 @@ SWISS_COLUMNS = (
     "id",
 )
 EC_V2_COLUMNS = ("determination:datetime", "metrics:area", "crop:code", "hcat:code", "id")
+ECAAS_COLUMNS = (
+    "id",
+    "crop:code",
+    "crop:name",
+    "hcat:code",
+    "planting_date",
+    "harvest_date",
+    "season",
+    "intercropped",
+    "harvest_weight",
+    "yield",
+)
+GLOCAB_COLUMNS = ("id", "determination:datetime", "region", "no_area", "predominant_crop")
 expected_columns = {
+    # the source's crop names stay next to HCAT, with every crop-cut attribute
+    "ke_ecaas": ECAAS_COLUMNS,
+    "zm_ecaas": ECAAS_COLUMNS,
+    "glocab": GLOCAB_COLUMNS,
+    "glocab#2016": GLOCAB_COLUMNS,
     # the crop extension requires both
     "ec_lt": ("crop:code", "crop:code_list"),
     "ec_lv": ("crop:code", "crop:code_list"),
@@ -348,6 +378,10 @@ expected_columns = {
 
 # Values a converter writes, as a column or as a constant in the collection metadata
 expected_values = {
+    "ke_ecaas": {"admin:country_code": "KE"},
+    "zm_ecaas": {"admin:country_code": "ZM"},
+    # 2016 holds one region only
+    "glocab#2016": {"region": "Ukraine_D", "admin:country_code": "UA"},
     "ec_at": {"admin:country_code": "AT"},
     "ec_be_vlg": {"admin:country_code": "BE", "admin:subdivision_code": "VLG"},
     "ec_be_wal": {"admin:country_code": "BE"},
@@ -372,7 +406,7 @@ filtered_codes = {
 }
 
 # Converters whose fixture maps every row to HCAT
-fully_mapped = {"de_bb"}
+fully_mapped = {"de_bb", "ke_ecaas", "zm_ecaas"}
 
 # The smallest field (m²) a converter keeps, where the fixture holds a smaller sliver
 minimum_area = {
