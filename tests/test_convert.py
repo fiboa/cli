@@ -309,7 +309,11 @@ ECAAS_COLUMNS = (
     "planting_date",
     "harvest_date",
     "season",
+    "crop_condition",
     "intercropped",
+    "intercrop",
+    "admin_level_1",
+    "admin_level_2",
     "harvest_weight",
     "yield",
 )
