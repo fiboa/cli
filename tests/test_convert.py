@@ -6,6 +6,7 @@ from csv import DictReader
 from os.path import exists
 from unittest.mock import patch
 
+import pandas as pd
 import pyarrow.parquet as pq
 from loguru import logger
 from pytest import mark
@@ -374,6 +375,9 @@ filtered_codes = {
 # Converters whose fixture maps every row to HCAT
 fully_mapped = {"de_bb"}
 
+# Converters whose source has crop codes only: crop:name comes from the code list
+names_from_table = {"ec_lv", "ec_si", "es", "fr", "hr", "it_1", "pt", "se"}
+
 # The smallest field (m²) a converter keeps, where the fixture holds a smaller sliver
 minimum_area = {
     "br_conab": 100,
@@ -456,6 +460,21 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
     if converter in fully_mapped:
         unmapped = sorted(set(df.loc[df["hcat:code"].isna(), "crop:code"]))
         assert not unmapped, f"{converter}: crop:code {unmapped} has no HCAT code"
+
+    if converter_id in names_from_table:
+        # a column of one value is kept once in the collection metadata
+        if "crop:name" in df.columns:
+            coded = df[df["crop:code"].astype("string").str.strip().fillna("") != ""]
+            names = coded["crop:name"]
+        else:
+            names = pd.Series([constants.get("crop:name")], dtype="string")
+        unnamed = sorted(set(coded.loc[names.isna(), "crop:code"])) if "crop:name" in df else []
+        assert names.notna().mean() > 0.9, (
+            f"{converter}: the source's crop names are missing next to crop:code {unnamed[:10]}"
+        )
+        # EuroCrops' Slovenian table lost its š/č/ž to "?"; the names must be intact
+        broken = sorted(set(names.dropna()[names.dropna().str.contains("?", regex=False)]))
+        assert not broken, f"{converter}: crop names with lost letters: {broken[:3]}"
 
     if "metrics:area" in df.columns and converter not in ("de_bb", "ec_de_bb"):
         # Check for accidental hectare conversion; fields should be more than 10 square meters

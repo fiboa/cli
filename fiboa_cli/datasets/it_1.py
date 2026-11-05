@@ -44,6 +44,11 @@ codes are joined in from the EuroCropsV2 NUTS mapping table at conversion time.
     admin_country_code = "IT"
     admin_subdivision_code = "1"
     hcat_mapping_csv = "https://fiboa.org/code/it/iti1.csv"
+    # the table lost the apostrophe of D'ACQUA to "?"
+    crop_name_corrections = {
+        "619": "COLTIVAZIONI ARBOREE PERMANENTI SOGGETTE A DIVIETO DI FERTILIZZAZIONE E DI "
+        "TRATTAMENTO FITOSANITARIO  LUNGO I CORSI D'ACQUA"
+    }
     columns = {
         "geometry": "geometry",
         "cropfield": "id",

@@ -4,6 +4,23 @@ from ..conversion.converter_wfs import WFSConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.hcat import CROP_EXTENSION
 
+# https://fiboa.org/code/de/de_mv.csv, the crop:code_list: code -> (name, English name)
+LAND_USE = {
+    "AF": ("Ackerfläche", "Arable land"),
+    "DGL": ("Dauergrünland", "Permanent Grassland"),
+    "DK": ("Obstpl.,Dauerkulturen", "Orchard, Permanent crops"),
+    "AAF": ("Aufforstg auf AF", "Afforestation on arable land"),
+    "AGL": ("Aufforstg auf GL", "Afforestation on grassland"),
+    "AÖD": ("Aufforstg auf ÖD", "Afforestation on wasteland"),
+    "FO": ("Forstfläche", "Forest land"),
+    "UV": ("Ufervegetation", "Riverside vegetation"),
+    "SO": ("Sondernutzung", "Not used"),
+    "Wa": ("Wald", "Forest"),
+    "32G": ("Artikel 32-Grünland (1307/2013)", "Article 32-Grassland (1307/2013)"),
+    "34G": ("Artikel 34-Grünland (73/2009)", "Article 34-Grassland (73/2009)"),
+    "32A": ("Artikel 32-Ackerland (1307/2013)", "Article 32-Agriculture land (1307/2013)"),
+}
+
 
 class Converter(WFSConverterMixin, AdminConverterMixin, FiboaBaseConverter):
     # The service returns at most 20,000 features per request, so the layer is read in pages
@@ -34,6 +51,8 @@ class Converter(WFSConverterMixin, AdminConverterMixin, FiboaBaseConverter):
         "fbid": ("id", "flik"),  # make flik id a dedicated column to align with NRW etc.
         "dgl_jahr": "dgl_jahr",
         "bodennutzu": "crop:code",  # Bodennutzungsart
+        "crop:name": "crop:name",  # the code list's names, see migrate()
+        "crop:name_en": "crop:name_en",
         "bez_kreis": "bez_kreis",  # Kreisbezeichnung
         "groesse_p": "metrics:area",  # Produktive Fläche des FB in Hektar (Nettofläche)
         "perimeter": "metrics:perimeter",  # Polygonumfang
@@ -42,6 +61,18 @@ class Converter(WFSConverterMixin, AdminConverterMixin, FiboaBaseConverter):
         "erwind_l": "erwind_l",
         "erwater_l": "erwater_l",
     }
+
+    def migrate(self, gdf):
+        # the code list writes Wa, the service WA
+        codes = gdf["bodennutzu"].astype("string").str.strip().str.upper()
+        gdf["crop:name"] = codes.map({k.upper(): v[0] for k, v in LAND_USE.items()}).astype(
+            "string"
+        )
+        gdf["crop:name_en"] = codes.map({k.upper(): v[1] for k, v in LAND_USE.items()}).astype(
+            "string"
+        )
+        return super().migrate(gdf)
+
     iso_schema = {
         "type": "string",
         "enum": [
