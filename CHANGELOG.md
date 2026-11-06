@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Converters no longer fail on GeoJSON features without a top-level `id`.
   - Converted and merged files have a fixed column order (the order of the column mapping) and fixed collection metadata, instead of a random order that changed between runs.
   - `fiboa merge` no longer fails on schemas with different enums or limits: it joins them so that the data of every merged dataset stays valid, and only keeps a property required if every dataset requires it.
+- LACUNA_LABELS (Mapping Africa): Read the fields from the project's S3 bucket with its filtered label catalog: one labelling per site, each field dated by its basemap month, with the assignment class, labeller and labeller quality scores. The labels are presence-only.
 
 ## [v0.30.0] - 2026-10-30
 

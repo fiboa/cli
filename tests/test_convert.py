@@ -118,6 +118,7 @@ tests = [
     "de_fusion_ml",
     "za_fusion_ml",
     "rw_rwanda_ml",
+    "lacuna_labels",
 ]
 test_path = "tests/data-files/convert"
 
@@ -136,6 +137,9 @@ extra_convert_parameters = {
     "de_thuenen": {"variant": "2021", **_input_files("de_thuenen", "CTM_GER_2021_seg_v201.fgb")},
     "es_nc": {"variant": "2025", **_input_files("es_nc", "es_nc.gpkg")},
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
+    "lacuna_labels": _input_files(
+        "lacuna_labels", "mapped_fields_final.parquet", "label-catalog-filtered.csv"
+    ),
     "nl": {"variant": "2023"},
     "jp": {"variant": "2026", **_input_files("jp", "jp_fude_2026_13.zip")},
     "dk#2008": {"variant": "2008"},
@@ -290,6 +294,16 @@ SWISS_COLUMNS = (
 )
 EC_V2_COLUMNS = ("determination:datetime", "metrics:area", "crop:code", "hcat:code", "id")
 expected_columns = {
+    # the catalog join adds the labelling date, class and labeller scores
+    "lacuna_labels": (
+        "determination:datetime",
+        "admin:country_code",
+        "site",
+        "label_class",
+        "labeller",
+        "qscore",
+        "label_category",
+    ),
     # the crop extension requires both
     "ec_lt": ("crop:code", "crop:code_list"),
     "ec_lv": ("crop:code", "crop:code_list"),
