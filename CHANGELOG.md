@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Converted and merged files have a fixed column order (the order of the column mapping) and fixed collection metadata, instead of a random order that changed between runs.
   - `fiboa merge` no longer fails on schemas with different enums or limits: it joins them so that the data of every merged dataset stays valid, and only keeps a property required if every dataset requires it.
 ### Added
-- GLOCAB: Added the University of Maryland's hand-digitised GloCAB field boundaries (Brazil, Canada, Russia, Ukraine, USA), one edition per year of digitisation (2016-2020), with each region's mapping month, the `no_area` flag and the region's predominant crop.
+- GLOCAB: Added the University of Maryland's hand-digitised GloCAB field boundaries (Brazil, Canada, Russia, Ukraine, USA), in one file with each region's mapping month (2016-2020) as the determination date, the `no_area` flag and the region's predominant crop.
 - KE-ECAAS, ZM-ECAAS: Added the crop-cut farm polygons of Pula's Bird's-Eye project (ECAAS) for Kenya and Zambia, with the source's crop names, HCAT, planting and harvest dates, season, crop condition, intercropping, harvested weight and yield.
 
 ### Changed

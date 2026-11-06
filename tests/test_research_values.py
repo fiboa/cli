@@ -1,9 +1,10 @@
 """Values the generic convert test does not check: dates parsed from mixed formats, and
-which GloCAB regions an edition keeps with which mapping date."""
+the mapping date and area GloCAB keeps for each field."""
 
 import datetime
 
 import pyarrow.parquet as pq
+import pytest
 from loguru import logger
 
 from fiboa_cli.convert import ConvertData
@@ -45,18 +46,23 @@ def test_ecaas_dates_are_month_first(tmp_parquet_file):
     assert row["hcat:name"] == "potatoes"
 
 
-def test_glocab_edition_keeps_its_regions_and_months(tmp_parquet_file):
-    df = convert(tmp_parquet_file, "glocab", "glocab", "glocab.gpkg", variant="2017")
+def test_glocab_keeps_every_region_with_its_month(tmp_parquet_file):
+    df = convert(tmp_parquet_file, "glocab", "glocab", "glocab.gpkg")
     months = (
         df.groupby("region")["determination:datetime"]
         .unique()
         .map(lambda dates: [d.strftime("%Y-%m") for d in dates])
     )
-    # the fixture also holds Ukraine_D (2016), Russia_E (2018) and Brazil_A (2019)
+    # one file for all mapping years; each field keeps its region's month, so a year can be subset
     assert months.to_dict() == {
-        "Ukraine_A": ["2017-03"],
+        "Brazil_A": ["2019-08"],
+        "Russia_E": ["2018-10"],
         "USA_E": ["2017-09"],
+        "Ukraine_A": ["2017-03"],
+        "Ukraine_D": ["2016-08"],
     }
-    assert set(df["admin:country_code"]) == {"UA", "US"}
+    assert set(df["admin:country_code"]) == {"BR", "RU", "UA", "US"}
     # USA_E has 8 ordinary fields and 4 flagged multi-field polygons in the fixture
     assert df.loc[df["region"] == "USA_E", "no_area"].sum() == 4
+    # measured from the geometry (the source's Area_km2 is wrong in USA_C), in m²
+    assert df.loc["Ukraine_A-0", "metrics:area"] == pytest.approx(364_972, rel=0.01)

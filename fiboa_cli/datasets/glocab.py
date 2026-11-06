@@ -39,8 +39,7 @@ COUNTRIES = {"Brazil": "BR", "Canada": "CA", "Russia": "RU", "Ukraine": "UA", "U
 
 
 class Converter(FiboaBaseConverter):
-    # One edition per year of the mapping dates; all of them are read from the same archive
-    variants = {year: SOURCE for year in sorted({d[:4] for d in MAPPING_DATES.values()})[::-1]}
+    sources = SOURCE
 
     id = "glocab"
     short_name = "GloCAB"
@@ -50,7 +49,7 @@ class Converter(FiboaBaseConverter):
 States, digitised by hand over 20 m Sentinel-2 imagery by geospatial analysts at the University of
 Maryland and quality-checked by a senior team member, as a by-product of the Global Cropland Area
 Burned (GloCAB) product. The readme gives each region a mapping date (a month, Table A), which is
-the determination date here; an edition holds the regions whose mapping date is in its year.
+each field's determination date here (2016 to 2020, by region).
 Where fields were too small to identify, the analyst digitised a larger boundary around several
 fields and set the `no_area` flag: those polygons are not true field boundaries.
 `predominant_crop` is the predominant crop type of the region, not of the field.
@@ -66,6 +65,9 @@ fields and set the `no_area` flag: those polygons are not true field boundaries.
     columns = {
         "geometry": "geometry",
         "id": "id",
+        # Area_km2 is not mapped: in USA_C every value is ~2.19x the polygon's area (a Web
+        # Mercator measurement) and 187 Ukraine_D values disagree with their polygons, so
+        # metrics:area is measured from the geometry instead.
         "determination:datetime": "determination:datetime",
         "admin:country_code": "admin:country_code",
         "Ctry_Reg": "region",
@@ -98,9 +100,6 @@ fields and set the `no_area` flag: those polygons are not true field boundaries.
         unknown = sorted(set(gdf.loc[dates.isna(), "Ctry_Reg"]))
         if unknown:
             raise ValueError(f"Regions without a mapping date: {unknown}")
-        gdf = gdf[dates.str.startswith(self.variant)].copy()
-        if gdf.empty:
-            raise ValueError(f"No GloCAB region in {path} has a mapping date in {self.variant}")
-        gdf["determination:datetime"] = pd.to_datetime(dates[gdf.index] + "-01", utc=True)
+        gdf["determination:datetime"] = pd.to_datetime(dates + "-01", utc=True)
         gdf["admin:country_code"] = gdf["Ctry_Reg"].str.split("_").str[0].map(COUNTRIES)
         return super().file_migration(gdf, path, uri, layer)

@@ -121,7 +121,6 @@ tests = [
     "ke_ecaas",
     "zm_ecaas",
     "glocab",
-    "glocab#2016",
 ]
 test_path = "tests/data-files/convert"
 
@@ -264,9 +263,8 @@ extra_convert_parameters = {
     "rw_rwanda_ml": _input_files("rw_rwanda", "rw_rwanda_2021.geojson"),
     "ke_ecaas": _input_files("ke_ecaas", "ecaas_geojson_kenya.geojson"),
     "zm_ecaas": _input_files("zm_ecaas", "ecaas_zambia_geojson.geojson"),
-    # one archive for every edition; the edition keeps the regions digitised in its year
-    "glocab": {"variant": "2017", **_input_files("glocab", "glocab.gpkg")},
-    "glocab#2016": {"variant": "2016", **_input_files("glocab", "glocab.gpkg")},
+    # one file with every region, each field dated by its region's mapping month
+    "glocab": _input_files("glocab", "glocab.gpkg"),
     # EuroCrops V2: the fixture is one year's file, named as the JRC names it
     "ec_de_bb": {"variant": "2020"},
     "ec_be_vlg": {"variant": "2010"},
@@ -317,13 +315,19 @@ ECAAS_COLUMNS = (
     "harvest_weight",
     "yield",
 )
-GLOCAB_COLUMNS = ("id", "determination:datetime", "region", "no_area", "predominant_crop")
+GLOCAB_COLUMNS = (
+    "id",
+    "metrics:area",
+    "determination:datetime",
+    "region",
+    "no_area",
+    "predominant_crop",
+)
 expected_columns = {
     # the source's crop names stay next to HCAT, with every crop-cut attribute
     "ke_ecaas": ECAAS_COLUMNS,
     "zm_ecaas": ECAAS_COLUMNS,
     "glocab": GLOCAB_COLUMNS,
-    "glocab#2016": GLOCAB_COLUMNS,
     # the crop extension requires both
     "ec_lt": ("crop:code", "crop:code_list"),
     "ec_lv": ("crop:code", "crop:code_list"),
@@ -384,8 +388,6 @@ expected_columns = {
 expected_values = {
     "ke_ecaas": {"admin:country_code": "KE"},
     "zm_ecaas": {"admin:country_code": "ZM"},
-    # 2016 holds one region only
-    "glocab#2016": {"region": "Ukraine_D", "admin:country_code": "UA"},
     "ec_at": {"admin:country_code": "AT"},
     "ec_be_vlg": {"admin:country_code": "BE", "admin:subdivision_code": "VLG"},
     "ec_be_wal": {"admin:country_code": "BE"},
