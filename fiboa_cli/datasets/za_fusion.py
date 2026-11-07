@@ -1,9 +1,9 @@
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 
-CROP_EXTENSION = "https://fiboa.org/crop-extension/v0.2.0/schema.yaml"
+from .commons.hcat import AddHCATMixin
 
 
-class ZaFusionConverter(FiboaBaseConverter):
+class ZaFusionConverter(AddHCATMixin, FiboaBaseConverter):
     sources = {
         "https://data.source.coop/esa/fusion-competition/sa-19E-258N-crop-labels-train-2017.geojson": "za_train_258N.geojson",
         "https://data.source.coop/esa/fusion-competition/sa-19E-259N-crop-labels-train-2017.geojson": "za_train_259N.geojson",
@@ -22,7 +22,8 @@ covering three tiles in the Western Cape region of South Africa.
     )
     attribution = "https://data.source.coop/esa/fusion-competition"
     license = "CC-BY-4.0"
-    extensions = {CROP_EXTENSION}
+    # the five classes of the competition, with their names; crop:code_list points here
+    hcat_mapping_csv = "https://fiboa.org/code/za/fusion/crop.csv"
     area_is_in_ha = False
     columns = {
         "geometry": "geometry",

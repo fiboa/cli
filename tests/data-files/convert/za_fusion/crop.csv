@@ -1,0 +1,6 @@
+original_code,original_name,translated_name,HCAT3_name,HCAT3_code
+1,Wheat,Wheat,common_soft_wheat,3301010100
+2,Barley,Barley,barley,3301010400
+3,Canola,Canola,rapeseed_rape,3301060400
+4,Lucerne/Medics,Lucerne/Medics,legumes_harvested_green,3301090300
+5,Small grain grazing,Small grain grazing,plants_harvested_green,3301090000
