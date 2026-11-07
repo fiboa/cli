@@ -36,10 +36,3 @@ The model was trained in MXNet 1.6.0 and can be loaded with the "model.load_para
     # (Wang, Waldner & Lobell 2022, https://doi.org/10.3390/rs14225738); 2022-11-12 is the
     # date of the Zenodo release
     column_additions = {"determination:datetime": "2020-10-01T00:00:00Z"}
-
-    def download_files(self, uris, cache_folder=None, **kwargs):
-        # GDAL reads the other parts of the shapefile next to the .shp
-        paths = super().download_files(uris, cache_folder, **kwargs)
-        shapefiles = [(path, uri) for path, uri in paths if path.endswith(".shp")]
-        # files given with -i in another format are read as they are
-        return shapefiles or paths

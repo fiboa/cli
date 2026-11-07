@@ -39,7 +39,7 @@ was intercropped, and the harvested weight and yield.
 
     columns = {
         "geometry": "geometry",
-        "id": "id",
+        "Case_ID": "id",
         # the name is the only identifier the source has for a crop
         "Crop_Type": ["crop:code", "crop:name"],
         "Planting_Date": "planting_date",
@@ -60,11 +60,6 @@ was intercropped, and the harvested weight and yield.
         "Harvesting_date": to_date,
         "Intercropping": lambda col: col.map({"yes": True, "no": False}).astype("boolean"),
     }
-
-    def _normalize_geojson_properties(self, feature):
-        # The features carry no GeoJSON id; Case_ID is the source's unique identifier
-        feature["id"] = feature["properties"].pop("Case_ID")
-        return super()._normalize_geojson_properties(feature)
 
     missing_schemas = {
         "properties": {
