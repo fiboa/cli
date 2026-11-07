@@ -10,6 +10,7 @@ CATALOG = "label-catalog-filtered.csv"
 
 class LacunaLabelsConverter(FiboaBaseConverter):
     sources = {f"{BUCKET}/{FIELDS}": FIELDS, f"{BUCKET}/{CATALOG}": CATALOG}
+    side_files = (CATALOG,)
     id = "lacuna_labels"
     short_name = "Mapping Africa"
     title = "Mapping Africa: crop field boundary labels for Africa, 2017-2023"
@@ -100,17 +101,9 @@ with [Planet's participant license agreement for the NICFI contract](https://go.
         }
     }
 
-    def read_data(self, paths, **kwargs):
-        # The catalog CSV is a side table, not geodata: read it here, join it in migrate()
-        catalog = [p for p in paths if p[0].endswith(".csv")]
-        if len(catalog) != 1:
-            raise ValueError(f"Expected one {CATALOG}, got {[p[0] for p in catalog]}")
-        # keep_default_na=False: Namibia's site codes start with "NA"
-        self.catalog = pd.read_csv(catalog[0][0], dtype=str, keep_default_na=False)
-        return super().read_data([p for p in paths if not p[0].endswith(".csv")], **kwargs)
-
     def migrate(self, gdf):
-        raw = self.catalog
+        # keep_default_na=False: Namibia's site codes start with "NA"
+        raw = self.read_side_file(CATALOG, dtype=str, keep_default_na=False)
         cat = pd.DataFrame(
             {
                 "name": raw["name"],
