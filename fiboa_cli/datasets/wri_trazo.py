@@ -2,7 +2,6 @@ import os
 import re
 
 import pandas as pd
-import shapely
 
 from ..conversion.fiboa_converter import FiboaBaseConverter
 
@@ -118,8 +117,6 @@ University, https://www.wri.org/research/field-boundaries-south-america
         if not match or match["region"] not in REGIONS:
             raise ValueError(f"Not a Trazo annotation file: {path}")
         region, year = match["region"], int(match["year"])
-        if year != REGIONS[region][0]:
-            raise ValueError(f"{path}: the year in the file name is not {REGIONS[region][0]}")
         if "year" in gdf.columns and set(gdf["year"].dropna().astype(int)) - {year}:
             raise ValueError(f"{path}: the year column disagrees with the file name ({year})")
         if gdf.crs is None:
@@ -130,14 +127,16 @@ University, https://www.wri.org/research/field-boundaries-south-america
             gdf = gdf.set_crs("EPSG:4326")
         # The files are in several CRS (Web Mercator, UTM, lon/lat); they are concatenated
         gdf = gdf.to_crs("EPSG:4326")
-        gdf.geometry = shapely.force_2d(gdf.geometry)
         # The source has no identifier; the row number in the region's file is stable
         gdf["id"] = [f"{region}-{i}" for i in range(len(gdf))]
         # Some files hold the same polygon twice (683 pairs in matogrosso_brazil_lcdib); keep the
         # first, so a field is counted once and the ids stay the source row numbers
         gdf = gdf[~gdf.geometry.to_wkb().duplicated()].copy()
         gdf["region"] = region
-        gdf["split"] = "test" if region.startswith("test") else "train"
-        gdf["basemap"] = REGIONS[region][1]
         gdf["determination:datetime"] = pd.Timestamp(f"{year}-01-01", tz="UTC")
         return super().file_migration(gdf, path, uri, layer)
+
+    def migrate(self, gdf):
+        gdf["basemap"] = gdf["region"].map(lambda r: REGIONS[r][1])
+        gdf["split"] = gdf["region"].str.startswith("test").map({True: "test", False: "train"})
+        return super().migrate(gdf)
