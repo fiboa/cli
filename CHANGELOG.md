@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+- Updated vecorel-cli to 0.4.3:
+  - A converter can list tables to join (e.g. a CSV) in `side_files` and read them with `read_side_file()`.
+  - A converter can list the parts of a shapefile (`.shx`, `.dbf`, `.prj`, ...) in `sources` one by one.
+  - Converters no longer fail on GeoJSON features without a top-level `id`.
+  - Converted and merged files have a fixed column order (the order of the column mapping) and fixed collection metadata, instead of a random order that changed between runs.
+  - `fiboa merge` no longer fails on schemas with different enums or limits: it joins them so that the data of every merged dataset stays valid, and only keeps a property required if every dataset requires it.
+
 ## [v0.30.0] - 2026-10-30
 
 ### Added
