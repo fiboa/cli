@@ -26,7 +26,7 @@ covering three tiles in the Western Cape region of South Africa.
     area_is_in_ha = False
     columns = {
         "geometry": "geometry",
-        "id": "id",
+        "fid": "id",
         "SHAPE_AREA": "metrics:area",
         "crop_id": "crop:code",
         "crop_name": "crop:name",
@@ -34,13 +34,6 @@ covering three tiles in the Western Cape region of South Africa.
     column_additions = {
         "determination:datetime": "2017-01-01T00:00:00Z",
     }
-
-    def _normalize_geojson_properties(self, feature):
-        fid = feature["properties"].get("fid")
-        if fid is None:
-            raise ValueError(f"Feature has no 'fid' property: {feature}")
-        feature["properties"]["id"] = fid
-        return feature
 
     def migrate(self, gdf):
         # Source GeoJSON uses EPSG:32734 (WGS84/UTM zone 34S) but the CRS tag
