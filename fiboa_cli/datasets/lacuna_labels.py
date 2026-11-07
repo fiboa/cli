@@ -6,12 +6,14 @@ from ..conversion.fiboa_converter import FiboaBaseConverter
 BUCKET = "https://africa-field-boundary-labels.s3.us-west-2.amazonaws.com"
 FIELDS = "mapped_fields_final.parquet"
 CATALOG = "label-catalog-filtered.csv"
+# The month of the Planet NICFI basemap a site was labelled on, from the catalog's `image`
+MONTH = r"_(\d{4}-\d{2})\.tif$"
 
 
 class LacunaLabelsConverter(FiboaBaseConverter):
     sources = {f"{BUCKET}/{FIELDS}": FIELDS, f"{BUCKET}/{CATALOG}": CATALOG}
     side_files = (CATALOG,)
-    id = "lacuna_labels"
+    id = "lacuna"
     short_name = "Mapping Africa"
     title = "Mapping Africa: crop field boundary labels for Africa, 2017-2023"
     description = """
@@ -49,18 +51,26 @@ with [Planet's participant license agreement for the NICFI contract](https://go.
     license = "Planet NICFI participant license agreement <https://go.planet.com/nicfi-pla-2024>"
 
     extensions = {ADMIN_DIVISION}
+    id_columns = ("fid",)
     columns = {
-        "id": "id",
         "geometry": "geometry",
-        "determination:datetime": "determination:datetime",
+        "image": "determination:datetime",
         "admin:country_code": "admin:country_code",
         "name": "site",
         "assignment_id": "assignment_id",
-        "label_class": "label_class",
-        "labeller": "labeller",
-        "qscore": "qscore",
-        "rscore": "rscore",
+        "Class": "label_class",
+        "Labeller": "labeller",
+        "Qscore": "qscore",
+        "Rscore": "rscore",
         "category": "label_category",
+        "completion_time": "completion_time",
+    }
+    column_migrations = {
+        "image": lambda col: pd.to_datetime(col.str.extract(MONTH, expand=False) + "-01", utc=True),
+        "Qscore": lambda col: pd.to_numeric(col, errors="coerce"),
+        "Rscore": lambda col: pd.to_numeric(col, errors="coerce"),
+        # fiboa stores date-times in milliseconds; the source has microseconds
+        "completion_time": lambda col: col.dt.floor("ms"),
     }
     missing_schemas = {
         "properties": {
@@ -86,6 +96,10 @@ with [Planet's participant license agreement for the NICFI contract](https://go.
                 "description": "The labeller's share of assignments rated acceptable "
                 "(one value per labeller)",
             },
+            "completion_time": {
+                "type": "date-time",
+                "description": "When the labeller finished the assignment",
+            },
             "label_category": {
                 "type": "string",
                 "enum": [
@@ -103,25 +117,16 @@ with [Planet's participant license agreement for the NICFI contract](https://go.
 
     def migrate(self, gdf):
         # keep_default_na=False: Namibia's site codes start with "NA"
-        raw = self.read_side_file(CATALOG, dtype=str, keep_default_na=False)
-        cat = pd.DataFrame(
-            {
-                "name": raw["name"],
-                "assignment_id": raw["assignment_id"].astype("int64"),
-                "label_class": raw["Class"],
-                "labeller": raw["Labeller"],
-                "qscore": pd.to_numeric(raw["Qscore"], errors="coerce"),
-                "rscore": pd.to_numeric(raw["Rscore"], errors="coerce"),
-                "month": raw["image"].str.extract(r"_(\d{4}-\d{2})\.tif$", expand=False),
-            }
-        )
-        if cat["month"].isna().any():
+        catalog = self.read_side_file(CATALOG, dtype=str, keep_default_na=False)
+        catalog = catalog[
+            ["name", "assignment_id", "Class", "Labeller", "Qscore", "Rscore", "image"]
+        ]
+        if catalog["image"].str.extract(MONTH, expand=False).isna().any():
             raise ValueError(f"{CATALOG} has rows without a YYYY-MM basemap month in `image`")
-        gdf = gdf.copy()
+        catalog["assignment_id"] = catalog["assignment_id"].astype("int64")
         gdf["assignment_id"] = gdf["assignment_id"].astype("int64")
-        # Inner join: only the catalog's assignments (one per site) are kept
-        gdf = gdf.merge(cat, on=["name", "assignment_id"], how="inner")
-        gdf["id"] = gdf["fid"].astype("int64").astype(str)
-        gdf["determination:datetime"] = pd.to_datetime(gdf.pop("month") + "-01", utc=True)
+        # Inner join: only the catalog's assignments (one per site) are kept; a catalog row
+        # listed twice fails instead of duplicating the fields
+        gdf = gdf.merge(catalog, on=["name", "assignment_id"], how="inner", validate="many_to_one")
         gdf["admin:country_code"] = gdf["name"].str[:2]
         return super().migrate(gdf)

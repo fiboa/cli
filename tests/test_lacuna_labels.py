@@ -44,3 +44,11 @@ def test_catalog_values_are_joined(tmp_parquet_file):
     assert gh["label_class"] == "2"
     assert round(gh["qscore"], 4) == 0.6368
     assert gh["determination:datetime"].strftime("%Y-%m") == "2018-02"
+    # the labeller's completion time is kept, to the millisecond
+    assert gh["completion_time"].strftime("%Y-%m-%d") == "2024-01-24"
+
+
+def test_ids_are_the_source_fids(tmp_parquet_file):
+    df = convert(tmp_parquet_file)
+    assert df["id"].str.fullmatch(r"\d+").all()
+    assert "286888" in set(df["id"])
