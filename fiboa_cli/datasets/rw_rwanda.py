@@ -2,19 +2,11 @@ from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 
 
 class RwRwandaConverter(FiboaBaseConverter):
-    # Not publicly hosted yet — user must supply via -i flag
-    sources = {}
-    data_access = """
-Request access and download the field boundary parquet from the NASA Harvest
-Rwanda Field Boundary Competition dataset on Source Cooperative:
-
-    https://source.coop/nasa/rwanda-field-boundary-competition
-
-Then run the converter with the -i flag pointing to your local copy:
-
-    fiboa convert rw_rwanda -o rw_rwanda.parquet \\
-        -i rw_rwanda_2021.parquet=/path/to/boundaries_rwanda_2021.parquet
-    """
+    # NASA Harvest publishes the labels as rasters; Kerner Lab converted them for Fields of the
+    # World and publishes the polygons openly
+    sources = {
+        "https://data.source.coop/kerner-lab/fields-of-the-world-rwanda/boundaries_rwanda_2021.parquet": "rw_rwanda_2021.parquet"
+    }
 
     id = "rw_rwanda"
     short_name = "Rwanda"
@@ -22,7 +14,8 @@ Then run the converter with the -i flag pointing to your local copy:
     description = """
 Field boundaries for smallholder farms in eastern Rwanda from the NASA Harvest
 Rwanda Field Boundary Competition dataset. Annotated from Planet imagery for
-the 2021 growing season.
+the 2021 growing season. The competition publishes the labels as rasters; these are the
+polygons Kerner Lab (Arizona State University) converted from them for Fields of the World.
     """
     provider = "NASA Harvest <https://source.coop/nasa/rwanda-field-boundary-competition>"
     attribution = "https://doi.org/10.34911/rdnt.g580ww"

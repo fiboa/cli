@@ -103,7 +103,8 @@ Multi-temporal composites of Sentinel-2 (S2) images are provided to ensure cloud
     # The key is the column name, the value is a constant value that's used for all rows.
     column_additions = {
         "determination:datetime": "2021-08-01T00:00:00Z",
-        "determination:method": "auto-imagery",
+        # "meticulously digitized from satellite images" (the dataset paper)
+        "determination:method": "manual",
     }
 
     def migrate(self, gdf):

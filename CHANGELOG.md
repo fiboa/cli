@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Converted and merged files have a fixed column order (the order of the column mapping) and fixed collection metadata, instead of a random order that changed between runs.
   - `fiboa merge` no longer fails on schemas with different enums or limits: it joins them so that the data of every merged dataset stays valid, and only keeps a property required if every dataset requires it.
 - LACUNA_LABELS (Mapping Africa): Read the fields from the project's S3 bucket with its filtered label catalog: one labelling per site, each field dated by its basemap month, with the assignment class, labeller and labeller quality scores. The labels are presence-only.
+### Added
+- GLOCAB: Added the University of Maryland's hand-digitised GloCAB field boundaries (Brazil, Canada, Russia, Ukraine, USA), in one file with each region's mapping month (2016-2020) as the determination date, the `no_area` flag and the region's predominant crop.
+- KE-ECAAS, ZM-ECAAS: Added the crop-cut farm polygons of Pula's Bird's-Eye project (ECAAS) for Kenya and Zambia, with the source's crop names, HCAT, planting and harvest dates, season, crop condition, intercropping, harvested weight and yield.
+
+### Changed
+- AI4SF: `determination:method` is `manual`: the fields were digitised by hand, not detected by a model.
+- IN-10K: The determination date is October 2020, the month of the imagery the fields were drawn on, not the release date; the shapefile is read without the record's archive, which also holds the model weights.
+- RW-RWANDA: Reads the openly published polygons from Source Cooperative instead of requiring a manual download.
+- ZA-FUSION: The crop codes are mapped to HCAT and carry a `crop:code_list`, so the output validates.
+
+### Fixed
+- The license test compares SPDX identifiers case-insensitively, so ids such as `GPL-2.0-or-later` pass.
 
 ## [v0.30.0] - 2026-10-30
 
