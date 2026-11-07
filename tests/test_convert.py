@@ -121,6 +121,7 @@ tests = [
     "ke_ecaas",
     "zm_ecaas",
     "glocab",
+    "wri_trazo",
 ]
 test_path = "tests/data-files/convert"
 
@@ -265,6 +266,15 @@ extra_convert_parameters = {
     "zm_ecaas": _input_files("zm_ecaas", "ecaas_zambia_geojson.geojson"),
     # one file with every region, each field dated by its region's mapping month
     "glocab": _input_files("glocab", "glocab.gpkg"),
+    # Web Mercator, UTM 20S with a duplicated polygon, no CRS (lon/lat), and a test region
+    # without a year column
+    "wri_trazo": _input_files(
+        "wri_trazo",
+        "acreAnnotations_2020.gpkg",
+        "chiquitaniaAnnotations_2020.gpkg",
+        "lowmonteAnnotations_2023.gpkg",
+        "testsoyAnnotations_2020.gpkg",
+    ),
     # EuroCrops V2: the fixture is one year's file, named as the JRC names it
     "ec_de_bb": {"variant": "2020"},
     "ec_be_vlg": {"variant": "2010"},
@@ -323,11 +333,21 @@ GLOCAB_COLUMNS = (
     "no_area",
     "predominant_crop",
 )
+WRI_TRAZO_COLUMNS = (
+    "id",
+    "metrics:area",
+    "determination:datetime",
+    "determination:method",
+    "region",
+    "split",
+    "basemap",
+)
 expected_columns = {
     # the source's crop names stay next to HCAT, with every crop-cut attribute
     "ke_ecaas": ECAAS_COLUMNS,
     "zm_ecaas": ECAAS_COLUMNS,
     "glocab": GLOCAB_COLUMNS,
+    "wri_trazo": WRI_TRAZO_COLUMNS,
     # the crop extension requires both
     "ec_lt": ("crop:code", "crop:code_list"),
     "ec_lv": ("crop:code", "crop:code_list"),
