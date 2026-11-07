@@ -20,7 +20,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - AI4SF: `determination:method` is `manual`: the fields were digitised by hand, not detected by a model.
-- IN-10K: The converter id is `india_10k`, its module name (was `in_10k`), so the ML variant is `india_10k_ml`.
 - IN-10K: The determination date is October 2020, the month of the imagery the fields were drawn on, not the release date; the shapefile is read without the record's archive, which also holds the model weights.
 - RW-RWANDA: Reads the openly published polygons from Source Cooperative instead of requiring a manual download.
 - ZA-FUSION: The crop codes are mapped to HCAT and carry a `crop:code_list`, so the output validates.

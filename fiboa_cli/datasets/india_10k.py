@@ -12,8 +12,7 @@ class IndiaConverter(AdminConverterMixin, FiboaBaseConverter):
         f"{RECORD}/india_10k_fields.{ext}/content": f"india_10k_fields.{ext}"
         for ext in ("shp", "shx", "dbf", "prj", "cpg")
     }
-    # the module name, as every other converter does (it was "in_10k")
-    id = "india_10k"
+    id = "in_10k"
     admin_country_code = "IN"
     short_name = "India 10k"
     title = "10,000 Crop Field Boundaries across India"
