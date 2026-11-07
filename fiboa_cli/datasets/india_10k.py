@@ -13,7 +13,6 @@ class IndiaConverter(AdminConverterMixin, FiboaBaseConverter):
         for ext in ("shp", "shx", "dbf", "prj", "cpg")
     }
     id = "in_10k"
-    admin_country_code = "IN"
     short_name = "India 10k"
     title = "10,000 Crop Field Boundaries across India"
     description = """
