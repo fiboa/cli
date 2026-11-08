@@ -30,6 +30,8 @@ This is a high-value dataset (HVD) under EU Implementing Regulation 2023/138.
 
     # FEGA declared-crop codes (PARC_PRODUCTO) to HCAT; the mixin also publishes it as crop:code_list
     hcat_mapping_csv = "https://fiboa.org/code/es/es.csv"
+    # the source has codes only; the table is made for the 2025 campaign
+    crop_names_from_table = True
 
     columns = {
         "geometry": "geometry",

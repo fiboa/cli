@@ -42,6 +42,8 @@ applied for and the area decided on are the same. The data is published at the e
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     hcat_mapping_csv = "https://fiboa.org/code/se/se.csv"
+    # the source has codes only; fiboa.org's table for this dataset names them
+    crop_names_from_table = True
     column_migrations = {
         # the campaign year, as an integer in the shapefile
         "arslager": lambda col: pd.to_datetime(col.astype(str), format="%Y")

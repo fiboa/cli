@@ -41,7 +41,9 @@ class AddHCATMixin:
     # name (no column, a column some editions lack, or empty values), so the source's own
     # names stay in the data next to HCAT. hcat:name_en already holds the table's
     # translated_name, the English of the source name.
-    crop_names_from_table = True
+    # Opt-in: codes get reused across editions (HR 200, NL), so only a converter whose
+    # table is made for the edition of its data may take the names from it.
+    crop_names_from_table = False
     # A table that repairs names of the HCAT table that lost letters to "?" (EuroCrops
     # si_2021.csv): its name for the code is taken where it matches letter for letter
     crop_names_repair_csv: Optional[str] = None
@@ -186,7 +188,7 @@ class AddHCATMixin:
                 if self.hcat_mapping_csv
                 else self.mapping_file
             )
-        return self.add_crop_names(gdf)
+        return gdf
 
     def add_crop_names(self, gdf):
         """Fill the crop name with the table's original_name where the source has none."""
@@ -232,7 +234,7 @@ class AddHCATMixin:
 
     def post_migrate(self, gdf) -> gpd.GeoDataFrame:
         gdf = super().post_migrate(gdf)
-        return self.add_hcat(gdf)
+        return self.add_crop_names(self.add_hcat(gdf))
 
 
 def repair_names(names: dict, rows: list[dict]) -> dict:

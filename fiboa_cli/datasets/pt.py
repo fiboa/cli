@@ -201,6 +201,8 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     hcat_mapping_csv = "https://fiboa.org/code/pt/pt.csv"
+    # fiboa.org's table for this dataset; it names the codes of the editions without names
+    crop_names_from_table = True
     area_is_in_ha = False
     missing_schemas = {
         "properties": {

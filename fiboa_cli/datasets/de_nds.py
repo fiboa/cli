@@ -34,6 +34,8 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
 
     # https://www.sla.niedersachsen.de/download/141235/Verzeichnis_Nutzungscodes.xlsx
     hcat_mapping_csv = "de.csv"
+    # the source has codes only; the federal codes are named in the table
+    crop_names_from_table = True
     hcat_mapping_supplements = ["https://fiboa.org/code/de/de_supplement.csv"]
     # The shapefile has no unique key: 880,581 features share 874,222 distinct
     # (FLIK, SCHLAGNR) pairs, so the row index is the only identifier available.

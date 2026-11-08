@@ -67,6 +67,8 @@ The anonymized version is distributed as part of the public service for making r
     # One merged list for all editions: EuroCrops splits France over two tables
     # and misses eleven newer codes (e.g. JAC, the most common code of 2024)
     hcat_mapping_csv = "https://fiboa.org/code/fr/fr.csv"
+    # the source has codes only; fiboa.org's table for the RPG names them
+    crop_names_from_table = True
 
     columns = {
         "geometry": "geometry",

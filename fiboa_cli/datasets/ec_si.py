@@ -6,6 +6,8 @@ from .commons.hcat import hcat_mapping_url
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     area_is_in_ha = False
     hcat_mapping_csv = "si_2021.csv"
+    # the source has codes only; the table is of the same year (2021)
+    crop_names_from_table = True
     # EuroCrops' table and RASTLINA lost the Slovenian letters (p?enica): the ministry's
     # newer table restores them where it spells the code alike, the rest are below
     crop_names_repair_csv = "https://fiboa.org/code/si/si.csv"
@@ -66,4 +68,4 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     def add_hcat(self, gdf):
         # the source carries HCAT already; only apply the supplement and add the code list
         gdf["crop:code_list"] = hcat_mapping_url(self.hcat_mapping_csv)
-        return self.add_crop_names(self.correct_resolved_hcat(gdf))
+        return self.correct_resolved_hcat(gdf)
