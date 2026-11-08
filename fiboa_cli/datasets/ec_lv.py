@@ -57,4 +57,4 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     def add_hcat(self, gdf):
         # the source carries HCAT already; only the code list is added
         gdf["crop:code_list"] = hcat_mapping_url(self.hcat_mapping_csv)
-        return self.add_crop_names(gdf)
+        return gdf
