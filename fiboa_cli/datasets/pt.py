@@ -173,8 +173,8 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         "2025": BASE + "2025/culturas.gpkg",
         "2023": BASE + "2023/Continente.gpkg",
         "2022": {BASE + "2022/2022.zip": MEMBERS["2022"]},
-        "2021": {BASE + "2021/2021.zip": MEMBERS["2021"]},
-        "2020": {BASE + "2017-2020/2020.zip": MEMBERS["2020"]},
+        "2021": {BASE + "2021/2021.zip": [*MEMBERS["2021"], CROP_TABLE["2021"]]},
+        "2020": {BASE + "2017-2020/2020.zip": [*MEMBERS["2020"], CROP_TABLE["2020"]]},
         "2019": {BASE + "2017-2020/2019.zip": MEMBERS["2019"]},
         "2018": {BASE + "2017-2020/2018.zip": MEMBERS["2018"]},
         "2017": {BASE + "2017-2020/2017.zip": MEMBERS["2017"]},
@@ -226,12 +226,14 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
                 gdf = gdf.rename(columns={numbered[min(numbered)]: "C1"})
         return gdf[[c for c in KEEP if c in gdf.columns]]
 
+    def select_variant(self, variant):
+        super().select_variant(variant)
+        self.side_files = (CROP_TABLE[self.variant],) if self.variant in CROP_TABLE else ()
+
     def read_data(self, paths, **kwargs):
         gdf = super().read_data(paths, **kwargs)
         if self.variant in CROP_TABLE:
-            crops = read_crop_table(
-                os.path.join(os.path.dirname(paths[0][0]), CROP_TABLE[self.variant])
-            )
+            crops = read_crop_table(self.side_paths[CROP_TABLE[self.variant]])
             gdf["OSA_ID"] = gdf["OSA_ID"].astype("int64")
             gdf = gdf.merge(crops, on="OSA_ID", how="left", validate="many_to_one")
         return gdf

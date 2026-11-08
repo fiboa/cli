@@ -1,9 +1,9 @@
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
 
-CROP_EXTENSION = "https://fiboa.org/crop-extension/v0.2.0/schema.yaml"
+from .commons.hcat import AddHCATMixin
 
 
-class ZaFusionConverter(FiboaBaseConverter):
+class ZaFusionConverter(AddHCATMixin, FiboaBaseConverter):
     sources = {
         "https://data.source.coop/esa/fusion-competition/sa-19E-258N-crop-labels-train-2017.geojson": "za_train_258N.geojson",
         "https://data.source.coop/esa/fusion-competition/sa-19E-259N-crop-labels-train-2017.geojson": "za_train_259N.geojson",
@@ -22,11 +22,12 @@ covering three tiles in the Western Cape region of South Africa.
     )
     attribution = "https://data.source.coop/esa/fusion-competition"
     license = "CC-BY-4.0"
-    extensions = {CROP_EXTENSION}
+    # the five classes of the competition, with their names; crop:code_list points here
+    hcat_mapping_csv = "https://fiboa.org/code/za/fusion/crop.csv"
     area_is_in_ha = False
     columns = {
         "geometry": "geometry",
-        "id": "id",
+        "fid": "id",
         "SHAPE_AREA": "metrics:area",
         "crop_id": "crop:code",
         "crop_name": "crop:name",
@@ -34,13 +35,6 @@ covering three tiles in the Western Cape region of South Africa.
     column_additions = {
         "determination:datetime": "2017-01-01T00:00:00Z",
     }
-
-    def _normalize_geojson_properties(self, feature):
-        fid = feature["properties"].get("fid")
-        if fid is None:
-            raise ValueError(f"Feature has no 'fid' property: {feature}")
-        feature["properties"]["id"] = fid
-        return feature
 
     def migrate(self, gdf):
         # Source GeoJSON uses EPSG:32734 (WGS84/UTM zone 34S) but the CRS tag

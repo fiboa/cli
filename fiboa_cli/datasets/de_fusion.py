@@ -25,21 +25,12 @@ covering two tiles in the Brandenburg region of Germany.
     area_is_in_ha = False
     columns = {
         "geometry": "geometry",
-        "id": "id",
+        "fid": "id",
         "SHAPE_AREA": "metrics:area",
         "crop_id": "crop:code",
         "crop_name": "crop:name",
         "determination:datetime": "determination:datetime",
     }
-
-    def _normalize_geojson_properties(self, feature):
-        # These GeoJSON files have no top-level feature id, only fid inside properties.
-        # Override to use fid so vecorel does not crash looking for feature["id"].
-        fid = feature["properties"].get("fid")
-        if fid is None:
-            raise ValueError(f"Feature has no 'fid' property: {feature}")
-        feature["properties"]["id"] = fid
-        return feature
 
     def file_migration(self, gdf, path, uri, layer=None):
         # Train file covers 2018, test file covers 2019.
