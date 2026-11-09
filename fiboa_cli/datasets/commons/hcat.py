@@ -1,5 +1,4 @@
 import csv
-import re
 from io import StringIO
 from typing import Optional
 
@@ -44,11 +43,6 @@ class AddHCATMixin:
     # Opt-in: codes get reused across editions (HR 200, NL), so only a converter whose
     # table is made for the edition of its data may take the names from it.
     crop_names_from_table = False
-    # A table that repairs names of the HCAT table that lost letters to "?" (EuroCrops
-    # si_2021.csv): its name for the code is taken where it matches letter for letter
-    crop_names_repair_csv: Optional[str] = None
-    # Names that are wrong in the table, by code; they win over the table and the repair
-    crop_name_corrections: dict[str, str] = {}
 
     hcat_columns = {
         "hcat:name_en": "hcat:name_en",
@@ -206,9 +200,6 @@ class AddHCATMixin:
             for row in rows
             if (row["original_code"] or "").strip()
         }
-        if self.crop_names_repair_csv:
-            names = repair_names(names, load_hcat_mapping(self.crop_names_repair_csv))
-        names |= self.crop_name_corrections
         found = self.get_code_column(gdf, columns=columns).astype("string").str.strip().map(names)
         if source in gdf.columns:
             current = gdf[source].astype("string")
@@ -235,20 +226,6 @@ class AddHCATMixin:
     def post_migrate(self, gdf) -> gpd.GeoDataFrame:
         gdf = super().post_migrate(gdf)
         return self.add_crop_names(self.add_hcat(gdf))
-
-
-def repair_names(names: dict, rows: list[dict]) -> dict:
-    """Replace each name with a "?" for a lost letter by the other table's name for the
-    same code, where that name matches it letter for letter, "?" standing for any letter."""
-    other = {(r["original_code"] or "").strip(): (r["original_name"] or "").strip() for r in rows}
-    repaired = dict(names)
-    for code, name in names.items():
-        candidate = other.get(code, "")
-        if name and "?" in name and candidate:
-            pattern = re.escape(name).replace(r"\?", ".")
-            if re.fullmatch(pattern, candidate):
-                repaired[code] = candidate
-    return repaired
 
 
 def hcat_mapping_url(csv_file):

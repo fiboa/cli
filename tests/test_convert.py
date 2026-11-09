@@ -430,7 +430,7 @@ filtered_codes = {
 fully_mapped = {"de_bb", "ke_ecaas", "zm_ecaas"}
 
 # Converters whose source has crop codes only: crop:name comes from the code list
-names_from_table = {"ec_lv", "ec_si", "es", "fr", "hr", "it_1", "lv", "pt", "se"}
+names_from_table = {"ec_lv", "ec_si", "es", "fr", "it_1", "lv", "pt", "se"}
 
 # The smallest field (m²) a converter keeps, where the fixture holds a smaller sliver
 minimum_area = {

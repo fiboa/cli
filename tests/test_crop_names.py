@@ -5,7 +5,6 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import box
 
-from fiboa_cli.datasets.commons.hcat import repair_names
 from fiboa_cli.datasets.de_mv import Converter as DEMV
 from fiboa_cli.datasets.ec_es import Converter as ECES
 from fiboa_cli.datasets.hr import Converter as HR
@@ -32,37 +31,17 @@ def _gdf(column, values):
     return gpd.GeoDataFrame({column: values}, geometry=[box(0, 0, 1, 1)] * len(values))
 
 
-def test_repair_takes_the_other_tables_name_only_where_it_matches():
-    names = {"001": "p?enica (jara)", "405": "me?ana raba (polj??ine)", "002": "rž"}
-    rows = [
-        {"original_code": "001", "original_name": "pšenica (jara)"},
-        # worded differently: not this code's name in the damaged edition
-        {"original_code": "405", "original_name": "mešana raba pod 0,1 ha (poljščine)"},
-        {"original_code": "002", "original_name": "rž (jara)"},
-    ]
-    repaired = repair_names(names, rows)
-    assert repaired["001"] == "pšenica (jara)"
-    assert repaired["405"] == "me?ana raba (polj??ine)"
-    # an intact name is never replaced
-    assert repaired["002"] == "rž"
-
-
-def test_corrections_win_over_the_table():
-    converter = HR()
-    converter.hcat_mapping = HR_TABLE
-    names = converter.add_crop_names(_gdf("land_use_id", ["200", "210"]))["crop:name"].tolist()
-    assert names == ["Oranica", "Staklenici na oranici"]
-
-
 def test_post_migrate_names_the_codes_after_hcat():
-    converter = HR()
+    converter = type("HRNames", (HR,), {"crop_names_from_table": True})()
     converter.hcat_mapping = HR_TABLE
     out = converter.post_migrate(_gdf("land_use_id", ["200", "210"]))
-    assert out["crop:name"].tolist() == ["Oranica", "Staklenici na oranici"]
+    assert out["crop:name"].tolist() == ["Staklenici na oranici", "Staklenici na oranici"]
     assert out["hcat:name_en"].tolist() == ["Arable land", "Greenhouses on arable land"]
 
 
 def test_a_converter_without_the_opt_in_gets_no_names_from_its_table():
+    # hr_2020.csv names the codes of every edition from 2011, which reuse some of them
+    assert not HR().crop_names_from_table
     # es.csv is made for the 2025 campaign; EuroCrops' 2021-2023 files may use its codes otherwise
     converter = ECES()
     assert not converter.crop_names_from_table
