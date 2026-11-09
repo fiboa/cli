@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - GLOCAB: Added the University of Maryland's hand-digitised GloCAB field boundaries (Brazil, Canada, Russia, Ukraine, USA), in one file with each region's mapping month (2016-2020) as the determination date, the `no_area` flag and the region's predominant crop.
-- WRI-TRAZO: Added the Trazo field boundaries hand-drawn by WRI and Arizona State University in 25 South American sampling regions (2020-2024), from WRI's original GeoPackages, with the region, its year as the determination date, a test/train split by region and the basemap the annotators used; polygons a source file holds twice are kept once.
 - KE-ECAAS, ZM-ECAAS: Added the crop-cut farm polygons of Pula's Bird's-Eye project (ECAAS) for Kenya and Zambia, with the source's crop names, HCAT, planting and harvest dates, season, crop condition, intercropping, harvested weight and yield.
+- WRI-TRAZO: Added the Trazo field boundaries hand-drawn by WRI and Arizona State University in 25 South American sampling regions (2020-2024), from WRI's original GeoPackages, with the region, its year as the determination date, a test/train split by region and the basemap the annotators used; polygons a source file holds twice are kept once.
 
 ### Changed
 - Updated vecorel-cli to 0.4.4:
@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Writing no longer fails for date-times with more than millisecond precision; they are stored in milliseconds.
 - AI4SF: `determination:method` is `manual`: the fields were digitised by hand, not detected by a model.
 - IN-10K: The determination date is October 2020, the month of the imagery the fields were drawn on, not the release date; the shapefile is read without the record's archive, which also holds the model weights.
+- LACUNA: Reads the fields with the project's filtered label catalog: one labelling per site, each field dated by its basemap month, with the assignment class, the labeller and their quality scores.
+- LACUNA: **Breaking:** `name` is now `site`, `land_type` is now `label_category`, `assignment_id` is an integer, and `image_date` is replaced by `determination:datetime` (the basemap month).
 - RW-RWANDA: Reads the openly published polygons from Source Cooperative instead of requiring a manual download.
 - ZA-FUSION: The crop codes are mapped to HCAT and carry a `crop:code_list`, so the output validates.
 
