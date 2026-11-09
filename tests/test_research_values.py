@@ -86,12 +86,7 @@ def test_wri_trazo_regions(tmp_parquet_file):
     assert by_region.size().to_dict() == {"acre": 3, "chiquitania": 2, "lowmonte": 3, "testsoy": 3}
     years = by_region["determination:datetime"].first().map(lambda d: d.year).to_dict()
     assert years == {"acre": 2020, "chiquitania": 2020, "lowmonte": 2023, "testsoy": 2020}
-    assert by_region["split"].unique().map(list).to_dict() == {
-        "acre": ["train"],
-        "chiquitania": ["train"],
-        "lowmonte": ["train"],
-        "testsoy": ["test"],
-    }
+    assert "split" not in df.columns
     assert by_region["basemap"].first().to_dict()["chiquitania"] == "sentinel-2"
     # UTM 20S (chiquitania) and a file without a CRS (lowmonte) both land in lon/lat
     centroids = {
@@ -102,3 +97,21 @@ def test_wri_trazo_regions(tmp_parquet_file):
     assert -63 < lon < -62 and -17.5 < lat < -16.5
     lon, lat = centroids["lowmonte"]
     assert -66 < lon < -63 and -39.5 < lat < -37.5
+
+
+def test_wri_trazo_ml_splits_by_region(tmp_parquet_file):
+    df = convert(
+        tmp_parquet_file,
+        "wri_trazo_ml",
+        "wri_trazo",
+        "acreAnnotations_2020.gpkg",
+        "chiquitaniaAnnotations_2020.gpkg",
+        "lowmonteAnnotations_2023.gpkg",
+        "testsoyAnnotations_2020.gpkg",
+    )
+    assert df.groupby("region")["split"].unique().map(list).to_dict() == {
+        "acre": ["train"],
+        "chiquitania": ["train"],
+        "lowmonte": ["train"],
+        "testsoy": ["test"],
+    }

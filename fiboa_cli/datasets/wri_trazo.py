@@ -60,10 +60,11 @@ baseline model performed poorly, about 500 samples in Paraguay from Mundo Agrope
 Mato Grosso samples chosen by active learning, and three randomly sampled test regions.
 
 Each region was annotated for one year, which is each field's determination date (1 January of
-that year). `split` is `test` for the three randomly sampled test regions (`testchiquitania`,
-`testmatogrosso`, `testsoy`), the statistically rigorous choice for evaluation, and `train` for
-the others, which were chosen for poor model performance, a query strategy or partner data
-(WRI's own chip files split those about 90/10 into train and val). Some Mato Grosso regions
+that year). The three test regions (`testchiquitania`, `testmatogrosso`, `testsoy`) were sampled
+randomly, the statistically rigorous choice for evaluation; the others were chosen for poor model
+performance, a query strategy or partner data (WRI's own chip files split those about 90/10 into
+train and val). `wri_trazo_ml` adds a `split`: `test` for the three test regions, `train` for the
+others. Some Mato Grosso regions
 overlap: a few `testmatogrosso` fields are also labelled in train regions, and many
 `matogrosso_brazil_lowconfidences` fields are also in `matogrosso_brazil_confidences`.
 `basemap` is the imagery the annotators drew on: monthly Planet basemaps or, in three regions,
@@ -90,7 +91,6 @@ University, https://www.wri.org/research/field-boundaries-south-america
         "geometry": "geometry",
         "determination:datetime": "determination:datetime",
         "region": "region",
-        "split": "split",
         "basemap": "basemap",
     }
     column_additions = {"determination:method": "manual"}
@@ -100,11 +100,6 @@ University, https://www.wri.org/research/field-boundaries-south-america
                 "type": "string",
                 "enum": sorted(REGIONS),
                 "description": "The Trazo sampling region (a folder of the source data)",
-            },
-            "split": {
-                "type": "string",
-                "enum": ["train", "test"],
-                "description": "test for the randomly sampled test regions, train otherwise",
             },
             "basemap": {
                 "type": "string",
@@ -138,5 +133,4 @@ University, https://www.wri.org/research/field-boundaries-south-america
 
     def migrate(self, gdf):
         gdf["basemap"] = gdf["region"].map(lambda r: REGIONS[r][1])
-        gdf["split"] = gdf["region"].str.startswith("test").map({True: "test", False: "train"})
         return super().migrate(gdf)

@@ -123,6 +123,7 @@ tests = [
     "zm_ecaas",
     "glocab",
     "wri_trazo",
+    "wri_trazo_ml",
 ]
 test_path = "tests/data-files/convert"
 
@@ -279,6 +280,13 @@ extra_convert_parameters = {
         "lowmonteAnnotations_2023.gpkg",
         "testsoyAnnotations_2020.gpkg",
     ),
+    "wri_trazo_ml": _input_files(
+        "wri_trazo",
+        "acreAnnotations_2020.gpkg",
+        "chiquitaniaAnnotations_2020.gpkg",
+        "lowmonteAnnotations_2023.gpkg",
+        "testsoyAnnotations_2020.gpkg",
+    ),
     # EuroCrops V2: the fixture is one year's file, named as the JRC names it
     "ec_de_bb": {"variant": "2020"},
     "ec_be_vlg": {"variant": "2010"},
@@ -343,7 +351,6 @@ WRI_TRAZO_COLUMNS = (
     "determination:datetime",
     "determination:method",
     "region",
-    "split",
     "basemap",
 )
 expected_columns = {
@@ -362,6 +369,7 @@ expected_columns = {
     "zm_ecaas": ECAAS_COLUMNS,
     "glocab": GLOCAB_COLUMNS,
     "wri_trazo": WRI_TRAZO_COLUMNS,
+    "wri_trazo_ml": (*WRI_TRAZO_COLUMNS, "split"),
     # the crop extension requires both
     "ec_lt": ("crop:code", "crop:code_list"),
     "ec_lv": ("crop:code", "crop:code_list"),
