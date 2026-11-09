@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Writing no longer fails for date-times with more than millisecond precision; they are stored in milliseconds.
 - AI4SF: `determination:method` is `manual`: the fields were digitised by hand, not detected by a model.
 - IN-10K: The determination date is October 2020, the month of the imagery the fields were drawn on, not the release date; the shapefile is read without the record's archive, which also holds the model weights.
+- LACUNA: Reads the fields with the project's filtered label catalog: one labelling per site, each field dated by its basemap month, with the assignment class, the labeller and their quality scores.
+- LACUNA: **Breaking:** `name` is now `site`, `land_type` is now `label_category`, `assignment_id` is an integer, and `image_date` is replaced by `determination:datetime` (the basemap month).
 - RW-RWANDA: Reads the openly published polygons from Source Cooperative instead of requiring a manual download.
 - ZA-FUSION: The crop codes are mapped to HCAT and carry a `crop:code_list`, so the output validates.
 
