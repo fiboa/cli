@@ -69,8 +69,6 @@ with [Planet's participant license agreement for the NICFI contract](https://go.
         "image": lambda col: pd.to_datetime(col.str.extract(MONTH, expand=False) + "-01", utc=True),
         "Qscore": lambda col: pd.to_numeric(col, errors="coerce"),
         "Rscore": lambda col: pd.to_numeric(col, errors="coerce"),
-        # fiboa stores date-times in milliseconds; the source has microseconds
-        "completion_time": lambda col: col.dt.floor("ms"),
     }
     missing_schemas = {
         "properties": {
