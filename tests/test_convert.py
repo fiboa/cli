@@ -57,6 +57,7 @@ tests = [
     "se",
     "ee",
     "ai4sf",
+    "ai4sf_ml",
     "ch_ai",
     "ch_ge",
     "ch_ge#2024",
@@ -140,6 +141,9 @@ extra_convert_parameters = {
     "de_thuenen": {"variant": "2021", **_input_files("de_thuenen", "CTM_GER_2021_seg_v201.fgb")},
     "es_nc": {"variant": "2025", **_input_files("es_nc", "es_nc.gpkg")},
     "ai4sf": _input_files("ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg"),
+    "ai4sf_ml": _input_files(
+        "ai4sf", "1_vietnam_areas.gpkg", "4_cambodia_areas.gpkg", "tiles_asia.gpkg"
+    ),
     "lacuna_labels": _input_files(
         "lacuna_labels", "mapped_fields_final.parquet", "label-catalog-filtered.csv"
     ),
