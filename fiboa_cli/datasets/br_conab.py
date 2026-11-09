@@ -47,6 +47,8 @@ class Converter(AdminConverterMixin, FiboaBaseConverter):
         "https://portaldeinformacoes.conab.gov.br/downloads/mapas/" + k: ["*.shp"] for k in _sources
     }
     id = "br_conab"
+    # SIRGAS 2000, the files come in several projections
+    crs = "EPSG:4674"
     short_name = "Conab"
     title = "Brazil Crop Fields (CONAB)"
     description = """
@@ -84,9 +86,6 @@ Further information or suggestions can be sent to the email address conab.geote@
         # Create unique IDs, without the upload timestamp the portal prefixes to its file names
         name = re.sub(r"^\d+_", "", Path(path).stem)
         gdf["id"] = name + "_" + gdf.index.astype(str)
-        # Harmonize projection or pd.concat will fail
-        if gdf.crs.srs != "EPSG:4674":
-            gdf.to_crs(crs="EPSG:4674", inplace=True)
         return gdf
 
     def migrate(self, gdf):

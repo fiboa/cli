@@ -219,8 +219,6 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     def file_migration(self, gdf, path, uri, layer=None):
         if self.variant not in MEMBERS:
             return gdf
-        # the regions come in four projections
-        gdf = gdf.to_crs("EPSG:4326")
         gdf["member"] = layer or os.path.splitext(os.path.basename(path))[0]
         if self.variant in NAME_EDITIONS:
             numbered = {int(m[1]): c for c in gdf.columns if (m := CROP_COLUMN.match(str(c)))}
@@ -231,6 +229,8 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     def select_variant(self, variant):
         super().select_variant(variant)
         self.side_files = (CROP_TABLE[self.variant],) if self.variant in CROP_TABLE else ()
+        # the regions come in four projections
+        self.crs = "EPSG:4326" if self.variant in MEMBERS else None
 
     def read_data(self, paths, **kwargs):
         gdf = super().read_data(paths, **kwargs)
