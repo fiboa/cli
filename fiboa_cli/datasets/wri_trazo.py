@@ -46,6 +46,8 @@ class Converter(FiboaBaseConverter):
     }
 
     id = "wri_trazo"
+    # the files are in several CRS (Web Mercator, UTM, lon/lat)
+    crs = "EPSG:4326"
     short_name = "Trazo"
     title = "Trazo field boundary annotations for South America"
     description = """
@@ -125,8 +127,6 @@ University, https://www.wri.org/research/field-boundaries-south-america
             if not (-180 <= minx <= maxx <= 180 and -90 <= miny <= maxy <= 90):
                 raise ValueError(f"{path} has no CRS and its coordinates are not lon/lat")
             gdf = gdf.set_crs("EPSG:4326")
-        # The files are in several CRS (Web Mercator, UTM, lon/lat); they are concatenated
-        gdf = gdf.to_crs("EPSG:4326")
         # The source has no identifier; the row number in the region's file is stable
         gdf["id"] = [f"{region}-{i}" for i in range(len(gdf))]
         # Some files hold the same polygon twice (683 pairs in matogrosso_brazil_lcdib); keep the
