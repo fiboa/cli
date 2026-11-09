@@ -7,18 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-### Changed
-- Updated vecorel-cli to 0.4.3:
-  - A converter can list tables to join (e.g. a CSV) in `side_files` and read them with `read_side_file()`.
-  - A converter can list the parts of a shapefile (`.shx`, `.dbf`, `.prj`, ...) in `sources` one by one.
-  - Converters no longer fail on GeoJSON features without a top-level `id`.
-  - Converted and merged files have a fixed column order (the order of the column mapping) and fixed collection metadata, instead of a random order that changed between runs.
-  - `fiboa merge` no longer fails on schemas with different enums or limits: it joins them so that the data of every merged dataset stays valid, and only keeps a property required if every dataset requires it.
 ### Added
 - GLOCAB: Added the University of Maryland's hand-digitised GloCAB field boundaries (Brazil, Canada, Russia, Ukraine, USA), in one file with each region's mapping month (2016-2020) as the determination date, the `no_area` flag and the region's predominant crop.
 - KE-ECAAS, ZM-ECAAS: Added the crop-cut farm polygons of Pula's Bird's-Eye project (ECAAS) for Kenya and Zambia, with the source's crop names, HCAT, planting and harvest dates, season, crop condition, intercropping, harvested weight and yield.
 
 ### Changed
+- Updated vecorel-cli to 0.4.4:
+  - A converter can list tables to join (e.g. a CSV) in `side_files` and read them with `read_side_file()`.
+  - A converter can list the parts of a shapefile (`.shx`, `.dbf`, `.prj`, ...) in `sources` one by one.
+  - Converters no longer fail on GeoJSON features without a top-level `id`.
+  - Converted and merged files have a fixed column order (the order of the column mapping) and fixed collection metadata, instead of a random order that changed between runs.
+  - `fiboa merge` no longer fails on schemas with different enums or limits: it joins them so that the data of every merged dataset stays valid, and only keeps a property required if every dataset requires it.
+  - A converter can set `crs` to reproject sources in different CRS to one.
+  - Writing no longer fails for date-times with more than millisecond precision; they are stored in milliseconds.
 - AI4SF: `determination:method` is `manual`: the fields were digitised by hand, not detected by a model.
 - IN-10K: The determination date is October 2020, the month of the imagery the fields were drawn on, not the release date; the shapefile is read without the record's archive, which also holds the model weights.
 - RW-RWANDA: Reads the openly published polygons from Source Cooperative instead of requiring a manual download.
