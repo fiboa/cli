@@ -36,6 +36,14 @@ class AddHCATMixin:
     # column missing anywhere else still fails loudly.
     variants_without_crops: set[str] = set()
 
+    # Fill crop:name with the table's original_name where the source carries no crop
+    # name (no column, a column some editions lack, or empty values), so the source's own
+    # names stay in the data next to HCAT. hcat:name_en already holds the table's
+    # translated_name, the English of the source name.
+    # Opt-in: codes get reused across editions (HR 200, NL), so only a converter whose
+    # table is made for the edition of its data may take the names from it.
+    crop_names_from_table = False
+
     hcat_columns = {
         "hcat:name_en": "hcat:name_en",
         "hcat:name": "hcat:name",
@@ -46,6 +54,11 @@ class AddHCATMixin:
         super().__init__(*args, **kwargs)
         self.columns |= self.hcat_columns | {"crop:code_list": "crop:code_list"}
         self.extensions = getattr(self, "extensions", set()) | {CROP_EXTENSION, HCAT_EXTENSION}
+        # a converter that maps no crop name gets one from the table (add_crop_names)
+        self._crop_name_entry = {}
+        if self.crop_names_from_table and self._source_column("crop:name") is None:
+            self._crop_name_entry = {"crop:name": "crop:name"}
+            self.columns |= self._crop_name_entry
 
     def has_no_crops(self) -> bool:
         """Whether the selected variant has no crop columns; override when no edition has any."""
@@ -55,7 +68,9 @@ class AddHCATMixin:
         # __init__ ran before the variant was known, so align the extensions and
         # columns with the chosen variant (in both directions)
         super().select_variant(variant)
-        crop_entries = self.hcat_columns | {"crop:code_list": "crop:code_list"}
+        crop_entries = (
+            self.hcat_columns | {"crop:code_list": "crop:code_list"} | self._crop_name_entry
+        )
         if self.has_no_crops():
             self.extensions -= {CROP_EXTENSION, HCAT_EXTENSION}
             removed = set(crop_entries.values())
@@ -169,6 +184,30 @@ class AddHCATMixin:
             )
         return gdf
 
+    def add_crop_names(self, gdf):
+        """Fill the crop name with the table's original_name where the source has none."""
+        if not self.crop_names_from_table or self.has_no_crops():
+            return gdf
+        columns = self.get_columns(gdf)
+        source = self._source_column("crop:name", columns)
+        if source is None:
+            return gdf
+        rows = self.get_hcat_mapping()
+        if not rows or "original_code" not in rows[0] or "original_name" not in rows[0]:
+            return gdf  # a table keyed on names: the source carries the names itself
+        names = {
+            (row["original_code"] or "").strip(): (row["original_name"] or "").strip() or None
+            for row in rows
+            if (row["original_code"] or "").strip()
+        }
+        found = self.get_code_column(gdf, columns=columns).astype("string").str.strip().map(names)
+        if source in gdf.columns:
+            current = gdf[source].astype("string")
+            gdf[source] = current.where(current.str.strip().fillna("") != "", found)
+        else:
+            gdf[source] = found.astype("string")
+        return gdf
+
     def correct_resolved_hcat(self, gdf):
         """The source carries HCAT already (EuroCrops); the supplements still win for their codes."""
         rows = [row for url in self.hcat_mapping_supplements for row in load_hcat_mapping(url)]
@@ -186,7 +225,7 @@ class AddHCATMixin:
 
     def post_migrate(self, gdf) -> gpd.GeoDataFrame:
         gdf = super().post_migrate(gdf)
-        return self.add_hcat(gdf)
+        return self.add_crop_names(self.add_hcat(gdf))
 
 
 def hcat_mapping_url(csv_file):

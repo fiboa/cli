@@ -5,7 +5,10 @@ from .commons.hcat import hcat_mapping_url
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     area_is_in_ha = False
-    hcat_mapping_csv = "si_2021.csv"
+    # EuroCrops' si_2021.csv with the Slovenian letters it lost to "?" restored
+    hcat_mapping_csv = "https://fiboa.org/code/si/si_2021.csv"
+    # the source has codes only; the table is of the same year (2021)
+    crop_names_from_table = True
     hcat_mapping_supplements = ["https://fiboa.org/code/si/si_2021_supplement.csv"]
     hcat_supplement_key = "crop_type_class"
     ec_year = 2021

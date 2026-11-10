@@ -154,13 +154,15 @@ def test_crop_names_resolve_across_the_spellings_2017_uses(converted):
     assert lookup["PRADOS_TEMPORARIOS"] == lookup["PRADOS TEMPORÁRIOS"]
 
 
-def test_2018_question_mark_names_survive_the_whole_pipeline(converted):
-    """They are all in Norte_N1, whose crop columns are lowercase and skip c8."""
+def test_2018_question_mark_names_take_the_lists_spelling(converted):
+    """They are all in Norte_N1, whose crop columns are lowercase and skip c8. The source
+    lost the accented letters to "?"; the crop list spells the same codes intact."""
     df = converted["2018"]
-    q = df[df["crop:name"].str.contains(r"\?", na=False)]
-    assert len(q) > 0
-    assert (q["crop:code"] != "").all()
-    assert q["hcat:code"].notna().all()
+    assert not df["crop:name"].str.contains(r"\?", na=False).any()
+    repaired = df[df["crop:name"].isin(("AGRIÃO", "AVELÃ"))]
+    assert len(repaired) > 0
+    assert set(repaired["crop:code"]) <= {"242", "116"}
+    assert repaired["hcat:code"].notna().all()
 
 
 @mark.parametrize("variant", ("2017", "2018", "2019"))
