@@ -8,6 +8,20 @@ from .commons.hcat import AddHCATMixin
 # (the old feed rvo/brpgewaspercelen/atom/v1_0/ redirects here since 2026)
 base = "https://service.pdok.nl/rvo/gewaspercelen/atom/downloads"
 
+# RVO gave these codes a new crop from the year listed. Earlier editions get the
+# code with an "o" suffix, which the code list carries with the old meaning, so
+# the current list holds for every edition. 2636 (landscape element → Leibomen,
+# year unknown) is left out: landscape elements are filtered out.
+REUSED_CODES = {
+    "1926": 2016,
+    "1927": 2017,
+    "657": 2019,
+    "1932": 2019,
+    "1933": 2019,
+    "1934": 2019,
+    "1935": 2019,
+}
+
 
 class NLCropConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     variants = {
@@ -64,6 +78,9 @@ Data is currently available for the years 2009 to 2025 (final) and 2026 (concept
                 }
             )
             gdf["jaar"] = int(self.variant)
+        codes = gdf["gewascode"].astype(str).str.strip()
+        old = [code for code, year in REUSED_CODES.items() if int(self.variant) < year]
+        gdf["gewascode"] = codes.mask(codes.isin(old), codes + "o")
         return super().migrate(gdf)
 
     column_filters = {
