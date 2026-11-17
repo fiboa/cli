@@ -10,7 +10,7 @@ from fiboa_cli.datasets.nl import NLCropConverter
 
 def migrate(year: int, codes: list, column: str = "GWS_GEWASCODE") -> list[str]:
     converter = NLCropConverter()
-    converter.variant = str(year)
+    converter.select_variant(str(year))
     frame = {column: codes, "geometry": [Point(0, 0)] * len(codes)}
     if column == "GWS_GEWASCODE":
         frame |= {"GWS_GEWAS": ["x"] * len(codes), "CAT_GEWASCATEGORIE": ["Bouwland"] * len(codes)}
@@ -55,7 +55,7 @@ ROUNDED_RD = (
 
 def shapefile(year: int, rows: list[tuple]) -> gpd.GeoDataFrame:
     converter = NLCropConverter()
-    converter.variant = str(year)
+    converter.select_variant(str(year))
     frame = gpd.GeoDataFrame(
         {
             "ID_GEOMETR": range(len(rows)),
@@ -90,3 +90,13 @@ def test_old_editions_keep_fallow_and_uncategorised_crops():
         ("Overige", "Bos (SBL-regeling)", "2027"),
     ]
     assert list(shapefile(2008, rows)["gewascode"]) == ["259", "265", "1804", "2030"]
+
+
+def test_old_edition_converts_from_input_files_without_a_download():
+    # 2005-2008 are not among the variants: they have no URL, only a copy given with -i
+    converter = NLCropConverter()
+    converter.select_variant("2005")
+    files = {"brp2005.zip": ["Export_pcr_pd20050515_2.shp"]}
+    assert "2005" not in converter.variants
+    assert converter.variant == "2005"
+    assert converter.get_input_urls(files) == files
