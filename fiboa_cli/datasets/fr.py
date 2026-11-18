@@ -8,14 +8,13 @@ from .commons.ec import AddHCATMixin
 class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # TODO, 2022 works, check (or discover) paths for other years
     variants = {
+        # IGN replaced the RPG 3.0 release of 2024 with RPG 4.0
         "2024": {
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.001": [
-                "**/RPG_Parcelles.gpkg"  # RPG 3.0 renamed PARCELLES_GRAPHIQUES.gpkg
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_4-0__GPKG_LAMB93_FXX_2024-01-01/RPG_4-0__GPKG_LAMB93_FXX_2024-01-01.7z.001": [
+                "**/RPG_Parcelles.gpkg"
             ],
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.002": [],
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.003": [],
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.004": [],
-            "https://data.geopf.fr/telechargement/download/RPG/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01/RPG_3-0__GPKG_LAMB93_FXX_2024-01-01.7z.005": [],
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_4-0__GPKG_LAMB93_FXX_2024-01-01/RPG_4-0__GPKG_LAMB93_FXX_2024-01-01.7z.002": [],
+            "https://data.geopf.fr/telechargement/download/RPG/RPG_4-0__GPKG_LAMB93_FXX_2024-01-01/RPG_4-0__GPKG_LAMB93_FXX_2024-01-01.7z.003": [],
         },
         "2023": {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01/RPG_2-2__GPKG_LAMB93_FXX_2023-01-01.7z": [

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - NL: The 2005-2008 editions, which RVO no longer publishes, convert from a copy of their shapefiles (`--variant <year> -i "<zip>|<shapefile>"`), with fallow (`Braakland`) and the crops that have no category kept.
 
 ### Changed
+- FR: The 2024 edition converts from RPG 4.0, which replaced the RPG 3.0 release IGN no longer publishes.
 - Updated vecorel-cli to 0.4.4:
   - A converter can list tables to join (e.g. a CSV) in `side_files` and read them with `read_side_file()`.
   - A converter can list the parts of a shapefile (`.shx`, `.dbf`, `.prj`, ...) in `sources` one by one.
