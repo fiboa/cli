@@ -220,7 +220,11 @@ class AddHCATMixin:
             fix = {row["original_code"].strip(): row[attribute] for row in rows}
             hit = key.isin(fix.keys())
             if column in gdf.columns and hit.any():
-                gdf.loc[hit, column] = key[hit].map(fix)
+                values = key[hit].map(fix)
+                # Europe-LAND ships the code as an integer, the table as text
+                if pd.api.types.is_numeric_dtype(gdf[column]):
+                    values = pd.to_numeric(values)
+                gdf.loc[hit, column] = values
         return gdf
 
     def post_migrate(self, gdf) -> gpd.GeoDataFrame:

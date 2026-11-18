@@ -1,5 +1,6 @@
 from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.ec import EuroCropsConverterMixin
+from .commons.encoding import repair_cp1257
 
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
@@ -50,16 +51,7 @@ The download service is a set of personalized spatial data of agricultural land 
     def migrate(self, gdf):
         # Fix CP1257 decoding
         if "GRUPE" in gdf.columns:
-            gdf["GRUPE"] = gdf["GRUPE"].map(self._repair_baltic_text)
+            gdf["GRUPE"] = gdf["GRUPE"].map(repair_cp1257)
         return super().migrate(gdf)
-
-    @staticmethod
-    def _repair_baltic_text(value):
-        if not isinstance(value, str):
-            return value
-        try:
-            return value.encode("latin-1").decode("cp1257")
-        except (UnicodeEncodeError, UnicodeDecodeError):
-            return value
 
     missing_schemas = {"properties": {"claimant_id": {"type": "int64"}}}
