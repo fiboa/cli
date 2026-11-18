@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - GLOCAB: Added the University of Maryland's hand-digitised GloCAB field boundaries (Brazil, Canada, Russia, Ukraine, USA), in one file with each region's mapping month (2016-2020) as the determination date, the `no_area` flag and the region's predominant crop.
 - KE-ECAAS, ZM-ECAAS: Added the crop-cut farm polygons of Pula's Bird's-Eye project (ECAAS) for Kenya and Zambia, with the source's crop names, HCAT, planting and harvest dates, season, crop condition, intercropping, harvested weight and yield.
 - WRI-TRAZO: Added the Trazo field boundaries hand-drawn by WRI and Arizona State University in 25 South American sampling regions (2020-2024), from WRI's original GeoPackages, with the region, its year as the determination date, the basemap the annotators used and a test/train split by region in `wri_trazo_ml`; polygons a source file holds twice are kept once.
+- NL: The 2005-2008 editions, which RVO no longer publishes, convert from a copy of their shapefiles (`--variant <year> -i "<zip>|<shapefile>"`), with fallow (`Braakland`) and the crops that have no category kept.
 
 ### Changed
 - Updated vecorel-cli to 0.4.4:
@@ -33,6 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - PT: 2018's crop names that lost their accented letters to `?` (`AGRI?O`) take the crop list's spelling (`AGRIÃO`).
 - The license test compares SPDX identifiers case-insensitively, so ids such as `GPL-2.0-or-later` pass.
+- NL: Crop codes RVO gave a new crop (657, 1926, 1927, 1932-1935) get an `o` suffix in the editions before the new meaning (`1934o`); `crop:code` is always a string.
 
 ## [v0.30.0] - 2026-10-30
 
