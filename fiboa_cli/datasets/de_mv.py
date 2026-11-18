@@ -2,10 +2,10 @@ from vecorel_cli.conversion.admin import AdminConverterMixin
 
 from ..conversion.converter_wfs import WFSConverterMixin
 from ..conversion.fiboa_converter import FiboaBaseConverter
-from .commons.hcat import CROP_EXTENSION
+from .commons.code_list import CodeListMixin
 
 
-class Converter(WFSConverterMixin, AdminConverterMixin, FiboaBaseConverter):
+class Converter(CodeListMixin, WFSConverterMixin, AdminConverterMixin, FiboaBaseConverter):
     # The service returns at most 20,000 features per request, so the layer is read in pages
     wfs_url = "https://www.geodaten-mv.de/dienste/gdimv_feldblock_wfs"
     wfs_params = {"typeNames": "mv:feldbloecke", "outputFormat": "shape-zip", "sortBy": "fbid"}
@@ -24,8 +24,10 @@ class Converter(WFSConverterMixin, AdminConverterMixin, FiboaBaseConverter):
 
     provider = "Ministerium für Landwirtschaft und Umwelt M-V <https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34>"
     license = "No restrictions apply <https://www.geodaten-mv.de/dienste/feldblock_atom?type=dataset&id=f18122c4-2585-4c22-9c48-9e960e8dhd34>"
-    extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml", CROP_EXTENSION}
-    column_additions = {"crop:code_list": "https://fiboa.org/code/de/de_mv.csv"}
+    extensions = {"https://fiboa.org/flik-extension/v0.2.0/schema.yaml"}
+    # the land use codes (Bodennutzungsart); the service writes WA, the list Wa
+    code_list = "https://fiboa.org/code/de/de_mv.csv"
+    code_list_file = "de_mv.csv"
 
     # hcat_mapping_csv = "de.csv"
 

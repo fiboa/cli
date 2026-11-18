@@ -1,0 +1,14 @@
+original_code,original_name,name_en
+AF,Ackerfläche,Arable land
+DGL,Dauergrünland,Permanent Grassland
+DK,"Obstpl.,Dauerkulturen","Orchard, Permanent crops"
+AAF,Aufforstg auf AF,Afforestation on arable land
+AGL,Aufforstg auf GL,Afforestation on grassland
+AÖD,Aufforstg auf ÖD,Afforestation on wasteland
+FO,Forstfläche,Forest land
+UV,Ufervegetation,Riverside vegetation
+SO,Sondernutzung,Not used
+Wa,Wald,Forest
+32G,Artikel 32-Grünland (1307/2013),Article 32-Grassland (1307/2013)
+34G,Artikel 34-Grünland (73/2009),Article 34-Grassland (73/2009)
+32A,Artikel 32-Ackerland (1307/2013),Article 32-Agriculture land (1307/2013)

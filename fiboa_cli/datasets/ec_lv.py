@@ -7,6 +7,8 @@ from .commons.hcat import hcat_mapping_url
 
 class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
     hcat_mapping_csv = "lv_2021.csv"
+    # the source has codes only; the table is of the same year (2021)
+    crop_names_from_table = True
     ec_year = 2021
     sources = {"https://zenodo.org/records/8229128/files/LV_2021.zip": ["LV_2021/LV_2021_EC21.shp"]}
     id = "ec_lv"

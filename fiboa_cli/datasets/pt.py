@@ -201,6 +201,8 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     }
     extensions = {"https://fiboa.org/crop-extension/v0.2.0/schema.yaml"}
     hcat_mapping_csv = "https://fiboa.org/code/pt/pt.csv"
+    # fiboa.org's table for this dataset; it names the codes of the editions without names
+    crop_names_from_table = True
     area_is_in_ha = False
     missing_schemas = {
         "properties": {
@@ -277,8 +279,12 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         gdf = gdf[~repeats].copy()
 
         names = gdf["C1"] if "C1" in gdf.columns else pd.Series(None, index=gdf.index)
-        gdf["CT_português"] = names
         gdf["CUL_CODIGO"] = self._crop_codes(names)
+        # 2018 lost its accented letters to "?" (AGRI?O); publish the list's spelling of the
+        # code there, and the source's own name everywhere else
+        damaged = names.astype("string").str.contains("?", regex=False).fillna(False)
+        listed = {e["original_code"]: e["original_name"] for e in self.hcat_mapping}
+        gdf["CT_português"] = names.where(~damaged, gdf["CUL_CODIGO"].map(listed))
         gdf["CUL_ID"] = gdf["OSA_ID"].fillna(self._island_ids(gdf))
         gdf["OSA_ID"] = gdf["PAR_NUM"].astype("int64")
         return gdf

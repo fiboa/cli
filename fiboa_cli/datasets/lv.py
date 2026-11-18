@@ -64,6 +64,8 @@ Each edition is the campaign the Rural Support Service published it for, taken f
     }
     # EuroCrops' lv_2021.csv plus the 34 codes the register added since
     hcat_mapping_csv = "https://fiboa.org/code/lv/lv.csv"
+    # The files carry the code without a name; the code list has it.
+    crop_names_from_table = True
     column_migrations = {
         "product_code": lambda col: col.astype("string").str.strip(),
         "period_code": lambda col: pd.to_datetime(
@@ -106,13 +108,6 @@ Each edition is the campaign the Rural Support Service published it for, taken f
                 f"(missing: {missing}; unexpected: {unexpected})"
             )
         return {url: f"lv_{self.variant}_{region}.gpkg" for region, url in regions.items()}
-
-    def post_migrate(self, gdf):
-        gdf = super().post_migrate(gdf)
-        # The files carry the code without a name; the code list has it.
-        names = self.hcat_lookup("original_code", "original_name", strip=True)
-        gdf["crop:name"] = self.get_code_column(gdf).str.strip().map(names)
-        return gdf
 
     def file_migration(self, gdf, path, uri, layer):
         # the campaigns up to 2023 name their columns in upper case

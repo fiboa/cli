@@ -6,6 +6,7 @@ from csv import DictReader
 from os.path import exists
 from unittest.mock import patch
 
+import pandas as pd
 import pyarrow.parquet as pq
 from loguru import logger
 from pytest import mark
@@ -123,6 +124,8 @@ tests = [
     "ke_ecaas",
     "zm_ecaas",
     "glocab",
+    "wri_trazo",
+    "wri_trazo_ml",
 ]
 test_path = "tests/data-files/convert"
 
@@ -273,6 +276,22 @@ extra_convert_parameters = {
     "zm_ecaas": _input_files("zm_ecaas", "ecaas_zambia_geojson.geojson"),
     # one file with every region, each field dated by its region's mapping month
     "glocab": _input_files("glocab", "glocab.gpkg"),
+    # Web Mercator, UTM 20S with a duplicated polygon, no CRS (lon/lat), and a test region
+    # without a year column
+    "wri_trazo": _input_files(
+        "wri_trazo",
+        "acreAnnotations_2020.gpkg",
+        "chiquitaniaAnnotations_2020.gpkg",
+        "lowmonteAnnotations_2023.gpkg",
+        "testsoyAnnotations_2020.gpkg",
+    ),
+    "wri_trazo_ml": _input_files(
+        "wri_trazo",
+        "acreAnnotations_2020.gpkg",
+        "chiquitaniaAnnotations_2020.gpkg",
+        "lowmonteAnnotations_2023.gpkg",
+        "testsoyAnnotations_2020.gpkg",
+    ),
     # EuroCrops V2: the fixture is one year's file, named as the JRC names it
     "ec_de_bb": {"variant": "2020"},
     "ec_be_vlg": {"variant": "2010"},
@@ -331,6 +350,14 @@ GLOCAB_COLUMNS = (
     "no_area",
     "predominant_crop",
 )
+WRI_TRAZO_COLUMNS = (
+    "id",
+    "metrics:area",
+    "determination:datetime",
+    "determination:method",
+    "region",
+    "basemap",
+)
 expected_columns = {
     # the catalog join adds the labelling date, class and labeller scores
     "lacuna_labels": (
@@ -346,6 +373,8 @@ expected_columns = {
     "ke_ecaas": ECAAS_COLUMNS,
     "zm_ecaas": ECAAS_COLUMNS,
     "glocab": GLOCAB_COLUMNS,
+    "wri_trazo": WRI_TRAZO_COLUMNS,
+    "wri_trazo_ml": (*WRI_TRAZO_COLUMNS, "split"),
     # the crop extension requires both
     "ec_lt": ("crop:code", "crop:code_list"),
     "ec_lv": ("crop:code", "crop:code_list"),
@@ -432,6 +461,9 @@ filtered_codes = {
 # Converters whose fixture maps every row to HCAT
 fully_mapped = {"de_bb", "ke_ecaas", "zm_ecaas"}
 
+# Converters whose source has crop codes only: crop:name comes from the code list
+names_from_table = {"ec_lv", "ec_si", "es", "fr", "it_1", "lv", "pt", "se"}
+
 # The smallest field (m²) a converter keeps, where the fixture holds a smaller sliver
 minimum_area = {
     "br_conab": 100,
@@ -514,6 +546,21 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
     if converter in fully_mapped:
         unmapped = sorted(set(df.loc[df["hcat:code"].isna(), "crop:code"]))
         assert not unmapped, f"{converter}: crop:code {unmapped} has no HCAT code"
+
+    if converter_id in names_from_table:
+        # a column of one value is kept once in the collection metadata
+        if "crop:name" in df.columns:
+            coded = df[df["crop:code"].astype("string").str.strip().fillna("") != ""]
+            names = coded["crop:name"]
+        else:
+            names = pd.Series([constants.get("crop:name")], dtype="string")
+        unnamed = sorted(set(coded.loc[names.isna(), "crop:code"])) if "crop:name" in df else []
+        assert names.notna().mean() > 0.9, (
+            f"{converter}: the source's crop names are missing next to crop:code {unnamed[:10]}"
+        )
+        # EuroCrops' Slovenian table lost its š/č/ž to "?"; the names must be intact
+        broken = sorted(set(names.dropna()[names.dropna().str.contains("?", regex=False)]))
+        assert not broken, f"{converter}: crop names with lost letters: {broken[:3]}"
 
     if "metrics:area" in df.columns and converter not in ("de_bb", "ec_de_bb"):
         # Check for accidental hectare conversion; fields should be more than 10 square meters
