@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - A converter can set `crs` to reproject sources in different CRS to one.
   - Writing no longer fails for date-times with more than millisecond precision; they are stored in milliseconds.
 - AI4SF: `determination:method` is `manual`: the fields were digitised by hand, not detected by a model.
+- AI4SF-ML: The split table (`tiles_asia.gpkg`) is downloaded with the other sources; files given with `-i` need to include it.
 - DE-MV: Adds `crop:name` and `crop:name_en` from the land use code list; `crop:code` takes the list's spelling (`Wa` instead of `WA`).
 - EC-LV, EC-SI, ES, FR, IT-1, PT and SE: `crop:name` holds the source's original crop name next to each crop code where the source has codes only; `hcat:name_en` keeps the English translation.
 - IN-10K: The determination date is October 2020, the month of the imagery the fields were drawn on, not the release date; the shapefile is read without the record's archive, which also holds the model weights.
