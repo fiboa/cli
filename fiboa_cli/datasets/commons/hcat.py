@@ -209,18 +209,29 @@ class AddHCATMixin:
         return gdf
 
     def correct_resolved_hcat(self, gdf):
-        """The source carries HCAT already (EuroCrops); the supplements still win for their codes."""
+        """The source carries HCAT already (EuroCrops); the supplements still win for their codes.
+
+        A supplement is keyed on original_code, or on original_name for a table without
+        codes (as add_hcat() does), such as lt_2021.csv.
+        """
         rows = [row for url in self.hcat_mapping_supplements for row in load_hcat_mapping(url)]
         if not rows:
             return gdf
+
+        def row_key(row):
+            return (row.get("original_code") or "").strip() or (
+                row.get("original_name") or ""
+            ).strip()
+
         key = self.get_code_column(gdf, self.hcat_supplement_key).str.strip()
         for column, attribute in zip(
             self.hcat_columns.keys(), ("translated_name", "HCAT3_name", "HCAT3_code")
         ):
-            fix = {row["original_code"].strip(): row[attribute] for row in rows}
+            fix = {row_key(row): row[attribute] for row in rows if row_key(row)}
             hit = key.isin(fix.keys())
             if column in gdf.columns and hit.any():
-                gdf.loc[hit, column] = key[hit].map(fix)
+                # Europe-LAND ships the code as an integer, the table as text
+                gdf.loc[hit, column] = key[hit].map(fix).astype(gdf[column].dtype)
         return gdf
 
     def post_migrate(self, gdf) -> gpd.GeoDataFrame:

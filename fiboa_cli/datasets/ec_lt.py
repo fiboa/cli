@@ -12,6 +12,8 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
         "hcat:code": "hcat:code",
     }
     sources = {"https://zenodo.org/records/6868143/files/LT_2021.zip": ["LT/LT_2021_EC.shp"]}
+    # the DBF is CP1257 and carries no .cpg
+    open_options = dict(encoding="cp1257")
 
     id = "ec_lt"
     short_name = "Lithuania"
@@ -46,20 +48,5 @@ The download service is a set of personalized spatial data of agricultural land 
         "Kukurūzai",
     ]
     column_filters = {"GRUPE": lambda col: (col.isin(Converter.CROP_GROUPS), False)}
-
-    def migrate(self, gdf):
-        # Fix CP1257 decoding
-        if "GRUPE" in gdf.columns:
-            gdf["GRUPE"] = gdf["GRUPE"].map(self._repair_baltic_text)
-        return super().migrate(gdf)
-
-    @staticmethod
-    def _repair_baltic_text(value):
-        if not isinstance(value, str):
-            return value
-        try:
-            return value.encode("latin-1").decode("cp1257")
-        except (UnicodeEncodeError, UnicodeDecodeError):
-            return value
 
     missing_schemas = {"properties": {"claimant_id": {"type": "int64"}}}
