@@ -6,9 +6,9 @@ from .commons.ec import AddHCATMixin
 
 
 class FRConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
-    # TODO, 2022 works, check (or discover) paths for other years
     variants = {
-        # IGN replaced the RPG 3.0 release of 2024 with RPG 4.0
+        # IGN replaced the RPG 3.0 release of 2024 with RPG 4.0. From RPG 3.0 on the
+        # parcels are in RPG_Parcelles.gpkg instead of PARCELLES_GRAPHIQUES.gpkg.
         "2024": {
             "https://data.geopf.fr/telechargement/download/RPG/RPG_4-0__GPKG_LAMB93_FXX_2024-01-01/RPG_4-0__GPKG_LAMB93_FXX_2024-01-01.7z.001": [
                 "**/RPG_Parcelles.gpkg"
