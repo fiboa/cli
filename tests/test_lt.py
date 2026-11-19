@@ -32,14 +32,16 @@ def test_repair_cp1257(value, expected):
 
 
 def fixture_table(csv_file=None, url=None):
-    return list(DictReader(open(f"{FIXTURES}/{csv_file.split('/')[-1]}", encoding="utf-8")))
+    with open(f"{FIXTURES}/{csv_file.split('/')[-1]}", encoding="utf-8") as f:
+        return list(DictReader(f))
 
 
 @patch("fiboa_cli.datasets.commons.hcat.load_hcat_mapping", side_effect=fixture_table)
-def test_supplement_corrects_pulses_and_wetlands(_):
+def test_table_corrects_pulses_and_wetlands(_):
+    """lt_2021.csv has no codes, so it corrects the source's HCAT by the (repaired) name."""
     converter = LTConverter()
     converter.select_variant("2025")
-    names = ["Ankðtiniai javai", "Ðlapynës", "Þieminiai javai"]
+    names = ["Ankštiniai javai", "Šlapynės", "Žieminiai javai"]
     gdf = gpd.GeoDataFrame(
         {
             "crop_code": names,
@@ -50,9 +52,9 @@ def test_supplement_corrects_pulses_and_wetlands(_):
         },
         geometry=[Point(0, 0)] * 3,
     )
-    out = converter.correct_resolved_hcat(converter.migrate(gdf))
-    assert out["crop_name"].tolist() == ["Ankštiniai javai", "Šlapynės", "Žieminiai javai"]
-    assert out["EC_hcat_c"].astype(str).tolist() == ["3301020000", "3399000000", "3301011501"]
+    out = converter.correct_resolved_hcat(gdf)
+    assert out["EC_hcat_c"].dtype == "int64"
+    assert out["EC_hcat_c"].tolist() == [3301020000, 3399000000, 3301011501]
     assert out["EC_hcat_n"].tolist()[:2] == [
         "legumes_dried_pulses_protein_crops",
         "not_known_and_other",
