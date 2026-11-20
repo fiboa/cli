@@ -143,6 +143,9 @@ def read_crop_table(path):
     key = next(f for f in pyogrio.read_info(path)["fields"] if f.lower() == "osa_id")
     df = pyogrio.read_dataframe(path, columns=[key, "C1"], read_geometry=False)
     df = df.rename(columns={key: "OSA_ID"})
+    # 2021 drops some codes' leading zeros ("22" for "022"); the code list has three digits
+    short = df["C1"].str.fullmatch(r"[0-9]{1,2}", na=False)
+    df["C1"] = df["C1"].mask(short, df["C1"].str.zfill(3))
     # 2021 has 14 empty rows keyed 0, which no field uses
     return df[df["OSA_ID"] != 0].astype({"OSA_ID": "int64"})
 
@@ -204,6 +207,11 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # fiboa.org's table for this dataset; it names the codes of the editions without names
     crop_names_from_table = True
     area_is_in_ha = False
+    # 2023 writes no code as " " and pads some names ("OLIVAL ")
+    column_migrations = {
+        "CUL_CODIGO": lambda col: col.str.strip(),
+        "CT_português": lambda col: col.str.strip(),
+    }
     missing_schemas = {
         "properties": {
             "block_id": {"type": "int64"},

@@ -201,6 +201,8 @@ def _fixture_crop_codes(year, folder):
     crops = pyogrio.read_dataframe(table, columns=[key, "C1"], read_geometry=False)
     crops = crops[crops[key] != 0]
     codes = ids.map(crops.set_index(crops[key].astype("int64"))["C1"]).fillna("")
+    # the code list writes every code with three digits
+    codes = codes.mask(codes.str.fullmatch(r"[0-9]{1,2}"), codes.str.zfill(3))
     return dict(zip(ids, codes))
 
 
@@ -225,3 +227,19 @@ def test_a_reused_converter_starts_each_edition_afresh(tmp_path):
     first = _convert(tmp_path / "a.parquet", "2017", converter=converter)
     second = _convert(tmp_path / "b.parquet", "2017", converter=converter)
     assert sorted(_island_ids(first)) == sorted(_island_ids(second))
+
+
+def test_2023_crop_codes_and_names_lose_their_padding(tmp_path):
+    df = _convert(tmp_path / "out.parquet", "2023")
+    for column in ("crop:code", "crop:name"):
+        values = df[column].dropna()
+        assert (values == values.str.strip()).all()
+    assert (df["crop:code"] == "").any()
+
+
+def test_2021_short_crop_codes_are_named(tmp_path):
+    df = _convert(tmp_path / "out.parquet", "2021")
+    codes = df["crop:code"].dropna()
+    assert not codes.str.fullmatch(r"\d{1,2}").any()
+    padded = df[df["crop:code"].isin(["006", "089", "090"])]
+    assert len(padded) and padded["crop:name"].notna().all()
