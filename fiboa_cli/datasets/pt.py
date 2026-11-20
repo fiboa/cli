@@ -138,13 +138,17 @@ def normalise_crop_name(value, keep_question_mark=False):
     return re.sub(r"\s+", " ", text).strip()
 
 
+SHORT_CODE = re.compile(r"[0-9]{1,2}")
+
+
 def tidy_crop_code(value):
-    # 2021's crop table drops some codes' leading zeros ("22" for "022"), which the code list
-    # has padded to three digits; 2023 pads codes (and blank ones) with spaces
+    # 2021's crop table drops some codes' leading zeros ("22" for "022"); the code list writes
+    # every code with three digits (POUSIO also as "89", the same crop as "089"). 2023 writes
+    # no code as " " instead of "".
     if not isinstance(value, str):
         return value
     value = value.strip()
-    return value.zfill(3) if value.isdigit() and len(value) < 3 else value
+    return value.zfill(3) if SHORT_CODE.fullmatch(value) else value
 
 
 def tidy_crop_name(value):

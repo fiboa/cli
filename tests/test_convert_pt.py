@@ -240,6 +240,7 @@ def test_a_reused_converter_starts_each_edition_afresh(tmp_path):
         (" ", ""),
         ("", ""),
         ("A1", "A1"),
+        ("٢٢", "٢٢"),
         (None, None),
     ],
 )
