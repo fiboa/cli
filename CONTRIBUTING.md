@@ -3,59 +3,65 @@
 Thanks for contributing! The [Development](README.md#development) section of the README explains the
 setup. The guidelines below collect what reviews ask for most often.
 
+## Responsibility and AI
+
+- You are responsible for everything you contribute, no matter how it was made. Check all of it
+  before you ask for a review: reviewing a contribution should take less work than making it.
+- Comments, reviews and replies on GitHub that are addressed to people should be written by a human
+  and concisely for a human.
+- Saying in the PR that you used AI is appreciated. Commits don't need AI attribution, as the
+  responsibility is entirely yours.
+
 ## Converters
 
-- Follow [Implement a converter](README.md#implement-a-converter) and start from
-  `fiboa_cli/datasets/template.py`.
-- Use the declarative hooks of the template and the base converter first, e.g. `sources`/`variants`,
-  `columns`, `column_additions`, `column_filters`, `column_migrations`, `missing_schemas`,
-  `extensions`, `area_is_in_ha`, `id_columns`, `open_options`, `crs`, `side_files`.
-- The hooks run in this order: `file_migration` (per file), `migrate`, `column_filters`,
-  `column_additions`, `column_migrations`, `post_migrate` (e.g. HCAT and crop names).
-- Override methods only for what no hook covers. `file_migration` is for per-file logic (file name, row
-  order); `migrate` is the fallback, not the main working mode. Overriding `read_data`, `get_data` or
-  `download_files` should be the exception and often can go upstream into vecorel-cli.
-- Don't re-implement what the base classes already do, e.g. dropping Z values, reprojecting
-  (`crs`), unit conversion (`area_is_in_ha`), numbering repeated ids, choosing the default variant.
-- If a converter needs a workaround for missing generic behaviour, fix it in vecorel-cli (or a shared
-  mixin in `datasets/commons`) instead of in the converter.
-- Reuse the mixins, e.g. `AddHCATMixin`, `CodeListMixin`,
-  `EuroCropsConverterMixin`, `AdminConverterMixin`, `WFSConverterMixin`, `EsriRESTConverterMixin`.
-- Train/val/test splits go into a separate `<id>_ml` converter with `MlSplitsMixin`.
-- Don't set attributes to their default values, and don't declare what the schemas already define.
+- Follow [Implement a converter](README.md#implement-a-converter) and start from the
+  [template](fiboa_cli/datasets/template.py).
+- Prefer the declarative attributes of the template and the
+  [base converter](https://github.com/vecorel/cli/blob/main/vecorel_cli/conversion/base.py) over
+  overriding methods. `migrate` is the last resort.
+- A conversion runs these steps in order:
+  1. Download the `sources` and read them with `open_options`
+  2. `file_migration` (per file), then reprojection to `crs`
+  3. `migrate`
+  4. `column_filters`
+  5. `column_additions`
+  6. `column_migrations`
+  7. `post_migrate` (e.g. HCAT and crop names)
+  8. Create the `id` (e.g. from `id_columns`) and drop rows that miss required values
+  9. Rename the columns as listed in `columns`, fix the geometries, number repeated ids and drop all
+     other columns
+
+  Until step 9, the columns have the source's names.
+- Don't re-implement what the base classes already do, and don't set attributes to their defaults.
+- Generic behaviour belongs in vecorel-cli or a [shared mixin](fiboa_cli/datasets/commons), not in a
+  single converter.
+- Train/val/test splits go into a separate `<id>_ml` converter.
 
 ## IDs
 
-- The converter ID starts with the ISO 3166 code of the country or region where there is one
-  (`de_bw`, `in_10k`); `ec_` stands for EuroCrops.
-- Avoid renaming the ID of a published converter: it is the collection id of published data.
-- Prefer stable source identifiers for `id`, so that ids stay the same across editions. Use
-  `id_columns` to compose them instead of building strings by hand.
+- Converter IDs start with the country or region code where there is one (`de_bw`); `ec_` stands
+  for EuroCrops. Don't rename published converters.
+- Use stable source identifiers as feature `id`, so that they stay the same across editions.
 
 ## Code lists and data
 
-- Code lists are CSV files published on fiboa.org (fiboa/fiboa.github.io, `code/`), not dicts in
-  Python. Fix wrong names or codes in those tables, not in converter code.
-- Take crop names from a table only if it was made for the edition of the data
-  (`crop_names_from_table`); codes get reused with other meanings across editions.
-- Verify what a source's codes mean before mapping them (e.g. to HCAT); don't guess.
-- Licenses are SPDX IDs (e.g. `CC-BY-4.0`, `CC0-1.0`). Without a license, link to the terms of use.
-  Attributions must be complete.
+- Code lists are CSV files in [fiboa.github.io](https://github.com/fiboa/fiboa.github.io/tree/main/code),
+  not dicts in Python. Fix wrong codes or names there.
+- Check what a source's codes mean before mapping them, and take crop names only from a table made
+  for the same edition.
+- Licenses are SPDX IDs, otherwise a link to the terms of use. Attributions must be complete.
 
 ## Tests
 
-- Add a small fixture of real source data and register the converter in `tests/test_convert.py`
-  (`tests`, `extra_convert_parameters`, `expected_columns`) instead of writing repetitive custom tests.
-- Keep tests proportionate.
-- Tests and fixtures must actually exercise the code paths they are meant to cover.
+- Add a small fixture of real source data and register it in [test_convert.py](tests/test_convert.py)
+  instead of writing custom tests for each converter.
+- Keep tests proportionate, and make sure they cover what they claim to.
 
 ## Changelog and pull requests
 
 - Every non-trivial change needs a `CHANGELOG.md` entry (CI checks it).
-- Changelog entries are short and user-facing, without internals, in Added / Changed / Fixed / etc.
-  Converter entries start with the upper-case id (`DE-BW:` for `de_bw`), are sorted by it and come
-  after general entries.
-- Keep PRs small and focused (one converter or one topic) and target `main`. Say if a PR depends on
-  another one.
+- Changelog entries are short and user-facing. Converter entries start with the upper-case ID
+  (`DE-BW:`) and come sorted after the general ones.
+- Keep PRs small and focused on one converter or topic, and say if a PR depends on another one.
 - Keep code comments and PR descriptions short.
-- Run `pixi run -e dev check` (lint, format, tests) before pushing.
+- Run `pixi run -e dev check` before pushing.
