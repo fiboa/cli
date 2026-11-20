@@ -278,13 +278,15 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             if column in gdf.columns and gdf[column].dtype.kind == "f":
                 gdf[column] = gdf[column].astype("int64")
 
+        return super().migrate(self._tidy_crop_columns(gdf))
+
+    def _tidy_crop_columns(self, gdf):
         pad = self.variant in CROP_TABLE
         if "CUL_CODIGO" in gdf.columns:
             gdf["CUL_CODIGO"] = gdf["CUL_CODIGO"].map(lambda v: tidy_crop_code(v, pad=pad))
         if "CT_português" in gdf.columns:
             gdf["CT_português"] = gdf["CT_português"].map(tidy_crop_name)
-
-        return super().migrate(gdf)
+        return gdf
 
     def _to_2023_layout(self, gdf):
         if self.variant in NAME_EDITIONS:

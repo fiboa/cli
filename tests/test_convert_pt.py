@@ -248,11 +248,15 @@ def test_crop_codes_are_padded_to_the_code_lists_three_digits(value, expected):
     assert pt.tidy_crop_code(value, pad=True) == expected
 
 
-def test_only_crop_table_editions_are_padded():
+@mark.parametrize("variant, code", [("2021", "089"), ("2020", "089"), ("2023", "89")])
+def test_only_crop_table_editions_are_padded(variant, code):
     """2023 publishes one POUSIO as "89"; a code an edition writes itself stays as it is."""
-    assert pt.tidy_crop_code(" 89 ") == "89"
-    assert pt.tidy_crop_code(" ") == ""
-    assert "2021" in pt.CROP_TABLE and "2023" not in pt.CROP_TABLE
+    converter = pt.PTConverter()
+    converter.variant = variant
+    df = pd.DataFrame({"CUL_CODIGO": [" 89 ", " ", "034"], "CT_português": ["POUSIO ", "", None]})
+    tidied = converter._tidy_crop_columns(df)
+    assert tidied["CUL_CODIGO"].tolist() == [code, "", "034"]
+    assert tidied["CT_português"].tolist()[:2] == ["POUSIO", ""]
 
 
 def test_crop_names_lose_their_padding():
