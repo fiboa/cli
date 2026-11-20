@@ -98,7 +98,7 @@ tests = [
     "sk#2018",
     "jecam",
     "ec_ro",
-    "india_10k",
+    "in_10k",
     "it_1",
     "ec_de_bb",
     "ec_be_vlg",
