@@ -47,6 +47,7 @@ tests = [
     "fi",
     "fr",
     "fr#2020",
+    "fr#2024",
     "hr",
     "nl",
     "nl_block",
@@ -229,6 +230,8 @@ extra_convert_parameters = {
     "fr": {"variant": "2022"},
     # two real volumes (.7z.001 + .7z.002), so the parts must be joined before extracting
     "fr#2020": {"variant": "2020"},
+    # RPG 4.0: three volumes, lowercase columns and RPG_Parcelles.gpkg; 100 rows from the real file
+    "fr#2024": {"variant": "2024"},
     # a page of each service: the current snapshot and a historic year, whose
     # Catxe reads "Febrer2024.0" where the current one reads "maig 2026"
     "es_ib": {"variant": "2026", **_input_files("es_ib", "es_ib_2026.geojson")},
