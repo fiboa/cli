@@ -201,7 +201,7 @@ def _fixture_crop_codes(year, folder):
     crops = pyogrio.read_dataframe(table, columns=[key, "C1"], read_geometry=False)
     crops = crops[crops[key] != 0]
     codes = ids.map(crops.set_index(crops[key].astype("int64"))["C1"]).fillna("")
-    codes = codes.map(pt.tidy_crop_code)
+    codes = codes.map(lambda v: pt.tidy_crop_code(v, pad=True))
     return dict(zip(ids, codes))
 
 
@@ -245,7 +245,14 @@ def test_a_reused_converter_starts_each_edition_afresh(tmp_path):
     ],
 )
 def test_crop_codes_are_padded_to_the_code_lists_three_digits(value, expected):
-    assert pt.tidy_crop_code(value) == expected
+    assert pt.tidy_crop_code(value, pad=True) == expected
+
+
+def test_only_crop_table_editions_are_padded():
+    """2023 publishes one POUSIO as "89"; a code an edition writes itself stays as it is."""
+    assert pt.tidy_crop_code(" 89 ") == "89"
+    assert pt.tidy_crop_code(" ") == ""
+    assert "2021" in pt.CROP_TABLE and "2023" not in pt.CROP_TABLE
 
 
 def test_crop_names_lose_their_padding():

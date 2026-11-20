@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ZA-FUSION: The crop codes are mapped to HCAT and carry a `crop:code_list`, so the output validates.
 
 ### Fixed
-- PT: 2021 crop codes the crop table writes without their leading zeros (`22` for `022`) are padded to the code list's three digits, so they get their crop name and HCAT class (about 23,000 parcels). In 2023, crop names lose the trailing space 18 of them carry (`OLIVAL `), and the parcels without a crop (about 1.5 million) have the empty code `""` instead of `" "`, as in the other editions.
+- PT: 2021 crop codes the crop table writes without their leading zeros (`22` for `022`) are padded to the code list's three digits, so they get their crop name and HCAT class (about 23,000 parcels); codes the other editions write themselves are left as published. In 2023, crop names lose the trailing space 18 of them carry (`OLIVAL `), and the parcels without a crop (about 1.5 million) have the empty code `""` instead of `" "`, as in the other editions.
 - PT: 2018's crop names that lost their accented letters to `?` (`AGRI?O`) take the crop list's spelling (`AGRIÃO`).
 - The license test compares SPDX identifiers case-insensitively, so ids such as `GPL-2.0-or-later` pass.
 - NL: Crop codes RVO gave a new crop (657, 1926, 1927, 1932-1935) get an `o` suffix in the editions before the new meaning (`1934o`); `crop:code` is always a string.
