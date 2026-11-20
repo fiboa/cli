@@ -244,6 +244,7 @@ Inside a Portolan catalog (`portolan init`), for dataset `<id>` and edition `<va
 ## Development
 
 This project uses [Pixi](https://pixi.sh/) for dependency management and development workflows.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the guidelines.
 
 ```bash
 # Install all dependencies including development tools
@@ -273,7 +274,7 @@ The following high-level description gives an idea how to implement a converter 
 
 1. Create a new file in `fiboa_cli/datasets` based on the `template.py`
 2. Fill in the required variables / test it / run it
-3. Add missing dependencies into the appropriate feature group in `pixi.toml` (or `setup.py` for pip users)
+3. Add missing dependencies into the appropriate feature group in `pyproject.toml`
 4. Add the converter to the list above
 5. Create a PR to submit your converter for review
 
