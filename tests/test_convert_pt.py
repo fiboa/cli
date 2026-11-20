@@ -201,7 +201,8 @@ def _fixture_crop_codes(year, folder):
     crops = pyogrio.read_dataframe(table, columns=[key, "C1"], read_geometry=False)
     crops = crops[crops[key] != 0]
     codes = ids.map(crops.set_index(crops[key].astype("int64"))["C1"]).fillna("")
-    codes = codes.map(lambda v: pt.tidy_crop_code(v, pad=True))
+    # the code list writes every code with three digits
+    codes = codes.mask(codes.str.fullmatch(r"[0-9]{1,2}"), codes.str.zfill(3))
     return dict(zip(ids, codes))
 
 
@@ -228,41 +229,12 @@ def test_a_reused_converter_starts_each_edition_afresh(tmp_path):
     assert sorted(_island_ids(first)) == sorted(_island_ids(second))
 
 
-@mark.parametrize(
-    "value, expected",
-    [
-        ("22", "022"),
-        ("6", "006"),
-        ("89", "089"),
-        ("034", "034"),
-        ("120", "120"),
-        (" 034 ", "034"),
-        (" ", ""),
-        ("", ""),
-        ("A1", "A1"),
-        ("٢٢", "٢٢"),
-        (None, None),
-    ],
-)
-def test_crop_codes_are_padded_to_the_code_lists_three_digits(value, expected):
-    assert pt.tidy_crop_code(value, pad=True) == expected
-
-
-@mark.parametrize("variant, code", [("2021", "089"), ("2020", "089"), ("2023", "89")])
-def test_only_crop_table_editions_are_padded(variant, code):
-    """2023 publishes one POUSIO as "89"; a code an edition writes itself stays as it is."""
-    converter = pt.PTConverter()
-    converter.variant = variant
-    df = pd.DataFrame({"CUL_CODIGO": [" 89 ", " ", "034"], "CT_português": ["POUSIO ", "", None]})
-    tidied = converter._tidy_crop_columns(df)
-    assert tidied["CUL_CODIGO"].tolist() == [code, "", "034"]
-    assert tidied["CT_português"].tolist()[:2] == ["POUSIO", ""]
-
-
-def test_crop_names_lose_their_padding():
-    assert pt.tidy_crop_name("OLIVAL ") == "OLIVAL"
-    assert pt.tidy_crop_name("PRADOS TEMPORÁRIOS ") == "PRADOS TEMPORÁRIOS"
-    assert pt.tidy_crop_name(None) is None
+def test_2023_crop_codes_and_names_lose_their_padding(tmp_path):
+    df = _convert(tmp_path / "out.parquet", "2023")
+    for column in ("crop:code", "crop:name"):
+        values = df[column].dropna()
+        assert (values == values.str.strip()).all()
+    assert (df["crop:code"] == "").any()
 
 
 def test_2021_short_crop_codes_are_named(tmp_path):

@@ -138,30 +138,14 @@ def normalise_crop_name(value, keep_question_mark=False):
     return re.sub(r"\s+", " ", text).strip()
 
 
-SHORT_CODE = re.compile(r"[0-9]{1,2}")
-
-
-def tidy_crop_code(value, pad=False):
-    # 2023 writes no code as " " instead of "". 2021's crop table drops some codes' leading
-    # zeros ("22" for "022"), which `pad` restores: the code list writes every code with
-    # three digits (POUSIO also as "89", the same crop as "089"). Only the crop-table
-    # editions are padded, so a code an edition writes itself stays as published.
-    if not isinstance(value, str):
-        return value
-    value = value.strip()
-    return value.zfill(3) if pad and SHORT_CODE.fullmatch(value) else value
-
-
-def tidy_crop_name(value):
-    # 2023 pads 18 of its names with a trailing space ("OLIVAL ")
-    return value.strip() if isinstance(value, str) else value
-
-
 def read_crop_table(path):
     # 2021 spells the key Osa_id and types it as a float
     key = next(f for f in pyogrio.read_info(path)["fields"] if f.lower() == "osa_id")
     df = pyogrio.read_dataframe(path, columns=[key, "C1"], read_geometry=False)
     df = df.rename(columns={key: "OSA_ID"})
+    # 2021 drops some codes' leading zeros ("22" for "022"); the code list has three digits
+    short = df["C1"].str.fullmatch(r"[0-9]{1,2}", na=False)
+    df["C1"] = df["C1"].mask(short, df["C1"].str.zfill(3))
     # 2021 has 14 empty rows keyed 0, which no field uses
     return df[df["OSA_ID"] != 0].astype({"OSA_ID": "int64"})
 
@@ -223,6 +207,11 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     # fiboa.org's table for this dataset; it names the codes of the editions without names
     crop_names_from_table = True
     area_is_in_ha = False
+    # 2023 writes no code as " " and pads some names ("OLIVAL ")
+    column_migrations = {
+        "CUL_CODIGO": lambda col: col.str.strip(),
+        "CT_português": lambda col: col.str.strip(),
+    }
     missing_schemas = {
         "properties": {
             "block_id": {"type": "int64"},
@@ -278,15 +267,7 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
             if column in gdf.columns and gdf[column].dtype.kind == "f":
                 gdf[column] = gdf[column].astype("int64")
 
-        return super().migrate(self._tidy_crop_columns(gdf))
-
-    def _tidy_crop_columns(self, gdf):
-        pad = self.variant in CROP_TABLE
-        if "CUL_CODIGO" in gdf.columns:
-            gdf["CUL_CODIGO"] = gdf["CUL_CODIGO"].map(lambda v: tidy_crop_code(v, pad=pad))
-        if "CT_português" in gdf.columns:
-            gdf["CT_português"] = gdf["CT_português"].map(tidy_crop_name)
-        return gdf
+        return super().migrate(gdf)
 
     def _to_2023_layout(self, gdf):
         if self.variant in NAME_EDITIONS:
