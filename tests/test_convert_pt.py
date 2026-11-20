@@ -201,6 +201,7 @@ def _fixture_crop_codes(year, folder):
     crops = pyogrio.read_dataframe(table, columns=[key, "C1"], read_geometry=False)
     crops = crops[crops[key] != 0]
     codes = ids.map(crops.set_index(crops[key].astype("int64"))["C1"]).fillna("")
+    codes = codes.map(pt.tidy_crop_code)
     return dict(zip(ids, codes))
 
 
@@ -225,3 +226,36 @@ def test_a_reused_converter_starts_each_edition_afresh(tmp_path):
     first = _convert(tmp_path / "a.parquet", "2017", converter=converter)
     second = _convert(tmp_path / "b.parquet", "2017", converter=converter)
     assert sorted(_island_ids(first)) == sorted(_island_ids(second))
+
+
+@mark.parametrize(
+    "value, expected",
+    [
+        ("22", "022"),
+        ("6", "006"),
+        ("89", "089"),
+        ("034", "034"),
+        ("120", "120"),
+        (" 034 ", "034"),
+        (" ", ""),
+        ("", ""),
+        ("A1", "A1"),
+        (None, None),
+    ],
+)
+def test_crop_codes_are_padded_to_the_code_lists_three_digits(value, expected):
+    assert pt.tidy_crop_code(value) == expected
+
+
+def test_crop_names_lose_their_padding():
+    assert pt.tidy_crop_name("OLIVAL ") == "OLIVAL"
+    assert pt.tidy_crop_name("PRADOS TEMPORÁRIOS ") == "PRADOS TEMPORÁRIOS"
+    assert pt.tidy_crop_name(None) is None
+
+
+def test_2021_short_crop_codes_are_named(tmp_path):
+    df = _convert(tmp_path / "out.parquet", "2021")
+    codes = df["crop:code"].dropna()
+    assert not codes.str.fullmatch(r"\d{1,2}").any()
+    padded = df[df["crop:code"].isin(["006", "089", "090"])]
+    assert len(padded) and padded["crop:name"].notna().all()

@@ -138,6 +138,20 @@ def normalise_crop_name(value, keep_question_mark=False):
     return re.sub(r"\s+", " ", text).strip()
 
 
+def tidy_crop_code(value):
+    # 2021's crop table drops some codes' leading zeros ("22" for "022"), which the code list
+    # has padded to three digits; 2023 pads codes (and blank ones) with spaces
+    if not isinstance(value, str):
+        return value
+    value = value.strip()
+    return value.zfill(3) if value.isdigit() and len(value) < 3 else value
+
+
+def tidy_crop_name(value):
+    # 2023 pads 18 of its names with a trailing space ("OLIVAL ")
+    return value.strip() if isinstance(value, str) else value
+
+
 def read_crop_table(path):
     # 2021 spells the key Osa_id and types it as a float
     key = next(f for f in pyogrio.read_info(path)["fields"] if f.lower() == "osa_id")
@@ -258,6 +272,10 @@ class PTConverter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
         for column in ("OSA_ID", "CUL_ID"):
             if column in gdf.columns and gdf[column].dtype.kind == "f":
                 gdf[column] = gdf[column].astype("int64")
+
+        for column, tidy in (("CUL_CODIGO", tidy_crop_code), ("CT_português", tidy_crop_name)):
+            if column in gdf.columns:
+                gdf[column] = gdf[column].map(tidy)
 
         return super().migrate(gdf)
 
