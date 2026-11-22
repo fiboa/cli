@@ -5,7 +5,7 @@ import pandas as pd
 from shapely.geometry import Point
 
 from .commons.ml_splits import MlSplitsMixin
-from .india_10k import IndiaConverter
+from .in_10k import IndiaConverter
 
 
 class India10kMlConverter(MlSplitsMixin, IndiaConverter):
