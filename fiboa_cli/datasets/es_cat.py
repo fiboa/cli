@@ -4,6 +4,9 @@ from ..conversion.fiboa_converter import FiboaBaseConverter
 from .commons.data import read_data_csv
 from .commons.hcat import AddHCATMixin
 
+# Geometry area over declared area above which a record is broken
+MAX_AREA_RATIO = 2
+
 
 class ESCatConverter(AddHCATMixin, FiboaBaseConverter):
     # Catalonia has its own coding list, not sublass of ESBaseConverter
@@ -66,6 +69,14 @@ This map allows you to locate the crops declared in the Agrarian Declaration - D
         to_lower = {k: k.lower() for k in gdf.columns if k != k.lower()}
         if to_lower:
             gdf.rename(columns=to_lower, inplace=True)
+
+        # Some records carry a geometry far larger than their declared area, made of copies of
+        # neighbouring parcels (in 2024 one 0.02 ha record has 2,218 parts over 8,500 ha).
+        declared = gdf["ha"] * 10_000
+        oversized = (declared > 0) & (self._measure_area(gdf.geometry) > MAX_AREA_RATIO * declared)
+        if oversized.any():
+            self.info(f"Dropping {oversized.sum()} record(s) far larger than their declared area")
+            gdf = gdf[~oversized]
 
         rows = read_data_csv("es_cat.csv")
         mapping = {row["original_name"]: row["original_code"] for row in rows}

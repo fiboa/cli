@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - The license test compares SPDX identifiers case-insensitively, so ids such as `GPL-2.0-or-later` pass.
+- ES-CAT: Records whose geometry is more than twice their declared area are dropped; they hold copies of neighbouring parcels.
 - LT: Crop names are spelled correctly (`Žieminiai javai` instead of `Þieminiai javai`), and pulses (`Ankštiniai javai`) and wetlands (`Šlapynės`) map to HCAT3 instead of spring cereals and spinach.
 - NL: Crop codes RVO gave a new crop (657, 1926, 1927, 1932-1935) get an `o` suffix in the editions before the new meaning (`1934o`); `crop:code` is always a string.
 - PT: Crop codes that 2021 writes without leading zeros (`22`) and 2023's padded crop names and codes get their crop name and HCAT class.

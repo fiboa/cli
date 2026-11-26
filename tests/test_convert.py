@@ -84,6 +84,7 @@ tests = [
     "pl",
     "pl_block",
     "es_cat",
+    "es_cat#2024",
     "es_nc",
     "es_ib",
     "es_ib#2024",
@@ -226,6 +227,15 @@ extra_convert_parameters = {
     "bg": {"variant": "2025", **_input_files("bg", "bg_agricultural_land_2025.zip")},
     "bg#2022": {"variant": "2022", **_input_files("bg", "bg_agricultural_land_2022.zip")},
     "es_cat": _input_files("es_cat", "Cultius_DUN2023_GPKG.zip"),
+    # 20 real records and one whose geometry is 92 times its declared area
+    "es_cat#2024": {
+        "variant": "2024",
+        "input_files": {
+            f"{test_path}/es_cat/Cultius_DUN2024_SHP.zip": [
+                "Cultius_DUN2024_SHP/Cultius_DUN2024_SHP.shp"
+            ]
+        },
+    },
     # the fixture is the 2022 archive; the converter's default is the newest edition
     "fr": {"variant": "2022"},
     # two real volumes (.7z.001 + .7z.002), so the parts must be joined before extracting
@@ -467,6 +477,11 @@ fully_mapped = {"de_bb", "ke_ecaas", "zm_ecaas"}
 # Converters whose source has crop codes only: crop:name comes from the code list
 names_from_table = {"ec_lv", "ec_si", "es", "fr", "it_1", "lv", "pt", "se"}
 
+# The rows a converter keeps, where its fixture holds rows to drop
+row_counts = {
+    "es_cat#2024": 20,
+}
+
 # The smallest field (m²) a converter keeps, where the fixture holds a smaller sliver
 minimum_area = {
     "br_conab": 100,
@@ -538,6 +553,9 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
             f"{converter}: {int(floaty.sum()):,} id(s) are stringified floats, "
             f"e.g. {df.loc[floaty, 'id'].head(3).tolist()}"
         )
+
+    if converter in row_counts:
+        assert len(df) == row_counts[converter], f"{converter} kept {len(df)} rows"
 
     if converter in minimum_area:
         smallest = df["metrics:area"].min()
