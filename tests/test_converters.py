@@ -666,9 +666,35 @@ def test_eurocrops_v2_takes_the_national_license_and_credits_both(_id, national)
     c = Converters()
     converter, source = c.load(_id), c.load(national)
     assert converter.license == source.license
+    assert converter.provider == source.provider
     assert converter.attribution.startswith(source.attribution or source.provider.split(" <")[0])
     assert converter.attribution.endswith("Joint Research Centre — EuroCropsV2")
-    # the provider is one name and one link, which STAC's providers need
+    assert "https://data.jrc.ec.europa.eu/" in converter.description
+
+
+@pytest.mark.parametrize(
+    "_id, credit",
+    [
+        ("ec_lt", "EuroCrops"),
+        ("ec_lv", "EuroCrops"),
+        ("ec_nl_crop", "EuroCrops"),
+        ("ec_ro", "EuroCrops"),
+        ("ec_si", "EuroCrops"),
+        ("lt", "Europe-LAND HE Project"),
+        ("ec_at", "EuroCropsV2"),
+        ("ec_be_vlg", "EuroCropsV2"),
+        ("ec_be_wal", "EuroCropsV2"),
+        ("ec_de_bb", "EuroCropsV2"),
+        ("ec_de_nrw", "EuroCropsV2"),
+        ("ec_ee", "EuroCropsV2"),
+        ("ec_es", "EuroCropsV2"),
+        ("ec_fr", "EuroCropsV2"),
+    ],
+)
+def test_redistributed_sources_keep_one_provider_and_credit_the_project(_id, credit):
+    """STAC's providers need one name and one link; the project goes into the attribution."""
+    converter = Converters().load(_id)
     name, url = parse_link_str(converter.provider)
-    assert converter.provider == source.provider
     assert url and "<" not in url and ">" not in url and "<" not in name
+    assert credit not in converter.provider
+    assert converter.attribution.endswith(credit)

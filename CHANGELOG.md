@@ -37,7 +37,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - The license test compares SPDX identifiers case-insensitively, so ids such as `GPL-2.0-or-later` pass.
 - EuroCrops converters keep the license of the national source instead of CC-BY-SA-4.0 for all.
-- EuroCrops V2 converters (EC-AT, EC-BE-VLG, EC-BE-WAL, EC-DE-BB, EC-DE-NRW, EC-EE, EC-ES, EC-FR) take the national source's license, provider and attribution instead of the JRC's CC-BY-4.0, and credit the JRC in the attribution.
+- EuroCrops, EuroCrops V2 and Europe-LAND converters keep the national provider alone, so that its link is valid, and credit the project in the attribution and description.
+- EuroCrops V2 converters (EC-AT, EC-BE-VLG, EC-BE-WAL, EC-DE-BB, EC-DE-NRW, EC-EE, EC-ES, EC-FR) take the national source's license and attribution instead of the JRC's CC-BY-4.0.
 - BE-WAL: License is CC-BY-4.0, with SPW as attribution.
 - DE-BB: Attribution is the source note `©MLEUV, dl-de/by-2-0, Daten verändert`.
 - EC-LT, LT: License is Lithuania's "Non-commercial use only" terms instead of CC-BY-SA-4.0 and CC-BY-4.0.

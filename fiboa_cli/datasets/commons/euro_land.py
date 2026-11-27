@@ -1,4 +1,5 @@
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+from fiboa_cli.datasets.commons.credit import credit_redistributor
 from fiboa_cli.datasets.commons.hcat import AddHCATMixin
 
 
@@ -45,8 +46,9 @@ class EuroLandBaseConverter(AddHCATMixin, FiboaBaseConverter):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        provider = "Europe-LAND HE Project <https://doi.org/10.5281/zenodo.14230620>"
-        self.provider = (f"{self.provider}, {provider}") if self.provider else provider
+        credit_redistributor(
+            self, "Europe-LAND HE Project", "https://doi.org/10.5281/zenodo.14230620"
+        )
 
     def migrate(self, gdf):
         # Some Europe-LAND files (e.g. LT 2024) ship an empty crop_code column next to
