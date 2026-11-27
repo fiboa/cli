@@ -18,6 +18,8 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
 
     provider = "Lauku atbalsta dienests <https://www.lad.gov.lv/lv/lauku-registra-dati>"
     attribution = "Lauku atbalsta dienests"
+    # data.gov.lv, "Lauksaimnieku deklarētās platības": CC0 1.0
+    license = "CC0-1.0"
 
     columns = {
         "geometry": "geometry",

@@ -12,6 +12,8 @@ class LTConverter(EuroLandBaseConverter):
 
     provider = "Nacionalinė mokėjimo agentūra prie Žemės ūkio ministerijos <https://www.nma.lt>"
     attribution = "Nacionalinė mokėjimo agentūra prie Žemės ūkio ministerijos"
+    # NMA's terms, which Europe-LAND's documentation (D2.1, Table 21) repeats
+    license = "Non-commercial use only <https://www.geoportal.lt/metadata-catalog/catalog/search/resource/details.page?uuid=%7B7AF3F5B2-DC58-4EC5-916C-813E994B2DCF%7D>"
     # The table spells the names correctly. The source carries HCAT itself; the table
     # also corrects it where it differs, which are two crops Europe-LAND mapped to HCAT2
     # classes (pulses to spring cereals, wetlands to spinach).

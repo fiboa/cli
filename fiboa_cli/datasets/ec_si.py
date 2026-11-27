@@ -23,6 +23,9 @@ class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
 
     provider = "Ministrstvo za kmetijstvo, gozdarstvo in prehrano <https://rkg.gov.si/vstop/>"
     attribution = "Ministrstvo za kmetijstvo, gozdarstvo in prehrano"
+    # The INSPIRE record's use limitation, as the EuroCrops wiki quotes it (eprostor.gov.si
+    # was unreachable): "Javno dostopni podatki, ni omejitve uporabe, citiranje vira obvezno"
+    license = "Publicly available data, no restriction of use, citation of source mandatory <https://eprostor.gov.si/imps/srv/slv/catalog.search#/metadata/21ecba4a-1214-4617-8bf4-020d2f235a25>"
 
     columns = {
         "geometry": "geometry",

@@ -8,6 +8,11 @@ from .de_bb import Converter as DEBBConverter
 
 class Converter(EuroCropsV2Mixin, AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     national = DEBBConverter
+    # geobroker's source note for modified data
+    attribution = (
+        "©MLEUV, dl-de/by-2-0, Daten verändert; "
+        "European Commission, Joint Research Centre — EuroCropsV2"
+    )
     nuts = "de4"
     years = range(2010, 2024)
     # landscape elements (hedges, tree rows, copses, wetlands, single trees, stone walls, rock

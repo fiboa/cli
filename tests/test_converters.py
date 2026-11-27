@@ -614,3 +614,60 @@ def test_no_converter_uses_the_old_hcat_attribute_names():
         for _id in c.list_ids()
     }
     assert not {k: v for k, v in old.items() if v}
+
+
+LT_TERMS = "Non-commercial use only <https://www.geoportal.lt/"
+
+
+@pytest.mark.parametrize(
+    "_id, license",
+    [
+        ("lt", LT_TERMS),
+        ("ec_lt", LT_TERMS),
+        ("lv", "CC0-1.0"),
+        ("ec_lv", "CC0-1.0"),
+        ("ec_nl_crop", "CC0-1.0"),
+        ("ec_si", "Publicly available data, no restriction of use"),
+    ],
+)
+def test_aggregated_sources_carry_the_national_license(_id, license):
+    """EuroCrops and Europe-LAND redistribute national data under the national terms."""
+    assert Converters().load(_id).license.startswith(license)
+
+
+def test_eurocrops_mixin_keeps_the_converters_license():
+    from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+    from fiboa_cli.datasets.commons.ec import EuroCropsConverterMixin
+
+    class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
+        id = "xx"
+        short_name = title = description = "XX"
+        license = "CC0-1.0"
+
+    converter = Converter()
+    assert converter.id == "ec_xx" and converter.license == "CC0-1.0"
+
+
+@pytest.mark.parametrize(
+    "_id, national",
+    [
+        ("ec_at", "at"),
+        ("ec_be_vlg", "be_vlg"),
+        ("ec_be_wal", "be_wal"),
+        ("ec_de_bb", "de_bb"),
+        ("ec_de_nrw", "de_nrw"),
+        ("ec_ee", "ee"),
+        ("ec_es", "es"),
+        ("ec_fr", "fr"),
+    ],
+)
+def test_eurocrops_v2_takes_the_national_license_and_credits_both(_id, national):
+    c = Converters()
+    converter, source = c.load(_id), c.load(national)
+    assert converter.license == source.license
+    assert converter.provider.startswith(source.provider)
+    assert "Joint Research Centre" in converter.provider
+    assert "Joint Research Centre" in converter.attribution
+    if source.attribution:
+        # Brandenburg's notice for modified data extends the national one
+        assert converter.attribution.startswith(source.attribution)

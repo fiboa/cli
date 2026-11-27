@@ -42,7 +42,8 @@ Each edition is the campaign the Rural Support Service published it for, taken f
     """
     provider = "Rural Support Service Republic of Latvia (Lauku atbalsta dienests) <https://www.lad.gov.lv/lv/lauku-registra-dati>"
     attribution = "Lauku atbalsta dienests"
-    license = "CC-BY-SA-4.0"  # Not sure, taken from Eurocrops. It is "public" and free and "available to any user"
+    # data.gov.lv, "Lauksaimnieku deklarētās platības <year>. gadā": CC0 1.0
+    license = "CC0-1.0"
 
     # The portal publishes 2015 onwards; every campaign has the same nine regions.
     variants = {str(year): str(year) for year in range(2025, 2014, -1)}
