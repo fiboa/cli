@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - BE-WAL: License is CC-BY-4.0, with SPW as attribution.
 - DE-BB: Attribution is the source note `©MLEUV, dl-de/by-2-0`.
 - EC-LT, LT: License is Lithuania's "Non-commercial use only" terms instead of CC-BY-SA-4.0 and CC-BY-4.0.
+- EC-LT: Provider is the National Paying Agency (NMA), the data's owner, instead of the Construction Sector Development Agency.
 - EC-LV, LV: License is CC0-1.0 instead of CC-BY-SA-4.0.
 - EC-SI: License is the source's terms (public, citation of source mandatory).
 - ES-CAT: Records whose geometry is more than twice their declared area are dropped; they hold copies of neighbouring parcels.
