@@ -56,11 +56,8 @@ class EuroCropsV2Mixin:
 The editions the national source no longer offers, from EuroCrops V2: the Joint Research Centre's
 harmonised archive of the Geo-Spatial Aid Application declarations, one GeoParquet per NUTS region
 and year in EPSG:3035. The crop codes are the national ones, mapped to HCAT with the national table.
+See https://data.jrc.ec.europa.eu/dataset/b9fb9e67-78a9-4327-9d59-39a928d812d3
     """
-    jrc_provider = (
-        "Joint Research Centre, European Commission "
-        "<https://data.jrc.ec.europa.eu/dataset/b9fb9e67-78a9-4327-9d59-39a928d812d3>"
-    )
     jrc_attribution = "European Commission, Joint Research Centre — EuroCropsV2"
 
     def __init_subclass__(cls, **kwargs):
@@ -69,12 +66,11 @@ and year in EPSG:3035. The crop codes are the national ones, mapped to HCAT with
         cls.id = f"ec_{national.id}"
         cls.short_name = national.short_name
         cls.title = f"{national.title.strip()} — EuroCrops V2"
-        cls.provider = f"{national.provider}, {cls.jrc_provider}"
+        # one provider, as the string holds a single link; the JRC is credited in the attribution
+        cls.provider = national.provider
         cls.license = national.license
-        # a subclass may set its own, e.g. the source's notice for modified data
-        if "attribution" not in cls.__dict__:
-            source = national.attribution or national.provider.split(" <")[0]
-            cls.attribution = f"{source}; {cls.jrc_attribution}"
+        source = national.attribution or national.provider.split(" <")[0]
+        cls.attribution = f"{source}; {cls.jrc_attribution}"
         cls.variants = {
             str(y): f"{JRC_V2_BASE}/{cls.nuts}_{y}.parquet" for y in sorted(cls.years, reverse=True)
         }

@@ -5,7 +5,7 @@ import pytest
 import spdx_license_list
 from shapely.geometry import Point
 from vecorel_cli.vecorel.schemas import VecorelSchema
-from vecorel_cli.vecorel.util import load_file
+from vecorel_cli.vecorel.util import load_file, parse_link_str
 
 from fiboa_cli.converters import Converters
 from fiboa_cli.fiboa.version import get_fiboa_uri
@@ -627,7 +627,8 @@ LT_TERMS = "Non-commercial use only <https://www.geoportal.lt/"
         ("lv", "CC0-1.0"),
         ("ec_lv", "CC0-1.0"),
         ("ec_nl_crop", "CC0-1.0"),
-        ("ec_si", "Publicly available data, no restriction of use"),
+        ("ec_si", "Javno dostopni podatki"),
+        ("ec_ro", "CC-BY-4.0"),
     ],
 )
 def test_aggregated_sources_carry_the_national_license(_id, license):
@@ -665,9 +666,9 @@ def test_eurocrops_v2_takes_the_national_license_and_credits_both(_id, national)
     c = Converters()
     converter, source = c.load(_id), c.load(national)
     assert converter.license == source.license
-    assert converter.provider.startswith(source.provider)
-    assert "Joint Research Centre" in converter.provider
-    assert "Joint Research Centre" in converter.attribution
-    if source.attribution:
-        # Brandenburg's notice for modified data extends the national one
-        assert converter.attribution.startswith(source.attribution)
+    assert converter.attribution.startswith(source.attribution or source.provider.split(" <")[0])
+    assert converter.attribution.endswith("Joint Research Centre — EuroCropsV2")
+    # the provider is one name and one link, which STAC's providers need
+    name, url = parse_link_str(converter.provider)
+    assert converter.provider == source.provider
+    assert url and "<" not in url and ">" not in url and "<" not in name
