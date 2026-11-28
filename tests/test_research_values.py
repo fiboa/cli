@@ -125,6 +125,8 @@ def test_wri_trazo_annotates_land_once(tmp_parquet_file):
         "matogrosso_brazil_lcdiAnnotations_2020.gpkg",
         # 1422, subdivided into 596-599 for 86% of its area
         "matogrosso_brazil_lcdibAnnotations_2020.gpkg",
+        # 2059, a square inside 2061 along part of its outline, not cut along the chip axes
+        "peruvianamazonAnnotations_2022.gpkg",
     )
     assert sorted(df.index) == [
         # the parent outline 1592 makes way for its subdivisions; nested fields and holes stay
@@ -143,9 +145,16 @@ def test_wri_trazo_annotates_land_once(tmp_parquet_file):
         "matogrosso_brazil_lcdi-0",
         "matogrosso_brazil_lcdi-3",
         "matogrosso_brazil_lcdi-5",
-        # a parent its subdivisions don't cover stays, and all of them go
+        # a parent its subdivisions don't cover is trimmed to the land they leave
+        "matogrosso_brazil_lcdib-0",
+        "matogrosso_brazil_lcdib-1",
+        "matogrosso_brazil_lcdib-2",
+        "matogrosso_brazil_lcdib-3",
         "matogrosso_brazil_lcdib-4",
         "matogrosso_brazil_lowconfidences-2",
+        # a field inside another is a clipped copy only where it is cut along the chip axes
+        "peruvianamazon-0",
+        "peruvianamazon-1",
         # the original stays, its redraw and the clipped copy go
         "testmatogrosso-0",
         "testmatogrosso-1",
@@ -160,6 +169,26 @@ def test_wri_trazo_annotates_land_once(tmp_parquet_file):
     ]
     holed = shapely.from_wkb(df.loc["altoparana-2", "geometry"])
     assert sum(len(part.interiors) for part in shapely.get_parts(holed)) == 1
+    # the trimmed parent keeps 14% of its 27 ha, and no longer lies under its subdivisions
+    lcdib = df[df.index.str.startswith("matogrosso_brazil_lcdib")]
+    assert lcdib.loc["matogrosso_brazil_lcdib-4", "metrics:area"] == pytest.approx(33_000, rel=0.05)
+    parent = shapely.from_wkb(lcdib.loc["matogrosso_brazil_lcdib-4", "geometry"])
+    pieces = [f"matogrosso_brazil_lcdib-{i}" for i in range(4)]
+    pieces = shapely.union_all(shapely.from_wkb(lcdib.loc[pieces, "geometry"]))
+    assert shapely.area(shapely.intersection(parent, pieces)) < 0.01 * shapely.area(parent)
+
+
+def test_wri_trazo_touching_ignores_holes():
+    import shapely
+
+    from fiboa_cli.datasets.wri_trazo import TOUCHING, _touches
+
+    # a 1 km square with a hole, and a field inside it along the hole's edge
+    outer = shapely.box(0, 0, 1000, 1000).difference(shapely.box(400, 400, 600, 600))
+    inner = shapely.box(300, 400, 400, 600)
+    assert not _touches(inner, outer, TOUCHING)
+    # along the outer edge, it does
+    assert _touches(shapely.box(0, 400, 100, 600), outer, TOUCHING)
 
 
 def test_wri_trazo_ml_splits_by_region(tmp_parquet_file):
