@@ -20,7 +20,8 @@ The dataset is in line with the conceptual framework described in the Land Cover
     provider = (
         "Ministry of Regional Development and Public Administration <http://spatial.mdrap.ro>"
     )
-    license = "CC0-1.0"
+    # The EuroCrops wiki's license for Romania; unverified, as data.gov.ro was unreachable
+    license = "CC-BY-4.0"
     column_additions = {
         "determination:datetime": "2017-01-01T00:00:00Z",
         "crop:code_list": hcat_mapping_url("ro_no_year.csv"),

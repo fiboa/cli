@@ -1,5 +1,6 @@
 from typing import Sequence
 
+from fiboa_cli.datasets.commons.credit import credit_redistributor
 from fiboa_cli.datasets.commons.hcat import AddHCATMixin
 
 
@@ -7,7 +8,8 @@ class EuroCropsConverterMixin(AddHCATMixin):
     """
     Adds HCAT columns to a GeoDataFrame, useful for transforming datasets supplied by the Eurocrops project.
     The Eurocrops files have their own column names, so we need to map them to HCAT extension names.
-    Also modifies the dataset title and provider to reflect the source.
+    Also modifies the dataset title, attribution and description to credit EuroCrops. The
+    provider and license stay those of the national source.
     """
 
     ec_year = None
@@ -28,9 +30,7 @@ class EuroCropsConverterMixin(AddHCATMixin):
         self.title += suffix
         self.short_name += suffix
 
-        provider = "EuroCrops <https://github.com/maja601/EuroCrops>"
-        self.provider = (f"{self.provider}, {provider}") if self.provider else provider
-        self.license = "CC-BY-SA-4.0"
+        credit_redistributor(self, "EuroCrops", "https://github.com/maja601/EuroCrops")
 
 
 JRC_V2_BASE = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/DRLL/EuroCropsV2/gpqtv202"
@@ -41,6 +41,7 @@ class EuroCropsV2Mixin:
     Converts the editions of a national dataset that only the JRC's EuroCrops V2 still offers, so
     that they fit the national collection: they take its crop table, admin codes and crop columns.
     A subclass names the national converter, the NUTS code of the files and the years it supplies.
+    The license and attribution are the national source's, with the JRC credited as processor.
     """
 
     national = None
@@ -56,12 +57,6 @@ The editions the national source no longer offers, from EuroCrops V2: the Joint 
 harmonised archive of the Geo-Spatial Aid Application declarations, one GeoParquet per NUTS region
 and year in EPSG:3035. The crop codes are the national ones, mapped to HCAT with the national table.
     """
-    provider = (
-        "Joint Research Centre, European Commission "
-        "<https://data.jrc.ec.europa.eu/dataset/b9fb9e67-78a9-4327-9d59-39a928d812d3>"
-    )
-    attribution = "European Commission, Joint Research Centre — EuroCropsV2"
-    license = "CC-BY-4.0"
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -69,6 +64,14 @@ and year in EPSG:3035. The crop codes are the national ones, mapped to HCAT with
         cls.id = f"ec_{national.id}"
         cls.short_name = national.short_name
         cls.title = f"{national.title.strip()} — EuroCrops V2"
+        cls.provider = national.provider
+        cls.license = national.license
+        cls.attribution = national.attribution
+        credit_redistributor(
+            cls,
+            "European Commission, Joint Research Centre — EuroCropsV2",
+            "https://data.jrc.ec.europa.eu/dataset/b9fb9e67-78a9-4327-9d59-39a928d812d3",
+        )
         cls.variants = {
             str(y): f"{JRC_V2_BASE}/{cls.nuts}_{y}.parquet" for y in sorted(cls.years, reverse=True)
         }

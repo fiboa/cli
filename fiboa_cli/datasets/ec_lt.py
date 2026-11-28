@@ -23,8 +23,10 @@ Collection of data on agricultural land and crop areas, cultivated crops in the 
 
 The download service is a set of personalized spatial data of agricultural land and crop areas, cultivated crops. The service provides object geometry with descriptive (attributive) data.
     """
-    provider = "Construction Sector Development Agency <https://www.geoportal.lt/geoportal/nacionaline-mokejimo-agentura-prie-zemes-ukio-ministerijos#savedSearchId={56542726-DC0B-461E-A32C-3E9A4A693E27}&collapsed=true>"
-    # license = "Non-commercial use only <https://www.geoportal.lt/metadata-catalog/catalog/search/resource/details.page?uuid=%7B7AF3F5B2-DC58-4EC5-916C-813E994B2DCF%7D>"
+    # the owner in the geoportal.lt record; the Construction Sector Development Agency is its metadata contact
+    provider = "Nacionalinė mokėjimo agentūra prie Žemės ūkio ministerijos <https://www.nma.lt>"
+    attribution = "Nacionalinė mokėjimo agentūra prie Žemės ūkio ministerijos"
+    license = "Non-commercial use only <https://www.geoportal.lt/metadata-catalog/catalog/search/resource/details.page?uuid=%7B7AF3F5B2-DC58-4EC5-916C-813E994B2DCF%7D>"
 
     columns = {
         "NMA_ID": "claimant_id",

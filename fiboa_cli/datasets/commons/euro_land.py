@@ -1,4 +1,5 @@
 from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+from fiboa_cli.datasets.commons.credit import credit_redistributor
 from fiboa_cli.datasets.commons.hcat import AddHCATMixin
 
 
@@ -9,7 +10,8 @@ class EuroLandBaseConverter(AddHCATMixin, FiboaBaseConverter):
     as open data. See https://zenodo.org/records/14384070 for a list of open data sets.
 
     Use this base class to create converters based on the euroland repository
-    Subclasses should still declare the required attributes from BaseConverter
+    Subclasses should still declare the required attributes from BaseConverter,
+    and the license of the national source, which differs between countries
 
     id = ""
     short_name = ""
@@ -35,7 +37,6 @@ class EuroLandBaseConverter(AddHCATMixin, FiboaBaseConverter):
         "field_size": "metrics:area",
         # "crop_area": "crop_area",
     }
-    license = "CC-BY-4.0"
     missing_schemas = {
         "properties": {
             "farm_id": {"type": "string"},
@@ -45,8 +46,9 @@ class EuroLandBaseConverter(AddHCATMixin, FiboaBaseConverter):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        provider = "Europe-LAND HE Project <https://doi.org/10.5281/zenodo.14230620>"
-        self.provider = (f"{self.provider}, {provider}") if self.provider else provider
+        credit_redistributor(
+            self, "Europe-LAND HE Project", "https://doi.org/10.5281/zenodo.14230620"
+        )
 
     def migrate(self, gdf):
         # Some Europe-LAND files (e.g. LT 2024) ship an empty crop_code column next to

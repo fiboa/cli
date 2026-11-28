@@ -5,7 +5,7 @@ import pytest
 import spdx_license_list
 from shapely.geometry import Point
 from vecorel_cli.vecorel.schemas import VecorelSchema
-from vecorel_cli.vecorel.util import load_file
+from vecorel_cli.vecorel.util import load_file, parse_link_str
 
 from fiboa_cli.converters import Converters
 from fiboa_cli.fiboa.version import get_fiboa_uri
@@ -614,3 +614,87 @@ def test_no_converter_uses_the_old_hcat_attribute_names():
         for _id in c.list_ids()
     }
     assert not {k: v for k, v in old.items() if v}
+
+
+LT_TERMS = "Non-commercial use only <https://www.geoportal.lt/"
+
+
+@pytest.mark.parametrize(
+    "_id, license",
+    [
+        ("lt", LT_TERMS),
+        ("ec_lt", LT_TERMS),
+        ("lv", "CC0-1.0"),
+        ("ec_lv", "CC0-1.0"),
+        ("ec_nl_crop", "CC0-1.0"),
+        ("ec_si", "Javno dostopni podatki"),
+        ("ec_ro", "CC-BY-4.0"),
+    ],
+)
+def test_aggregated_sources_carry_the_national_license(_id, license):
+    """EuroCrops and Europe-LAND redistribute national data under the national terms."""
+    assert Converters().load(_id).license.startswith(license)
+
+
+def test_eurocrops_mixin_keeps_the_converters_license():
+    from fiboa_cli.conversion.fiboa_converter import FiboaBaseConverter
+    from fiboa_cli.datasets.commons.ec import EuroCropsConverterMixin
+
+    class Converter(EuroCropsConverterMixin, FiboaBaseConverter):
+        id = "xx"
+        short_name = title = description = "XX"
+        license = "CC0-1.0"
+
+    converter = Converter()
+    assert converter.id == "ec_xx" and converter.license == "CC0-1.0"
+
+
+@pytest.mark.parametrize(
+    "_id, national",
+    [
+        ("ec_at", "at"),
+        ("ec_be_vlg", "be_vlg"),
+        ("ec_be_wal", "be_wal"),
+        ("ec_de_bb", "de_bb"),
+        ("ec_de_nrw", "de_nrw"),
+        ("ec_ee", "ee"),
+        ("ec_es", "es"),
+        ("ec_fr", "fr"),
+    ],
+)
+def test_eurocrops_v2_takes_the_national_license_and_credits_both(_id, national):
+    c = Converters()
+    converter, source = c.load(_id), c.load(national)
+    assert converter.license == source.license
+    assert converter.provider == source.provider
+    assert converter.attribution.startswith(source.attribution or source.provider.split(" <")[0])
+    assert converter.attribution.endswith("Joint Research Centre — EuroCropsV2")
+    assert "https://data.jrc.ec.europa.eu/" in converter.description
+
+
+@pytest.mark.parametrize(
+    "_id, credit",
+    [
+        ("ec_lt", "EuroCrops"),
+        ("ec_lv", "EuroCrops"),
+        ("ec_nl_crop", "EuroCrops"),
+        ("ec_ro", "EuroCrops"),
+        ("ec_si", "EuroCrops"),
+        ("lt", "Europe-LAND HE Project"),
+        ("ec_at", "EuroCropsV2"),
+        ("ec_be_vlg", "EuroCropsV2"),
+        ("ec_be_wal", "EuroCropsV2"),
+        ("ec_de_bb", "EuroCropsV2"),
+        ("ec_de_nrw", "EuroCropsV2"),
+        ("ec_ee", "EuroCropsV2"),
+        ("ec_es", "EuroCropsV2"),
+        ("ec_fr", "EuroCropsV2"),
+    ],
+)
+def test_redistributed_sources_keep_one_provider_and_credit_the_project(_id, credit):
+    """STAC's providers need one name and one link; the project goes into the attribution."""
+    converter = Converters().load(_id)
+    name, url = parse_link_str(converter.provider)
+    assert url and "<" not in url and ">" not in url and "<" not in name
+    assert credit not in converter.provider
+    assert converter.attribution.endswith(credit)

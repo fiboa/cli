@@ -12,6 +12,8 @@ class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
     title = "Field boundaries for Berlin / Brandenburg, Germany"
     description = """A Crop Field (German: "Schlaege") is a contiguous agricultural area surrounded by permanent boundaries, which is cultivated with a single crop."""
     license = "DL-DE-BY-2.0"
+    # geobroker's source note for modified data
+    attribution = "©MLEUV, dl-de/by-2-0, Daten verändert"
     provider = "Land Brandenburg <https://geobroker.geobasis-bb.de/gbss.php?MODE=GetProductInformation&PRODUCTID=9e95f21f-4ecf-4682-9a44-e5f7609f6fa0>"
     hcat_mapping_csv = "de.csv"
     hcat_mapping_supplements = [

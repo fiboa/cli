@@ -36,6 +36,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - The license test compares SPDX identifiers case-insensitively, so ids such as `GPL-2.0-or-later` pass.
+- EuroCrops converters keep the license of the national source instead of CC-BY-SA-4.0 for all.
+- EuroCrops, EuroCrops V2 and Europe-LAND converters keep the national provider alone, so that its link is valid, and credit the project in the attribution and description.
+- EuroCrops V2 converters (EC-AT, EC-BE-VLG, EC-BE-WAL, EC-DE-BB, EC-DE-NRW, EC-EE, EC-ES, EC-FR) take the national source's license and attribution instead of the JRC's CC-BY-4.0.
+- BE-WAL: License is CC-BY-4.0, with SPW as attribution.
+- DE-BB: Attribution is the source note `©MLEUV, dl-de/by-2-0, Daten verändert`.
+- EC-LT, LT: License is Lithuania's "Non-commercial use only" terms instead of CC-BY-SA-4.0 and CC-BY-4.0.
+- EC-LT: Provider is the National Paying Agency (NMA), the data's owner, instead of the Construction Sector Development Agency.
+- EC-LV, LV: License is CC0-1.0 instead of CC-BY-SA-4.0.
+- EC-RO: License is CC-BY-4.0, as the EuroCrops documentation states, instead of CC-BY-SA-4.0 (not confirmed at the source).
+- EC-SI: License is the source's terms, as for SI, instead of CC-BY-SA-4.0.
 - ES-CAT: Records whose geometry is more than twice their declared area are dropped; they hold copies of neighbouring parcels.
 - LT: Crop names are spelled correctly (`Žieminiai javai` instead of `Þieminiai javai`), and pulses (`Ankštiniai javai`) and wetlands (`Šlapynės`) map to HCAT3 instead of spring cereals and spinach.
 - NL: Crop codes RVO gave a new crop (657, 1926, 1927, 1932-1935) get an `o` suffix in the editions before the new meaning (`1934o`); `crop:code` is always a string.
