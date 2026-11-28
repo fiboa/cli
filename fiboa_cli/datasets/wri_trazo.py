@@ -71,11 +71,11 @@ MOSTLY, ALMOST_ALL, TWICE = 0.5, 0.95, 0.9
 # A field inside another runs along it when this share of its outline lies within
 # TOUCH_DISTANCE m of the other's outline (holes aside)
 TOUCHING, TOUCH_DISTANCE = 0.25, 10
-# A parent outline that smaller fields mostly inside it cover to TILED is dropped for them. If
-# two or more of them run along its outline (SUBDIVIDES of theirs) and cover it to MOSTLY, the
-# parent is trimmed to the land they leave; a remainder (or part of it) under SLIVER of the
-# parent is dropped.
-TILED, SUBDIVIDES, SLIVER = 0.9, 0.05, 0.01
+# A parent outline is trimmed to the land its subdivisions (smaller fields mostly inside it)
+# leave if two or more of them run along its outline (SUBDIVIDES of theirs) and cover it to
+# MOSTLY. Parts of the rest narrower than SLIVER m are dropped, and the parent goes if nothing
+# else is left.
+SUBDIVIDES, SLIVER = 0.05, 10
 # Of the rest of its outline, this share of a clipped copy runs along the axes of the chip CRS
 # (within AXIS_ANGLE degrees)
 CLIPPED, AXIS_ANGLE = 0.5, 2
@@ -126,7 +126,7 @@ def _is_clipped(inner, outer, region):
     along the axes of the chip CRS, as a copy clipped by a chip box does"""
     if not _touches(inner, outer, TOUCHING):
         return False
-    rest = _runs_along(inner, outer)[1]
+    rest = shapely.line_merge(_runs_along(inner, outer)[1])
     rest = [line for line in shapely.get_parts(rest) if line.length > 2 * TOUCH_DISTANCE]
     if not rest:
         return True
@@ -143,13 +143,15 @@ def _is_clipped(inner, outer, region):
     return aligned >= CLIPPED * total
 
 
-def _trim(geom, pieces, crs, area):
+def _trim(geom, pieces, crs):
     """A parent outline without the land its pieces cover and without slivers, or None"""
     rest = shapely.make_valid(shapely.difference(geom, shapely.union_all(pieces)))
     parts = [p for p in shapely.get_parts(rest) if p.geom_type == "Polygon"]
     if parts:
-        measured = gpd.GeoSeries(parts, crs=crs).to_crs(EQUAL_AREA_CRS).area.to_numpy()
-        parts = [p for p, m in zip(parts, measured) if m >= SLIVER * area]
+        # a part wider than SLIVER somewhere survives shrinking by half of it
+        metric = gpd.GeoSeries(parts, crs=crs).to_crs(EQUAL_AREA_CRS)
+        wide = ~metric.buffer(-SLIVER / 2).is_empty.to_numpy()
+        parts = [p for p, w in zip(parts, wide) if w]
     return shapely.multipolygons(parts) if parts else None
 
 
@@ -201,18 +203,13 @@ def find_overlaps(gdf):
         if kept(left[i]) and kept(right[i]):
             reason[left[i]] = "twice"
 
-    # a parent outline that smaller fields mostly inside it cover goes; one that two or more of
-    # them running along its outline cover mostly is trimmed; the largest first, so that a
-    # grandparent is judged before its children
+    # parent outlines next to their subdivisions are trimmed to the land these leave (below)
     children = same & (area[right] < area[left]) & (right_in >= MOSTLY)
     parents = np.unique(left[children])
     for field in parents[np.lexsort((row[parents], region[parents], -area[parents]))]:
         pieces = right[children & (left == field)]
         pieces = pieces[kept(pieces)]
         if not kept(field) or len(pieces) < 2:
-            continue
-        if share_under(field, pieces) >= TILED:
-            reason[field] = "parent"
             continue
         touching = [p for p in pieces if _touches(geoms[p], geoms[field], SUBDIVIDES)]
         if len(touching) >= 2 and share_under(field, np.array(touching)) >= MOSTLY:
@@ -237,7 +234,7 @@ def find_overlaps(gdf):
         pieces = [p for p in pieces if kept(p)]
         if not kept(field) or len(pieces) < 2:
             continue
-        rest = _trim(source[field], source[pieces], gdf.crs, area[field])
+        rest = _trim(source[field], source[pieces], gdf.crs)
         if rest is None:
             reason[field] = "parent"
         else:
@@ -276,11 +273,11 @@ regions, Sentinel-2 alone.
 Land that the source annotates twice is kept once. Some Mato Grosso regions annotated the same
 chips: train fields that lie mostly under `testmatogrosso` fields and `{GIVES_WAY}` fields
 that lie mostly under `{OTHER_SAMPLE}` fields are dropped. Within a region, of a field
-drawn twice the later one is dropped. A parent outline next to its subdivisions is dropped where
-they cover it; where they cover most of it, it is trimmed to the land they leave. Copies of a
-field clipped by a chip box are dropped: fields almost all inside another that run along its
-outline and are otherwise cut along the axes of the chip grid. Other fields drawn inside a field
-without a hole for them are kept.
+drawn twice the later one is dropped. A parent outline drawn next to subdivisions that cover
+most of it is trimmed to the land they leave, and dropped if only thin strips are left. Copies
+of a field clipped by a chip box are dropped: fields almost all inside another that run along
+its outline and are otherwise cut along the axes of the chip grid. Other fields drawn inside a
+field without a hole for them are kept.
 
 Every field inside the 256x256 Sentinel-2 chips of WRI's training data is annotated; annotations
 that reach beyond a chip are kept, but land outside the chips is not completely labelled.

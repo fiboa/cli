@@ -114,7 +114,7 @@ def test_wri_trazo_annotates_land_once(tmp_parquet_file):
         # rows 0-2, and 1346, a curved field inside 1342 that runs along half of its outline
         "testsoyAnnotations_2020.gpkg",
         # 1922 and its redraw 2336 (94.9% inside it), 1946 with 2350, a copy of it clipped by a
-        # chip box, and 2016 and 2017
+        # chip box, 2016 and 2017, and 2362, 97% covered by 1958 and 2089
         "testmatogrossoAnnotations_2020.gpkg",
         # 439 (inside lowconfidences-479), 1064 (mostly under testmatogrosso-2016/2017), 1413
         "matogrosso_brazil_confidencesAnnotations_2020.gpkg",
@@ -125,7 +125,8 @@ def test_wri_trazo_annotates_land_once(tmp_parquet_file):
         "matogrosso_brazil_lcdiAnnotations_2020.gpkg",
         # 1422, subdivided into 596-599 for 86% of its area
         "matogrosso_brazil_lcdibAnnotations_2020.gpkg",
-        # 2059, a square inside 2061 along part of its outline, not cut along the chip axes
+        # 1358 = 197 + 1752 but for thin strips, and 2059, a square inside 2061 along part of
+        # its outline, not cut along the chip axes
         "peruvianamazonAnnotations_2022.gpkg",
     )
     assert sorted(df.index) == [
@@ -152,14 +153,20 @@ def test_wri_trazo_annotates_land_once(tmp_parquet_file):
         "matogrosso_brazil_lcdib-3",
         "matogrosso_brazil_lcdib-4",
         "matogrosso_brazil_lowconfidences-2",
-        # a field inside another is a clipped copy only where it is cut along the chip axes
+        # nothing but thin strips is left of 1358; a field inside another is a clipped copy
+        # only where it is cut along the chip axes
         "peruvianamazon-0",
-        "peruvianamazon-1",
-        # the original stays, its redraw and the clipped copy go
+        "peruvianamazon-2",
+        "peruvianamazon-3",
+        "peruvianamazon-4",
+        # the original stays, its redraw and the clipped copy go; 2362 is trimmed
         "testmatogrosso-0",
         "testmatogrosso-1",
         "testmatogrosso-2",
         "testmatogrosso-3",
+        "testmatogrosso-4",
+        "testmatogrosso-5",
+        "testmatogrosso-8",
         # a curved field inside another is not a clipped copy
         "testsoy-0",
         "testsoy-1",
@@ -169,9 +176,10 @@ def test_wri_trazo_annotates_land_once(tmp_parquet_file):
     ]
     holed = shapely.from_wkb(df.loc["altoparana-2", "geometry"])
     assert sum(len(part.interiors) for part in shapely.get_parts(holed)) == 1
-    # the trimmed parent keeps 14% of its 27 ha, and no longer lies under its subdivisions
+    # the trimmed parents keep the land their subdivisions leave: 3.7 of 27 ha, 0.4 of 15 ha
     lcdib = df[df.index.str.startswith("matogrosso_brazil_lcdib")]
-    assert lcdib.loc["matogrosso_brazil_lcdib-4", "metrics:area"] == pytest.approx(33_000, rel=0.05)
+    assert lcdib.loc["matogrosso_brazil_lcdib-4", "metrics:area"] == pytest.approx(37_000, rel=0.05)
+    assert df.loc["testmatogrosso-8", "metrics:area"] == pytest.approx(3_900, rel=0.05)
     parent = shapely.from_wkb(lcdib.loc["matogrosso_brazil_lcdib-4", "geometry"])
     pieces = [f"matogrosso_brazil_lcdib-{i}" for i in range(4)]
     pieces = shapely.union_all(shapely.from_wkb(lcdib.loc[pieces, "geometry"]))
@@ -189,6 +197,29 @@ def test_wri_trazo_touching_ignores_holes():
     assert not _touches(inner, outer, TOUCHING)
     # along the outer edge, it does
     assert _touches(shapely.box(0, 400, 100, 600), outer, TOUCHING)
+
+
+def test_wri_trazo_clipped_copies_follow_the_chip_axes():
+    import pyproj
+    import shapely
+    from shapely import affinity
+
+    from fiboa_cli.conversion.fiboa_converter import EQUAL_AREA_CRS
+    from fiboa_cli.datasets.wri_trazo import _is_clipped
+
+    # a 1 km field near Cuiabá in the equal-area CRS, and a corner of it
+    x, y = pyproj.Transformer.from_crs("EPSG:4326", EQUAL_AREA_CRS, always_xy=True).transform(
+        -56, -15
+    )
+    field = shapely.box(x, y, x + 1000, y + 1000)
+    corner = shapely.box(x, y, x + 300, y + 300)
+    assert _is_clipped(corner, field, "acre")
+    # turned by 30°, the cut no longer follows the chip axes
+    turned = affinity.rotate(shapely.GeometryCollection([field, corner]), 30, origin=(x, y))
+    assert not _is_clipped(turned.geoms[1], turned.geoms[0], "acre")
+    # unless it is too short to tell (under 20 m)
+    tiny = affinity.rotate(shapely.box(x, y, x + 8, y + 8), 30, origin=(x, y))
+    assert _is_clipped(tiny, turned.geoms[0], "acre")
 
 
 def test_wri_trazo_ml_splits_by_region(tmp_parquet_file):
