@@ -7,10 +7,8 @@ base = "https://www.apprrr.hr/wp-content/uploads/nipp"
 
 
 class Converter(AdminConverterMixin, AddHCATMixin, FiboaBaseConverter):
-    variants = {
-        "2024": f"{base}/land_parcels.gpkg",
-        **{str(y): f"{base}/arkod_31_12_{y}.gpkg" for y in range(2023, 2010, -1)},
-    }
+    # The year-end archives; the weekly land_parcels.gpkg needs agreements with APPRRR
+    variants = {str(y): f"{base}/arkod_31_12_{y}.gpkg" for y in range(2024, 2010, -1)}
     id = "hr"
     short_name = "Croatia"
     title = "Croatian Field Boundaries"
@@ -29,7 +27,7 @@ and supporting sustainable land use practices.
         "copyright © 2024. Agencija za plaćanja u poljoprivredi, ribarstvu i ruralnom razvoju"
     )
 
-    license = "Prostorni podaci i servisi <https://www.apprrr.hr/prostorni-podaci-servisi/>"
+    license = "No conditions apply to access and use, as in the NIPP register records of the archives (e.g. 2024: http://registri.nipp.hr/izvori/1874) <http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply>"
     column_migrations = {"land_use_id": lambda col: col.astype(int)}
 
     columns = {
@@ -96,15 +94,17 @@ and supporting sustainable land use practices.
     area_is_in_ha = False
 
     ARCHIVE_CRS = "EPSG:3765"
+    # GDAL's names for the GeoPackage srs_id 0 and -1, which the archives set
+    UNDEFINED_CRS = ("Undefined geographic SRS", "Undefined Cartesian SRS")
 
     def migrate(self, gdf):
-        if gdf.crs is None:
-            # Some archives ship no .prj, and those metres would reach the STAC
-            # extent as degrees. A CRS that is declared is trusted, EPSG or not.
-            gdf = gdf.set_crs(self.ARCHIVE_CRS)
+        if gdf.crs is None or gdf.crs.name in self.UNDEFINED_CRS:
+            # Those metres would reach the STAC extent as degrees. A CRS that
+            # is declared is trusted, EPSG or not.
+            gdf = gdf.set_crs(self.ARCHIVE_CRS, allow_override=True)
 
         # The dated archives carry ARKOD's own parcel id, unique per edition;
-        # only the rolling land_parcels.gpkg has none.
+        # only the weekly land_parcels.gpkg (given with -i) has none.
         if "id" not in gdf.columns:
             gdf["id"] = gdf.index
         return super().migrate(gdf)

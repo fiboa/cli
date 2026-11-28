@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - DE-MV: Adds `crop:name` and `crop:name_en` from the land use code list; `crop:code` takes the list's spelling (`Wa` instead of `WA`).
 - EC-LV, EC-SI, ES, FR, IT-1, PT and SE: `crop:name` holds the source's original crop name next to each crop code where the source has codes only; `hcat:name_en` keeps the English translation.
 - FR: The 2024 edition converts from RPG 4.0, which replaced the RPG 3.0 release IGN no longer publishes.
+- HR: The 2024 edition converts from APPRRR's year-end archive (`arkod_31_12_2024.gpkg`) instead of the weekly current snapshot, which needs agreements with APPRRR; the license is the archives' "no conditions apply to access and use".
 - IN-10K: The determination date is October 2020, the month of the imagery the fields were drawn on, not the release date; the shapefile is read without the record's archive, which also holds the model weights.
 - IN-10K: The converters are called by their collection ids, `fiboa convert in_10k` and `fiboa convert in_10k_ml`, instead of `india_10k` and `india_10k_ml`.
 - LACUNA: Reads the fields with the project's filtered label catalog: one labelling per site, each field dated by its basemap month, with the assignment class, the labeller and their quality scores.
@@ -37,6 +38,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - The license test compares SPDX identifiers case-insensitively, so ids such as `GPL-2.0-or-later` pass.
 - ES-CAT: Records whose geometry is more than twice their declared area are dropped; they hold copies of neighbouring parcels.
+- HR: The archives' undefined GeoPackage CRS is read as Croatia TM (EPSG:3765) again, instead of being written out as an undefined geographic CRS around the projected coordinates.
 - LT: Crop names are spelled correctly (`Žieminiai javai` instead of `Þieminiai javai`), and pulses (`Ankštiniai javai`) and wetlands (`Šlapynės`) map to HCAT3 instead of spring cereals and spinach.
 - NL: Crop codes RVO gave a new crop (657, 1926, 1927, 1932-1935) get an `o` suffix in the editions before the new meaning (`1934o`); `crop:code` is always a string.
 - PT: Crop codes that 2021 writes without leading zeros (`22`) and 2023's padded crop names and codes get their crop name and HCAT class.

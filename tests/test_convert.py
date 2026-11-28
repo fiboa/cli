@@ -6,6 +6,7 @@ from csv import DictReader
 from os.path import exists
 from unittest.mock import patch
 
+import geopandas as gpd
 import pandas as pd
 import pyarrow.parquet as pq
 from loguru import logger
@@ -528,6 +529,14 @@ def test_converter(load_mapping_mock, capsys, tmp_parquet_file, converter):
         raise AssertionError(f"Found error in output: '{error.group(0)}'\n\n{output}")
 
     ValidateData().validate(tmp_parquet_file)
+
+    # metres declared as degrees, e.g. under an undefined GeoPackage SRS
+    gdf = gpd.read_parquet(tmp_parquet_file, columns=["geometry"])
+    if gdf.crs is None or gdf.crs.is_geographic:
+        xmin, ymin, xmax, ymax = gdf.total_bounds
+        assert -180 <= xmin <= xmax <= 180 and -90 <= ymin <= ymax <= 90, (
+            f"{converter}: coordinates {gdf.total_bounds} are not degrees, CRS {gdf.crs}"
+        )
 
     df = pq.read_table(tmp_parquet_file).to_pandas()
 
