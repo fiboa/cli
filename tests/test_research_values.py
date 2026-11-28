@@ -1,5 +1,6 @@
 """Values the generic convert test does not check: dates parsed from mixed formats, the
-mapping date and area GloCAB keeps for each field, and Trazo's regions."""
+mapping date and area GloCAB keeps for each field, and Trazo's regions and the overlapping
+annotations it drops."""
 
 import datetime
 
@@ -97,6 +98,48 @@ def test_wri_trazo_regions(tmp_parquet_file):
     assert -63 < lon < -62 and -17.5 < lat < -16.5
     lon, lat = centroids["lowmonte"]
     assert -66 < lon < -63 and -39.5 < lat < -37.5
+
+
+def test_wri_trazo_annotates_land_once(tmp_parquet_file):
+    import shapely
+
+    # real fields, renumbered: each file holds the rows named below in the source's order
+    df = convert(
+        tmp_parquet_file,
+        "wri_trazo",
+        "wri_trazo",
+        # 532 with 534 drawn inside it, 1331 with 1333 in its hole, 1592 = 1537 + 1569 + 1591
+        "altoparanaAnnotations_2020.gpkg",
+        # 1946, 2016 and 2350, a copy of 1946 cut off at a chip edge
+        "testmatogrossoAnnotations_2020.gpkg",
+        # 1064, which mostly lies under testmatogrosso-2016, and 1413
+        "matogrosso_brazil_confidencesAnnotations_2020.gpkg",
+        # 245 and 246, which lie under matogrosso_brazil_confidences-1413
+        "matogrosso_brazil_lowconfidencesAnnotations_2020.gpkg",
+        # the same field drawn twice: 632 and 1388 alike, 876 inside 4550, 2444 and 3329 shifted
+        "matogrosso_brazil_lcdiAnnotations_2020.gpkg",
+    )
+    assert sorted(df.index) == [
+        # the parent outline 1592 makes way for its subdivisions; nested fields and holes stay
+        "altoparana-0",
+        "altoparana-1",
+        "altoparana-2",
+        "altoparana-3",
+        "altoparana-4",
+        "altoparana-5",
+        "altoparana-6",
+        # the test region is kept, the confidences region over lowconfidences
+        "matogrosso_brazil_confidences-1",
+        # of two drawings, the one inside the other goes, otherwise the later one
+        "matogrosso_brazil_lcdi-0",
+        "matogrosso_brazil_lcdi-3",
+        "matogrosso_brazil_lcdi-5",
+        # the clipped copy goes
+        "testmatogrosso-0",
+        "testmatogrosso-1",
+    ]
+    holed = shapely.from_wkb(df.loc["altoparana-2", "geometry"])
+    assert sum(len(part.interiors) for part in shapely.get_parts(holed)) == 1
 
 
 def test_wri_trazo_ml_splits_by_region(tmp_parquet_file):
