@@ -73,9 +73,11 @@ MOSTLY, ALMOST_ALL, TWICE = 0.5, 0.95, 0.9
 TOUCHING, TOUCH_DISTANCE = 0.25, 10
 # A parent outline is trimmed to the land its subdivisions (smaller fields mostly inside it)
 # leave if two or more of them run along its outline (SUBDIVIDES of theirs) and cover it to
-# MOSTLY. Parts of the rest narrower than SLIVER m are dropped, and the parent goes if nothing
-# else is left.
-SUBDIVIDES, SLIVER = 0.05, 10
+# MOSTLY. Strips of the rest narrower than SLIVER m (roads and gaps between the subdivisions) are
+# dropped, and the parent goes if nothing else is left.
+SUBDIVIDES, SLIVER = 0.05, 30
+# The grid trimmed outlines are snapped to, in degrees
+PRECISION = 1e-9
 # Of the rest of its outline, this share of a clipped copy runs along the axes of the chip CRS
 # (within AXIS_ANGLE degrees)
 CLIPPED, AXIS_ANGLE = 0.5, 2
@@ -143,16 +145,26 @@ def _is_clipped(inner, outer, region):
     return aligned >= CLIPPED * total
 
 
-def _trim(geom, pieces, crs):
-    """A parent outline without the land its pieces cover and without slivers, or None"""
-    rest = shapely.make_valid(shapely.difference(geom, shapely.union_all(pieces)))
-    parts = [p for p in shapely.get_parts(rest) if p.geom_type == "Polygon"]
-    if parts:
-        # a part wider than SLIVER somewhere survives shrinking by half of it
-        metric = gpd.GeoSeries(parts, crs=crs).to_crs(EQUAL_AREA_CRS)
-        wide = ~metric.buffer(-SLIVER / 2).is_empty.to_numpy()
-        parts = [p for p, w in zip(parts, wide) if w]
+def _polygons(geom):
+    parts = [p for p in shapely.get_parts(geom) if p.geom_type == "Polygon" and not p.is_empty]
     return shapely.multipolygons(parts) if parts else None
+
+
+def _trim(geom, pieces, crs):
+    """A parent outline without the land its pieces cover and without the strips of it narrower
+    than SLIVER, or None"""
+    rest = _polygons(shapely.make_valid(shapely.difference(geom, shapely.union_all(pieces))))
+    if rest is None:
+        return None
+    # what is SLIVER wide survives shrinking by half of it and growing back
+    metric = gpd.GeoSeries([rest], crs=crs).to_crs(EQUAL_AREA_CRS)
+    wide = metric.buffer(-SLIVER / 2).buffer(SLIVER / 2).to_crs(crs).iloc[0]
+    if wide.is_empty:
+        return None
+    rest = shapely.make_valid(shapely.intersection(rest, shapely.make_valid(wide)))
+    # snap to a grid of about 0.1 mm, so that the outline stays valid when reprojected
+    rest = shapely.make_valid(shapely.set_precision(_polygons(rest), PRECISION))
+    return _polygons(rest)
 
 
 def find_overlaps(gdf):

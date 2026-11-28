@@ -102,6 +102,7 @@ def test_wri_trazo_regions(tmp_parquet_file):
 
 
 def test_wri_trazo_annotates_land_once(tmp_parquet_file):
+    import geopandas as gpd
     import shapely
 
     # real fields, renumbered: each file holds the rows named below in the source's order
@@ -176,10 +177,18 @@ def test_wri_trazo_annotates_land_once(tmp_parquet_file):
     ]
     holed = shapely.from_wkb(df.loc["altoparana-2", "geometry"])
     assert sum(len(part.interiors) for part in shapely.get_parts(holed)) == 1
-    # the trimmed parents keep the land their subdivisions leave: 3.7 of 27 ha, 0.4 of 15 ha
+    # the trimmed parents keep the land their subdivisions leave, without the strips narrower
+    # than 30 m between them: 1.6 of 27 ha and 0.25 of 15 ha
     lcdib = df[df.index.str.startswith("matogrosso_brazil_lcdib")]
-    assert lcdib.loc["matogrosso_brazil_lcdib-4", "metrics:area"] == pytest.approx(37_000, rel=0.05)
-    assert df.loc["testmatogrosso-8", "metrics:area"] == pytest.approx(3_900, rel=0.05)
+    assert lcdib.loc["matogrosso_brazil_lcdib-4", "metrics:area"] == pytest.approx(16_300, rel=0.05)
+    assert df.loc["testmatogrosso-8", "metrics:area"] == pytest.approx(2_500, rel=0.05)
+    # and stay valid when reprojected
+    trimmed = gpd.GeoSeries(
+        shapely.from_wkb(df.loc[["matogrosso_brazil_lcdib-4", "testmatogrosso-8"], "geometry"]),
+        crs="EPSG:4326",
+    )
+    for crs in ("EPSG:4326", "EPSG:6933", "EPSG:32721"):
+        assert trimmed.to_crs(crs).is_valid.all(), crs
     parent = shapely.from_wkb(lcdib.loc["matogrosso_brazil_lcdib-4", "geometry"])
     pieces = [f"matogrosso_brazil_lcdib-{i}" for i in range(4)]
     pieces = shapely.union_all(shapely.from_wkb(lcdib.loc[pieces, "geometry"]))
