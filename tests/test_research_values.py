@@ -84,7 +84,8 @@ def test_wri_trazo_regions(tmp_parquet_file):
     by_region = df.groupby("region")
     # chiquitania's file holds its second and third polygon twice: kept once, ids stay row numbers
     assert sorted(df.index[df["region"] == "chiquitania"]) == ["chiquitania-0", "chiquitania-1"]
-    assert by_region.size().to_dict() == {"acre": 3, "chiquitania": 2, "lowmonte": 3, "testsoy": 3}
+    # testsoy's fixture holds its first three rows and 1342 with 1346, a field drawn inside it
+    assert by_region.size().to_dict() == {"acre": 3, "chiquitania": 2, "lowmonte": 3, "testsoy": 5}
     years = by_region["determination:datetime"].first().map(lambda d: d.year).to_dict()
     assert years == {"acre": 2020, "chiquitania": 2020, "lowmonte": 2023, "testsoy": 2020}
     assert "split" not in df.columns
@@ -110,14 +111,20 @@ def test_wri_trazo_annotates_land_once(tmp_parquet_file):
         "wri_trazo",
         # 532 with 534 drawn inside it, 1331 with 1333 in its hole, 1592 = 1537 + 1569 + 1591
         "altoparanaAnnotations_2020.gpkg",
-        # 1946, 2016 and 2350, a copy of 1946 cut off at a chip edge
+        # rows 0-2, and 1346, a curved field inside 1342 that runs along half of its outline
+        "testsoyAnnotations_2020.gpkg",
+        # 1922 and its redraw 2336 (94.9% inside it), 1946 with 2350, a copy of it clipped by a
+        # chip box, and 2016 and 2017
         "testmatogrossoAnnotations_2020.gpkg",
-        # 1064, which mostly lies under testmatogrosso-2016, and 1413
+        # 439 (inside lowconfidences-479), 1064 (mostly under testmatogrosso-2016/2017), 1413
         "matogrosso_brazil_confidencesAnnotations_2020.gpkg",
-        # 245 and 246, which lie under matogrosso_brazil_confidences-1413
+        # 245 and 246 under confidences-1413, and 479, a large field mostly annotated nowhere else
         "matogrosso_brazil_lowconfidencesAnnotations_2020.gpkg",
-        # the same field drawn twice: 632 and 1388 alike, 876 inside 4550, 2444 and 3329 shifted
+        # the same field drawn twice: 632 and 1388 alike, 876 inside 4550 (which is 89% inside
+        # 876), 2444 and 3329 shifted
         "matogrosso_brazil_lcdiAnnotations_2020.gpkg",
+        # 1422, subdivided into 596-599 for 86% of its area
+        "matogrosso_brazil_lcdibAnnotations_2020.gpkg",
     )
     assert sorted(df.index) == [
         # the parent outline 1592 makes way for its subdivisions; nested fields and holes stay
@@ -128,15 +135,28 @@ def test_wri_trazo_annotates_land_once(tmp_parquet_file):
         "altoparana-4",
         "altoparana-5",
         "altoparana-6",
-        # the test region is kept, the confidences region over lowconfidences
-        "matogrosso_brazil_confidences-1",
+        # the test region is kept, confidences over lowconfidences where half of a field is under
+        # the other region's fields
+        "matogrosso_brazil_confidences-0",
+        "matogrosso_brazil_confidences-2",
         # of two drawings, the one inside the other goes, otherwise the later one
         "matogrosso_brazil_lcdi-0",
         "matogrosso_brazil_lcdi-3",
         "matogrosso_brazil_lcdi-5",
-        # the clipped copy goes
+        # a parent its subdivisions don't cover stays, and all of them go
+        "matogrosso_brazil_lcdib-4",
+        "matogrosso_brazil_lowconfidences-2",
+        # the original stays, its redraw and the clipped copy go
         "testmatogrosso-0",
         "testmatogrosso-1",
+        "testmatogrosso-2",
+        "testmatogrosso-3",
+        # a curved field inside another is not a clipped copy
+        "testsoy-0",
+        "testsoy-1",
+        "testsoy-2",
+        "testsoy-3",
+        "testsoy-4",
     ]
     holed = shapely.from_wkb(df.loc["altoparana-2", "geometry"])
     assert sum(len(part.interiors) for part in shapely.get_parts(holed)) == 1

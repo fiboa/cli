@@ -40,24 +40,25 @@ REGIONS = {
 }
 FILE_NAME = re.compile(r"^(?P<region>.+)Annotations_(?P<year>\d{4})\.gpkg$")
 
+# Of the two active learning samples (low model confidence on farmland, and anywhere), whose
+# chips overlap in places and are drawn in about as much detail there, the first gives way to
+# the second (swap them to flip)
+GIVES_WAY = "matogrosso_brazil_lowconfidences"
+OTHER_SAMPLE = "matogrosso_brazil_confidences"
 # Where regions annotated the same chips, the fields of the region with the higher rank give way
-# (the others have rank 1). The test regions stay whole, so that no test field is also in train.
-# The chips of the active learning samples confidences and lowconfidences (low model confidence
-# on farmland and anywhere) overlap in places and are drawn in as much detail there; which of
-# them gives way is a choice.
-RANK = {
-    "testchiquitania": 0,
-    "testmatogrosso": 0,
-    "testsoy": 0,
-    "matogrosso_brazil_lowconfidences": 2,
-}
-# A field is "inside" another when this share of its area is
-MOSTLY, ALMOST_ALL = 0.5, 0.95
-# A parent outline that its subdivisions cover to this share is dropped
-TILED = 0.9
-# A field inside another is a copy, not a field drawn inside a field, when this share of its
-# outline runs along the other's outline (within TOUCH_DISTANCE m)
-TOUCHING, TOUCH_DISTANCE = 0.25, 10
+# (the others have rank 1); no field of a test region gives way to a train region
+RANK = {"testchiquitania": 0, "testmatogrosso": 0, "testsoy": 0, GIVES_WAY: 2}
+# Shares of a field's area: "mostly" and "almost all" inside another field, and two fields that
+# each lie this much inside the other are one field drawn twice
+MOSTLY, ALMOST_ALL, TWICE = 0.5, 0.95, 0.9
+# A parent outline that its subdivisions cover to this share is dropped for them; below it, the
+# parent stays and its subdivisions go, except those whose outline runs along less than CLEAR of
+# the parent's: those are fields drawn inside it
+TILED, CLEAR = 0.9, 0.05
+# A field inside another is a clipped copy, not a field drawn inside a field, when this share of
+# its outline runs along the other's outline (within TOUCH_DISTANCE m) and the rest is made of
+# straight lines (at least this share of it, as clipping makes)
+TOUCHING, TOUCH_DISTANCE, STRAIGHT = 0.25, 10, 0.5
 
 
 def _overlaps(geoms):
@@ -75,13 +76,36 @@ def _overlaps(geoms):
     )
 
 
+def _outline(geom):
+    """The exterior rings of a (multi)polygon, without its holes"""
+    rings = [shapely.get_exterior_ring(p) for p in shapely.get_parts(geom) if not p.is_empty]
+    return shapely.multilinestrings(rings) if rings else shapely.MultiLineString()
+
+
+def _touches(inner, outer, share=TOUCHING, straight=False):
+    """Whether this share of the inner field's outline runs along the outer's, and (if straight)
+    the rest of it is made of straight lines, as when a copy is clipped by a chip box"""
+    outline = _outline(inner)
+    near = shapely.buffer(_outline(outer), TOUCH_DISTANCE)
+    if shapely.length(shapely.intersection(outline, near)) < share * shapely.length(outline):
+        return False
+    if not straight:
+        return True
+    own = shapely.line_merge(shapely.difference(outline, near))
+    lines = [line for line in shapely.get_parts(own) if line.length > 2 * TOUCH_DISTANCE]
+    total = sum(line.length for line in lines)
+    # a straight line, or two meeting at a corner, keeps at most three points when simplified
+    simple = sum(line.length for line in lines if len(line.simplify(TOUCH_DISTANCE).coords) <= 3)
+    return total == 0 or simple >= STRAIGHT * total
+
+
 def find_overlaps(gdf):
-    """Why each field goes so that a piece of land is annotated once: "region", "parent" or
-    "copy", or "" to keep it.
+    """Why each field goes so that a piece of land is annotated once: "region", "twice",
+    "parent", "subdivision" or "copy", or "" to keep it.
 
     The source annotates some land twice: a region that annotated chips of another region again,
-    parent outlines next to their subdivisions, copies of a field cut off at a chip edge and
-    shifted copies. Fields drawn inside another field and real holes stay.
+    a field drawn twice, parent outlines next to their subdivisions and copies of a field clipped
+    by a chip box. Fields drawn inside another field and real holes stay.
     """
     geoms = shapely.make_valid(gdf.geometry.to_crs(EQUAL_AREA_CRS).values)
     area = shapely.area(geoms)
@@ -108,39 +132,47 @@ def find_overlaps(gdf):
         under = shapely.intersection(geoms[field], shapely.union_all(geoms[others]))
         return shapely.area(under) / area[field]
 
-    # (a) a field of a region with a higher rank goes if half of it lies under the other
-    # region's fields or if it holds half of one of them
+    # a field goes if half of it lies under fields of regions with a lower rank
     yields = ~same & (rank[left] > rank[right])
     fields = np.unique(left[yields])
     for field in fields[np.argsort(rank[fields], kind="stable")]:
-        held = right[yields & (left == field) & (right_in >= MOSTLY)]
-        if kept(held).any() or share_under(field, yields) >= MOSTLY:
+        if share_under(field, yields) >= MOSTLY:
             reason[field] = "region"
 
-    # (b) a parent outline that two or more subdivisions (smaller fields mostly inside it)
-    # cover; the largest first, so that a grandparent goes before its children are judged
+    # of a field drawn twice, the later row goes
+    for i in np.flatnonzero(
+        same & (left_in >= TWICE) & (right_in >= TWICE) & (row[left] > row[right])
+    ):
+        if kept(left[i]) and kept(right[i]):
+            reason[left[i]] = "twice"
+
+    # a parent outline with two or more subdivisions (smaller fields mostly inside it) goes if
+    # they cover it, otherwise its subdivisions go; the largest first, so that a grandparent is
+    # judged before its children
     children = same & (area[right] < area[left]) & (right_in >= MOSTLY)
     parents = np.unique(left[children])
     for field in parents[np.lexsort((row[parents], region[parents], -area[parents]))]:
-        if kept(field) and kept(right[children & (left == field)]).sum() >= 2:
-            if share_under(field, children) >= TILED:
-                reason[field] = "parent"
+        pieces = right[children & (left == field)]
+        pieces = pieces[kept(pieces)]
+        if not kept(field) or len(pieces) < 2:
+            continue
+        if share_under(field, children) >= TILED:
+            reason[field] = "parent"
+        else:
+            for piece in pieces:
+                if _touches(geoms[piece], geoms[field], share=CLEAR):
+                    reason[piece] = "subdivision"
 
-    # (c) a copy: a field almost all inside another that touches its outline or covers most of
-    # it goes; of two fields that each lie mostly inside the other, the later in the file goes
+    # a field almost all inside another goes if it covers most of it or is a clipped copy;
+    # of two fields that each lie mostly inside the other, the later row goes
     for i in np.flatnonzero(same & (left_in >= MOSTLY)):
         a, b = left[i], right[i]
         if not (kept(a) and kept(b)):
             continue
-        a_inside, b_inside = left_in[i] >= ALMOST_ALL, right_in[i] >= ALMOST_ALL
-        if a_inside and not b_inside:
-            outline = shapely.boundary(geoms[a])
-            along = shapely.intersection(
-                outline, shapely.buffer(shapely.boundary(geoms[b]), TOUCH_DISTANCE)
-            )
-            if right_in[i] >= MOSTLY or shapely.length(along) >= TOUCHING * shapely.length(outline):
+        if left_in[i] >= ALMOST_ALL and right_in[i] < ALMOST_ALL:
+            if right_in[i] >= MOSTLY or _touches(geoms[a], geoms[b], straight=True):
                 reason[a] = "copy"
-        elif a_inside or (not b_inside and right_in[i] >= MOSTLY):
+        elif right_in[i] >= MOSTLY and right_in[i] < ALMOST_ALL:
             reason[a if row[a] > row[b] else b] = "copy"
     return reason
 
@@ -156,7 +188,7 @@ class Converter(FiboaBaseConverter):
     crs = "EPSG:4326"
     short_name = "Trazo"
     title = "Trazo field boundary annotations for South America"
-    description = """
+    description = f"""
 Agricultural field boundaries drawn by hand by World Resources Institute (WRI) and Arizona State
 University annotators (in Paraguay with Mundo Agropecuario) in 25 sampling regions across South
 America, 2020-2024, to adapt the
@@ -174,11 +206,12 @@ others. `basemap` is the imagery the annotators drew on: monthly Planet basemaps
 regions, Sentinel-2 alone.
 
 Land that the source annotates twice is kept once. Some Mato Grosso regions annotated the same
-chips: a few train fields that lie under `testmatogrosso` fields and
-`matogrosso_brazil_lowconfidences` fields that lie under `matogrosso_brazil_confidences` fields
-are dropped. Within a region, a parent outline that its subdivisions cover is dropped for them,
-and so are copies of a field: polygons held twice, copies cut off at a chip edge and redrawn
-or shifted copies. Fields drawn inside another field without a hole in it are kept.
+chips: train fields that lie mostly under `testmatogrosso` fields and `{GIVES_WAY}` fields
+that lie mostly under `{OTHER_SAMPLE}` fields are dropped. Within a region, of a field
+drawn twice the later one is dropped; a parent outline is dropped where its subdivisions cover
+it, and otherwise the subdivisions that run along its outline; and so are copies of a field
+clipped by a chip box (lying inside another field, partly along its outline, cut by straight
+lines). Other fields drawn inside a field without a hole for them are kept.
 
 Every field inside the 256x256 Sentinel-2 chips of WRI's training data is annotated; annotations
 that reach beyond a chip are kept, but land outside the chips is not completely labelled.
